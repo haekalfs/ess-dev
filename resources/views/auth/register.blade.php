@@ -1,25 +1,29 @@
-@extends('layouts.login')
+@extends('layouts.main')
 
 @section ('content')
-<!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Dashboard</h1>
-    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-</div>
-@endsection
-@section('content-sidebar')
-
-@endsection
-
-@section('sidebar-info-ssl')
-<hr class="sidebar-divider my-0">
-<div class="text-center text"><br>
-    <p><strong><a>Supported Browser</a></strong><br>
-        <a>Chrome, Firefox, IE9, Opera, Safari, dan mobile browser terkini
-            <br>Min : 1024 x 768</a>
-    </p>
-</div>
-<div class="text-center">
-    <img class="text-center" width="150px" height="100px" src="{{ asset('img/ssl.png') }}" />
+<div style="display: flex;justify-content: center;align-items: center;">
+    <div class="margin-top:20px; border border-primary;" style="text-align: start; width:50%">
+        <h3 style="margin:10px">REGISTER FOR USER</h3>
+        <div style=" margin:30px">
+            <div>
+                <div class="row g-3 align-items-top">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <tr>
+                                    <tr><th>ID</th><td><input type="id" class="form-control border-dark"></td></tr>
+                                    <tr><th>User ID</th><td><input type="user_id" class="form-control border-dark"></td></tr>
+                                    <tr><th>Employee ID</th><td><input type="employee_id" class="form-control border-dark"></td></tr>
+                                    <tr><th>Full Name</th><td><input type="name" class="form-control border-dark"></td></tr>
+                                    <tr><th>Position</th><td><input type="Position" class="form-control border-dark"></td></tr>
+                                </tr>
+                            </table>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <input class="btn btn-primary" type="submit" value="Submit">
+                              </div>
+                        </div>
+                </div>
+            </div> 
+        </div> 
+    </div>         
 </div>
 @endsection

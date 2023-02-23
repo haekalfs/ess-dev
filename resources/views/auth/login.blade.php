@@ -40,8 +40,7 @@
         </div>
         <div class="lc-block mb-4">
             <div editable="rich">
-
-                <p class="lead">Employee Self Service (ESS) is a digital system that enables employees to manage their own personal and business information more easily and effectively. With ESS, employees can access various features and services available in it to take care of administrative and management needs related to their work.</p>
+                <p class="lead">Employee Self Service is a digital system that enables employees to manage their own personal and business information more easily and effectively. With ESS, employees can access various features and services available in it to take care of administrative and management needs related to their work.</p>
             </div>
         </div>
         <div class="lc-block">
