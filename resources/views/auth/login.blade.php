@@ -9,15 +9,15 @@
             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/pr-po.jpg') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
                             alt="First slide">
                     </div>
                     <div class="carousel-item">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/pr-po.jpg') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
                             alt="Second slide">
                     </div>
                     <div class="carousel-item">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/pr-po.jpg') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
                             alt="Third slide">
                     </div>
                 </div>
@@ -35,17 +35,12 @@
     <div class="col-md-6 col-xl-5">
         <div class="lc-block mb-3">
             <div editable="rich">
-                <h5 class="fw-bolder display-5"><strong>PR-PO Controller</strong> <i class="fas fa-fw fa-cogs"></i></h5>
+                <h5 class="fw-bolder display-5"><strong>ESS - Employee Self Service</strong> <i class="fas fa-fw fa-cogs"></i></h5>
             </div>
         </div>
         <div class="lc-block mb-4">
             <div editable="rich">
-
-                <p class="lead">PR-PO Controller is an app to manage purchase orders. It streamlines the process of
-                    creating and tracking purchase orders,
-                    and makes it easy to stay on top of your spending.
-                    PR-PO Controller lets you create and track purchase orders from anywhere, so you can always know
-                    where your money is going.</p>
+                <p class="lead">Employee Self Service is a digital system that enables employees to manage their own personal and business information more easily and effectively. With ESS, employees can access various features and services available in it to take care of administrative and management needs related to their work.</p>
             </div>
         </div>
         <div class="lc-block">
