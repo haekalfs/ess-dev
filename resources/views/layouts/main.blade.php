@@ -9,11 +9,10 @@
     <link href="{{ asset('img/PC-01A.png') }}" rel="icon">
     <link href="{{ asset('img/PC-01A.png') }}" rel="apple-touch-icon">
 
-
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>ESS</title>
+    <title>ESS Perdana</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -24,6 +23,7 @@
 
 
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/file_icon_download.css') }}">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
 
@@ -52,7 +52,113 @@
             <hr class="sidebar-divider my-0">
 
 
-            @yield('content-sidebar')
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item @yield('active-page-db')">
+                <a class="nav-link" href="/home">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Main Menu
+            </div>
+
+            <li class="nav-item @yield('active-page-myform')">
+                <a class="nav-link" href="/myform">
+                    <i class="fas fa-fw fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item @yield('active-page-po')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-database"></i>
+                    <span>Time Report</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Form:</h6>
+                        <a class="collapse-item" href="/pr/create">Create PR</a>
+                        <a class="collapse-item" href="/po/tambah">Create PO</a>
+                        <a class="collapse-item" href="#">Create PO <small style="color: red;"><i> &nbsp;&nbsp;Based on PR</i></small></a>
+                        <a class="collapse-item" href="/po-pr/history">History</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item @yield('active-page-approval')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                    aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-eye"></i>
+                    <span>Approval</span>
+                </a>
+                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Tools:</h6>
+                        {{-- @if (Auth::user()->role == 'administrator' && Auth::user()->department == 'BOD')
+                        <a class="collapse-item" href="/approval">PR/PO Approval</a>
+                        <a class="collapse-item" href="/approval_hr">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;HR</i></small></a>
+                        <a class="collapse-item" href="/approval_finance">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;Finance</i></small></a>
+                        @elseif(Auth::user()->role == 'administrator' && Auth::user()->department == 'HR')
+                        <a class="collapse-item" href="/approval_hr">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;HR</i></small></a>
+                        @elseif(Auth::user()->role == 'administrator' && Auth::user()->department == 'Finances')
+                        <a class="collapse-item" href="/approval_finance">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;Finance</i></small></a>
+                        @else
+                        <a class="collapse-item" href="#"><i class="fas fa-fw fa-user-alt-slash"></i><small style="color: red;"><i> &nbsp;&nbsp;Restricted Access</i></small></a></a>
+                        @endif --}}
+                    </div>
+                </div>
+            </li>
+
+            {{-- <li class="nav-item">
+    <a class="nav-link" href="">
+        <i class="fas fa-fw fa-exclamation-triangle"></i>
+        <span>History</span>
+    </a>
+</li> --}}
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Add-On
+            </div>
+
+
+            <li class="nav-item @yield('active-page-users')">
+                <a class="nav-link" href="/manage/users">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Manage Users</span></a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Having Troubles?
+            </div>
+
+            <!-- Nav Item - Tables -->
+            <li class="nav-item">
+                <a class="nav-link" href="mailto:haekal@perdana.co.id">
+                    <i class="fas fa-fw fa-paper-plane"></i>
+                    <span>Contact Administrator</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
             <br>
             <style>
                 .text {
@@ -88,7 +194,9 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-search fa-fw"></i>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                aria-labelledby="searchDropdown">
                                 <form class="form-inline mr-auto w-100 navbar-search">
                                     <div class="input-group">
                                         <input type="text" class="form-control bg-light border-0 small"
@@ -139,7 +247,7 @@
                         </li>
 
                     </ul>
-                    <a href="https://github.com/haekalfs/AMS" title="Made by Haekal Sastradilaga"><i class="fas fa-fw fa-laptop-code"></i></a>
+
                 </nav>
                 <!-- End of Topbar -->
 
@@ -198,5 +306,15 @@
     <script src="{{ asset('js/demo/datatables-demo.js') }}"></script>
 
 </body>
+
+<script>
+function isconfirm(){
+	if(!confirm('Are you sure want to do this ?')){
+	    event.preventDefault();
+	    return;
+	}
+    return true;
+}
+</script>
 
 </html>
