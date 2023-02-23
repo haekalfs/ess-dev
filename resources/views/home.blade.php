@@ -5,20 +5,32 @@
         <div class="col-sm-6 mb-3 mb-sm-0">
             <div class="card">
                 <h5 class="card-header" style="background-color: #edbb20; color:white; font-weight:800">Employee Information</h5>
-                <div class="card-body">
-                  <h5 class="card-title">Special title treatment</h5>
-                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
+                <div class="table-responsive">
+                  <table class="table table-bordered" width="100%" cellspacing="0">
+                      <tr>
+                          <tr><th>ID</th></tr>
+                          <tr><th>User ID</th></tr>
+                          <tr><th>Employee ID</th></tr>
+                          <tr><th>Full Name</th></tr>
+                          <tr><th>Position</th></tr>
+                      </tr>
+                  </table>
                 </div>
-              </div>
+            </div>  
         </div>
         <div class="col-sm-6">
             <div class="card">
                 <h5 class="card-header" style="background-color: #edbb20; color:white; font-weight:800">Leave Balance</h5>
-                <div class="card-body">
-                  <h5 class="card-title">Special title treatment</h5>
-                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
+                <div class="table-responsive">
+                  <table class="table table-bordered" width="100%" cellspacing="0">
+                      <tr>
+                          <tr><th>Leaves Balance</th></tr>
+                          <tr><th>5 Year Term</th></tr>
+                          <tr><th>Weekend Replacement</th></tr>
+                          <tr><th>Total Leave Available</th></tr>
+                          <tr><th>Sick</th></tr>
+                      </tr>
+                  </table>
                 </div>
             </div>
       </div>
