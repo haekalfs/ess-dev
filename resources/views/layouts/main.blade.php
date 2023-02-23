@@ -82,10 +82,7 @@
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Form:</h6>
-                        <a class="collapse-item" href="/pr/create">Create PR</a>
-                        <a class="collapse-item" href="/po/tambah">Create PO</a>
-                        <a class="collapse-item" href="#">Create PO <small style="color: red;"><i> &nbsp;&nbsp;Based on PR</i></small></a>
-                        <a class="collapse-item" href="/po-pr/history">History</a>
+                        <a class="collapse-item" href="/timesheet">Timesheet</a>
                     </div>
                 </div>
             </li>
@@ -101,27 +98,10 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Tools:</h6>
-                        {{-- @if (Auth::user()->role == 'administrator' && Auth::user()->department == 'BOD')
-                        <a class="collapse-item" href="/approval">PR/PO Approval</a>
-                        <a class="collapse-item" href="/approval_hr">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;HR</i></small></a>
-                        <a class="collapse-item" href="/approval_finance">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;Finance</i></small></a>
-                        @elseif(Auth::user()->role == 'administrator' && Auth::user()->department == 'HR')
-                        <a class="collapse-item" href="/approval_hr">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;HR</i></small></a>
-                        @elseif(Auth::user()->role == 'administrator' && Auth::user()->department == 'Finances')
-                        <a class="collapse-item" href="/approval_finance">PR/PO Approval <small style="color: red;"><i> &nbsp;&nbsp;Finance</i></small></a>
-                        @else
-                        <a class="collapse-item" href="#"><i class="fas fa-fw fa-user-alt-slash"></i><small style="color: red;"><i> &nbsp;&nbsp;Restricted Access</i></small></a></a>
-                        @endif --}}
+                        <a class="collapse-item" href="/approval_finance">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
                     </div>
                 </div>
             </li>
-
-            {{-- <li class="nav-item">
-    <a class="nav-link" href="">
-        <i class="fas fa-fw fa-exclamation-triangle"></i>
-        <span>History</span>
-    </a>
-</li> --}}
             <!-- Divider -->
             <hr class="sidebar-divider">
 

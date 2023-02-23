@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,8 +16,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home');
-});
+})->middleware('auth');
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+//Timesheet
+Route::get('/timesheet', 'TimesheetController@index')->middleware('auth');
+Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
+Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities');
