@@ -43,7 +43,7 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                 <div class="sidebar-brand-icon">
-                    <img src="{{ asset('img/PC-02.png') }}" style="height: 65px; width: 135px;" />
+                    <img src="{{ asset('img/PC-02.png') }}" style="height: auto; max-width: 90%;" />
                 </div>
                 <div class="sidebar-brand-text mx-3"></div>
             </a>
@@ -76,7 +76,7 @@
             <li class="nav-item @yield('active-page-po')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-clock"></i>
+                    <i class="fas fa-fw fa-calendar"></i>
                     <span>Time Report</span>
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
