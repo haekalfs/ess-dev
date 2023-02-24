@@ -43,7 +43,7 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                 <div class="sidebar-brand-icon">
-                    <img src="{{ asset('img/PC-02.png') }}" style="height: 40px; width: 90px;" />
+                    <img src="{{ asset('img/PC-02.png') }}" style="height: 65px; width: 135px;" />
                 </div>
                 <div class="sidebar-brand-text mx-3"></div>
             </a>
@@ -55,8 +55,8 @@
             <!-- Nav Item - Dashboard -->
             <li class="nav-item @yield('active-page-db')">
                 <a class="nav-link" href="/home">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>Home</span></a>
             </li>
 
             <!-- Divider -->
@@ -76,7 +76,7 @@
             <li class="nav-item @yield('active-page-po')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-database"></i>
+                    <i class="fas fa-fw fa-clock"></i>
                     <span>Time Report</span>
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
@@ -91,7 +91,7 @@
             <li class="nav-item @yield('active-page-approval')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
                     aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-eye"></i>
+                    <i class="fas fa-fw fa-check-circle"></i>
                     <span>Approval</span>
                 </a>
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
