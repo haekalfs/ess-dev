@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Timesheet;
 use Carbon\Carbon;
+use Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class TimesheetController extends Controller
 {
@@ -13,21 +16,73 @@ class TimesheetController extends Controller
         return view('timereport.timesheet');
     }
 
-    public function timesheet_entry($id)
+    public function timesheet_entry($year, $month)
     {
-        $startOfMonth = Carbon::now()->setMonth($id)->startOfMonth();
-        $endOfMonth = Carbon::now()->setMonth($id)->endOfMonth();
-        $firstDayOfWeek = $startOfMonth->startOfWeek();
-
-
-        $timesheets = Timesheet::whereBetween('ts_date', [$startOfMonth, $endOfMonth])->get();
-        
-        $dates = [];
-        for ($date = $firstDayOfWeek; $date <= $endOfMonth; $date->addDay()) {
-            $dates[] = $date->copy();
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+    
+        // Get the number of days in the selected month
+        $numDays = Carbon::create($year, $month)->daysInMonth;
+    
+        // Create an empty array to store the calendar data
+        $calendar = [];
+    
+        // Add the days of the week as the first row
+        $calendar[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+        // Get the last day of the previous month
+        $lastDayPrevMonth = Carbon::create($year, $month, 1)->subDay()->day;
+    
+        // Get the day of the week that the 1st of the month falls on
+        $dayOfWeek = Carbon::create($year, $month, 1)->dayOfWeek;
+    
+        // Create a counter to keep track of the day we're on
+        $dayCounter = 1;
+    
+        // Create a flag to indicate whether we've added the first day of the month
+        $firstDayAdded = false;
+    
+        // Loop through each day of the month and check if it is a holiday
+        for ($i = 0; $i < 6; $i++) {
+            // Create an empty array to represent the current week
+            $week = [];
+    
+            // Add the days from the previous month for the first week
+            if (!$firstDayAdded) {
+                for ($j = $dayOfWeek - 1; $j >= 0; $j--) {
+                    $week[] = $lastDayPrevMonth - $j;
+                }
+    
+                // Add the first day of the month
+                $week[] = $dayCounter;
+                $dayCounter++;
+                $firstDayAdded = true;
+            }
+    
+            // Add the rest of the days of the week
+            for ($j = count($week); $j < 7 && $dayCounter <= $numDays; $j++) {
+                $week[] = $dayCounter;
+                $dayCounter++;
+            }
+    
+            // Pad out the end of the last week with empty cells
+            while (count($week) < 7) {
+                $week[] = '';
+            }
+    
+            // Add the week to the calendar array
+            $calendar[] = $week;
+    
+            // If we've added all the days in the month, we're done
+            if ($dayCounter > $numDays) {
+                break;
+            }
         }
-        return view('timereport.timesheet_entry', ['entry' => $id, 'dates' => $dates, 'savedActivities' => $timesheets]);
+    
+        // Return the calendar view with the calendar data
+        return view('timereport.timesheet_entry', compact('calendar', 'year', 'month'));
     }
+    
 
     public function save(Request $request)
     {
@@ -42,6 +97,119 @@ class TimesheetController extends Controller
                 ]
             );
         }
+        Session::flash('success',"Timesheet has been saved!");
         return redirect()->back();
+    }
+
+    public function showCalendar($year, $month)
+    {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the number of days in the specified month and year
+        $numDays = Carbon::create($year, $month)->daysInMonth;
+
+        // Create an empty array to store the calendar data
+        $calendar = [];
+
+        // Loop through each day of the month and check if it is a holiday
+        for ($i = 1; $i <= $numDays; $i++) {
+            $date = Carbon::create($year, $month, $i)->format('Ymd');
+            $holiday = $this->tanggalMerah($date);
+            $calendar[$i] = [
+                'date' => $i,
+                'holiday' => $holiday,
+            ];
+        }
+
+        // Return the calendar view with the calendar data
+        return view('timereport.testing', compact('calendar'));
+    }
+
+    public function tanggalMerah($value) {
+        $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"),true);
+
+        //check tanggal merah berdasarkan libur nasional
+        if(isset($array[$value])) {
+            return "tanggal merah ".$array[$value]["deskripsi"];
+        }
+
+        //check tanggal merah berdasarkan hari minggu
+        elseif(date("D",strtotime($value))==="Sun") {
+            return "tanggal merah hari minggu";
+        }
+
+        //bukan tanggal merah
+        else {
+            return "bukan tanggal merah";
+        }
+    }
+
+    public function save_entries(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'task' => 'required',
+            'clickedDate' => 'required',
+            'location' => 'required',
+            'from' => 'required',
+            'to' => 'required',
+            'activity' => 'required',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+    
+        // Timesheet::updateOrCreate(
+        //     ['ts_user_id' => Auth::user()->user_id, 'ts_date' => $request->clickedDate],
+        //     [
+        //         'ts_from_time' => $request->from,
+        //         'ts_to_time' => $request->to,
+        //         'ts_activity' => $request->activity,
+        //         'ts_task' => $request->task,
+        //         'ts_location' => $request->location,
+        //         // Add more activity columns as needed
+        //     ]
+        // );
+        $entry = new Timesheet;
+        $entry->ts_user_id = Auth::user()->user_id;
+        $entry->ts_date = $request->clickedDate;
+        $entry->ts_task = $request->task;
+        $entry->ts_location = $request->location;
+        $entry->ts_from_time = $request->from;
+        $entry->ts_to_time = $request->to;
+        $entry->ts_activity = $request->activity;
+        $entry->save();
+    
+        return response()->json(['success' => 'Entry saved successfully.']);
+    }
+
+    public function getActivities($year, $month)
+    {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        // Get the Timesheet records between the start and end dates
+        $activities = Timesheet::whereBetween('ts_date', [$startDate, $endDate])
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+        
+        return response()->json($activities);
+    }
+
+    public function destroy($id)
+    {
+        $activity = Timesheet::find($id);
+
+        if ($activity) {
+            $activity->delete();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Activity not found']);
+        }
     }
 }

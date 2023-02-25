@@ -19,14 +19,14 @@
                 </thead>
                 <tbody>
                     @php
-                    $currentMonth = date('m');
+                    $currentMonth = date('m'); $currentYear = date('Y');
                     @endphp
                     @foreach (range(1, $currentMonth) as $entry)
                     <tr>
                         <td>{{ date("F", mktime(0, 0, 0, $entry, 1)) }}</td>
                         <td></td>
                         <td></td>
-                        <td class="action"><a href="/timesheet/entry/{{ $entry }}" class="btn btn-primary btn-sm">View Details</a></td>
+                        <td class="action"><a href="/timesheet/entry/{{ $currentYear }}/{{ $entry }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit</a><a href="/timesheet/entry/{{ $entry }}" class="btn btn-primary btn-sm" style="margin-left: 3%;">Preview</a></td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -36,7 +36,7 @@
 </div>
 <style>
 .action{
-    width: 150px;
+    width: 140px;
 }
 </style>
 @endsection

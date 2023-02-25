@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Timesheet extends Model
 {
-    use SoftDeletes;
 
     protected $primaryKey = 'ts_id';
     protected $table = "timesheet";

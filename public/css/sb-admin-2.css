@@ -11284,3 +11284,17 @@ body.sidebar-toggled footer.sticky-footer {
    background-color: rgba(0, 0, 0, 0);
    border:none;
 }
+
+.zoom80{
+  zoom: 80%;
+}
+
+.zoom90{
+  zoom: 90%;
+}
+
+.zoom70{
+  zoom: 70%;
+}
+
+
