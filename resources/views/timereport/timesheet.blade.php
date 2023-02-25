@@ -16,17 +16,20 @@
                         <th>Last Updated At</th>
                         <th>Status</th>
                         <th>Action</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    @php
-                    $currentMonth = date('m'); $currentYear = date('Y');
-                    @endphp
-                    @foreach (range(1, $currentMonth) as $entry)
+                    @foreach ($entries as $entry)
                     <tr>
-                        <td>{{ date("F", mktime(0, 0, 0, $entry, 1)) }}</td>
+                        <td>{{ $entry['month'] }}</td>
+                        <td>{{ $entry['lastUpdatedAt'] }}</td>
                         <td></td>
-                        <td></td>
-                        <td class="action"><a href="/timesheet/entry/{{ $currentYear }}/{{ $entry }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit</a><a href="/timesheet/entry/{{ $entry }}" class="btn btn-primary btn-sm" style="margin-left: 3%;">Preview</a></td>
+                        <td class="action">
+                            <a href="{{ $entry['editUrl'] }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit
+                            </a>
+                            <a href="{{ $entry['previewUrl'] }}" class="btn btn-primary btn-sm" style="margin-left: 3%;">Preview</a>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

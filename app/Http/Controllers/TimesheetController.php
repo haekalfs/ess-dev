@@ -7,14 +7,36 @@ use Carbon\Carbon;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TimesheetController extends Controller
 {
     public function index()
-    {
-        return view('timereport.timesheet');
+{
+    $currentMonth = date('m');
+    $currentYear = date('Y');
+    $entries = [];
+    foreach (range(1, $currentMonth) as $entry) {
+        $month = date("F", mktime(0, 0, 0, $entry, 1));
+        $lastUpdate = DB::table('timesheet')
+            ->whereMonth('ts_date', $entry)
+            ->whereYear('ts_date', $currentYear)
+            ->orderBy('updated_at', 'desc')
+            ->first();
+        if ($lastUpdate) {
+            $lastUpdatedAt = $lastUpdate->updated_at;
+            $editUrl = "/timesheet/entry/$currentYear/$entry";
+        } else {
+            $lastUpdatedAt = 'None';
+            $editUrl = "/timesheet/entry/$currentYear/$entry";
+        }
+        $previewUrl = "/timesheet/entry/$entry";
+        $entries[] = compact('month', 'lastUpdatedAt', 'editUrl', 'previewUrl');
     }
+    return view('timereport.timesheet', compact('entries'));
+}
+
 
     public function timesheet_entry($year, $month)
     {
