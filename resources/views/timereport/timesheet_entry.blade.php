@@ -119,7 +119,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Preview</a><input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Submit">
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Preview</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
         </div>
     </div>
     <!-- Card Body -->
@@ -203,13 +203,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" format="HH:mm" name="from" id="start-time">
+                                    <input type="time" class="form-control" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" format="HH:mm" name="to" id="end-time">
+                                    <input type="time" class="form-control" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="to" id="end-time">
                                 </div>
                             </div>
                         </div>

@@ -28,6 +28,7 @@ Route::get('/testing', 'TimesheetController@calendar')->middleware('auth');
 //Timesheet
     //Editing
 Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name('save.entries');//testing
+
 Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry')->middleware('auth');
 Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
 Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
@@ -35,6 +36,8 @@ Route::delete('/activities/{id}', 'TimesheetController@destroy');
     //Preview
 Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview-timesheet');
 Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print');
+//submit
+Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet');
 
 
 // Testing

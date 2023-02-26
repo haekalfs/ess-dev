@@ -249,9 +249,8 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
-        $activities->ts_status = '20';
-        $activities->save();
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')
+        ->update(['ts_status_id' => '20']);
         
         // return response()->json($activities);
         Session::flash('success',"Timereport $year - 0$month has been submitted!");
