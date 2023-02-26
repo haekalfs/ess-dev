@@ -37,7 +37,7 @@ function deleteActivity(activityId) {
         url: '/activities/' + activityId,
         type: 'DELETE',
         success: function(response) {
-            fetchActivities(year, month);
+            fetchActivities(yearput, monthput);
         },
         error: function(response) {
             console.log(response);
@@ -50,9 +50,9 @@ function deleteActivity(activityId) {
     fetchActivities(yearput, monthput);
     
     // Function to fetch the activities via AJAX
-function fetchActivities(year, month) {
+function fetchActivities(yearput, monthput) {
     $.ajax({
-        url: '/get-activities/' + year + '/' + month,
+        url: '/get-activities/' + yearput + '/' + monthput,
         type: 'GET',
         success: function(response) {
             // Clear the table body
@@ -111,6 +111,7 @@ function fetchActivities(year, month) {
                 // Update the card body with the counts for each location
                 var cardBody = $('.calculations');
                 cardBody.empty(); // Clear the card body
+                // cardBody.append($('<td><h6 class="m-0 font-weight-bold text-primary">Leaves Calculation</h6></td>'));
                 var cardBodyTotals = $('.calculationTotals');
                 cardBodyTotals.empty(); // Clear the card body
                 $.each(counts, function(location, count) {
@@ -172,7 +173,7 @@ function fetchActivities(year, month) {
                 $('.alert-success').fadeOut('slow');
             }, 5000);
         // Fetch the updated list of activities
-        fetchActivities(year, month);
+        fetchActivities(yearput, monthput);
       },
       error: function(jqXHR, textStatus, errorThrown) {
             $('.alert-danger').show();

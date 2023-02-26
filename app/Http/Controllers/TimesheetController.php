@@ -201,6 +201,7 @@ class TimesheetController extends Controller
         $entry->ts_from_time = $request->from;
         $entry->ts_to_time = $request->to;
         $entry->ts_activity = $request->activity;
+        $entry->ts_status_id = '20';
         $entry->save();
     
         return response()->json(['success' => 'Entry saved successfully.']);
@@ -212,13 +213,11 @@ class TimesheetController extends Controller
         date_default_timezone_set("Asia/Jakarta");
 
         // Get the start and end dates for the selected month
-        $startDate = Carbon::create($year, $month)->startOfMonth();
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate, $endDate])
-                                ->orderBy('created_at', 'desc')
-                                ->get();
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
         
         return response()->json($activities);
     }
