@@ -203,13 +203,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" name="from" id="start-time">
+                                    <input type="time" class="form-control" format="HH:mm" name="from" id="start-time">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" name="to" id="end-time">
+                                    <input type="time" class="form-control" format="HH:mm" name="to" id="end-time">
                                 </div>
                             </div>
                         </div>
