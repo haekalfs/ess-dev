@@ -39,8 +39,86 @@ active
                 </div>
             </div>
             <!-- Card Body -->
-            <div class="card-body">
-                
+            <div class="card-body zoom90">
+                <div class="row">
+                    <div class="col-md-3 align-items-center text-center">
+                        <div class="col-md-3 text-center">
+                            <img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 220px;" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Employee Information</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-sm">
+                                    <td>Nama</td>
+                                    <td>: {{$user_info->name}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <td>Service year</td>
+                                    <td>: <?php 
+                                    $hired_date = $user_info->users_detail->hired_date; // assuming $hired_date is in Y-m-d format
+                                    $current_date = date('Y-m-d'); // get the current date
+
+                                    // create DateTime objects from the hired_date and current_date values
+                                    $hired_date_obj = new DateTime($hired_date);
+                                    $current_date_obj = new DateTime($current_date);
+
+                                    // calculate the difference between the hired_date and current_date
+                                    $diff = $current_date_obj->diff($hired_date_obj);
+
+                                    // get the total number of years from the difference object
+                                    $total_years_of_service = $diff->y;
+
+                                    // output the total years of service
+                                    echo $total_years_of_service.' Years';
+                                    ?></td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <td>Assignment</td>
+                                    <td>: {{$user_info->users_detail->hired_date}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-5">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Timesheet Information</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-sm">
+                                    <td>Periode :</td>
+                                    <td>: {{ date("F", mktime(0, 0, 0, $month, 1)); }} {{ $year }}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <td>Status</td>
+                                    <td>: 
+                                        @if ($lastUpdate->ts_status_id == '10')
+                                        Saved
+                                        @elseif($lastUpdate->ts_status_id == '20')
+                                        Submitted
+                                        @elseif($lastUpdate->ts_status_id == '29')
+                                        Approved
+                                        @else
+                                        Waiting for Approval
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <td>Updated At</td>
+                                    <td>: {{ $lastUpdate->updated_at }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -50,31 +128,33 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Timesheet Preview</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" target="_blank" id="manButton" style="margin-right: 10px;">Download</a><input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Submit">
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" target="_blank" id="manButton" style="margin-right: 10px;">Download</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
         </div>
     </div>
     <!-- Card Body -->
     <div class="card-body">
-        <div class="table-responsive zoom80">
+        <div class="table-responsive zoom90 table-sm">
             <table class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="width: 80px;">Day</th>
                         <th>Date</th>
                         <th>Task</th>
                         <th>Location</th>
+                        <th style="width: 600px;">Activity</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Activity</th>
                 </thead>
                 <tbody>
                     @foreach($timesheet as $timesheets)
                     <tr>
+                        <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
                         <td>{{ $timesheets->ts_date }}</td>
                         <td>{{ $timesheets->ts_task }}</td>
                         <td>{{ $timesheets->ts_location }}</td>
+                        <td>{{ $timesheets->ts_activity }}</td>
                         <td>{{ $timesheets->ts_from_time }}</td>
                         <td>{{ $timesheets->ts_to_time }}</td>
-                        <td>{{ $timesheets->ts_activity }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -88,14 +168,32 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Approval History</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Timesheet Workflow</h6>
                 {{-- <div class="text-right">
                     <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Reset">
                 </div> --}}
             </div>
             <!-- Card Body -->
             <div class="card-body">
-                
+                <table class="table table-sm zoom90">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Activity</th>
+                            <th>Updated at</th>
+                            <th>Notes</th>
+                    </thead>
+                    <tbody>
+                        @foreach($workflow as $workflows)
+                        <tr>
+                            <td>{{ $workflows->user_id }}</td>
+                            <td>{{ $workflows->activity }}</td>
+                            <td>{{ $workflows->updated_at }}</td>
+                            <td>{{ $workflows->note }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -110,9 +208,18 @@ active
             </div>
             <!-- Card Body -->
             <div class="card-body">
-                
+                <table class="zoom80">
+                    {{-- <thead>
+                        <tr class="calculations">
+                        </tr>
+                    </thead> --}}
+                    <tbody class="calculations">
+                    </tbody>
+                </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
             </div>
         </div>
     </div>
 </div>
+<input type="hidden" id="yearSel" value="{{ $year }}">
+<input type="hidden" id="monthSel" value="{{ $month }}">
 @endsection
