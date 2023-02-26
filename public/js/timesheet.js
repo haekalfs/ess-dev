@@ -201,7 +201,7 @@ function fetchActivities(yearput, monthput) {
 // }
 
 $(function() {
-    $('#to').timepicker({
+    $('#start-time').timepicker({
       showMeridian: false,
       minuteStep: 1,
       defaultTime: false
@@ -209,7 +209,7 @@ $(function() {
   });
 
   $(function() {
-    $('#from').timepicker({
+    $('#end-time').timepicker({
       showMeridian: false,
       minuteStep: 1,
       defaultTime: false
