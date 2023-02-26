@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@section('active-page-timesheet')
+active
+@endsection
+
 @section('content')
 <!-- Page Heading -->
 <h1 class="h3 mb-2 text-gray-800">Timesheet Entry</h1>
@@ -115,7 +119,7 @@
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <button class="btn btn-secondary btn-sm" type="button" id="manButton" style="margin-right: 10px;">Preview</button><input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Submit">
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Preview</a><input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Submit">
         </div>
     </div>
     <!-- Card Body -->

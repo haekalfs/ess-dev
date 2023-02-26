@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Timesheet;
 use Carbon\Carbon;
 use Session;
+use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,29 +14,29 @@ use Illuminate\Support\Facades\Validator;
 class TimesheetController extends Controller
 {
     public function index()
-{
-    $currentMonth = date('m');
-    $currentYear = date('Y');
-    $entries = [];
-    foreach (range(1, $currentMonth) as $entry) {
-        $month = date("F", mktime(0, 0, 0, $entry, 1));
-        $lastUpdate = DB::table('timesheet')
-            ->whereMonth('ts_date', $entry)
-            ->whereYear('ts_date', $currentYear)
-            ->orderBy('updated_at', 'desc')
-            ->first();
-        if ($lastUpdate) {
-            $lastUpdatedAt = $lastUpdate->updated_at;
-            $editUrl = "/timesheet/entry/$currentYear/$entry";
-        } else {
-            $lastUpdatedAt = 'None';
-            $editUrl = "/timesheet/entry/$currentYear/$entry";
+    {
+        $currentMonth = date('m');
+        $currentYear = date('Y');
+        $entries = [];
+        foreach (range(1, $currentMonth) as $entry) {
+            $month = date("F", mktime(0, 0, 0, $entry, 1));
+            $lastUpdate = DB::table('timesheet')
+                ->whereMonth('ts_date', $entry)
+                ->whereYear('ts_date', $currentYear)
+                ->orderBy('updated_at', 'desc')
+                ->first();
+            if ($lastUpdate) {
+                $lastUpdatedAt = $lastUpdate->updated_at;
+                $editUrl = "/timesheet/entry/$currentYear/$entry";
+            } else {
+                $lastUpdatedAt = 'None';
+                $editUrl = "/timesheet/entry/$currentYear/$entry";
+            }
+            $previewUrl = "/timesheet/entry/preview/$currentYear/$entry";
+            $entries[] = compact('month', 'lastUpdatedAt', 'editUrl', 'previewUrl');
         }
-        $previewUrl = "/timesheet/entry/$entry";
-        $entries[] = compact('month', 'lastUpdatedAt', 'editUrl', 'previewUrl');
+        return view('timereport.timesheet', compact('entries'));
     }
-    return view('timereport.timesheet', compact('entries'));
-}
 
 
     public function timesheet_entry($year, $month)
@@ -181,18 +182,6 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
-    
-        // Timesheet::updateOrCreate(
-        //     ['ts_user_id' => Auth::user()->user_id, 'ts_date' => $request->clickedDate],
-        //     [
-        //         'ts_from_time' => $request->from,
-        //         'ts_to_time' => $request->to,
-        //         'ts_activity' => $request->activity,
-        //         'ts_task' => $request->task,
-        //         'ts_location' => $request->location,
-        //         // Add more activity columns as needed
-        //     ]
-        // );
         $entry = new Timesheet;
         $entry->ts_user_id = Auth::user()->user_id;
         $entry->ts_date = $request->clickedDate;
@@ -201,7 +190,7 @@ class TimesheetController extends Controller
         $entry->ts_from_time = $request->from;
         $entry->ts_to_time = $request->to;
         $entry->ts_activity = $request->activity;
-        $entry->ts_status_id = '20';
+        $entry->ts_status_id = '10';
         $entry->save();
     
         return response()->json(['success' => 'Entry saved successfully.']);
@@ -232,5 +221,56 @@ class TimesheetController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Activity not found']);
         }
+    }
+
+    public function preview($year, $month)
+    {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        // Get the Timesheet records between the start and end dates
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
+        
+        // return response()->json($activities);
+        return view('timereport.preview', compact('year', 'month'), ['timesheet' => $activities]);
+    }
+
+    public function submit_timesheet($year, $month)
+    {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        // Get the Timesheet records between the start and end dates
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
+        $activities->ts_status = '20';
+        $activities->save();
+        
+        // return response()->json($activities);
+        Session::flash('success',"Timereport $year - 0$month has been submitted!");
+        return redirect()->back();
+    }
+
+    public function print($year, $month)
+    {
+    	// Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        // Get the Timesheet records between the start and end dates
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')->get();
+ 
+    	$pdf = PDF::loadview('timereport.timereport_pdf',['timesheet' => $activities]);
+    	return $pdf->download('timesheet - '. $year . $month.'.pdf');
     }
 }

@@ -67,14 +67,14 @@
                 Main Menu
             </div>
 
-            <li class="nav-item @yield('active-page-myform')">
-                <a class="nav-link" href="/myform">
+            <li class="nav-item @yield('active-page-myprofile')">
+                <a class="nav-link" href="/myprofile">
                     <i class="fas fa-fw fa-user-circle"></i>
                     <span>My Profile</span>
                 </a>
             </li>
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item @yield('active-page-po')">
+            <li class="nav-item @yield('active-page-timesheet')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-calendar"></i>
@@ -99,7 +99,7 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Tools:</h6>
-                        <a class="collapse-item" href="/approval_finance">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
+                        <a class="collapse-item" href="/approval/director">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
                     </div>
                 </div>
             </li>
