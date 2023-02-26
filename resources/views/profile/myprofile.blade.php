@@ -56,7 +56,7 @@ active
                     <div class="col-md-9">
                         <div class="row">
                             <div class="col-md-12">
-                                <h1 class="m-0 font-weight-bold text-dark">[{{$user_info->users_detail->employee_id}}] {{Auth::user()->name}}</h1>
+                                <h1 class="m-0 font-weight-bold text-dark">[{{$user_info->users_detail->employee_id}}] {{Auth::user()->name}}</h1><br>
                             </div>
                             <div class="col-md-12">
                                 <div class="row">
