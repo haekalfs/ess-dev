@@ -11,30 +11,28 @@
 			font-size: 9pt;
 		}
 	</style>
-	<center>
-		<h5>Timesheet</h4>
-		<h6><a target="_blank" href="https://www.malasngoding.com/membuat-laporan-…n-dompdf-laravel/">www.ess.perdana.co.id</a></h5>
-	</center>
  
-	<table class='table table-bordered'>
+	<table class='table table-bordered table-sm'>
 		<thead>
             <tr>
+                <th style="width: 10px;">Day</th>
                 <th>Date</th>
                 <th>Task</th>
                 <th>Location</th>
+                <th style="width: 300px;">Activity</th>
                 <th>From</th>
                 <th>To</th>
-                <th>Activity</th>
         </thead>
         <tbody>
             @foreach($timesheet as $timesheets)
             <tr>
-                <td>{{ $timesheets->ts_date }}</td>
+                <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
+                <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('d-M-Y') }}</td>
                 <td>{{ $timesheets->ts_task }}</td>
                 <td>{{ $timesheets->ts_location }}</td>
+                <td>{{ $timesheets->ts_activity }}</td>
                 <td>{{ $timesheets->ts_from_time }}</td>
                 <td>{{ $timesheets->ts_to_time }}</td>
-                <td>{{ $timesheets->ts_activity }}</td>
             </tr>
             @endforeach
         </tbody>

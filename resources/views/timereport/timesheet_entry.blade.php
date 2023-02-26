@@ -105,7 +105,7 @@ active
                                 <tr class="calculations">
                                 </tr>
                             </thead> --}}
-                            <tbody class="calculations">
+                            <tbody>
                             </tbody>
                         </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
                     </div>
@@ -119,7 +119,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Preview</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/{{$year}}/{{$month}}" id="manButton">Preview</a>
         </div>
     </div>
     <!-- Card Body -->
@@ -128,22 +128,24 @@ active
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="width: 10px;">Day</th>
                         <th>Date</th>
                         <th>Task</th>
                         <th>Location</th>
+                        <th style="width: 600px;">Activity</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Activity</th>
                         <th style="width: 10px;">Action</th>
                 </thead>
                 <tfoot>
                     <tr>
+                        <th style="width: 10px;">Day</th>
                         <th>Date</th>
                         <th>Task</th>
                         <th>Location</th>
+                        <th style="width: 600px;">Activity</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Activity</th>
                         <th style="width: 10px;">Action</th>
                     </tr>
                 </tfoot>

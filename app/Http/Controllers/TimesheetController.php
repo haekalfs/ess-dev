@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Timesheet;
+use App\Models\Timesheet_workflow;
+use App\Models\User;
 use Carbon\Carbon;
 use Session;
 use PDF;
@@ -235,8 +237,17 @@ class TimesheetController extends Controller
         // Get the Timesheet records between the start and end dates
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
         
+        $user_info = User::find(Auth::user()->id);
+
+        $workflow = Timesheet_workflow::where('user_id', Auth::user()->user_id)->where('month_periode', $month)->get();
+
+        $lastUpdate = DB::table('timesheet')
+                ->whereMonth('ts_date', $month)
+                ->whereYear('ts_date', $year)
+                ->orderBy('updated_at', 'desc')
+                ->first();
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month'), ['timesheet' => $activities]);
+        return view('timereport.preview', compact('year', 'month'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow, 'lastUpdate' => $lastUpdate]);
     }
 
     public function submit_timesheet($year, $month)
@@ -252,6 +263,7 @@ class TimesheetController extends Controller
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')
         ->update(['ts_status_id' => '20']);
         
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->user_id, 'month_periode' => $month],['activity' => 'Submitted','note' => '', 'user_timesheet' => Auth::user()->user_id]);
         // return response()->json($activities);
         Session::flash('success',"Timereport $year - 0$month has been submitted!");
         return redirect()->back();
