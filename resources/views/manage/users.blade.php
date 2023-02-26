@@ -28,4 +28,45 @@ active
 </div>
 @endif
 
+<div class="container">
+    <div class="card mt-5">
+        <div class="card-header text-center">
+            <h3>Data Pegawai</h3>
+        </div>
+        <div class="card-body">
+            <a href="/users/tambah" class="btn btn-primary">Input Pegawai Baru</a>
+            <br/>
+            <br/>
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Employee ID</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Posisi</th>
+                        <th>Role</th>
+                        <th>Opsi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $p)
+                    <tr>
+                        <td>{{ $p->user_id }}</td>
+                        <td>{{ $p->employee_id }}</td>
+                        <td>{{ $p->name }}</td>
+                        <td>{{ $p->email }}</td>
+                        <td>{{ $p->position}}</td>
+                        <td>{{ $p->role }}</td>
+                        <td>
+                            <a href="/users/edit/{{ $p->id }}" class="btn btn-warning">Edit</a>
+                            <a href="/users/hapus/{{ $p->id }}" class="btn btn-danger">Hapus</a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 @endsection

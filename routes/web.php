@@ -56,5 +56,7 @@ Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth');
-
+Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth');
+Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth');
+Route::put('/users/update/{id}', 'UserController@update')->middleware('auth');
 
