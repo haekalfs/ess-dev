@@ -200,18 +200,3 @@ function fetchActivities(yearput, monthput) {
 //     }
 // }
 
-$(function() {
-    $('#start-time').timepicker({
-      showMeridian: false,
-      minuteStep: 1,
-      defaultTime: false
-    });
-  });
-
-  $(function() {
-    $('#end-time').timepicker({
-      showMeridian: false,
-      minuteStep: 1,
-      defaultTime: false
-    });
-  });
