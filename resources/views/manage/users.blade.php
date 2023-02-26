@@ -45,7 +45,8 @@ active
                         <th>Nama</th>
                         <th>Email</th>
                         <th>Posisi</th>
-                        <th>Role</th>
+                        <th>Employee Status</th>
+                        <th>Hired Date</th>
                         <th>Opsi</th>
                     </tr>
                 </thead>
@@ -53,11 +54,12 @@ active
                     @foreach($data as $p)
                     <tr>
                         <td>{{ $p->user_id }}</td>
-                        <td>{{ $p->employee_id }}</td>
-                        <td>{{ $p->name }}</td>
-                        <td>{{ $p->email }}</td>
-                        <td>{{ $p->position}}</td>
-                        <td>{{ $p->role }}</td>
+                        <td>{{$p->users_detail->employee_id}}</td>
+                        <td>{{$p->name}}</td>
+                        <td>{{$p->email}}</td>
+                        <td>{{$p->users_detail->position}}</td>
+                        <td>{{$p->users_detail->employee_status}}</td>
+                        <td>{{$p->users_detail->hired_date}}</td>
                         <td>
                             <a href="/users/edit/{{ $p->id }}" class="btn btn-warning">Edit</a>
                             <a href="/users/hapus/{{ $p->id }}" class="btn btn-danger">Hapus</a>

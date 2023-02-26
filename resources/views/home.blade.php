@@ -122,7 +122,7 @@
                     </tr>
                     <tr>
                         <th>Employee ID</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->employee_id}}</td>
                     </tr>
                     <tr>
                         <th>Full Name</th>
@@ -130,11 +130,11 @@
                     </tr>
                     <tr>
                         <th>Hired Date</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->hired_date}}</td>
                     </tr>
                     <tr>
-                        <th>Service Year</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                        <th>Position</th>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->position}}</td>
                     </tr>
                   </tr>
               </table>
