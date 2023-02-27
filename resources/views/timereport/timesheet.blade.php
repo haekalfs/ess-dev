@@ -5,6 +5,19 @@ active
 @endsection
 
 @section('content')
+@if ($message = Session::get('success'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('failed'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Time Report</h6>
@@ -28,10 +41,12 @@ active
                         <td>{{ $entry['month'] }}</td>
                         <td>{{ $entry['lastUpdatedAt'] }}</td>
                         <td>{{ $entry['status'] }}</td>
-                        <td class="action">
-                            <a href="{{ $entry['editUrl'] }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit
-                            </a>
+                        <td class="action text-center">
+                            @if (!$entry['isSubmitted'])
+                                <a href="{{ $entry['editUrl'] }}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit
+                                </a>
+                            @endif
                             <a href="{{ $entry['previewUrl'] }}" class="btn btn-primary btn-sm" style="margin-left: 3%;">Preview</a>
                         </td>
                     </tr>
@@ -43,7 +58,7 @@ active
 </div>
 <style>
 .action{
-    width: 140px;
+    width: 180px;
 }
 </style>
 @endsection

@@ -1,13 +1,13 @@
 @extends('layouts.main')
 
-@section('active-page-approval')
+@section('active-page-timesheet')
 active
 @endsection
 
 @section('content')
 <!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Timesheet Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></h1>
-<p class="mb-4">Approval Page.</p>
+<h1 class="h3 mb-2 text-gray-800">Timesheet Review <small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></h1>
+<p class="mb-4">Review Page.</p>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -31,8 +31,9 @@ active
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Approval History</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Timereport Employees</h6>
         <div class="text-right">
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/review/fm/export" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export (XLS)</a>
         </div>
     </div>
     <div class="card-body">
@@ -41,7 +42,7 @@ active
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Request Date</th>
+                        <th>Status</th>
                         <th>Timesheet Periode</th>
                         <th>Action</th>
                     </tr>
@@ -53,11 +54,10 @@ active
                         <td>{{ $approval->user_timesheet }}</td>
                         <td>{{ $approval->date_submitted }}</td>
                         <td>{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
-                        <td class="action">
-                            <a href="/approval/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve
+                        <td class="action text-center">
+                            <a href="/timesheet/review/fm/export" class="btn btn-primary btn-sm">
+                                <i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download
                             </a>
-                            <a href="/reject/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
                         </td>
                         @else
                         <td></td>

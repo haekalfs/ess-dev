@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Users_detail;
 use Carbon\Carbon;
 use Session;
+use Illuminate\Support\Facades\Crypt;
 use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,15 +39,23 @@ class TimesheetController extends Controller
                 }else{
                     $status = "Rejected";
                 }
+                $encryptYear = Crypt::encrypt($currentYear);
+                $encryptMonth = Crypt::encrypt($entry);
+                $isSubmitted = ($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29');
                 $lastUpdatedAt = $lastUpdate->updated_at;
-                $editUrl = "/timesheet/entry/$currentYear/$entry";
+                $editUrl = "/timesheet/entry/".$encryptYear."/".$encryptMonth;
             } else {
+                $encryptYear = Crypt::encrypt($currentYear);
+                $encryptMonth = Crypt::encrypt($entry);
+                $isSubmitted = false;
                 $status = 'None';
                 $lastUpdatedAt = 'None';
-                $editUrl = "/timesheet/entry/$currentYear/$entry";
+                $editUrl = "/timesheet/entry/".$encryptYear."/".$encryptMonth;
             }
-            $previewUrl = "/timesheet/entry/preview/$currentYear/$entry";
-            $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl');
+            $encryptYear = Crypt::encrypt($currentYear);
+            $encryptMonth = Crypt::encrypt($entry);
+            $previewUrl = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
+            $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
         }
         return view('timereport.timesheet', compact('entries'));
     }
@@ -54,6 +63,13 @@ class TimesheetController extends Controller
 
     public function timesheet_entry($year, $month)
     {
+        $year = Crypt::decrypt($year);
+        $month = Crypt::decrypt($month);
+        $lastUpdate = DB::table('timesheet')
+                ->whereMonth('ts_date', $month)
+                ->whereYear('ts_date', $year)
+                ->orderBy('updated_at', 'desc')
+                ->first();
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
     
@@ -114,9 +130,24 @@ class TimesheetController extends Controller
                 break;
             }
         }
-    
-        // Return the calendar view with the calendar data
-        return view('timereport.timesheet_entry', compact('calendar', 'year', 'month'));
+        if($lastUpdate){
+            if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
+                Session::flash('failed',"You've already submitted your timereport!");
+                return redirect()->route('timesheet');
+            }else{
+                $encryptYear = Crypt::encrypt($year);
+                $encryptMonth = Crypt::encrypt($month);
+                $previewButton = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
+                return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton'));
+            }
+        } else {
+            $encryptYear = Crypt::encrypt($year);
+            $encryptMonth = Crypt::encrypt($month);
+            $previewButton = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
+            return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton'));
+        }
+        // // Return the calendar view with the calendar data
+        // return view('timereport.timesheet_entry', compact('calendar', 'year', 'month'));
     }
     
 
@@ -239,6 +270,8 @@ class TimesheetController extends Controller
 
     public function preview($year, $month)
     {
+        $year = Crypt::decrypt($year);
+        $month = Crypt::decrypt($month);
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 

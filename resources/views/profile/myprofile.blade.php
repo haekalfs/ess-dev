@@ -57,10 +57,26 @@ active
                         <div class="row">
                             <div class="col-md-12">
                                 <h1 class="m-0 font-weight-bold text-dark">[{{$user_info->users_detail->employee_id}}] {{Auth::user()->name}}</h1><br>
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr class="table-sm">
+                                            <td>Department</td>
+                                            <td style="width: 400px;">: Finances And General Affair</td>
+                                            <td style="width: 200px;">Employment Status</td>
+                                            <td>: {{$user_info->users_detail->status}}</td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Status</td>
+                                            <td style="width: 200px;">: {{$user_info->users_detail->hired_date}}</td>
+                                            <td style="width: 200px;">Hired Date</td>
+                                            <td>: {{$user_info->users_detail->hired_date}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-7">
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
@@ -69,42 +85,41 @@ active
                                             </thead>
                                             <tbody>
                                                 <tr class="table-sm">
-                                                    <td>Nama</td>
-                                                    <td>: {{$user_info->name}}</td>
+                                                    <td>Address</td>
+                                                    <td>: {{$user_info->users_detail->usr_address}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Hired Date</td>
-                                                    <td>: {{$user_info->users_detail->hired_date}}</td>
+                                                    <td>Current Address</td>
+                                                    <td>: {{$user_info->users_detail->current_address}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Assignment</td>
-                                                    <td>: 2 Years</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <table class="table table-borderless">
-                                            <thead>
-                                                <tr>
-                                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Document Information</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="table-sm">
-                                                    <td>Nama</td>
-                                                    <td>: {{$user_info->name}}</td>
+                                                    <td>City</td>
+                                                    <td>: {{$user_info->users_detail->usr_address_city}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Hired Date</td>
-                                                    <td>: {{$user_info->users_detail->hired_date}}</td>
+                                                    <td>Postal Code</td>
+                                                    <td>: {{$user_info->users_detail->usr_address_postal}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Assignment</td>
-                                                    <td>: 2 Years</td>
+                                                    <td>Province</td>
+                                                    <td>: {{$user_info->users_detail->employee_id}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Email</td>
+                                                    <td>: {{$user_info->email}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Home Phone</td>
+                                                    <td>: {{$user_info->users_detail->usr_phone_home}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Mobile Phone</td>
+                                                    <td>: {{$user_info->users_detail->usr_phone_mobile}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
@@ -113,29 +128,64 @@ active
                                             </thead>
                                             <tbody>
                                                 <tr class="table-sm">
-                                                    <td>Periode :</td>
-                                                    {{-- <td>: {{ date("F", mktime(0, 0, 0, $month, 1)); }} {{ $year }}</td> --}}
+                                                    <td>Birth Date :</td>
+                                                    <td>: {{$user_info->users_detail->usr_dob}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Status</td>
-                                                    <td>: 
-                                                        {{-- @if ($lastUpdate->ts_status_id == '10')
-                                                        Saved
-                                                        @elseif($lastUpdate->ts_status_id == '20')
-                                                        Submitted
-                                                        @elseif($lastUpdate->ts_status_id == '29')
-                                                        Approved
-                                                        @else
-                                                        Waiting for Approval
-                                                        @endif --}}
-                                                    </td>
+                                                    <td>Birth Place</td>
+                                                    <td>: {{$user_info->users_detail->usr_birth_place}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Updated At</td>
-                                                    {{-- <td>: {{ $lastUpdate->updated_at }}</td> --}}
+                                                    <td>Gender</td>
+                                                    <td>: {{$user_info->users_detail->usr_gender}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Religion</td>
+                                                    <td>: {{$user_info->users_detail->usr_religion}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Merital Status</td>
+                                                    <td>: {{$user_info->users_detail->usr_merital_status}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Num of Children</td>
+                                                    <td>: {{$user_info->users_detail->usr_children}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Document Information</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>NPWP</td>
+                                                    <td>: {{$user_info->users_detail->usr_npwp}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Identity Type</td>
+                                                    <td>: {{$user_info->users_detail->usr_id_type}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Identity No</td>
+                                                    <td>: {{$user_info->users_detail->usr_id_no}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Identity Expiration</td>
+                                                    <td>: {{$user_info->users_detail->usr_id_expiration}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-5">
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
@@ -144,27 +194,31 @@ active
                                             </thead>
                                             <tbody>
                                                 <tr class="table-sm">
-                                                    <td>Nama</td>
+                                                    <td>Bank Name</td>
+                                                    <td>: {{$user_info->users_detail->usr_bank_name}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Bank Branch</td>
+                                                    <td>: {{$user_info->users_detail->usr_bank_branch}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Bank Account Num</td>
+                                                    <td>: {{$user_info->users_detail->usr_bank_account}}</td>
+                                                </tr>
+                                                <tr class="table-sm">
+                                                    <td>Bank Account Name</td>
                                                     <td>: {{$user_info->name}}</td>
-                                                </tr>
-                                                <tr class="table-sm">
-                                                    <td>Hired Date</td>
-                                                    <td>: {{$user_info->users_detail->hired_date}}</td>
-                                                </tr>
-                                                <tr class="table-sm">
-                                                    <td>Assignment</td>
-                                                    <td>: 2 Years</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
+                                </div><br>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div><br>
     </div>
 </div>
 @endsection

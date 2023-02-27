@@ -61,7 +61,6 @@ active
                                         <td style="color: red">{{ $day }}</td>
                                     @else
                                     <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}">{{ $day }}</td>
-
                                     @endif
                                 @endforeach
                             </tr>
@@ -119,7 +118,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/{{$year}}/{{$month}}" id="manButton">Preview</a>
+            <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
         </div>
     </div>
     <!-- Card Body -->
