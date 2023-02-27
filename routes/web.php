@@ -34,10 +34,10 @@ Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store
 Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
 Route::delete('/activities/{id}', 'TimesheetController@destroy');
     //Preview
-Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview-timesheet');
-Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print');
-//submit
-Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet');
+Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview-timesheet')->middleware('auth');
+Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print')->middleware('auth');
+    //submit
+Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
 
 
 // Testing
@@ -49,6 +49,10 @@ Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->nam
 
 //Approval
 Route::get('/approval/director', 'ApprovalController@approval_director')->name('approval-director');
+Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director');
+Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director');
+
+Route::get('/timesheet/export', 'ApprovalController@export_excel');
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');

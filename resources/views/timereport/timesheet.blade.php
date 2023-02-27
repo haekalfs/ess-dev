@@ -13,7 +13,7 @@ active
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+            <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>Month</th>
@@ -27,7 +27,7 @@ active
                     <tr>
                         <td>{{ $entry['month'] }}</td>
                         <td>{{ $entry['lastUpdatedAt'] }}</td>
-                        <td></td>
+                        <td>{{ $entry['status'] }}</td>
                         <td class="action">
                             <a href="{{ $entry['editUrl'] }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit

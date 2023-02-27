@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
 use App\Models\User;
+use App\Models\Users_detail;
 use Carbon\Carbon;
 use Session;
 use PDF;
@@ -28,14 +29,24 @@ class TimesheetController extends Controller
                 ->orderBy('updated_at', 'desc')
                 ->first();
             if ($lastUpdate) {
+                if($lastUpdate->ts_status_id == '10'){
+                    $status = "Saved";
+                }elseif($lastUpdate->ts_status_id == '20'){
+                    $status = "Submitted";
+                }elseif($lastUpdate->ts_status_id == '29'){
+                    $status = "Approved";
+                }else{
+                    $status = "Rejected";
+                }
                 $lastUpdatedAt = $lastUpdate->updated_at;
                 $editUrl = "/timesheet/entry/$currentYear/$entry";
             } else {
+                $status = 'None';
                 $lastUpdatedAt = 'None';
                 $editUrl = "/timesheet/entry/$currentYear/$entry";
             }
             $previewUrl = "/timesheet/entry/preview/$currentYear/$entry";
-            $entries[] = compact('month', 'lastUpdatedAt', 'editUrl', 'previewUrl');
+            $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl');
         }
         return view('timereport.timesheet', compact('entries'));
     }
@@ -172,6 +183,7 @@ class TimesheetController extends Controller
 
     public function save_entries(Request $request)
     {
+        date_default_timezone_set("Asia/Jakarta");
         $validator = Validator::make($request->all(), [
             'task' => 'required',
             'clickedDate' => 'required',
@@ -239,15 +251,34 @@ class TimesheetController extends Controller
         
         $user_info = User::find(Auth::user()->id);
 
-        $workflow = Timesheet_workflow::where('user_id', Auth::user()->user_id)->where('month_periode', $month)->get();
+        $workflow = Timesheet_workflow::where('user_id', Auth::user()->user_id)->where('month_periode', $year.$month)->get();
 
+        $info = [];
         $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $month)
                 ->whereYear('ts_date', $year)
                 ->orderBy('updated_at', 'desc')
                 ->first();
+        if ($lastUpdate) {
+            if($lastUpdate->ts_status_id == '10'){
+                $status = "Saved";
+            }elseif($lastUpdate->ts_status_id == '20'){
+                $status = "Submitted";
+            }elseif($lastUpdate->ts_status_id == '29'){
+                $status = "Approved";
+            }elseif($lastUpdate->ts_status_id == '404'){
+                $status = "Rejected";
+            }else{
+                $status = "404";
+            }
+            $lastUpdatedAt = $lastUpdate->updated_at;
+        } else {
+            $status = 'None';
+            $lastUpdatedAt = 'None';
+        }
+        $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow, 'lastUpdate' => $lastUpdate]);
+        return view('timereport.preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
@@ -263,7 +294,7 @@ class TimesheetController extends Controller
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')
         ->update(['ts_status_id' => '20']);
         
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->user_id, 'month_periode' => $month],['activity' => 'Submitted','note' => '', 'user_timesheet' => Auth::user()->user_id]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->user_id, 'month_periode' => $year.$month],['activity' => 'Submitted', 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->user_id]);
         // return response()->json($activities);
         Session::flash('success',"Timereport $year - 0$month has been submitted!");
         return redirect()->back();
@@ -278,10 +309,14 @@ class TimesheetController extends Controller
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
+        $user_info = User::find(Auth::user()->id);
+
+        $user_info_details = Users_detail::where('user_id', Auth::user()->id)->first();
+        $user_info_emp_id = $user_info_details->employee_id;
         // Get the Timesheet records between the start and end dates
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')->get();
  
-    	$pdf = PDF::loadview('timereport.timereport_pdf',['timesheet' => $activities]);
+    	$pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'),['timesheet' => $activities,  'user_info' => $user_info,]);
     	return $pdf->download('timesheet - '. $year . $month.'.pdf');
     }
 }

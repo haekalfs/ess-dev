@@ -93,28 +93,20 @@ active
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($info as $info)
                                 <tr class="table-sm">
                                     <td>Periode :</td>
                                     <td>: {{ date("F", mktime(0, 0, 0, $month, 1)); }} {{ $year }}</td>
                                 </tr>
                                 <tr class="table-sm">
                                     <td>Status</td>
-                                    <td>: 
-                                        @if ($lastUpdate->ts_status_id == '10')
-                                        Saved
-                                        @elseif($lastUpdate->ts_status_id == '20')
-                                        Submitted
-                                        @elseif($lastUpdate->ts_status_id == '29')
-                                        Approved
-                                        @else
-                                        Waiting for Approval
-                                        @endif
-                                    </td>
+                                    <td>: {{ $info['status'] }}</td>
                                 </tr>
                                 <tr class="table-sm">
                                     <td>Updated At</td>
-                                    <td>: {{ $lastUpdate->updated_at }}</td>
+                                    <td>: {{ $info['lastUpdatedAt'] }}</td>
                                 </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -144,19 +136,41 @@ active
                         <th style="width: 600px;">Activity</th>
                         <th>From</th>
                         <th>To</th>
+                        <th>Hours</th>
                 </thead>
                 <tbody>
+                    <?php $total_work_hours = 0; ?>
                     @foreach($timesheet as $timesheets)
-                    <tr>
-                        <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
-                        <td>{{ $timesheets->ts_date }}</td>
-                        <td>{{ $timesheets->ts_task }}</td>
-                        <td>{{ $timesheets->ts_location }}</td>
-                        <td>{{ $timesheets->ts_activity }}</td>
-                        <td>{{ $timesheets->ts_from_time }}</td>
-                        <td>{{ $timesheets->ts_to_time }}</td>
-                    </tr>
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
+                            <td>{{ $timesheets->ts_date }}</td>
+                            <td>{{ $timesheets->ts_task }}</td>
+                            <td>{{ $timesheets->ts_location }}</td>
+                            <td>{{ $timesheets->ts_activity }}</td>
+                            <td>{{ $timesheets->ts_from_time }}</td>
+                            <td>{{ $timesheets->ts_to_time }}</td>
+                            <td>
+                            <?php 
+                            $start_time = strtotime($timesheets->ts_from_time);
+                            $end_time = strtotime($timesheets->ts_to_time);
+                            $time_diff_seconds = $end_time - $start_time;
+                            $time_diff_hours = gmdate('H', $time_diff_seconds);
+                            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes;
+                            ?>
+                            </td>
+                        </tr>
                     @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive zoom90 table-sm">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr class="table-sm">
+                        <td class="m-0 font-weight-bold text-danger" width="1160px">Total Workhours</td>
+                        <td class="text-center"><?php echo intval($total_work_hours); ?> Hours</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

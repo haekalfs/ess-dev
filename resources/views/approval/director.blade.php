@@ -36,29 +36,40 @@ active
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+            <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Employee ID</th>
                         <th>Request Date</th>
                         <th>Timesheet Periode</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($approval as $approvals)
+                    @foreach($approvals as $approval)
                     <tr>
-                        <td>{{ $approvals->user_timesheet }}</td>
+                        @if ($approval)
+                        <td>{{ $approval->user_timesheet }}</td>
+                        <td>{{ $approval->date_submitted }}</td>
+                        <td>{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
+                        <td class="action">
+                            <a href="/approval/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve
+                            </a>
+                            <a href="/reject/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
+                        </td>
+                        @else
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td class="action">
-                            <a href="" class="btn btn-primary btn-sm">
+                            <a href="#" class="btn btn-primary btn-sm">
                                 <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit
                             </a>
-                            <a href="" class="btn btn-primary btn-sm" style="margin-left: 3%;">Preview</a>
+                            <a href="#" class="btn btn-danger btn-sm" style="margin-left: 3%;">Preview</a>
                         </td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>
@@ -68,7 +79,7 @@ active
 </div>
 <style>
 .action{
-    width: 140px;
+    width: 190px;
 }
 </style>
 @endsection
