@@ -8,24 +8,20 @@
                 <div class="table-responsive">
                   <table class="table table-bordered">
                         <tr>
-                            <th>ID</th>
-                            <td style="text-align: start; font-weight:650">01</td>
-                        </tr>
-                        <tr>
                             <th>User ID</th>
-                            <td style="text-align: start; font-weight:650">12345</td>
+                            <td style="text-align: start; font-weight:650">{{ Auth::user()->user_id }}</td>
                         </tr>
                         <tr>
                             <th>Employee ID</th>
-                            <td style="text-align: start; font-weight:650">1720090</td>
+                            <td style="text-align: start; font-weight:650">{{ Auth::user()->employee_id }}</td>
                         </tr>
                         <tr>
                             <th>Full Name</th>
-                            <td style="text-align: start; font-weight:650">Dio febrian</td>
+                            <td style="text-align: start; font-weight:650">{{ Auth::user()->name }}</td>
                         </tr>
                         <tr>
                             <th>Position</th>
-                            <td style="text-align: start; font-weight:650">Frontend Web</td>
+                            <td style="text-align: start; font-weight:650">{{ Auth::user()->position }}</td>
                         </tr>
                       </tr>
                   </table>
@@ -53,10 +49,6 @@
                         <tr>
                             <th>Total Leave Available</th>
                             <td style="text-align: start; font-weight:650">8</td>
-                        </tr>
-                        <tr>
-                            <th>Sick</th>
-                            <td style="text-align: start; font-weight:650">2</td>
                         </tr>
                       </tr>
                   </table>
@@ -130,7 +122,7 @@
                     </tr>
                     <tr>
                         <th>Employee ID</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->employee_id}}</td>
                     </tr>
                     <tr>
                         <th>Full Name</th>
@@ -138,11 +130,11 @@
                     </tr>
                     <tr>
                         <th>Hired Date</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->hired_date}}</td>
                     </tr>
                     <tr>
-                        <th>Service Year</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                        <th>Position</th>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->position}}</td>
                     </tr>
                   </tr>
               </table>
