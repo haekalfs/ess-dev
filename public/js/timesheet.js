@@ -60,7 +60,7 @@ function fetchActivities(yearput, monthput) {
             // Check if the response is empty or null
             if (response.length === 0) {
                 // Display a message to the user
-                $('#activity-table').append($('<tr><td class="text-center" colspan="7">No data available in table.</td></tr>'));
+                $('#activity-table').append($('<tr><td class="text-center" colspan="8">No data available in table.</td></tr>'));
                 $('.calculations').text('No data available.');
             } else {
                 // Create an object to store the counts for each location

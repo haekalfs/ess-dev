@@ -9,15 +9,15 @@
             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
                             alt="First slide">
                     </div>
                     <div class="carousel-item">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
                             alt="Second slide">
                     </div>
                     <div class="carousel-item">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
                             alt="Third slide">
                     </div>
                 </div>
