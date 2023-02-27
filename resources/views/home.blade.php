@@ -109,7 +109,7 @@ active
                                             alt="First slide">
                                     </div>
                                     <div class="carousel-item">
-                                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess.png') }}"
+                                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
                                             alt="Second slide">
                                     </div>
                                     <div class="carousel-item">

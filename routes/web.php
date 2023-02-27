@@ -40,32 +40,32 @@ Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController
     //submit
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
 //Review
-Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance');
-Route::get('/timesheet/review/fm/export', 'ApprovalController@export_excel');
+Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware(['checkRole:admin']);
+Route::get('/timesheet/review/fm/export', 'ApprovalController@export_excel')->middleware(['checkRole:admin']);
 
 
 // Testing
 Route::get('/development', 'HomeController@notification_indev');
-Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar');
-Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update');
-Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
-Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities');
+Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar')->middleware(['checkRole:admin']);
+Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update')->middleware(['checkRole:admin']);
+Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth')->middleware(['checkRole:admin']);
+Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities')->middleware(['checkRole:admin']);
 
 //Approval
-Route::get('/approval', 'ApprovalController@index')->name('approval.main');
-Route::get('/approval/director', 'ApprovalController@approval_director')->name('approval-director');
-Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director');
-Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director');
+Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware(['checkRole:admin']);
+Route::get('/approval/director', 'ApprovalController@approval_director')->name('approval-director')->middleware(['checkRole:admin']);
+Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director')->middleware(['checkRole:admin']);
+Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware(['checkRole:admin']);
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
 
 
 //manage users
-Route::get('/manage/users', 'UserController@index')->middleware('auth');
-Route::get('/users/tambah', 'UserController@tambah')->middleware('auth');
-Route::get('/users/store', 'UserController@store')->middleware('auth');
+Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/users/tambah', 'UserController@tambah')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/users/store', 'UserController@store')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth');
-Route::put('/users/update/{id}', 'UserController@update')->middleware('auth');
-Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth');
+Route::put('/users/update/{id}', 'UserController@update')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->middleware(['checkRole:admin']);
 
