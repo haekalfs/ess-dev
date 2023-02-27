@@ -82,8 +82,11 @@
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Form:</h6>
+                        <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
+                        <a class="collapse-item" href="/development">Summary</a>
+                        <h6 class="collapse-header">Restricted Access:</h6>
+                        <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
                     </div>
                 </div>
             </li>
@@ -99,7 +102,7 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Tools:</h6>
-                        <a class="collapse-item" href="/approval/director">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
+                        <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
                     </div>
                 </div>
             </li>
