@@ -81,7 +81,7 @@ class ApprovalController extends Controller
 		$currentMonth = date('m');
         $currentYear = date('Y');
 
-        $approvals = Timesheet_workflow::where('ts_status_id', '20')->whereYear('date_submitted', $currentYear)->get();
+        $approvals = Timesheet_workflow::where('ts_status_id', '29')->whereYear('date_submitted', $currentYear)->get();
 		return view('review.finance', compact('approvals'));
 	}
 }
