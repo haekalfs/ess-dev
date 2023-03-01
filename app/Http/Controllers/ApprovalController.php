@@ -38,9 +38,9 @@ class ApprovalController extends Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $activities = Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
-        ->where('ts_user_id', "haekals")
+        ->where('ts_user_id', $user_timesheet)
         ->update(['ts_status_id' => '29']);
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->user_id, 'month_periode' => $year.$month],['date_approved' => date('Y-m-d'),'activity' => 'Approved', 'ts_status_id' => '29', 'note' => '', 'user_timesheet' => $user_timesheet]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'month_periode' => $year.$month],['date_approved' => date('Y-m-d'),'activity' => 'Approved', 'ts_status_id' => '29', 'note' => '', 'user_timesheet' => $user_timesheet]);
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
         Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
@@ -53,7 +53,7 @@ class ApprovalController extends Controller
         $activities = Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
         ->where('ts_user_id', "haekals")
         ->update(['ts_status_id' => '404']);
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->user_id, 'month_periode' => $year.$month],['activity' => 'Approved', 'ts_status_id' => '404', 'note' => '', 'user_timesheet' => $user_timesheet]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'month_periode' => $year.$month],['activity' => 'Approved', 'ts_status_id' => '404', 'note' => '', 'user_timesheet' => $user_timesheet]);
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
         Session::flash('warning',"Your rejected $user_timesheet $yearA - $monthA timereport!");

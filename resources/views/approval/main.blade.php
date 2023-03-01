@@ -102,7 +102,7 @@ active
         </div>
     </div>
 </div>
-<div class="card shadow mb-4">
+{{-- <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Approval History</h6>
         <div class="text-right">
@@ -140,7 +140,7 @@ active
             </table>
         </div>
     </div>
-</div>
+</div> --}}
 <style>
 .action{
     width: 190px;
