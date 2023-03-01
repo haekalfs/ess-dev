@@ -177,8 +177,8 @@ active
                                 <div class="form-group">
                                     <label for="password">Task :</label>
                                     <select class="form-control" id="task" name="task">
-                                        <option>HO</option>
-                                        <option>Project (JOB Tomori, PLN, LPS, Vale, etc...)</option>
+                                        <option value="HO">HO</option>
+                                        <option value="Project">Project (JOB Tomori, PLN, LPS, Vale, etc...)</option>
                                         <option>Sick</option>
                                         <option>Other</option>
                                         <option>Standby</option>

@@ -97,10 +97,10 @@ function fetchActivities(yearput, monthput) {
                 // Create a lookup table of rates for each location
                 var rates = {
                     'HO': 70000,
-                    'Luar Kota': 80000,
-                    'Dalam Kota': 90000,
-                    'WFH': 60000,
-                    'Outer Ring' : 70000
+                    'Luar Kota': 200000,
+                    'Dalam Kota': 115000,
+                    'WFH': 45000,
+                    'Outer Ring' : 140000
                 };
 
                 // Create an object to store the total for each location

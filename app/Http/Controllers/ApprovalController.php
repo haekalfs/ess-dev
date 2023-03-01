@@ -62,8 +62,19 @@ class ApprovalController extends Controller
 
     public function export_excel()
 	{
-		return Excel::download(new TimesheetExport, 'siswa.xlsx');
-	}
+        $date = date('Y-m');
+		return Excel::download(new TimesheetExport, $date.'TimesheetEmployees_PerdanaConsulting.xlsx');
+        // $path = public_path('template_fm.xlsx');
+        // $excel = Excel::load($path);
+
+        // $worksheet = $excel->getActiveSheet();
+        // $worksheet->each(function($row, $index) {
+        //     $row->setCellValue('A' . $index, 'New Value');
+        // });
+
+        // $excel->store('xlsx', $path);
+    }
+
 
     public function review()
 	{

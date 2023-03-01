@@ -28,6 +28,7 @@ class TimesheetController extends Controller
                 ->whereMonth('ts_date', $entry)
                 ->whereYear('ts_date', $currentYear)
                 ->orderBy('updated_at', 'desc')
+                ->where('ts_user_id', Auth::user()->id)
                 ->first();
             if ($lastUpdate) {
                 if($lastUpdate->ts_status_id == '10'){
@@ -69,6 +70,7 @@ class TimesheetController extends Controller
                 ->whereMonth('ts_date', $month)
                 ->whereYear('ts_date', $year)
                 ->orderBy('updated_at', 'desc')
+                ->where('ts_user_id', Auth::user()->id)
                 ->first();
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
@@ -228,7 +230,7 @@ class TimesheetController extends Controller
             return response()->json(['error' => $validator->errors()]);
         }
         $entry = new Timesheet;
-        $entry->ts_user_id = Auth::user()->user_id;
+        $entry->ts_user_id = Auth::user()->id;
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $request->task;
         $entry->ts_location = $request->location;
@@ -251,7 +253,7 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->where('ts_user_id', Auth::user()->id)->get();
         
         return response()->json($activities);
     }
@@ -280,17 +282,18 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->get();
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
         
         $user_info = User::find(Auth::user()->id);
 
-        $workflow = Timesheet_workflow::where('user_id', Auth::user()->user_id)->where('month_periode', $year.$month)->get();
+        $workflow = Timesheet_workflow::where('user_id', Auth::user()->id)->where('month_periode', $year.$month)->get();
 
         $info = [];
         $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $month)
                 ->whereYear('ts_date', $year)
                 ->orderBy('updated_at', 'desc')
+                ->where('ts_user_id', Auth::user()->id)
                 ->first();
         if ($lastUpdate) {
             if($lastUpdate->ts_status_id == '10'){
@@ -324,10 +327,10 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')
         ->update(['ts_status_id' => '20']);
         
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->user_id, 'month_periode' => $year.$month],['activity' => 'Submitted', 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->user_id]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'month_periode' => $year.$month],['activity' => 'Submitted', 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
         // return response()->json($activities);
         Session::flash('success',"Timereport $year - 0$month has been submitted!");
         return redirect()->back();
@@ -347,7 +350,7 @@ class TimesheetController extends Controller
         $user_info_details = Users_detail::where('user_id', Auth::user()->id)->first();
         $user_info_emp_id = $user_info_details->employee_id;
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->user_id)->orderBy('created_at', 'desc')->get();
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('ts_date', 'asc')->get();
  
     	$pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'),['timesheet' => $activities,  'user_info' => $user_info,]);
     	return $pdf->download('timesheet - '. $year . $month.'.pdf');
