@@ -5,9 +5,9 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
+{{-- <!-- Page Heading -->
 <h1 class="h3 mb-2 text-gray-800">Approval</h1>
-<p class="mb-4">Approval Page.</p>
+<p class="mb-4">Approval Page.</p> --}}
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -38,7 +38,7 @@ active
                     <div class="col mr-2"><a href="/approval/director">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                             Timesheet Approval</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">4</div></a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -56,7 +56,7 @@ active
                     <div class="col mr-2"><a href="#">
                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                             Medical Approval</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">3</div></a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-hand-holding-medical fa-2x text-gray-300"></i>
@@ -74,7 +74,7 @@ active
                     <div class="col mr-2"><a href="#">
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                             Reimburse Approval</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">2</div></a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -92,7 +92,7 @@ active
                     <div class="col mr-2"><a href="#">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                             Leave Approval</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">1</div><a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div><a>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-plane-departure fa-2x text-gray-300"></i>
