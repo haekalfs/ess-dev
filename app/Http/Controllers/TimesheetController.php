@@ -226,6 +226,22 @@ class TimesheetController extends Controller
             'activity' => 'required',
         ]);
     
+        $inputFromTime = $request->from;
+        $inputToTime = $request->to;
+        // check if time is in 24-hour format
+        if (preg_match('/^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $inputFromTime)) {
+            $formattedFromTime = $inputFromTime;
+        } else {
+            // convert time from 12-hour format to 24-hour format
+            $formattedFromTime = date('H:i', strtotime($inputFromTime));
+        }
+        if (preg_match('/^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $inputToTime)) {
+            $formattedToTime = $inputToTime;
+        } else {
+            // convert time from 12-hour format to 24-hour format
+            $formattedToTime = date('H:i', strtotime($inputToTime));
+        }
+
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
@@ -234,8 +250,8 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $request->task;
         $entry->ts_location = $request->location;
-        $entry->ts_from_time = $request->from;
-        $entry->ts_to_time = $request->to;
+        $entry->ts_from_time = $inputFromTime;
+        $entry->ts_to_time = $inputToTime;
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
         $entry->save();
