@@ -60,7 +60,7 @@ active
                                     @if ($day !== '' && date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
                                         <td style="color: red">{{ $day }}</td>
                                     @else
-                                    <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}">{{ $day }}</td>
+                                    <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
                                     @endif
                                 @endforeach
                             </tr>
@@ -158,6 +158,7 @@ active
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 
+<script></script>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -204,7 +205,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time">
+                                    <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -232,6 +233,7 @@ active
 		</div>
 	</div>
 </div>
+
 <style>
     td {
         cursor: pointer;

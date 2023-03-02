@@ -90,6 +90,10 @@ function fetchActivities(yearput, monthput) {
                     
                     // Increment the count for the location of this activity
                     counts[activity.ts_location] += 1;
+
+                    var day = date.getDate();
+                    var taskEntry = $('#task_entry' + day);
+                    taskEntry.addClass('border-bottom-primary');
                 });
                 // Add click handlers for the edit and delete buttons
                 $('.delete-btn').click(deleteActivity);
@@ -114,6 +118,8 @@ function fetchActivities(yearput, monthput) {
                 // Update the card body with the counts for each location
                 var cardBody = $('.calculations');
                 cardBody.empty(); // Clear the card body
+                var clickable = $('.clickable2');
+                clickable.empty(); // Clear the card body
                 // cardBody.append($('<td><h6 class="m-0 font-weight-bold text-primary">Leaves Calculation</h6></td>'));
                 var cardBodyTotals = $('.calculationTotals');
                 cardBodyTotals.empty(); // Clear the card body
@@ -132,6 +138,7 @@ function fetchActivities(yearput, monthput) {
                     cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
                     cardBody.append($('<td></td>').text(formattedResult));
                     cardBody.append($('</tr>'));
+                    clickable.append($('<a></a').text("1 Acti..."));
                     // cardBodyRates.append($('<td></td>').text(formattedResult));
                 });
                 // Calculate the overall total
@@ -202,4 +209,8 @@ function fetchActivities(yearput, monthput) {
 //         });
 //     }
 // }
-
+$(function () {
+    $('#start-time, #end-time').datetimepicker({
+        format: 'H:m',
+    });
+});

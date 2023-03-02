@@ -5,9 +5,7 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Approval</h1>
-<p class="mb-4">Approval Page.</p>
+<h1 class="h3 mb-2 text-gray-800">Approval Page</h1><br>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -102,18 +100,16 @@ active
         </div>
     </div>
 </div>
-<!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Approval</h1>
-<p class="mb-4">Approval Page.</p>
+<hr class="sidebar-divider"><br>
 <div class="row">
 
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card border-left-dark shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2"><a href="/approval/director">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
                             Timesheet History</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
                     </div>
@@ -127,11 +123,11 @@ active
 
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
+        <div class="card border-left-dark shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2"><a href="#">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
                             Medical History</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
                     </div>
@@ -145,11 +141,11 @@ active
 
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
+        <div class="card border-left-dark shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2"><a href="#">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
                             Reimburse History</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
                     </div>
@@ -163,11 +159,11 @@ active
 
     <!-- Pending Requests Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card border-left-dark shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2"><a href="#">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
                             Leave History</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div><a>
                     </div>

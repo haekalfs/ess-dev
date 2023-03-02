@@ -60,6 +60,8 @@ Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reje
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
 
+//Project Assignment
+Route::get('/myprojects', 'ProjectController@index')->name('myproject');
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin']);

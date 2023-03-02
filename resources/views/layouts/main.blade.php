@@ -106,6 +106,25 @@
                     </div>
                 </div>
             </li>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item @yield('active-page-project')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fas fa-fw fa-code-branch"></i>
+                    <span>Project Assignment</span>
+                </a>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Project Assignment:</h6>
+                        <a class="collapse-item" href="/development">MyProjects</a>
+                        <h6 class="collapse-header">Restricted Access:</h6>
+                        <a class="collapse-item" href="/development">Project Assignment</a>
+                        <a class="collapse-item" href="/development">Project Organization</a>
+                        <a class="collapse-item" href="/development">Project Monitor</a>
+                    </div>
+                </div>
+            </li>
             <!-- Divider -->
             <hr class="sidebar-divider">
 
