@@ -144,7 +144,7 @@ active
                                                     <td>: {{$user_info->users_detail->usr_religion}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Merital Status</td>
+                                                    <td>Marital Status</td>
                                                     <td>: {{$user_info->users_detail->usr_merital_status}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
@@ -155,8 +155,6 @@ active
                                         </table>
                                     </div>
                                 </div>
-
-
                                 <div class="row">
                                     <div class="col-md-7">
                                         <table class="table table-borderless">

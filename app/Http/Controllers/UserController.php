@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Users_detail;
 
 class UserController extends Controller
 {
@@ -12,6 +13,8 @@ class UserController extends Controller
     {
         $data = User::all();
         return view('manage.users', ['data' => $data]);
+        
+        
     }
     
     public function tambah()
@@ -44,30 +47,54 @@ class UserController extends Controller
     public function delete($id)
     {
         $data = DB::table('users')->where('id', $id)->delete();
-        return redirect()->back();
+        return redirect()->back()->with('success', 'User delete successfully');
     }
     
 
-    public function edit(User $user, Users_detail $users_detail)
+    public function edit($id)
     {
-        return view('manage.users_edit', compact('user', 'users_detail'));
+        $user = User::with('users_detail')->findOrFail($id);
+        return view('manage.users_edit', compact('user'));
     }
     
-    public function update($id, Request $request)
+    public function update(Request $request, $id)
     {
+        
         $this->validate($request,[
-        'employee_id' => 'required',   
-        'name' => 'required',
-        'email' => 'required',
-        'posisi' => 'required',
-        ]);
-    
-        $data = User::find($id);
-        $data->employee_id = $request->employee_id;
-        $data->name = $request->name;
-        $data->email = $request->email;
-        $data->posisi = $request->posisi;
-        $data->save();
-        return redirect('/manage/users');
+            'employee_id' => 'required',   
+            'name' => 'required',
+            'email' => 'required',
+            'posisi' => 'required',
+            ]);
+            $user = User::find($id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->update();
+
+            $user_details_save = Users_detail::where('user_id',$id)->first();
+            $user_details_save->employee_id = $request->employee_id;
+            $user_details_save->position = $request->posisi;
+            $user_details_save->save();
+
+
+        return redirect('/manage/users')
+            ->with('success', 'User updated successfully');
     }
+    // public function update($id, Request $request)
+    // {
+        // $this->validate($request,[
+        // 'employee_id' => 'required',   
+        // 'name' => 'required',
+        // 'email' => 'required',
+        // 'posisi' => 'required',
+        // ]);
+    
+        // $data = User::find($id);
+        // $data->employee_id = $request->employee_id;
+        // $data->name = $request->name;
+        // $data->email = $request->email;
+        // $data->posisi = $request->posisi;
+        // $data->save();
+    //     return redirect('/manage/users');
+    // }
 }
