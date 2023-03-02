@@ -60,7 +60,7 @@ active
                                     @if ($day !== '' && date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
                                         <td style="color: red">{{ $day }}</td>
                                     @else
-                                    <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}">{{ $day }}</td>
+                                    <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
                                     @endif
                                 @endforeach
                             </tr>
