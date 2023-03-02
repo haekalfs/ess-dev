@@ -24,6 +24,7 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "@dmuy/jquery-timepicker": "^1.0.2",
         "fullcalendar": "^6.1.4"
     }
 }

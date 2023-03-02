@@ -158,6 +158,7 @@ active
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 
+<script></script>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -205,7 +206,6 @@ active
                                 <div class="form-group">
                                     <label for="email">From :</label>
                                     <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
-
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -233,6 +233,7 @@ active
 		</div>
 	</div>
 </div>
+
 <style>
     td {
         cursor: pointer;
