@@ -211,9 +211,6 @@ function fetchActivities(yearput, monthput) {
 // }
 $(function () {
     $('#start-time, #end-time').datetimepicker({
-        format: 'HH:mm',
-        pickDate: false,
-        pickSeconds: false,
-        pick12HourFormat: false            
+        format: 'H:m',
     });
 });
