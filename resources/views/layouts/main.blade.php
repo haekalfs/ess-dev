@@ -93,7 +93,6 @@
                     </div>
                 </div>
             </li>
-
             @if (Auth::user()->role == 'admin')
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item @yield('active-page-approval')">
