@@ -68,23 +68,23 @@ active
                     <tr>
                       <tr>
                           <th>Leaves Balance</th>
-                          <td style="text-align: start; font-weight:500">: 10</td>
+                          <td style="text-align: start; font-weight:500">: N/A</td>
                       </tr>
                       <tr>
                           <th>5 Year Term</th>
-                          <td style="text-align: start; font-weight:500">: -</td>
+                          <td style="text-align: start; font-weight:500">: N/A</td>
                       </tr>
                       <tr>
                           <th>Weekend Replacement</th>
-                          <td style="text-align: start; font-weight:500">: 1</td>
+                          <td style="text-align: start; font-weight:500">: N/A</td>
                       </tr>
                       <tr>
                           <th>Total Leave Available</th>
-                          <td style="text-align: start; font-weight:500">: 8</td>
+                          <td style="text-align: start; font-weight:500">: N/A</td>
                       </tr>
                       <tr>
                           <th>Sick</th>
-                          <td style="text-align: start; font-weight:500">: 2</td>
+                          <td style="text-align: start; font-weight:500">: N/A</td>
                       </tr>
                     </tr>
                 </table>
