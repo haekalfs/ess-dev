@@ -117,10 +117,10 @@
                 <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Project Assignment:</h6>
-                        <a class="collapse-item" href="/development">MyProjects</a>
+                        <a class="collapse-item" href="/myprojects">MyProjects</a>
                         <h6 class="collapse-header">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Project Assignment</a>
-                        <a class="collapse-item" href="/development">Project Organization</a>
+                        <a class="collapse-item" href="/assigning">Project Assignment</a>
+                        <a class="collapse-item" href="/project_list">Project Organization</a>
                         <a class="collapse-item" href="/development">Project Monitor</a>
                     </div>
                 </div>

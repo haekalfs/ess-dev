@@ -52,16 +52,18 @@ Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->midd
 Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities')->middleware(['checkRole:admin']);
 
 //Approval
-Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware(['checkRole:admin']);
+Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/director', 'ApprovalController@approval_director')->name('approval-director')->middleware(['checkRole:admin']);
 Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director')->middleware(['checkRole:admin']);
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware(['checkRole:admin']);
 
 //myprofile
-Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
+Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
 
 //Project Assignment
-Route::get('/myprojects', 'ProjectController@index')->name('myproject');
+Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware(['checkRole:admin']);
+Route::get('/assigning', 'ProjectController@assigning')->name('project-assigning')->middleware(['checkRole:admin']);
+Route::get('/project_list', 'ProjectController@project_list')->name('project-list')->middleware(['checkRole:admin']);
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin']);
