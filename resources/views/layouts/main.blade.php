@@ -85,12 +85,16 @@
                         <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
                         <a class="collapse-item" href="/development">Summary</a>
-                        <h6 class="collapse-header">Restricted Access:</h6>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
+                        @else
+                        @endif
                     </div>
                 </div>
             </li>
 
+            @if (Auth::user()->role == 'admin')
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item @yield('active-page-approval')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -101,11 +105,13 @@
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Tools:</h6>
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
                     </div>
                 </div>
             </li>
+            @else
+            @endif
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-project')">
@@ -118,10 +124,13 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Project Assignment:</h6>
                         <a class="collapse-item" href="/myprojects">MyProjects</a>
-                        <h6 class="collapse-header">Restricted Access:</h6>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/assigning">Project Assignment</a>
                         <a class="collapse-item" href="/project_list">Project Organization</a>
                         <a class="collapse-item" href="/development">Project Monitor</a>
+                        @else
+                        @endif
                     </div>
                 </div>
             </li>
