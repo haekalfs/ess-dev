@@ -147,7 +147,26 @@
                         <a class="collapse-item" href="/development">History</a>
                         @if (Auth::user()->role == 'admin')
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Reimburse Approval</a>
+                        <a class="collapse-item" href="/development">Manage Reimburse</a>
+                        @else
+                        @endif
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item @yield('active-page-med-reimburse')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMedReimburse"
+                    aria-expanded="true" aria-controls="collapseMedReimburse">
+                    <i class="fas fa-fw fa-hand-holding-medical"></i>
+                    <span>Medical Reimburse</span>
+                </a>
+                <div id="collapseMedReimburse" class="collapse" aria-labelledby="headingMedReimburse" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">My Medical Reimburse:</h6>
+                        <a class="collapse-item" href="/development">History <small style="color: red;"><i> &nbsp;&nbsp;Medical</i></small></a>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Manage Reimburse</a>
                         @else
                         @endif
