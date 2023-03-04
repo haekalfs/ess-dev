@@ -5,7 +5,7 @@ active
 @endsection
 
 @section('content')
-<h1 class="h3 mb-2 text-gray-800">Approval Page</h1><br>
+{{-- <h1 class="h3 mb-2 text-center text-gray-800">Approval Page</h1><br> --}}
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -27,7 +27,6 @@ active
 </div>
 @endif
 <div class="row">
-
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
@@ -100,91 +99,17 @@ active
         </div>
     </div>
 </div>
-<hr class="sidebar-divider"><br>
-<div class="row">
 
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-dark shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2"><a href="/approval/director">
-                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
-                            Timesheet History</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-dark shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2"><a href="#">
-                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
-                            Medical History</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-hand-holding-medical fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-dark shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2"><a href="#">
-                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
-                            Reimburse History</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Requests Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-dark shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2"><a href="#">
-                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
-                            Leave History</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div><a>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-plane-departure fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{{-- <div class="card shadow mb-4">
+<div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Approval History</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Recently Activity</h6>
         <div class="text-right">
         </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
+                <thead class="thead-dark">
                     <tr>
                         <th>Name</th>
                         <th>Activity</th>
@@ -213,7 +138,93 @@ active
             </table>
         </div>
     </div>
-</div> --}}
+</div>
+<div class="card shadow mb-4">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-primary">Approval History</h6>
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse" id="collapseCardExample">
+        <div class="card-body">
+            <div class="row">
+
+                <!-- Earnings (Monthly) Card Example -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-dark shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2"><a href="/approval/director">
+                                    <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                        Timesheet History</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Earnings (Monthly) Card Example -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-dark shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2"><a href="#">
+                                    <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                        Medical History</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-hand-holding-medical fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Earnings (Monthly) Card Example -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-dark shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2"><a href="#">
+                                    <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                        Reimburse History</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Pending Requests Card Example -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-dark shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2"><a href="#">
+                                    <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                        Leave History</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">0</div><a>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-plane-departure fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
 .action{
     width: 190px;
