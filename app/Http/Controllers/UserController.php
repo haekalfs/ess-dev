@@ -61,24 +61,22 @@ class UserController extends Controller
     {
         
         $this->validate($request,[
-            'employee_id' => 'required',   
             'name' => 'required',
             'email' => 'required',
-            'posisi' => 'required',
+            
             ]);
             $user = User::find($id);
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->update();
+            $user->save();
 
             $user_details_save = Users_detail::where('user_id',$id)->first();
-            $user_details_save->employee_id = $request->employee_id;
-            $user_details_save->position = $request->posisi;
+            $user_details_save->status = $request->status;
+            // $user_details_save->position = $request->posisi;
             $user_details_save->save();
 
 
-        return redirect('/manage/users')
-            ->with('success', 'User updated successfully');
+        return redirect('/manage/users')->with('success', 'User updated successfully');
     }
     // public function update($id, Request $request)
     // {
