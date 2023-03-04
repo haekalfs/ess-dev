@@ -106,7 +106,7 @@ active
                             </thead> --}}
                             <tbody>
                             </tbody>
-                        </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
+                        </table><small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small>
                     </div>
                 </div>
             </div>
@@ -179,10 +179,14 @@ active
                                     <label for="password">Task :</label>
                                     <select class="form-control" id="task" name="task">
                                         <option value="HO">HO</option>
-                                        <option value="Project">Project (JOB Tomori, PLN, LPS, Vale, etc...)</option>
-                                        <option>Sick</option>
-                                        <option>Other</option>
+                                        <option value="Sick">Sick</option>
+                                        <option value="Other">Other</option>
                                         <option>Standby</option>
+                                        <optgroup label="Projects">
+                                            @foreach($assignment as $assign)
+                                            <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
+                                            @endforeach
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
@@ -192,11 +196,12 @@ active
                                 <div class="form-group">
                                     <label for="password">Location :</label>
                                     <select class="form-control" id="location" name="location">
-                                        <option value="Dalam Kota">Dalam Kota</option>
-                                        <option value="Luar Kota">Luar Kota</option>
+                                        <option value="DK">Dalam Kota</option>
+                                        <option value="LK">Luar Kota</option>
                                         <option value="HO">Head Office</option>
                                         <option value="Outer Ring">Outer Ring (Bogor, Depok, Tangerang, Bekasi)</option>
                                         <option value="WFH">WFH/WFA (Work From Home/Anywhere)</option>
+                                        <option hidden value="N/a">N/a</option>
                                     </select>
                                 </div>
                             </div>
@@ -233,7 +238,34 @@ active
 		</div>
 	</div>
 </div>
-
+<script>
+    document.getElementById("task").addEventListener("change", function() {
+    if (this.value === "Sick") {
+        document.getElementById("activity").value = "-";
+        document.getElementById("location").value = "N/a";
+        document.getElementById("start-time").value = "00:00";
+        document.getElementById("end-time").value = "00:00";
+        document.getElementById("activity").setAttribute("readonly", true);
+        document.getElementById("location").setAttribute("readonly", true);
+        document.getElementById("start-time").setAttribute("readonly", true);
+        document.getElementById("end-time").setAttribute("readonly", true);
+    } else if(this.value === "Other") {
+        document.getElementById("activity").value = "-";
+        document.getElementById("location").value = "N/a";
+        document.getElementById("start-time").value = "00:00";
+        document.getElementById("end-time").value = "00:00";
+        document.getElementById("activity").setAttribute("readonly", true);
+        document.getElementById("location").setAttribute("readonly", true);
+        document.getElementById("start-time").setAttribute("readonly", true);
+        document.getElementById("end-time").setAttribute("readonly", true);  
+    } else {
+        document.getElementById("activity").removeAttribute("readonly");
+        document.getElementById("location").removeAttribute("readonly");
+        document.getElementById("start-time").removeAttribute("readonly");
+        document.getElementById("end-time").removeAttribute("readonly");
+    }
+});
+</script>
 <style>
     td {
         cursor: pointer;

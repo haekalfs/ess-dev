@@ -85,12 +85,15 @@
                         <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
                         <a class="collapse-item" href="/development">Summary</a>
-                        <h6 class="collapse-header">Restricted Access:</h6>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
+                        @else
+                        @endif
                     </div>
                 </div>
             </li>
-
+            @if (Auth::user()->role == 'admin')
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item @yield('active-page-approval')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -101,8 +104,72 @@
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Tools:</h6>
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
+                    </div>
+                </div>
+            </li>
+            @else
+            @endif
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item @yield('active-page-leave')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLeave"
+                    aria-expanded="true" aria-controls="collapseLeave">
+                    <i class="fas fa-fw fa-plane-departure"></i>
+                    <span>Leave</span>
+                </a>
+                <div id="collapseLeave" class="collapse" aria-labelledby="headingLeave" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">My Leaves:</h6>
+                        <a class="collapse-item" href="/development">History</a>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
+                        <a class="collapse-item" href="/development">Leave Report</a>
+                        <a class="collapse-item" href="/development">Manage</a>
+                        <a class="collapse-item" href="/development">Timesheet <i class="fas fa-fw fa-random"></i> Leave</a>
+                        @else
+                        @endif
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item @yield('active-page-reimburse')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReimburse"
+                    aria-expanded="true" aria-controls="collapseReimburse">
+                    <i class="fas fa-fw fa-money-check-alt"></i>
+                    <span>Reimburse</span>
+                </a>
+                <div id="collapseReimburse" class="collapse" aria-labelledby="headingReimburse" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">My Reimburse:</h6>
+                        <a class="collapse-item" href="/development">History</a>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
+                        <a class="collapse-item" href="/development">Manage Reimburse</a>
+                        @else
+                        @endif
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item @yield('active-page-med-reimburse')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMedReimburse"
+                    aria-expanded="true" aria-controls="collapseMedReimburse">
+                    <i class="fas fa-fw fa-hand-holding-medical"></i>
+                    <span>Medical Reimburse</span>
+                </a>
+                <div id="collapseMedReimburse" class="collapse" aria-labelledby="headingMedReimburse" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">My Medical Reimburse:</h6>
+                        <a class="collapse-item" href="/development">History <small style="color: red;"><i> &nbsp;&nbsp;Medical</i></small></a>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
+                        <a class="collapse-item" href="/development">Manage Reimburse</a>
+                        @else
+                        @endif
                     </div>
                 </div>
             </li>
@@ -117,11 +184,14 @@
                 <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Project Assignment:</h6>
-                        <a class="collapse-item" href="/development">MyProjects</a>
-                        <h6 class="collapse-header">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Project Assignment</a>
-                        <a class="collapse-item" href="/development">Project Organization</a>
+                        <a class="collapse-item" href="/myprojects">MyProjects</a>
+                        @if (Auth::user()->role == 'admin')
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
+                        <a class="collapse-item" href="/assigning">Project Assignment</a>
+                        <a class="collapse-item" href="/project_list">Project Organization</a>
                         <a class="collapse-item" href="/development">Project Monitor</a>
+                        @else
+                        @endif
                     </div>
                 </div>
             </li>
@@ -133,11 +203,31 @@
                 Add-On
             </div>
 
-
+            <!-- Nav Item - Pages Collapse Menu -->
+            @if (Auth::user()->role == 'admin')
             <li class="nav-item @yield('active-page-users')">
-                <a class="nav-link" href="/manage/users">
-                    <i class="fas fa-fw fa-users"></i>
-                    <span>Manage Users</span></a>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSystem"
+                    aria-expanded="true" aria-controls="collapseSystem">
+                    <i class="fas fa-fw fa-user-cog"></i>
+                    <span>System Management</span>
+                </a>
+                <div id="collapseSystem" class="collapse" aria-labelledby="headingSystem" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Administrator Access:</h6>
+                        <a class="collapse-item" href="/manage/users">Manage Users</a>
+                        <a class="collapse-item" href="/development">Manage</a>
+                        <a class="collapse-item" href="/development">Timesheet <i class="fas fa-fw fa-random"></i> Leave</a>
+                    </div>
+                </div>
+            </li>
+            @else
+            @endif
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>{{ __('Logout') }}</span>
+                </a>
             </li>
             <!-- Divider -->
             <hr class="sidebar-divider">

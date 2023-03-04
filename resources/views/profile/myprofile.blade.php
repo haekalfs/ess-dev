@@ -60,13 +60,13 @@ active
                                 <table class="table table-borderless">
                                     <tbody>
                                         <tr class="table-sm">
-                                            <td>Department</td>
-                                            <td style="width: 400px;">: Finances And General Affair</td>
+                                            <td style="width: 150px;">Department</td>
+                                            <td style="width: 300px;">: Finances And General Affair</td>
                                             <td style="width: 200px;">Employment Status</td>
                                             <td>: {{$user_info->users_detail->status}}</td>
                                         </tr>
                                         <tr class="table-sm">
-                                            <td>Status</td>
+                                            <td style="width: 150px;">Status</td>
                                             <td style="width: 200px;">: {{$user_info->users_detail->hired_date}}</td>
                                             <td style="width: 200px;">Hired Date</td>
                                             <td>: {{$user_info->users_detail->hired_date}}</td>
@@ -80,7 +80,7 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Contact Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Contact Information</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -123,7 +123,7 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Profile Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Profile Information</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -160,24 +160,24 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Document Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Document Information</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr class="table-sm">
-                                                    <td>NPWP</td>
+                                                    <td style="width: 150px;">NPWP</td>
                                                     <td>: {{$user_info->users_detail->usr_npwp}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Identity Type</td>
+                                                    <td style="width: 150px;">Identity Type</td>
                                                     <td>: {{$user_info->users_detail->usr_id_type}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Identity No</td>
+                                                    <td style="width: 150px;">Identity No</td>
                                                     <td>: {{$user_info->users_detail->usr_id_no}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Identity Expiration</td>
+                                                    <td style="width: 200px;">Identity Expiration</td>
                                                     <td>: {{$user_info->users_detail->usr_id_expiration}}</td>
                                                 </tr>
                                             </tbody>
@@ -187,24 +187,24 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Bank Account</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Bank Account</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr class="table-sm">
-                                                    <td>Bank Name</td>
+                                                    <td style="width: 150px;">Bank Name</td>
                                                     <td>: {{$user_info->users_detail->usr_bank_name}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Bank Branch</td>
+                                                    <td style="width: 150px;">Bank Branch</td>
                                                     <td>: {{$user_info->users_detail->usr_bank_branch}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Bank Account Num</td>
+                                                    <td style="width: 150px;">Bank Account Num</td>
                                                     <td>: {{$user_info->users_detail->usr_bank_account}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Bank Account Name</td>
+                                                    <td style="width: 200px;">Bank Account Name</td>
                                                     <td>: {{$user_info->name}}</td>
                                                 </tr>
                                             </tbody>

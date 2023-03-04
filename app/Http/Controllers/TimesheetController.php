@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company_project;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
 use App\Models\User;
@@ -132,6 +133,7 @@ class TimesheetController extends Controller
                 break;
             }
         }
+        $assignment = Company_project::all();
         if($lastUpdate){
             if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
                 Session::flash('failed',"You've already submitted your timereport!");
@@ -140,13 +142,13 @@ class TimesheetController extends Controller
                 $encryptYear = Crypt::encrypt($year);
                 $encryptMonth = Crypt::encrypt($month);
                 $previewButton = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
-                return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton'));
+                return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment'));
             }
         } else {
             $encryptYear = Crypt::encrypt($year);
             $encryptMonth = Crypt::encrypt($month);
             $previewButton = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
-            return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton'));
+            return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment'));
         }
         // // Return the calendar view with the calendar data
         // return view('timereport.timesheet_entry', compact('calendar', 'year', 'month'));

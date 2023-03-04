@@ -6,9 +6,11 @@ use App\Exports\TimesheetExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Session;
@@ -81,7 +83,7 @@ class ApprovalController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        $month = date('m') - 2;
+        $month = date('m') - 1;
         $year = date('Y');
         $monthName = date("F", mktime(0, 0, 0, $month, 1));
         // Set the default time zone to Jakarta
@@ -162,5 +164,52 @@ class ApprovalController extends Controller
 
         $approvals = Timesheet_workflow::where('ts_status_id', '29')->whereYear('date_submitted', $currentYear)->get();
 		return view('review.finance', compact('approvals'));
+	}
+
+    public function ts_preview($id, $year, $month)
+	{
+		// $year = Crypt::decrypt($year);
+        // $month = Crypt::decrypt($month);
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        // Get the Timesheet records between the start and end dates
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', $id)->get();
+        
+        $user_info = User::find($id);
+
+        $workflow = Timesheet_workflow::where('user_id', $id)->where('month_periode', $year.$month)->get();
+
+        $info = [];
+        $lastUpdate = DB::table('timesheet')
+                ->whereMonth('ts_date', $month)
+                ->whereYear('ts_date', $year)
+                ->orderBy('updated_at', 'desc')
+                ->where('ts_user_id', $id)
+                ->first();
+        if ($lastUpdate) {
+            if($lastUpdate->ts_status_id == '10'){
+                $status = "Saved";
+            }elseif($lastUpdate->ts_status_id == '20'){
+                $status = "Submitted";
+            }elseif($lastUpdate->ts_status_id == '29'){
+                $status = "Approved";
+            }elseif($lastUpdate->ts_status_id == '404'){
+                $status = "Rejected";
+            }else{
+                $status = "404";
+            }
+            $lastUpdatedAt = $lastUpdate->updated_at;
+        } else {
+            $status = 'None';
+            $lastUpdatedAt = 'None';
+        }
+        $info[] = compact('status', 'lastUpdatedAt');
+        // return response()->json($activities);
+        return view('timereport.preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
 	}
 }

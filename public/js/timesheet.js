@@ -66,8 +66,8 @@ function fetchActivities(yearput, monthput) {
                 // Create an object to store the counts for each location
                 var counts = {
                     'HO': 0,
-                    'Luar Kota': 0,
-                    'Dalam Kota': 0,
+                    'LK': 0,
+                    'DK': 0,
                     'WFH': 0,
                     'Outer Ring' : 0
                 };
@@ -101,8 +101,8 @@ function fetchActivities(yearput, monthput) {
                 // Create a lookup table of rates for each location
                 var rates = {
                     'HO': 70000,
-                    'Luar Kota': 200000,
-                    'Dalam Kota': 115000,
+                    'LK': 200000,
+                    'DK': 115000,
                     'WFH': 45000,
                     'Outer Ring' : 140000
                 };
@@ -110,8 +110,8 @@ function fetchActivities(yearput, monthput) {
                 // Create an object to store the total for each location
                 var totals = {
                     'HO': 0,
-                    'Luar Kota': 0,
-                    'Dalam Kota': 0,
+                    'LK': 0,
+                    'DK': 0,
                     'WFH': 0,
                     'Outer Ring' : 0
                 };
@@ -138,7 +138,6 @@ function fetchActivities(yearput, monthput) {
                     cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
                     cardBody.append($('<td></td>').text(formattedResult));
                     cardBody.append($('</tr>'));
-                    clickable.append($('<a></a').text("1 Acti..."));
                     // cardBodyRates.append($('<td></td>').text(formattedResult));
                 });
                 // Calculate the overall total
@@ -214,3 +213,4 @@ $(function () {
         format: 'H:m',
     });
 });
+
