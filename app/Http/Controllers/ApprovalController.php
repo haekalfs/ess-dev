@@ -83,7 +83,7 @@ class ApprovalController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        $month = date('m') - 2;
+        $month = date('m') - 1;
         $year = date('Y');
         $monthName = date("F", mktime(0, 0, 0, $month, 1));
         // Set the default time zone to Jakarta
