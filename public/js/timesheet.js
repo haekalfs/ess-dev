@@ -77,12 +77,12 @@ function fetchActivities(yearput, monthput) {
                     var date = new Date(activity.ts_date);
                     var options = { weekday: 'short' };
                     row.append($('<td></td>').text(date.toLocaleDateString('en-US', options)));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').text(activity.ts_date));
-                    row.append($('<td></td>').text(activity.ts_task));
-                    row.append($('<td></td>').text(activity.ts_location));
-                    row.append($('<td></td>').text(activity.ts_activity));
-                    row.append($('<td></td>').text(activity.ts_from_time));
-                    row.append($('<td></td>').text(activity.ts_to_time));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                     var actions = $('<td></td>');
                     actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
                     row.append(actions);

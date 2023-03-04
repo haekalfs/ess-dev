@@ -57,10 +57,14 @@ active
                         @foreach (array_slice($calendar, 1) as $week)
                             <tr>
                                 @foreach ($week as $day)
-                                    @if ($day !== '' && date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
-                                        <td style="color: red">{{ $day }}</td>
+                                    @if ($day !== '' && date('n', strtotime($year.'-'.$month.'-'.$day)) == $month)
+                                        @if (date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
+                                            <td style="color: red">{{ $day }}</td>
+                                        @else
+                                            <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                        @endif
                                     @else
-                                    <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                        <td>&nbsp;</td>
                                     @endif
                                 @endforeach
                             </tr>
@@ -99,14 +103,10 @@ active
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
-                        <table class="zoom80">
-                            {{-- <thead>
-                                <tr class="calculations">
-                                </tr>
-                            </thead> --}}
-                            <tbody>
-                            </tbody>
-                        </table><small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small>
+                        @foreach($assignment as $assign)
+                        <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name}}</li>
+                        @endforeach
+                        <small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small>
                     </div>
                 </div>
             </div>

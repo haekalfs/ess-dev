@@ -127,7 +127,7 @@
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Leave Report</a>
                         <a class="collapse-item" href="/development">Manage</a>
-                        <a class="collapse-item" href="/development">Timesheet <i class="fas fa-fw fa-random"></i> Leave</a>
+                        <a class="collapse-item" href="/development">Timesheet &nbsp;<i class="fas fa-fw fa-exchange-alt"></i>&nbsp; Leave</a>
                         @else
                         @endif
                     </div>
@@ -215,8 +215,33 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Administrator Access:</h6>
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
-                        <a class="collapse-item" href="/development">Manage</a>
-                        <a class="collapse-item" href="/development">Timesheet <i class="fas fa-fw fa-random"></i> Leave</a>
+                        <a class="collapse-item" href="/development">Manage Roles</a>
+                        <a class="collapse-item" href="/development">User Group</a>
+                        <h6 class="collapse-header">Master Data:</h6>
+                        <a class="collapse-item" href="/manage/users">List Employees</a>
+                        <a class="collapse-item" href="/development">List Consultant</a>
+                    </div>
+                </div>
+            </li>
+            @else
+            @endif
+            <!-- Nav Item - Pages Collapse Menu -->
+            @if (Auth::user()->role == 'admin')
+            <li class="nav-item @yield('active-page-HR')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHRSystem"
+                    aria-expanded="true" aria-controls="collapseHRSystem">
+                    <i class="fas fa-fw fa-tools"></i>
+                    <span>HR Tools</span>
+                </a>
+                <div id="collapseHRSystem" class="collapse" aria-labelledby="headingHRSystem" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">HR Access:</h6>
+                        <a class="collapse-item" href="/development">Manage IDs</a>
+                        {{-- <a class="collapse-item" href="/development">Manage Roles</a>
+                        <a class="collapse-item" href="/development">User Group</a>
+                        <h6 class="collapse-header">Master Data:</h6>
+                        <a class="collapse-item" href="/manage/users">List Employees</a>
+                        <a class="collapse-item" href="/development">List Consultant</a> --}}
                     </div>
                 </div>
             </li>

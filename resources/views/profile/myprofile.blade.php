@@ -35,7 +35,7 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
                 <div class="text-right">
-                    <a class="btn btn-danger btn-sm" type="button" href="{{ url()->previous() }}" id="manButton">Change Password</a>
+                    <a class="btn btn-danger btn-sm" type="button" href="#" id="manButton">Change Password</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -48,7 +48,7 @@ active
                                     <td><img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 225px;" /></td>
                                 </tr>
                                 <tr>
-                                    <td><a class="btn btn-primary btn-sm" type="button" href="{{ url()->previous() }}" id="manButton">Upload CV</a></td>
+                                    <td><a class="btn btn-primary btn-sm" type="button" href="#" id="manButton">Upload CV</a></td>
                                 </tr>
                             </tbody>
                         </table>
