@@ -53,11 +53,12 @@ active
                         <td>{{ $approval->user_timesheet }}</td>
                         <td>{{ $approval->date_submitted }}</td>
                         <td>{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
-                        <td class="action">
+                        <td class="action text-center">
                             <a href="/approval/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve
                             </a>
                             <a href="/reject/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
+                            <a href="/approval/director/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;">Preview</a>
                         </td>
                         @else
                         <td></td>
@@ -80,7 +81,7 @@ active
 </div>
 <style>
 .action{
-    width: 190px;
+    width: 250px;
 }
 </style>
 @endsection
