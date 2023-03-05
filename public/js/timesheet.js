@@ -184,6 +184,10 @@ function fetchActivities(yearput, monthput) {
       data: formData,
       success: function(response) {
         $('.alert-success').show();
+        document.getElementById("activity").removeAttribute("readonly");
+        document.getElementById("location").removeAttribute("readonly");
+        document.getElementById("start-time").removeAttribute("readonly");
+        document.getElementById("end-time").removeAttribute("readonly");
         $('#entry-form')[0].reset();
             setTimeout(function() {
                 $('.alert-success').fadeOut('slow');
