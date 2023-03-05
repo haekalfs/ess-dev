@@ -37,9 +37,17 @@ function deleteActivity(activityId) {
         url: '/activities/' + activityId,
         type: 'DELETE',
         success: function(response) {
+            $('.alert-success-delete').show();
+            setTimeout(function() {
+                $('.alert-success-delete').fadeOut('slow');
+            }, 3000);
             fetchActivities(yearput, monthput);
         },
-        error: function(response) {
+        error: function(response,jqXHR, textStatus, errorThrown) {
+            $('.alert-danger-delete').show();
+            setTimeout(function() {
+                $('.alert-danger-delete').fadeOut('slow');
+            }, 3000);
             console.log(response);
         }
         });
@@ -165,7 +173,6 @@ function fetchActivities(yearput, monthput) {
     });
 }
 
-
   $('#save-entry').click(function(e) {
     e.preventDefault();
     // Serialize the form data
@@ -180,7 +187,7 @@ function fetchActivities(yearput, monthput) {
         $('#entry-form')[0].reset();
             setTimeout(function() {
                 $('.alert-success').fadeOut('slow');
-            }, 5000);
+            }, 3000);
         // Fetch the updated list of activities
         fetchActivities(yearput, monthput);
       },
@@ -188,7 +195,7 @@ function fetchActivities(yearput, monthput) {
             $('.alert-danger').show();
             setTimeout(function() {
                 $('.alert-danger').fadeOut('slow');
-            }, 5000);
+            }, 3000);
         }
     });
   });
