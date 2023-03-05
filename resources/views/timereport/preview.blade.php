@@ -202,7 +202,7 @@ active
                         <tr>
                             <td>{{ $workflows->user_id }}</td>
                             <td>{{ $workflows->activity }}</td>
-                            <td>{{ $workflows->updated_at }}</td>
+                            <td>{{ $workflows->created_at }}</td>
                             <td>{{ $workflows->note }}</td>
                         </tr>
                         @endforeach

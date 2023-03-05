@@ -122,7 +122,7 @@ active
                     <tr>
                         @if ($workflow)
                         <td>{{ $workflow->user_id }}</td>
-                        <td>{{ $workflow->date_submitted }}</td>
+                        <td>{{ $workflow->activity }}</td>
                         <td>{{ date("F", mktime(0, 0, 0, substr($workflow->month_periode, 4, 2), 1)) }} - {{ substr($workflow->month_periode, 0, 4) }}</td>
                         <td>{{ $workflow->updated_at }}</td>
                         @else

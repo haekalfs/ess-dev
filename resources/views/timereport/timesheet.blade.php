@@ -27,7 +27,7 @@ active
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered zoom90" width="100%" cellspacing="0">
-                <thead>
+                <thead class="thead-light">
                     <tr>
                         <th>Month</th>
                         <th>Last Updated At</th>

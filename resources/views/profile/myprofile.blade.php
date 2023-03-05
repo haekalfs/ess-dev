@@ -35,7 +35,7 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
                 <div class="text-right">
-                    <a class="btn btn-danger btn-sm" type="button" href="#" id="manButton">Change Password</a>
+                    <a class="btn btn-danger btn-sm" type="button" data-toggle="modal" data-target="#changePass" id="manButton">Change Password</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -220,5 +220,49 @@ active
             </div>
         </div><br>
     </div>
+</div>
+<div class="modal fade" id="changePass" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Change Password</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+            @if (session('status'))
+			<div class="alert alert-success" role="alert">
+			    {{ session('status') }}
+			</div>
+			@endif
+			<form method="POST" action="{{ route('password.email') }}">
+                @csrf
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row mb-3">
+                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
+        
+                            <div class="col-md-8">
+                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
+                                    value="{{ old('email') }}" required autocomplete="email" autofocus>
+        
+                                @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+				    </div>
+                </div>
+			    <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="submit" class="btn btn-primary">
+                        {{ __('Send Password Reset Link') }}
+                    </button>
+			    </div>
+			</form>
+		</div>
+	</div>
 </div>
 @endsection
