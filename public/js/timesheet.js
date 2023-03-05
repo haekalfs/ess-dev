@@ -219,9 +219,4 @@ function fetchActivities(yearput, monthput) {
 //         });
 //     }
 // }
-$(function () {
-    $('#start-time, #end-time').datetimepicker({
-        format: 'H:m',
-    });
-});
 

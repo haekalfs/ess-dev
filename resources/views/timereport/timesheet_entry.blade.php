@@ -136,8 +136,8 @@ active
     <!-- Card Body -->
     <div class="card-body">
         <div class="table-responsive zoom80">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
                         <th style="width: 10px;">Day</th>
                         <th>Date</th>
@@ -148,7 +148,7 @@ active
                         <th>To</th>
                         <th style="width: 10px;">Action</th>
                 </thead>
-                <tfoot>
+                {{-- <tfoot class="thead-light">
                     <tr>
                         <th style="width: 10px;">Day</th>
                         <th>Date</th>
@@ -159,7 +159,7 @@ active
                         <th>To</th>
                         <th style="width: 10px;">Action</th>
                     </tr>
-                </tfoot>
+                </tfoot> --}}
                 <tbody id="activity-table">
                     <!-- Display the data fetched via AJAX here -->
                 </tbody>
