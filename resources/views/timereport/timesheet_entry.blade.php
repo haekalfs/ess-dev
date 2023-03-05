@@ -189,7 +189,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
-                                    <select class="form-control" id="task" name="task">
+                                    <select class="form-control" id="task" name="task" required>
                                         <option value="HO">HO</option>
                                         <option value="Sick">Sick</option>
                                         <option value="Other">Other</option>
@@ -207,7 +207,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="location" name="location">
+                                    <select class="form-control" id="location" name="location" required>
                                         <option value="DK">Dalam Kota</option>
                                         <option value="LK">Luar Kota</option>
                                         <option value="HO">Head Office</option>
@@ -222,21 +222,33 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                    <input type="time" class="form-control" required autocomplete="off" name="from" id="start-time">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="to" id="end-time">
+                                    <input type="time" class="form-control" required autocomplete="off" name="to" id="end-time">
                                 </div>
                             </div>
+                            {{-- <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">From :</label>
+                                    <input type="time" class="form-control" required step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">To :</label>
+                                    <input type="time" class="form-control" required step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="to" id="end-time">
+                                </div>
+                            </div> --}}
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="activity" name="activity"></textarea>
+                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>
