@@ -72,7 +72,17 @@ active
                                 <td>Finances And General Affair</td>
                             </tr>
                             <tr class="table-sm">
-                                <td>Employment Status</td>
+                                <td>Position</td>
+                                <td><input class="input-group-text flex"  style="font-size: 11px"  name="position" placeholder="Position..." value=" {{ $user->users_detail->position}}">
+                                    @if($errors->has('position'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('position')}}
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr class="table-sm">
+                                <td>Status</td>
                                 <td><input class="input-group-text flex"  style="font-size: 11px"  name="status" placeholder="Status..." value=" {{ $user->users_detail->status}}">
                                     @if($errors->has('status'))
                                         <div class="text-danger">
@@ -82,7 +92,7 @@ active
                                 </td>
                             </tr>
                             <tr class="table-sm">
-                                <td>Status</td>
+                                <td>Employee Status</td>
                                 <td><input class="input-group-text" style="font-size: 11px"  name="employee_status" placeholder="Status Employee..." value=" {{ $user->users_detail->employee_status}}">
                                     @if($errors->has('employee_status'))
                                         <div class="text-danger">
@@ -100,6 +110,16 @@ active
                                         </div>
                                     @endif
                                     </td>
+                            </tr>
+                            <tr class="table-sm">
+                            <td>Resign Date</td>
+                                <td><input class="input-group-text" style="font-size: 11px" name="resignation_date" placeholder="Resign Date..." value=" {{ $user->users_detail->resignation_date}}">
+                                    @if($errors->has('resignation_date'))
+                                        <div class="text-danger">
+                                            {{ $errors->first('resignation_date')}}
+                                        </div>
+                                    @endif
+                                </td>
                             </tr>
                             <tr class="table-sm">
                                 <td>Employee ID</td>
