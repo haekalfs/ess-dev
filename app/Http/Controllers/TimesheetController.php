@@ -252,12 +252,14 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $request->task;
         $entry->ts_location = $request->location;
-        $entry->ts_from_time = $inputFromTime;
-        $entry->ts_to_time = $inputToTime;
+        $entry->ts_from_time = $formattedFromTime;
+        $entry->ts_to_time = $formattedToTime;
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
         $entry->save();
     
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+
         return response()->json(['success' => 'Entry saved successfully.']);
     }
 
@@ -348,7 +350,7 @@ class TimesheetController extends Controller
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')
         ->update(['ts_status_id' => '20']);
         
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'month_periode' => $year.$month],['activity' => 'Submitted', 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month],['date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
         // return response()->json($activities);
         Session::flash('success',"Timereport $year - 0$month has been submitted!");
         return redirect()->back();

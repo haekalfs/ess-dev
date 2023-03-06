@@ -24,11 +24,18 @@ active
 
 <div class="alert alert-success" role="alert" style="display: none;">
     Your entry has been saved successfully.
-  </div>
-  
-  <div class="alert alert-danger" role="alert" style="display: none;">
+</div>
+
+<div class="alert alert-danger" role="alert" style="display: none;">
     An error occurred while saving your entry. Please try again.
-  </div>
+</div>
+<div class="alert bg-success text-white shadow alert-success-delete" role="alert" style="display: none;">
+    Your entry has been deleted.
+</div>
+
+<div class="alert bg-danger text-white shadow alert-danger-delete" role="alert" style="display: none;">
+    An error occurred while deleting your entry. Please try again.
+</div>
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
@@ -47,7 +54,7 @@ active
                         @foreach ($calendar[0] as $dayName)
                           <col style="width: {{ 100 / count($calendar[0]) }}%;">
                         @endforeach
-                      </colgroup>
+                    </colgroup>
                     <thead class="thead-dark">
                         @foreach ($calendar[0] as $dayName)
                             <th>{{ $dayName }}</th>
@@ -57,10 +64,19 @@ active
                         @foreach (array_slice($calendar, 1) as $week)
                             <tr>
                                 @foreach ($week as $day)
-                                    @if ($day !== '' && date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
-                                        <td style="color: red">{{ $day }}</td>
+                                    @if ($day !== '' && date('n', strtotime($year.'-'.$month.'-'.$day)) == $month)
+                                        @if (date('j', strtotime($year.'-'.$month.'-'.$day)) == 1)
+                                            @php
+                                                $prevMonth = date('n', strtotime($year.'-'.$month.'-'.$day.' -1 day'));
+                                            @endphp
+                                        @endif
+                                        @if (date('N', strtotime($year.'-'.$month.'-'.$day)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
+                                            <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                        @else
+                                            <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                        @endif
                                     @else
-                                    <td data-toggle="modal" class="clickable" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                        <td class="prev-month-day">&nbsp;</td>
                                     @endif
                                 @endforeach
                             </tr>
@@ -99,14 +115,10 @@ active
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
-                        <table class="zoom80">
-                            {{-- <thead>
-                                <tr class="calculations">
-                                </tr>
-                            </thead> --}}
-                            <tbody>
-                            </tbody>
-                        </table><small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small>
+                        @foreach($assignment as $assign)
+                        <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name}}</li>
+                        @endforeach
+                        {{-- <small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small> --}}
                     </div>
                 </div>
             </div>
@@ -124,8 +136,8 @@ active
     <!-- Card Body -->
     <div class="card-body">
         <div class="table-responsive zoom80">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
                         <th style="width: 10px;">Day</th>
                         <th>Date</th>
@@ -136,7 +148,7 @@ active
                         <th>To</th>
                         <th style="width: 10px;">Action</th>
                 </thead>
-                <tfoot>
+                {{-- <tfoot class="thead-light">
                     <tr>
                         <th style="width: 10px;">Day</th>
                         <th>Date</th>
@@ -147,7 +159,7 @@ active
                         <th>To</th>
                         <th style="width: 10px;">Action</th>
                     </tr>
-                </tfoot>
+                </tfoot> --}}
                 <tbody id="activity-table">
                     <!-- Display the data fetched via AJAX here -->
                 </tbody>
@@ -177,7 +189,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
-                                    <select class="form-control" id="task" name="task">
+                                    <select class="form-control" id="task" name="task" required>
                                         <option value="HO">HO</option>
                                         <option value="Sick">Sick</option>
                                         <option value="Other">Other</option>
@@ -195,7 +207,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="location" name="location">
+                                    <select class="form-control" id="location" name="location" required>
                                         <option value="DK">Dalam Kota</option>
                                         <option value="LK">Luar Kota</option>
                                         <option value="HO">Head Office</option>
@@ -210,21 +222,33 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                    <input type="time" class="form-control" required autocomplete="off" name="from" id="start-time">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="to" id="end-time">
+                                    <input type="time" class="form-control" required autocomplete="off" name="to" id="end-time">
                                 </div>
                             </div>
+                            {{-- <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">From :</label>
+                                    <input type="time" class="form-control" required step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">To :</label>
+                                    <input type="time" class="form-control" required step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="to" id="end-time">
+                                </div>
+                            </div> --}}
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="activity" name="activity"></textarea>
+                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>

@@ -37,9 +37,17 @@ function deleteActivity(activityId) {
         url: '/activities/' + activityId,
         type: 'DELETE',
         success: function(response) {
+            $('.alert-success-delete').show();
+            setTimeout(function() {
+                $('.alert-success-delete').fadeOut('slow');
+            }, 3000);
             fetchActivities(yearput, monthput);
         },
-        error: function(response) {
+        error: function(response,jqXHR, textStatus, errorThrown) {
+            $('.alert-danger-delete').show();
+            setTimeout(function() {
+                $('.alert-danger-delete').fadeOut('slow');
+            }, 3000);
             console.log(response);
         }
         });
@@ -77,12 +85,12 @@ function fetchActivities(yearput, monthput) {
                     var date = new Date(activity.ts_date);
                     var options = { weekday: 'short' };
                     row.append($('<td></td>').text(date.toLocaleDateString('en-US', options)));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').text(activity.ts_date));
-                    row.append($('<td></td>').text(activity.ts_task));
-                    row.append($('<td></td>').text(activity.ts_location));
-                    row.append($('<td></td>').text(activity.ts_activity));
-                    row.append($('<td></td>').text(activity.ts_from_time));
-                    row.append($('<td></td>').text(activity.ts_to_time));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                     var actions = $('<td></td>');
                     actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
                     row.append(actions);
@@ -165,7 +173,6 @@ function fetchActivities(yearput, monthput) {
     });
 }
 
-
   $('#save-entry').click(function(e) {
     e.preventDefault();
     // Serialize the form data
@@ -177,10 +184,14 @@ function fetchActivities(yearput, monthput) {
       data: formData,
       success: function(response) {
         $('.alert-success').show();
+        document.getElementById("activity").removeAttribute("readonly");
+        document.getElementById("location").removeAttribute("readonly");
+        document.getElementById("start-time").removeAttribute("readonly");
+        document.getElementById("end-time").removeAttribute("readonly");
         $('#entry-form')[0].reset();
             setTimeout(function() {
                 $('.alert-success').fadeOut('slow');
-            }, 5000);
+            }, 3000);
         // Fetch the updated list of activities
         fetchActivities(yearput, monthput);
       },
@@ -188,7 +199,7 @@ function fetchActivities(yearput, monthput) {
             $('.alert-danger').show();
             setTimeout(function() {
                 $('.alert-danger').fadeOut('slow');
-            }, 5000);
+            }, 3000);
         }
     });
   });
@@ -208,9 +219,4 @@ function fetchActivities(yearput, monthput) {
 //         });
 //     }
 // }
-$(function () {
-    $('#start-time, #end-time').datetimepicker({
-        format: 'H:m',
-    });
-});
 
