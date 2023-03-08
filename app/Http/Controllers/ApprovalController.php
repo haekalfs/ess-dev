@@ -46,8 +46,8 @@ class ApprovalController extends Controller
         $activities = Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
         ->where('ts_user_id', $user_timesheet)
         ->update(['ts_status_id' => '29']);
-        Timesheet_workflow::updateOrCreate(['user_id' => $user_timesheet,'activity' => 'Approved', 'month_periode' => $year.$month],['date_approved' => date('Y-m-d'), 'ts_status_id' => '29', 'note' => '', 'user_timesheet' => $user_timesheet]);
-        Timesheet_workflow::updateOrCreate(['user_id' => $user_timesheet,'activity' => 'Submitted', 'month_periode' => $year.$month],['ts_status_id' => '29', 'note' => '', 'user_timesheet' => $user_timesheet]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id,'activity' => 'Approved', 'month_periode' => $year.$month],['date_approved' => date('Y-m-d'), 'ts_status_id' => '29', 'note' => '', 'user_timesheet' => $user_timesheet]);
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id,'activity' => 'Submitted', 'month_periode' => $year.$month],['ts_status_id' => '29', 'note' => '', 'user_timesheet' => $user_timesheet]);
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
         Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");

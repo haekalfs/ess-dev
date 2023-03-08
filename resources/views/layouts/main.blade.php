@@ -105,7 +105,8 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Director</i></small></a>
+                        <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Primary</i></small></a>
+                        <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Additional</i></small></a>
                     </div>
                 </div>
             </li>
