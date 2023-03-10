@@ -75,3 +75,8 @@ Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth')->middl
 Route::put('/users/update/{id}', 'UserController@update')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->middleware(['checkRole:admin']);
 
+//medical reimburse
+// Testing
+Route::get('/medical/history', 'MedicalController@index')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth')->middleware(['checkRole:admin']);
+// Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update')->middleware(['checkRole:admin']);
