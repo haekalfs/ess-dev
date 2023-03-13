@@ -262,6 +262,86 @@ active
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Entry <a id="entry-date-update"></a></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form method="post" id="update-form">
+                @csrf
+				<div class="modal-body" style="">
+                    <input type="hidden" id="update_clickedDate" name="update_clickedDate">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Task :</label>
+                                    <select class="form-control" id="update_task" name="update_task" required>
+                                        <option value="HO">HO</option>
+                                        <option value="Sick">Sick</option>
+                                        <option value="Other">Other</option>
+                                        <option>Standby</option>
+                                        <optgroup label="Projects">
+                                            @foreach($assignment as $assign)
+                                            <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Location :</label>
+                                    <select class="form-control" id="update_location" name="update_location" required>
+                                        <option value="DK">Dalam Kota</option>
+                                        <option value="LK">Luar Kota</option>
+                                        <option value="HO">Head Office</option>
+                                        <option value="Outer Ring">Outer Ring (Bogor, Depok, Tangerang, Bekasi)</option>
+                                        <option value="WFH">WFH/WFA (Work From Home/Anywhere)</option>
+                                        <option hidden value="N/a">N/a</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">From :</label>
+                                    <input type="time" class="form-control" required autocomplete="off" name="update_from" id="update_from">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">To :</label>
+                                    <input type="time" class="form-control" required autocomplete="off" name="update_to" id="update_to">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Activity :</label>
+                                    <textarea type="text" class="form-control" id="update_activity" name="update_activity" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" id="update-entry" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
 <script>
     document.getElementById("task").addEventListener("change", function() {
     if (this.value === "Sick") {
