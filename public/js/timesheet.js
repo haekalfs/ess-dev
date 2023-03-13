@@ -151,7 +151,7 @@ function fetchActivities(yearput, monthput) {
                     row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
                     row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
                     row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal "></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
                     row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
                     row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                     var actions = $('<td></td>');
