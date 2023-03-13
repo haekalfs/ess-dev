@@ -33,8 +33,6 @@ $(function() {
             type: 'GET',
             success: function(response) {
                 // Set the values of the form fields with the data received from the server
-                $('#clickedDate').val(response.clickedDate);
-                $('#updateModal').find('#date').val(date);
                 $('#updateModal').find('#update_task').val(response.ts_task);
                 $('#updateModal').find('#update_location').val(response.ts_location);
                 $('#updateModal').find('#update_activity').val(response.ts_activity);
