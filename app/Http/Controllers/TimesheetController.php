@@ -249,6 +249,7 @@ class TimesheetController extends Controller
         }
         $entry = new Timesheet;
         $entry->ts_user_id = Auth::user()->id;
+        $entry->ts_id_date = str_replace('-','',$request->clickedDate);
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $request->task;
         $entry->ts_location = $request->location;
