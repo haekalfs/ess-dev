@@ -36,8 +36,8 @@ $(function() {
                 $('#updateModal').find('#update_task').val(response.ts_task);
                 $('#updateModal').find('#update_location').val(response.ts_location);
                 $('#updateModal').find('#update_activity').val(response.ts_activity);
-                $('#updateModal').find('#update_from-time').val(response.ts_from_time);
-                $('#updateModal').find('#update_to-time').val(response.ts_to_time);
+                $('#updateModal').find('#update_from').val(response.ts_from_time);
+                $('#updateModal').find('#update_to').val(response.ts_to_time);
     
             },
             error: function(response, jqXHR, textStatus, errorThrown) {

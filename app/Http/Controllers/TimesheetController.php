@@ -253,8 +253,8 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $request->task;
         $entry->ts_location = $request->location;
-        $entry->ts_from_time = $formattedFromTime;
-        $entry->ts_to_time = $formattedToTime;
+        $entry->ts_from_time = date('H:i', strtotime($request->from));;
+        $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
         $entry->save();
