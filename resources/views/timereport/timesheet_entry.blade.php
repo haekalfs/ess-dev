@@ -213,13 +213,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="from" id="start-time">
+                                    <input type="time" class="form-control" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="to" id="end-time">
+                                    <input type="time" class="form-control" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             {{-- <div class="col-md-6">
