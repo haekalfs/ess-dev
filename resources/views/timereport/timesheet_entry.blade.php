@@ -153,9 +153,11 @@ active
                 </tbody>
             </table>
         </div>
+        <div class="text-right zoom90">
+            <a class="btn btn-danger btn-sm" type="button" href="" id="">Reset All</a>
+        </div>
     </div>
 </div>
-<a class="btn btn-danger btn-sm" type="button" href="" id="">Reset All</a>
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 
