@@ -86,8 +86,20 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function() {
+    if (localStorage.getItem('modalShown') == null) {
+        $('#infoModal').modal('show');
+        localStorage.setItem('modalShown', 'true');
+    }
+    // localStorage.removeItem('modalShown');
+});
 
-
+$(document).ready(function() {
+    if (localStorage.getItem('modalHome') == null) {
+        $('#homeModal').modal('show');
+        localStorage.setItem('modalHome', 'true');
+    }
+});
 //this is my save function 
 $(document).ready(function() {
 

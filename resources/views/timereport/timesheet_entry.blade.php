@@ -338,7 +338,7 @@ active
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add Manually Entry<a id="entry-date-update"></a></h5>
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add Entry Manually<a id="entry-date-update"></a></h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -352,7 +352,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Date :</label>
-                                    <input type="date" class="form-control" required autocomplete="off" name="update_from" value="<?php echo date('Ymd'); ?>?">
+                                    <input type="date" class="form-control" required autocomplete="off" name="update_from">
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -419,6 +419,28 @@ active
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title m-0 font-weight-bold text-danger" id="exampleModalLabel">User Guide</h5>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p><a class="text-warning">Warning!!</a>. For now ESS is in the development stage. To submit your timesheet, follow these steps:</p>
+            <p>1. Add entries for each of your mandays, by clicking on the date on the calendar.</p>
+            <p>2. Fill in each column correctly! If your time format is AM/PM, the from and to time columns must have AM and PM. example : 02:00 PM</p>
+            <p>3. If everything has been filled in correctly, preview your timesheet then download it.</p>
+            <p>4. Send your timesheet to each leadership for the approval process.</p>
+            <p>Thank You.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">I Understand</button>
+        </div>
+      </div>
+    </div>
+</div>
+
 <script>
     document.getElementById("task").addEventListener("change", function() {
     if (this.value === "Sick") {
