@@ -70,13 +70,14 @@ Route::get('/project_list', 'ProjectController@project_list')->name('project-lis
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/tambah', 'UserController@tambah')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/users/store', 'UserController@store')->middleware('auth')->middleware(['checkRole:admin']);
+Route::post('/users/store', 'UserController@store')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth')->middleware(['checkRole:admin']);
 Route::put('/users/update/{id}', 'UserController@update')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->middleware(['checkRole:admin']);
 
 //medical reimburse
 // Testing
-Route::get('/medical/history', 'MedicalController@index')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
+Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
+Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth')->middleware(['checkRole:admin']);
 // Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update')->middleware(['checkRole:admin']);

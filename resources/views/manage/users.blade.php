@@ -30,11 +30,11 @@ active
 
 <div class="container">
     <div class="card mt-5 d-flex p-2">
-        <div class="card-header text-center">
-            <h3>Data Pegawai</h3>
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h5 class="m-0 font-weight-bold text-primary">Data Pegawai</h5>
         </div>
         <div class="card-body">
-            <a href="/users/tambah" class="btn btn-primary">Input Pegawai Baru</a>
+            <a href="/users/tambah" class="btn btn-primary btn-sm">Input Pegawai Baru</a>
             <br/>
             <br/>
             <table class="table table-bordered table-hover table-striped" id="dataTable">
@@ -54,7 +54,7 @@ active
                     @foreach($data as $p)
                     <tr style="font-size: 12px">
                         <td>{{$p->users_detail->employee_id}}</td>
-                        <td>{{$p->user_id }}</td>
+                        <td>{{$p->id }}</td>
                         <td>{{$p->name}}</td>
                         <td>{{$p->users_detail->employee_status}}</td>
                         <td>{{$p->users_detail->hired_date}}</td>

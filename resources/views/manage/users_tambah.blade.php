@@ -37,10 +37,9 @@ active
                 <h4 class="m-0 font-weight-bold text-primary">Add Employee</h4>
                 <form method="post" action="/users/store/">
                 @csrf
-                @method('PUT')
                 <div class="text-right">
-                    <a href="/manage/users" class="btn btn-primary" id="manButton">Kembali</a>
-                    <input type="submit" class="btn btn-success" value="Simpan">
+                    <a href="/manage/users" class="btn btn-primary btn-sm" id="manButton">Kembali</a>
+                    <input type="submit" class="btn btn-success btn-sm" value="Simpan">
                 </div>
             </div>
             <!-- Card Body -->
@@ -53,15 +52,18 @@ active
                                     <td><img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 225px;" /></td>
                                 </tr>
                                 <tr>
-                                    <td><a class="btn btn-primary btn-sm" type="button" href="{{ url()->previous() }}" id="manButton">Upload CV</a></td>
+                                    <td><a class="btn btn-primary btn-sm" type="button" href="#" id="manButton">Upload CV</a></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="col-md-6">
-                        <div class="row input-group input-group-sm ">
+                        <div class="row input-group input-group-sm ">  
 {{-- Employee Informasi --}}
                     <table class="table table-borderless ">
+                        <div class="col-md-7">
+                                
+                        </div>
                         <thead>
                             <tr>
                                 <th class="m-0 font-weight-bold text-primary" colspan="2">Employee Information</th>
@@ -153,34 +155,28 @@ active
                                 <tr class="table-sm">
                                     <td>Role Account</td>
                                     <td><select class="form-control form-control-sm" name="role" style="width: 48%">
-                                        <option selected disabled>Role choose</option>
-                                        <option value="employee">Employee</option>
+                                        <option selected value="employee">Employee</option>
                                         <option value="approval">Approval</option>
                                         <option value="admin">Admin</option>
                                       </select>
                                     </td>
                                 </tr>
+                                <tr class="table-sm">
+                                    <td>Email</td>
+                                    <td><input class="input-group-text" style="font-size: 11px"  name="email" placeholder="Email...">
+                                        @if($errors->has('email'))
+                                            <div class="text-danger">
+                                                {{ $errors->first('email')}}
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <td>Password</td>
+                                    <td><input class="input-group-text" style="font-size: 11px"  name="password" value="" placeholder="****">
+                                    </td>
+                                </tr>
                             </tbody>
-                            <tr class="table-sm">
-                                <td>Email</td>
-                                <td><input class="input-group-text" style="font-size: 11px"  name="email" placeholder="Email...">
-                                    @if($errors->has('email'))
-                                        <div class="text-danger">
-                                            {{ $errors->first('email')}}
-                                        </div>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr class="table-sm">
-                                <td>Password</td>
-                                {{-- <td><input class="input-group-text" style="font-size: 11px"  name="email" placeholder="Email...">
-                                    @if($errors->has('p'))
-                                        <div class="text-danger">
-                                            {{ $errors->first('email')}}
-                                        </div>
-                                    @endif --}}
-                                </td>
-                            </tr>
                         {{-- Kontak Informasi --}}
                         <thead>
                             <tr>
@@ -190,7 +186,7 @@ active
                         <tbody>
                             <tr class="table-sm">
                                 <td>Address</td>
-                                <td><input class="input-group-text" style="font-size: 11px"  name="usr_address" placeholder="User Address...">
+                                <td><textarea class="input-group-text" style="font-size: 11px"  name="usr_address" placeholder="User Address..."></textarea>
                                     @if($errors->has('usr_address'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_address')}}
@@ -200,7 +196,7 @@ active
                             </tr>
                             <tr class="table-sm">
                                 <td>Current Address</td>
-                                <td><input class="input-group-text" style="font-size: 11px"  name="current_address" placeholder="Current Address...">
+                                <td><textarea class="input-group-text" style="font-size: 11px"  name="current_address" placeholder="Current Address..."></textarea>
                                     @if($errors->has('current_address'))
                                         <div class="text-danger">
                                             {{ $errors->first('current_address')}}
@@ -288,7 +284,7 @@ active
                             </tr>
                             <tr class="table-sm">
                                 <td>Identity Expiration</td>
-                                <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_expiration" placeholder="User ID Card Expiration...">
+                                <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_expiration" placeholder="User Identity Expiration...">
                                     @if($errors->has('usr_id_expiration'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_id_expiration')}}
@@ -297,12 +293,12 @@ active
                                 </td>
                             </tr>
                         </tbody>
+                        {{-- Informasi Pribadi --}}
                         <thead>
                             <tr>
                                 <th class="m-0 font-weight-bold text-primary" colspan="2">Profile Information</th>
                             </tr>
                         </thead>
-                        {{-- Informasi Pribadi --}}
                         <tbody>
                             <tr class="table-sm">
                                 <td>Name</td>

@@ -30,12 +30,12 @@ active
 
 <div class="container">
     <div class="card mt-5 d-flex p-2">
-        <div class="card-header text-center">
-            <h3>Medical History</h3>
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h5 class="m-0 font-weight-bold text-primary">Medical History</h5>
         </div>
         <div class="card-body">
-            <a href="/medical/entry" class="btn btn-primary">New Request</a>
-            <a href="" class="btn btn-primary">View Report</a>
+            <a href="/medical/entry" class="btn btn-primary btn-sm">New Request</a>
+            <a href="" class="btn btn-primary btn-sm">View Report</a>
             <br/>
             <br/>
             <table class="table table-bordered table-hover table-striped" id="dataTable">
@@ -51,15 +51,15 @@ active
                 <tbody>
                     @foreach($med as $q)
                     <tr style="font-size: 12px">
-                        <td>{{$q->req_number}}</td>
-                        <td>{{$q->req_date}}</td>
-                        <td>{{$q->payment}}</td>
-                        <td>{{$q->status}}</td>
-                        <td class="row-cols-2 justify-content-betwen">
-                            <a href="/users/edit/" title="Edit" class="btn btn-warning btn-sm" >
+                        <td>{{$q->med_number}}</td>
+                        <td>{{$q->med_date}}</td>
+                        <td>{{$q->med_payment}}</td>
+                        <td>{{$q->med_status}}</td>
+                        <td class="row-cols-2 justify-content-betwen" style="align-items: center">
+                            <a href="#" title="Edit" class="btn btn-warning btn-sm" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>
                             </a>
-                            <a href="/users/hapus/" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-bars justify-content"></i></a>
+                            <a href="#" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-bars justify-content"></i></a>
                         </td>
                     </tr>
                     @endforeach
