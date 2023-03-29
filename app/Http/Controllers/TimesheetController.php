@@ -249,11 +249,12 @@ class TimesheetController extends Controller
         }
         $entry = new Timesheet;
         $entry->ts_user_id = Auth::user()->id;
+        $entry->ts_id_date = str_replace('-','',$request->clickedDate);
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $request->task;
         $entry->ts_location = $request->location;
-        $entry->ts_from_time = $formattedFromTime;
-        $entry->ts_to_time = $formattedToTime;
+        $entry->ts_from_time = date('H:i', strtotime($request->from));;
+        $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
         $entry->save();
@@ -374,5 +375,41 @@ class TimesheetController extends Controller
  
     	$pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'),['timesheet' => $activities,  'user_info' => $user_info,]);
     	return $pdf->download('timesheet - '. $year . $month.'.pdf');
+    }
+
+    public function getActivitiesEntry($year, $month, $id)
+    {
+        // Use the $year, $month, and $id parameters to fetch data from your database or other data source
+        $data = Timesheet::find($id);
+
+        // Return the data as a JSON response
+        return response()->json($data);
+    }
+
+    public function updateActivitiesEntry($id, Request $request)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'update_task' => 'required',
+            'update_clickedDate' => 'required',
+            'update_location' => 'required',
+            'update_from' => 'required',
+            'update_to' => 'required',
+            'update_activity' => 'required',
+        ]);
+
+        $inputFromTimeUpdate = $request->update_from;
+        $inputToTimeUpdate = $request->update_to;
+
+        $entry = Timesheet::find($id);
+        $entry->ts_task = $request->update_task;
+        $entry->ts_location = $request->update_location;
+        $entry->ts_from_time = date('H:i', strtotime($inputFromTimeUpdate));
+        $entry->ts_to_time = date('H:i', strtotime($inputToTimeUpdate));
+        $entry->ts_activity = $request->update_activity;
+        $entry->ts_status_id = '10';
+        $entry->save();
+
+        return response()->json(['success' => 'Entry updated successfully.']);
     }
 }

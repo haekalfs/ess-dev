@@ -120,7 +120,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Timesheet Preview</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" target="_blank" id="manButton" style="margin-right: 10px;">Download</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
         </div>
     </div>
     <!-- Card Body -->

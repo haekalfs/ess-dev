@@ -14,6 +14,69 @@ $(function() {
         $('#selected-date-display').text(formattedDateStr);
     });
 });
+
+$(function() {
+    $('#updateModal').on('show.bs.modal', function (event) {
+        var activityId = $(event.relatedTarget).data('id');
+        var date = $(event.relatedTarget).data('date');
+        var formattedDate = new Date(date).toLocaleDateString('en-US', { 
+            day: 'numeric', 
+            month: 'short', 
+            year: 'numeric' 
+        }).replace(',', '').split(' ');
+        var month = formattedDate[0];
+        var day = formattedDate[1];
+        var year = formattedDate[2];
+        var formattedDateStr = day + '-' + month + '-' + year;
+        $.ajax({
+            url: '/get-data/' + year + '/' + month + '/' + activityId,
+            type: 'GET',
+            success: function(response) {
+                // Set the values of the form fields with the data received from the server
+                $('#updateModal').find('#update_task').val(response.ts_task);
+                $('#updateModal').find('#update_location').val(response.ts_location);
+                $('#updateModal').find('#update_activity').val(response.ts_activity);
+                $('#updateModal').find('#update_from').val(response.ts_from_time);
+                $('#updateModal').find('#update_to').val(response.ts_to_time);
+    
+            },
+            error: function(response, jqXHR, textStatus, errorThrown) {
+                console.log(response);
+            }
+        });
+        $('#entry-date-update').text(formattedDateStr);
+
+        $('#update-entry').click(function(e) {
+            e.preventDefault();
+            var yearput = $('#yearSel').val();
+            var monthput = $('#monthSel').val();
+            // Serialize the form data
+            var updateData = $('#update-form').serialize();
+            // Send an AJAX request to the entries.store route
+            $.ajax({
+            type: 'POST',
+            url: '/update-entries/' + activityId,
+            data: updateData,
+            success: function(response) {
+                $('.alert-success').show();
+                $('#update-form')[0].reset();
+                    setTimeout(function() {
+                        $('.alert-success').fadeOut('slow');
+                    }, 3000);
+                // Fetch the updated list of activities
+                window.location.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                    $('.alert-danger').show();
+                    setTimeout(function() {
+                        $('.alert-danger').fadeOut('slow');
+                    }, 3000);
+                }
+            });
+        });
+    });
+});
+
 $(document).ready(function () {
     $('.clickable').click(function () {
         var clickedDate = $(this).data('date');
@@ -23,8 +86,20 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function() {
+    if (localStorage.getItem('modalShown') == null) {
+        $('#infoModal').modal('show');
+        localStorage.setItem('modalShown', 'true');
+    }
+    // localStorage.removeItem('modalShown');
+});
 
-
+$(document).ready(function() {
+    if (localStorage.getItem('modalHome') == null) {
+        $('#homeModal').modal('show');
+        localStorage.setItem('modalHome', 'true');
+    }
+});
 //this is my save function 
 $(document).ready(function() {
 
@@ -85,12 +160,12 @@ function fetchActivities(yearput, monthput) {
                     var date = new Date(activity.ts_date);
                     var options = { weekday: 'short' };
                     row.append($('<td></td>').text(date.toLocaleDateString('en-US', options)));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
-                    row.append($('<td data-toggle="modal" class="clickable" data-target="#myModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal "></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
+                    row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                     var actions = $('<td></td>');
                     actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
                     row.append(actions);
@@ -173,50 +248,37 @@ function fetchActivities(yearput, monthput) {
     });
 }
 
-  $('#save-entry').click(function(e) {
-    e.preventDefault();
-    // Serialize the form data
-    var formData = $('#entry-form').serialize();
-    // Send an AJAX request to the entries.store route
-    $.ajax({
-      type: 'POST',
-      url: '/entries',
-      data: formData,
-      success: function(response) {
-        $('.alert-success').show();
-        document.getElementById("activity").removeAttribute("readonly");
-        document.getElementById("location").removeAttribute("readonly");
-        document.getElementById("start-time").removeAttribute("readonly");
-        document.getElementById("end-time").removeAttribute("readonly");
-        $('#entry-form')[0].reset();
-            setTimeout(function() {
-                $('.alert-success').fadeOut('slow');
-            }, 3000);
-        // Fetch the updated list of activities
-        fetchActivities(yearput, monthput);
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-            $('.alert-danger').show();
-            setTimeout(function() {
-                $('.alert-danger').fadeOut('slow');
-            }, 3000);
-        }
+    $('#save-entry').click(function(e) {
+        e.preventDefault();
+        // Serialize the form data
+        var formData = $('#entry-form').serialize();
+        // Send an AJAX request to the entries.store route
+        $.ajax({
+        type: 'POST',
+        url: '/entries',
+        data: formData,
+        success: function(response) {
+            $('.alert-success').show();
+            document.getElementById("activity").removeAttribute("readonly");
+            document.getElementById("location").removeAttribute("readonly");
+            document.getElementById("start-time").removeAttribute("readonly");
+            document.getElementById("end-time").removeAttribute("readonly");
+            $('#entry-form')[0].reset();
+                setTimeout(function() {
+                    $('.alert-success').fadeOut('slow');
+                }, 3000);
+            // Fetch the updated list of activities
+            fetchActivities(yearput, monthput);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').show();
+                setTimeout(function() {
+                    $('.alert-danger').fadeOut('slow');
+                }, 3000);
+            }
+        });
     });
-  });
 });
-// function deleteActivity() {
-//     var activityId = $(this).data('id');
-//     if (confirm("Are you sure you want to delete this activity?")) {
-//         $.ajax({
-//             type: 'DELETE',
-//             url: '/activities/' + activityId,
-//             success: function(response) {
-//                 fetchActivities();
-//             },
-//             error: function(jqXHR, textStatus, errorThrown) {
-//                 console.log(textStatus, errorThrown);
-//             }
-//         });
-//     }
-// }
+
+
 

@@ -24,10 +24,12 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/logout', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //testing
 Route::get('/testing', 'TimesheetController@calendar')->middleware('auth')->middleware(['checkRole:admin']);
+Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name('save.entries');//testing
 
 //Timesheet
     //Editing
-Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name('save.entries');//testing
+Route::get('/get-data/{year}/{month}/{id}', 'TimesheetController@getActivitiesEntry');
+Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')->name('entries.update');
 
 Route::get('/timesheet', 'TimesheetController@index')->middleware('auth')->name('timesheet');
 Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry')->middleware('auth');
@@ -39,7 +41,7 @@ Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@previ
 Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print')->middleware('auth');
     //submit
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
-//Review
+    //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/timesheet/review/fm/export', 'ApprovalController@export_excel')->middleware('auth')->middleware(['checkRole:admin']);
 
