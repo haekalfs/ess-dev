@@ -100,10 +100,10 @@ active
                                                     <td>Postal Code</td>
                                                     <td>: {{$user_info->users_detail->usr_address_postal}}</td>
                                                 </tr>
-                                                <tr class="table-sm">
+                                                {{-- <tr class="table-sm">
                                                     <td>Province</td>
                                                     <td>: {{$user_info->users_detail->employee_id}}</td>
-                                                </tr>
+                                                </tr> --}}
                                                 <tr class="table-sm">
                                                     <td>Email</td>
                                                     <td>: {{$user_info->email}}</td>
@@ -210,7 +210,8 @@ active
                                             </tbody>
                                         </table>
                                     </div>
-                                </div><br>
+                                </div>
+                                <br>
                             </div>
                         </div>
                     </div>
