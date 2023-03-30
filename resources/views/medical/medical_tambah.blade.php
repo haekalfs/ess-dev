@@ -43,11 +43,11 @@ active
                     <div class="row" style="zoom:96%; padding-left:20px">
                         <h6>Payment Method  :</h6>
                         <label class="col-md-2">
-                            <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
+                            <input class="form-radio-input" type="radio" name="payment_method" id="pay_med" value="Cash" checked="">
                             <span class="form-radio-sign">Transfer</span>
                         </label>
                         <label class="col-md-4">
-                            <input class="form-radio-input" type="radio" name="payment_method" value="Transfer" checked="">
+                            <input class="form-radio-input" type="radio" name="payment_method" id="pay_med" value="Transfer" checked="">
                             <span class="form-radio-sign">Cash</span>
                         </label>
                     </div>
@@ -172,31 +172,32 @@ copyButton.addEventListener("click", function (event) {
         
         clonedForm.querySelector(`#items_label1`).innerHTML = `ENTRY #3 `;
     }
-    
+   
     document.querySelector(`#items_label0`).innerHTML = `ENTRY #2 `;
     // Submit the form data to the Laravel controller
     const medForm = document.querySelector("#btn-submit");
         medForm.addEventListener("submit", function(event) {
-            event.preventDefault();
+        event.preventDefault();
 
-            const medFormData = new medFormData(medForm);
+        const formData = new FormData(medForm);
 
-            fetch("/medical/entry/store", {
+        const totalAmount = document.getElementById('totalAmount').value;
+        formData.append('totalAmount', totalAmount);
+
+        fetch("/medical/entry/store", {
             method: "POST",
-            body: medFormData
-            })
-            .then(response => response.json())
-            .then(data => {
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
             console.log(data);
-            })
-            .catch(error => {
+        })
+        .catch(error => {
             console.error(error);
-            });
-
-            
         });
-});
+    });
 
+});
 
 // Function to undo the creation of the copied form
 function undoCreation() {

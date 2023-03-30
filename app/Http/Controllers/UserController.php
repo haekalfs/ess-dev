@@ -55,7 +55,9 @@ class UserController extends Controller
             'usr_bank_account'=> 'required',
             ]);
         
-        $lastId = Users_detail::orderBy('id', 'desc')->first()->id;
+        $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        $lastId = Users_detail::orderBy('id')->pluck('id')->first();
+        $nextId = intval(substr($lastId, 4)) + 1;
         $hash_pwd = Hash::make($request->password);
 
         User::create([
@@ -68,7 +70,7 @@ class UserController extends Controller
     	]);
  
         Users_detail::create([
-            'id' => $lastId + 1,
+            'id' => $nextId,
             'user_id' => $request->usr_id,
             'employee_id' => $request->employee_id,
             'position' => $request->position,
