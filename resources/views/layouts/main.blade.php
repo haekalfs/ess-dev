@@ -105,8 +105,11 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Primary</i></small></a>
+                        @if (Auth::user()->role == 'admin')
+                        <a class="collapse-item" href="/approval">Approval</a>
+                        @else
                         <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Additional</i></small></a>
+                        @endif
                     </div>
                 </div>
             </li>
@@ -188,7 +191,7 @@
                         <a class="collapse-item" href="/myprojects">MyProjects</a>
                         @if (Auth::user()->role == 'admin')
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/assigning">Project Assignment</a>
+                        <a class="collapse-item" href="/assignment">Project Assignment</a>
                         <a class="collapse-item" href="/project_list">Project Organization</a>
                         <a class="collapse-item" href="/development">Project Monitor</a>
                         @else
@@ -206,7 +209,7 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             @if (Auth::user()->role == 'admin')
-            <li class="nav-item @yield('active-page-users')">
+            <li class="nav-item @yield('active-page-system_management')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSystem"
                     aria-expanded="true" aria-controls="collapseSystem">
                     <i class="fas fa-fw fa-user-cog"></i>
@@ -216,8 +219,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Administrator Access:</h6>
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
-                        <a class="collapse-item" href="/development">Manage Roles</a>
-                        <a class="collapse-item" href="/development">User Group</a>
+                        <a class="collapse-item" href="/hrtools/manage/roles">User Access & Privilege</a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/users">List Employees</a>
                         <a class="collapse-item" href="/development">List Consultant</a>
@@ -238,8 +240,8 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">HR Access:</h6>
                         <a class="collapse-item" href="/development">Manage IDs</a>
-                        {{-- <a class="collapse-item" href="/development">Manage Roles</a>
-                        <a class="collapse-item" href="/development">User Group</a>
+                        {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
+                        {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/users">List Employees</a>
                         <a class="collapse-item" href="/development">List Consultant</a> --}}

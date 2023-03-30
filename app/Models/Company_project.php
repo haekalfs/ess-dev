@@ -9,4 +9,9 @@ class Company_project extends Model
 {
     use HasFactory;
     protected $table = "company_projects";
+
+
+    public function role(){
+    	return $this->hasMany('App\Models\Role');
+    }
 }

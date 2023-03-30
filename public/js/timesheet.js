@@ -99,6 +99,7 @@ $(document).ready(function() {
         $('#homeModal').modal('show');
         localStorage.setItem('modalHome', 'true');
     }
+    // localStorage.removeItem('modalHome');
 });
 //this is my save function 
 $(document).ready(function() {
@@ -150,6 +151,7 @@ function fetchActivities(yearput, monthput) {
                 var counts = {
                     'HO': 0,
                     'LK': 0,
+                    'LN': 0,
                     'DK': 0,
                     'WFH': 0,
                     'Outer Ring' : 0
@@ -185,6 +187,7 @@ function fetchActivities(yearput, monthput) {
                 var rates = {
                     'HO': 70000,
                     'LK': 200000,
+                    'LN': 400000,
                     'DK': 115000,
                     'WFH': 45000,
                     'Outer Ring' : 140000
@@ -194,6 +197,7 @@ function fetchActivities(yearput, monthput) {
                 var totals = {
                     'HO': 0,
                     'LK': 0,
+                    'LN': 0,
                     'DK': 0,
                     'WFH': 0,
                     'Outer Ring' : 0

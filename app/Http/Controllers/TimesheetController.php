@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EssMailer;
 use App\Models\Company_project;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
@@ -14,6 +15,7 @@ use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class TimesheetController extends Controller
@@ -133,7 +135,15 @@ class TimesheetController extends Controller
                 break;
             }
         }
-        $assignment = Company_project::all();
+        // Company_project::all();
+        $userId = Auth::user()->id;
+
+        $assignment = DB::table('project_assignment_users')
+            ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
+            ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
+            ->select('project_assignment_users.*', 'company_projects.project_name', 'company_projects.project_code', 'project_assignments.assignment_no')
+            ->where('project_assignment_users.user_id', '=', $userId)
+            ->get();
         if($lastUpdate){
             if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
                 Session::flash('failed',"You've already submitted your timereport!");

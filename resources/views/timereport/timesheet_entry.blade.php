@@ -111,7 +111,7 @@ active
                 <div class="card shadow mb-4">
                     <!-- Card Header - Dropdown -->
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Projects Assignment</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">MyProjects Assignment</h6>
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
@@ -182,14 +182,14 @@ active
                                     <label for="password">Task :</label>
                                     <select class="form-control" id="task" name="task" required>
                                         <option value="HO">HO</option>
-                                        <option value="Sick">Sick</option>
-                                        <option value="Other">Other</option>
-                                        <option>Standby</option>
                                         <optgroup label="Projects">
                                             @foreach($assignment as $assign)
                                             <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
                                             @endforeach
                                         </optgroup>
+                                        <option>Standby</option>
+                                        <option value="Sick">Sick</option>
+                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                             </div>
@@ -203,6 +203,7 @@ active
                                         <option value="LK">Luar Kota</option>
                                         <option value="HO">Head Office</option>
                                         <option value="Outer Ring">Outer Ring (Bogor, Depok, Tangerang, Bekasi)</option>
+                                        <option value="LN">Luar Negeri</option>
                                         <option value="WFH">WFH/WFA (Work From Home/Anywhere)</option>
                                         <option hidden value="N/a">N/a</option>
                                     </select>

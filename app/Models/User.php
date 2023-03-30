@@ -47,4 +47,8 @@ class User extends Authenticatable
     public function users_detail(){
     	return $this->hasOne('App\Models\Users_detail');
     }
+
+    public function role(){
+    	return $this->hasMany('App\Models\Role');
+    }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\CheckRole;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,7 +56,7 @@ Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->nam
 
 //Approval
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/approval/director', 'ApprovalController@approval_director')->name('approval-director')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/timesheet/p', 'ApprovalController@approval_primary')->name('approval_primary')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/director/preview/{id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth')->middleware(['checkRole:admin']);
@@ -65,8 +66,10 @@ Route::get('/approval/director/preview/{id}/{year}/{month}', 'ApprovalController
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
 
 //Project Assignment
-Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/assigning', 'ProjectController@assigning')->name('project-assigning')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth')->middleware(['checkRole:employee,consultant']);
+Route::get('/assignment', 'ProjectController@assigning')->name('project-assigning')->middleware('auth')->middleware(['checkRole:admin']);
+Route::post('/assignment/add-entries', 'ProjectController@add_project_assignment')->name('add_projects')->middleware('auth');
+Route::post('/assignment/add-member/{id}', 'ProjectController@add_project_assignment_member')->name('project-assigning')->middleware('auth');
 Route::get('/project_list', 'ProjectController@project_list')->name('project-list')->middleware('auth')->middleware(['checkRole:admin']);
 
 //manage users
@@ -77,3 +80,13 @@ Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth')->middl
 Route::put('/users/update/{id}', 'UserController@update')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->middleware(['checkRole:admin']);
 
+
+//HR TOOLS
+Route::get('/hrtools/manage/roles', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::post('/manage/roles/add-role', 'ManagementController@add_roles')->name('add_roles')->middleware('auth');
+
+
+
+
+///Mailer
+Route::get('/kirimemail','MailerController@index');

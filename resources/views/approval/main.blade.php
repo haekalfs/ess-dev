@@ -28,14 +28,14 @@ active
 @endif
 <div class="row">
     <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
+    <div class="col-xl-3 col-md-6 mb-4 timesheet">
         <div class="card border-left-primary shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
-                    <div class="col mr-2"><a href="/approval/director">
+                    <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                             Timesheet Approval</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div></a>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -205,14 +205,14 @@ active
                 </div>
             
                 <!-- Pending Requests Card Example -->
-                <div class="col-xl-3 col-md-6 mb-4">
+                <div class="col-xl-3 col-md-6 mb-4 testtt">
                     <div class="card border-left-dark shadow h-100 py-2">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
-                                <div class="col mr-2"><a href="#">
+                                <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
                                         Leave History</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">0</div><a>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-plane-departure fa-2x text-gray-300"></i>
@@ -225,6 +225,20 @@ active
         </div>
     </div>
 </div>
+<script>
+    const card = document.querySelector('.timesheet');
+
+    card.addEventListener('click', function() {
+    window.location.href = '/approval/timesheet/p';
+    });
+    card.addEventListener('mouseover', function() {
+    card.style.cursor = 'pointer';
+    });
+
+    card.addEventListener('mouseout', function() {
+    card.style.cursor = 'default';
+    });
+</script>
 <style>
 .action{
     width: 190px;

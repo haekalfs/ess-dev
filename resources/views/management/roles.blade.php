@@ -1,12 +1,10 @@
 @extends('layouts.main')
 
-@section('active-page-project')
+@section('active-page-system_management')
 active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -20,60 +18,95 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-
-@if ($message = Session::get('warning'))
-<div class="alert alert-warning alert-block">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>{{ $message }}</strong>
-</div>
-@endif
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Project Assignment</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Manage Roles</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addModal" id="addButton">+ New Assignment</a>
+            <button class="btn btn-primary btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Assign Role</button>
         </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered zoom90" width="100%" id="dataTableRoles" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
-                        <th>Request Date</th>
-                        <th>Assignment No.</th>
-                        <th>Project Name</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>No</th>
+                        <th>Role Name</th>
+                        <th width="80px">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($assignment as $assign)
-                    <tr>
-                        <td>{{ $assign->req_date }}</td>
-                        <td>{{ $assign->assignment_no }}</td>
-                        <td>{{ $assign->project_name }}</td>
-                        <td>New Request</td>
-                        <td>
-                            <div class=''>
-                                <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                    Action
-                                </a>
-                                <div class='dropdown-menu' aria-labelledby='dropdownMenu'>
-                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
-                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                    @foreach ($users as $user)
+                        <tr>
+                            <td>{{ $user['name'] }}</td>
+                            <td>{{ $user['roles'] }}</td>
+                            <td>
+                                <div class=''>
+                                    <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu2' data-toggle='dropdown'
+                                        aria-haspopup='true' aria-expanded='false'>
+                                        Action
+                                    </a>
+                                    <div class='dropdown-menu' aria-labelledby='dropdownMenu2'>
+                                        <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
+                                        <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+<div class="card shadow mb-4">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-primary">Roles</h6>
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse" id="collapseCardExample">
+        <div class="card-body">
+            <div class="text-right">
+                <button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addRoleModal" id="addButton" style="margin-right: 10px;">+ New Role</button> 
+            </div><br>
+            <div class="table-responsive">
+                <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>No</th>
+                            <th>Role Name</th>
+                            <th width="80px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $user)
+                            <tr>
+                                <td>{{ $user['name'] }}</td>
+                                <td>{{ $user['roles'] }}</td>
+                                <td>
+                                    <div class=''>
+                                        <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu2' data-toggle='dropdown'
+                                            aria-haspopup='true' aria-expanded='false'>
+                                            Action
+                                        </a>
+                                        <div class='dropdown-menu' aria-labelledby='dropdownMenu2'>
+                                            <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
+                                            <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+<div class="modal fade" id="addRoleModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header border-bottom-1">
@@ -116,9 +149,7 @@ active
                                 <div class="form-group">
                                     <label for="password">Project :</label>
                                     <select class="form-control" id="update_location" name="update_location" required>
-                                            @foreach($project as $company_project)
-                                            <option value="{{$company_project->project_name}}">{{ $company_project->project_name}}</option>
-                                            @endforeach
+                                        
                                     </select>
                                 </div>
                             </div>
