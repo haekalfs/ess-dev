@@ -5,17 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Project_assignment extends Model
+class Role extends Model
 {
-    use HasFactory;
-    protected $table = "Project_assignments";
-
+    protected $table = "roles";
+    protected $fillable = ["id", "role_name", "role_id", "user_id", "created_at", "updated_at"];
 
     public function user(){
     	return $this->belongsTo('App\Models\Users');
-    }
-
-    public function worker(){
-    	return $this->hasMany('App\Models\Project_assignment_user');
     }
 }

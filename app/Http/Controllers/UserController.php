@@ -14,7 +14,6 @@ class UserController extends Controller
     {
         $data = User::all();
         return view('manage.users', ['data' => $data]);
-        
     }
     
     public function tambah()

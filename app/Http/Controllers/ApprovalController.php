@@ -31,13 +31,13 @@ class ApprovalController extends Controller
 		return view('approval.main', compact('workflows'));
 	}
 
-    public function approval_director()
+    public function approval_primary()
     {
         $currentMonth = date('m');
         $currentYear = date('Y');
 
         $approvals = Timesheet_workflow::where('ts_status_id', '20')->whereYear('date_submitted', $currentYear)->get();
-        return view('approval.director', compact('approvals'));
+        return view('approval.approval_primary', compact('approvals'));
     }
 
     public function approve_director($user_timesheet,$year,$month)

@@ -29,9 +29,9 @@ active
 @endif
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Projects Organization</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Project Assignment</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button" href="" id="copyButton">+ New Project</a>
+            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addModal" id="addButton">+ New Assignment</a>
         </div>
     </div>
     <div class="card-body">
@@ -39,25 +39,31 @@ active
             <table class="table table-bordered zoom90" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Project Code</th>
+                        <th>Request Date</th>
+                        <th>Assignment No.</th>
                         <th>Project Name</th>
-                        <th>Client Name</th>
-                        <th>Periode Start</th>
-                        <th>Periode End</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($projects as $project)
+                    @foreach($assignment as $assign)
                     <tr>
-                        <td>{{ $project->id }}</td>
-                        <td>{{ $project->project_code}}</td>
-                        <td>{{ $project->project_name}}</td>
-                        <td>{{ $project->client_id}}</td>
-                        <td>{{ $project->periode_start}}</td>
-                        <td>{{ $project->periode_end}}</td>
-                        <td><a class="btn btn-primary btn-sm" href="#">Action</a> </td>
+                        <td>{{ $assign->req_date }}</td>
+                        <td>{{ $assign->assignment_no }}</td>
+                        <td>{{ $assign->project_name }}</td>
+                        <td>New Request</td>
+                        <td>
+                            <div class=''>
+                                <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                    Action
+                                </a>
+                                <div class='dropdown-menu' aria-labelledby='dropdownMenu'>
+                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
+                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -65,6 +71,7 @@ active
         </div>
     </div>
 </div>
+
 <style>
 .action{
     width: 180px;

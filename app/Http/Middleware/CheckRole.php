@@ -15,17 +15,16 @@ class CheckRole
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, ...$roles)
     {
-        $roles = array_slice(func_get_args(), 2);
+        $user = $request->user();
+        $userRoles = $user->role()->whereIn('role_name', $roles)->get();
 
-        foreach ($roles as $role) { 
-            $user = \Auth::user()->role;
-            if( $user == $role){
-                return $next($request);
-            }
+        if ($userRoles->count() > 0) {
+            return $next($request);
         }
         Session::flash('failed',"You doesn't have rights to access this page!");
-        return redirect('/');
+        return redirect('/'); // or return a response with an error message
     }
+
 }
