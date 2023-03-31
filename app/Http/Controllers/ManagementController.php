@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Role;
+use App\Models\Role_template;
+use App\Models\User;
 
 class ManagementController extends Controller
 {
     public function roles()
     {
+        
         $users = DB::table('users')
         ->join('roles', 'users.id', '=', 'roles.user_id')
         ->select('users.id', 'users.name', 'roles.role_name', 'roles.created_at')
@@ -17,6 +20,8 @@ class ManagementController extends Controller
         ->get();
 
     $usersData = [];
+
+    $r_name= Role_template::all();
 
     foreach ($users as $user) {
         if (!isset($usersData[$user->id])) {
@@ -43,18 +48,41 @@ class ManagementController extends Controller
             'created_at' => $userData['created_at']
         ];
     }
-
-    return view('management.roles', ['users' => $usersList]);
+        
+    return view('management.roles', ['users' => $usersList, 'r_name' =>$r_name,]);
     }
 
     public function add_roles(Request $request)
     {
+        // $latestForm = Role_template::whereNull('deleted_at')->orderBy('id')->pluck('id')->first();
+        // $nextForm = intval(substr($latestForm, 4))+ 1;
+        $lastId = Role_template::orderBy('id', 'desc')->first();
+        $nextId = ($lastId) ? $lastId->id + 1 : 1;
+        $randomNumber = mt_rand(10, 90);              
+        
         $this->validate($request,[
-            'date_prepared' => 'required',
-    		'po_req_number' => 'required'
+    		'new_role' => 'required',
+            'new_role_code' => 'required'
     	]);
 
+        Role_template::create([
+            'id' => $nextId,
+            'role' => $request->new_role_code,
+    		'role_name' => $request->new_role,
+            'role_id'=> $randomNumber
+    	]);
+        return redirect('/hrtools/manage')->with('success', 'Role Create successfully');
+    }
 
-        return view('projects.assigning', compact('assignment', 'project'));
+    public function delete($id)
+    {
+        $r_name = DB::table('role_templates')->where('id', $id)->delete();
+        return redirect('/hrtools/manage')->with('success', 'Role delete successfully');
+    }
+    
+    public function edit($id)
+    {
+        $r_name = Role_template::findOrFail($id);
+        return view('/hrtools/manage', compact('role_template'));
     }
 }

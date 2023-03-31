@@ -13,4 +13,8 @@ class Role extends Model
     public function user(){
     	return $this->belongsTo('App\Models\Users');
     }
+
+    public function role_template(){
+    	return $this->hasOne('App\Models\Role_template');
+    }
 }
