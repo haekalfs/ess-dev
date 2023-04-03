@@ -109,19 +109,35 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/manage/add_roles" method="post">
+			<form action="/manage/assign_roles" method="post">
                 @csrf
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="password">Role Name :</label>
-                                    <input type="text" class="form-control" id="input-new_role" name="new_role">
+                                    <label for="password">Select Users :</label>
+                                    <input list="encodings" value="" class="col-sm-12 custom-select custom-select-sm">
+                                    <datalist id="encodings">
+                                        <option value="ISO-8859-1">ISO-8859-1</option>
+                                        <option value="cp1252">ANSI</option>
+                                        <option value="utf8">UTF-8</option>
+                                    </datalist>
                                 </div>
+                            </div>
+                        </div>
+				    </div>
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="password">Role Code :</label>
-                                    <input type="text" class="form-control" id="input-new_role" name="new_role_code">
+                                    <label for="password">Select Roles :</label>
+                                    <input list="encodings" value="" class="col-sm-12 custom-select custom-select-sm">
+                                    <datalist id="encodings">
+                                        <option value="ISO-8859-1">ISO-8859-1</option>
+                                        <option value="cp1252">ANSI</option>
+                                        <option value="utf8">UTF-8</option>
+                                    </datalist>
                                 </div>
                             </div>
                         </div>
