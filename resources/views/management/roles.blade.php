@@ -41,16 +41,7 @@ active
                             <td>{{ $user['name'] }}</td>
                             <td>{{ $user['roles'] }}</td>
                             <td>
-                                <div class=''>
-                                    <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu2' data-toggle='dropdown'
-                                        aria-haspopup='true' aria-expanded='false'>
-                                        Action
-                                    </a>
-                                    <div class='dropdown-menu' aria-labelledby='dropdownMenu2'>
-                                        <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
-                                        <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
-                                    </div>
-                                </div>
+                                <a href="/manage/roles/assign_delete/{{ $user['roles'] }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i></a>
                             </td>
                         </tr>
                     @endforeach
@@ -109,7 +100,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/manage/assign_roles" method="post">
+			<form action="/manage/roles/assign_roles" method="post">
                 @csrf
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
@@ -117,12 +108,18 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Select Users :</label>
-                                    <input list="encodings" value="" class="col-sm-12 custom-select custom-select-sm">
+                                    <select class="custom-select" id="inputUser" name="inputUser">
+                                        <option selected disabled>Choose...</option>
+                                        @foreach ($us_List as $userlist)
+                                            <option value="{{ $userlist->id}}">{{ $userlist->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    {{-- <input list="encodings" value="" class="col-sm-12 custom-select custom-select-sm">
                                     <datalist id="encodings">
-                                        <option value="ISO-8859-1">ISO-8859-1</option>
-                                        <option value="cp1252">ANSI</option>
-                                        <option value="utf8">UTF-8</option>
-                                    </datalist>
+                                        @foreach ($usersList as $userlist)
+                                            <option value="{{ $userlist->name }}">{{ $userlist->name }}</option>
+                                        @endforeach
+                                    </datalist> --}}
                                 </div>
                             </div>
                         </div>
@@ -132,12 +129,12 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Select Roles :</label>
-                                    <input list="encodings" value="" class="col-sm-12 custom-select custom-select-sm">
-                                    <datalist id="encodings">
-                                        <option value="ISO-8859-1">ISO-8859-1</option>
-                                        <option value="cp1252">ANSI</option>
-                                        <option value="utf8">UTF-8</option>
-                                    </datalist>
+                                    <select class="custom-select" id="inputRole" name="inputRole">
+                                        <option selected disabled>Choose...</option>
+                                        @foreach($r_name as $rn)
+                                            <option value="{{ $rn ->role }}">{{ $rn ->role_name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -193,7 +190,7 @@ active
 </style>
 <script>
     function isconfirm() {
-        var conf = confirm("Are you sure you want to delete this role template?");
+        var conf = confirm("Are you sure you want to delete this ?");
         if (conf) {
             return true;
         } else {

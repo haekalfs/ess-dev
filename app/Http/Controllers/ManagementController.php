@@ -21,9 +21,8 @@ class ManagementController extends Controller
         ->get();
 
     $usersData = [];
-
+    $u_List= User::all();
     $r_name= Role_template::all();
-
     foreach ($users as $user) {
         if (!isset($usersData[$user->id])) {
             // If this is the first time we've seen this user, create a new entry in the $usersData array
@@ -50,8 +49,9 @@ class ManagementController extends Controller
         ];
     }
         
-    return view('management.roles', ['users' => $usersList, 'r_name' =>$r_name,]);
+    return view('management.roles', ['users' => $usersList, 'r_name' =>$r_name, 'us_List' => $u_List]);
     }
+
 
     public function add_roles(Request $request)
     {
@@ -75,6 +75,29 @@ class ManagementController extends Controller
         return redirect('/hrtools/manage/roles')->with('success', 'Role Create successfully');
     }
 
+    public function assign_roles(Request $request)
+    {
+        $lastId = Role::orderBy('id', 'desc')->first();
+        $nextId = ($lastId) ? $lastId->id + 1 : 1;        
+        
+        $this->validate($request,[
+    		'inputUser' => 'required',
+            'inputRole' => 'required'
+    	]);
+
+        Role::create([
+            'id' => $nextId,
+            'user_id' => $request->inputUser,
+    		'role_name' => $request->inputRole,
+    	]);
+        return redirect('/hrtools/manage/roles')->with('success', 'Role Assign successfully');
+    }
+    public function assign_delete($user_id)
+    {   
+        $users = DB::table('roles')->where('user_id', $user_id)->delete();
+        return redirect('/hrtools/manage/roles')->with('success', 'Role delete successfully');
+    }
+    
     public function delete($id)
     {   
         $r_name = DB::table('role_templates')->where('id', $id)->delete();

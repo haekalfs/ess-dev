@@ -85,10 +85,9 @@ Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->mi
 Route::get('/hrtools/manage/roles', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/manage/roles/delete/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::post('/manage/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::get('/hrtools/manage/delete/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-
 
 
 
