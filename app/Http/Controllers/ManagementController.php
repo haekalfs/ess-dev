@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Role_template;
 use App\Models\User;
+use Maatwebsite\Excel\Row;
 
 class ManagementController extends Controller
 {
@@ -80,4 +81,9 @@ class ManagementController extends Controller
         return redirect('/hrtools/manage/roles')->with('success', 'Role delete successfully');
     }
     
+    public function edit($id)
+    {
+        $r_name = Role_template::findOrFail($id);
+        return view('/hrtools/manage/roles', compact('role_template'));
+    }
 }
