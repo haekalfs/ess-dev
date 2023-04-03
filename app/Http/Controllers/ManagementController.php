@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Role_template;
 use App\Models\User;
+use Maatwebsite\Excel\Row;
 
 class ManagementController extends Controller
 {
@@ -71,18 +72,18 @@ class ManagementController extends Controller
     		'role_name' => $request->new_role,
             'role_id'=> $randomNumber
     	]);
-        return redirect('/hrtools/manage')->with('success', 'Role Create successfully');
+        return redirect('/hrtools/manage/roles')->with('success', 'Role Create successfully');
     }
 
     public function delete($id)
     {
         $r_name = DB::table('role_templates')->where('id', $id)->delete();
-        return redirect('/hrtools/manage')->with('success', 'Role delete successfully');
+        return redirect('/hrtools/manage/roles')->with('success', 'Role delete successfully');
     }
     
     public function edit($id)
     {
         $r_name = Role_template::findOrFail($id);
-        return view('/hrtools/manage', compact('role_template'));
+        return view('/hrtools/manage/roles', compact('role_template'));
     }
 }

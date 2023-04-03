@@ -22,7 +22,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Manage Roles</h6>
         <div class="text-right">
-            <button class="btn btn-primary btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Assign Role</button>
+            <button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#assignRoleModal" id="manButton" style="margin-right: 10px;">+ Assign Role</button>
         </div>
     </div>
     <div class="card-body">
@@ -99,6 +99,42 @@ active
     </div>
 </div>
 
+
+<div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Assign Role</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form action="/manage/add_roles" method="post">
+                @csrf
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Role Name :</label>
+                                    <input type="text" class="form-control" id="input-new_role" name="new_role">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Role Code :</label>
+                                    <input type="text" class="form-control" id="input-new_role" name="new_role_code">
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary btn-sm" value="Save">
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
 <div class="modal fade" id="addRoleModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
