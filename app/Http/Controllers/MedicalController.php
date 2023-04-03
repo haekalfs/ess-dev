@@ -25,164 +25,105 @@ class MedicalController extends Controller
     }
     public function entry()
     {
-        // $string = "MED_00001";
-        // $prefix = $pieces[0]; // "MED"
-        // $latestTitle = Medical::whereNull('deleted_at')->orderBy('med_number')->pluck('med_number')->first();
-        // $nextTitle = $latestTitle + 1;
-        $uniqueId = hexdec(substr(uniqid(), 0, 8));
         $latestForm = Medical::whereNull('deleted_at')->orderBy('med_number')->pluck('med_number')->first();
         $nextForm = intval(substr($latestForm, 4)) + 1;
         $nextMedNumber = 'MED_' . str_pad($nextForm, 5, '0', STR_PAD_LEFT);    
         return view('medical.medical_tambah', compact('nextMedNumber'));
-        
     }
 
-    public function store(Request $request)
+    public function edit($id)
+    {
+        $med = Medical::with('Medical_details')->findOrFail($id);
+        return view('medical.medical_edit', compact('med'));
+    }
+    public function p(Request $request)
     {
         $this->validate($request, [
-            'id' => 'required',
-            'med_number' => 'required',
-            'med_users' => 'required',
-            'med_req_date' => 'required',
-            'med_payment' => 'required',
-            'med_status' => 'required',
-            'med_total_amount' => 'required',
-            'mdet_id' => 'required',
-            'mdet_attachment' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'mdet_amount' => 'required|numeric',
-            'mdet_desc' => 'required|string|max:255',
+            'payment_method' => 'required',
+            // 'attach' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'amount' => 'required',
+            // 'desc' => 'required',
+            'totalAmount' => 'required',
+        
         ]);
     
-        $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        $lastId = Medical::orderBy('id', 'desc')->first();
+        $nextId = ($lastId) ? $lastId->id + 1 : 1;
         $latestForm = Medical::whereNull('deleted_at')->orderBy('med_number')->pluck('med_number')->first();
         $nextForm = intval(substr($latestForm, 4)) + 1;
         $nextMedNumber = 'MED_' . str_pad($nextForm, 5, '0', STR_PAD_LEFT);
     
-        while (Medical::where('id', $uniqueId)->exists()) {
-            $uniqueId = hexdec(substr(uniqid(), 0, 8));
-        }
-    
         Medical::create([
-            'id' => $uniqueId,
+            'id' => $nextId,
             'med_number' => $nextMedNumber,
             'med_users' => Auth::user()->id,
             'med_req_date' => date('Y-m-d'),
-            'med_payment' => $request->pay_med,
+            'med_payment' => $request->payment_method,
             'med_status' => 'New Request',
             'med_total_amount' => $request->totalAmount,
         ]);
     
-        $med_detail = new Medical_details();
+        // $med_detail = new Medical_details();
     
-        if ($request->hasFile('mdet_attachment')) {
-            $attach = $request->file('mdet_attachment');
-            $filename = time() . '.' . $attach->getClientOriginalExtension();
-            $attach->move(public_path('attach'), $filename);
-            $med_detail->mdet_attachment = $filename;
-        }
+        // if ($request->hasFile('mdet_attachment')) {
+        //     $attach = $request->file('mdet_attachment');
+        //     $filename = time() . '.' . $attach->getClientOriginalExtension();
+        //     $attach->move(public_path('attach'), $filename);
+        //     $med_detail->mdet_attachment = $filename;
+        // }
     
-        $med_detail->mdet_id = $request['id'];
-        $med_detail->mdet_number = $nextMedNumber;
-        $med_detail->mdet_amount = $request['mdet_amount'];
-        $med_detail->mdet_desc = $request['mdet_desc'];
-        $med_detail->save();
+        // $med_detail->mdet_id = $request['id'];
+        // $med_detail->mdet_number = $nextMedNumber;
+        // $med_detail->mdet_amount = $request['mdet_amount'];
+        // $med_detail->mdet_desc = $request['mdet_desc'];
+        // $med_detail->save();
     
         return redirect('medical.history')->with('success', 'Medical Reimburse Add successfully');
  
+    }
 
-        // menyimpan data file yang diupload ke variabel $file
-        // $file = $request->file('attach');
-
-        // // nama file
-        // echo 'File Name: '.$file->getClientOriginalName();
-        // echo '<br>';
-
-        // // ekstensi file
-        // echo 'File Extension: '.$file->getClientOriginalExtension();
-        // echo '<br>';
-
-        // // real path
-        // echo 'File Real Path: '.$file->getRealPath();
-        // echo '<br>';
-
-        // // ukuran file
-        // echo 'File Size: '.$file->getSize();
-        // echo '<br>';
-
-        // // tipe mime
-        // echo 'File Mime Type: '.$file->getMimeType();
-
-        // // isi dengan nama folder tempat kemana file diupload
-        // $upload_folder = public_path('img/');
-
-        // // upload file
-        // $file->move($upload_folder, Auth::medical_details()->mdet_number.".".$file->getClientOriginalExtension());
-
-        // $mdet = medical_details::find(Auth::user()->id);
-        // $mdet->mdet_attachment = Auth::user()->id.".".$file->getClientOriginalExtension();
-        // $mdet->save();
+    public function store(Request $request)
+    {
+        // Validasi data yang di-submit dari form
+        $request->validate([
+            'payment_method' => 'required',
+            'totalAmount' => 'required',
+            'attach.*' => 'required',
+            'amount.*' => 'required',
+            'desc.*' => 'required',
+        ]);
         
-        // Medical_details::create([
-        //     'id' => $uniqueId,
-        //     'mdet_number' => $nextMedNumber,
-        //     'mdet_attachment' => $request-> attach,
-        //     'mdet_amount' => $request-> amount,
-        //     'mdet_desc' => $request-> desc,
+        $lastId = Medical::orderBy('id', 'desc')->first();
+        $nextId = ($lastId) ? $lastId->id + 1 : 1;
+        $latestForm = Medical::whereNull('deleted_at')->orderBy('med_number')->pluck('med_number')->first();
+        $nextForm = intval(substr($latestForm, 4)) + 1;
+        $nextMedNumber = 'MED_' . str_pad($nextForm, 5, '0', STR_PAD_LEFT);
 
-        // ]);
+        // Buat objek Medical dan simpan ke dalam database
+        $medical = new Medical;
+        $medical->med_id = $request->$nextId;
+        $medical->med_number = $request->$nextMedNumber;
+        $medical->med_users = $request->Auth::user()->id;
+        $medical->med_payment = $request->input('payment_method');
+        // $medical->med_status = $request->New Request;
+        $medical->med_total_amount = $request->input('totalAmount');
+        $medical->save();
 
-        // // Validate the form data
-        // $data = $request->validate([
-        //     'mdet_attachment.*' => 'required',
-        //     'mdet_amount.*' => 'required',
-        //     'mdet_desc.*' => 'required'
-        // ]);
+        // Looping untuk mengambil data dari form dan memasukkannya ke dalam tabel medical_details
+        $attachArr = $request->input('attach');
+        $amountArr = $request->input('amount');
+        $descArr = $request->input('desc');
+        for ($i = 0; $i < count($attachArr); $i++) {
+            $medicalDetail = new Medical_details;
+            $medicalDetail->mdet_id = $medical->med_id;
+            $medicalDetail->mdet_med_number = $medical->med_number;
+            $medicalDetail->mdet_attachment = $attachArr[$i];
+            $medicalDetail->mdet_amount = $amountArr[$i];
+            $medicalDetail->mdet_desc = $descArr[$i];
+            $medicalDetail->save();
+        }
 
-        // $attach = $request->file('attach');
-        // $amount = $request->input('amount');
-        // $desc = $request->input('desc');
-    
-        // if ($request->hasFile('attach')) {
-        //     foreach ($attach as $key => $value) {
-        //         $imageName = time() . '_' . $value->getClientOriginalName();
-        //         $value->move(public_path('images'), $imageName);
-        //         $data[] = array(
-        //             'attach' => $imageName,
-        //             'amount' => $amount[$key],
-        //             'desc' => $desc[$key]
-        //         );
-        //     }
-        // }
-
-        // for($i = 0; $i < count($attach); $i++){
-        //     DB::table('Medical_details')->insert([
-        //         'mdet_attachment' => $attach[$i],
-        //         'mdet_amount' => $amount[$i],
-        //         'mdet_desc' => $desc[$i]
-        //     ]);
-        // }
-        
-        // Count the number of items in the arrays
-        // $num_items = count($data['attach']);
-        // $num_units = count($data['amount']);
-        // $num_units = count($data['desc']);
-
-        // if ($num_items == $num_units) {
-        //     for ($i = 0; $i < count($attach); $i++) {
-        //         $data = new Medical;
-        //         $data->no_item = $i+1;
-        //         $data->attach = $attach[$i];
-        //         $data->amount = $amount[$i];
-        //         $data->desc = $desc[$i];
-        //         $data->id = $uniqueId;
-        //         $data->save();
-        //     }
-        //     $med_no = Medical::whereNull('deleted_at')->orderBy('med_number', 'desc')->pluck('id')->first();
-        //     Session::flash('success',"Purchase Order #$med_no Has Been Created!");
-        //     return redirect('/medical/history');
-        // }else {
-        //     Session::flash('failed',"Error Database has Occured! Failed to create purchase order!");
-        //     return redirect('/medical/history');
-        // }
+        return response()->json(['message' => 'Data berhasil disimpan']);
+        // return redirect('medical.history')->with('success', 'Medical Reimburse Add successfully');
     }
 }

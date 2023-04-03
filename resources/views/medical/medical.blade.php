@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('active-page-myprofile')
+@section('active-page-medicals')
 active
 @endsection
 

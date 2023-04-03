@@ -88,7 +88,7 @@ active
                                 <td>{{ $rn['role'] }}</td>
                                 <td>{{ $rn['role_name'] }}</td>
                                 <td>
-                                  <a href="/hrtools/manage/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                  <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
                                 </td>
                             </tr>
                         @endforeach
@@ -108,7 +108,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/manage/add_roles" method="post">
+			<form action="/manage/roles/add_roles" method="post">
                 @csrf
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">

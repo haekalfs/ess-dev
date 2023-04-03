@@ -82,19 +82,16 @@ Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->mi
 
 
 //HR TOOLS
-Route::get('/hrtools/manage', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::post('/manage/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::get('/hrtools/manage/delete/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-
-
-
+Route::get('/hrtools/manage/roles', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::get('/manage/roles/delete/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
 
 ///Mailer
 Route::get('/kirimemail','MailerController@index');
+
 //medical reimburse
-// Testing
 Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
 Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth')->middleware(['checkRole:admin']);
-// Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update')->middleware(['checkRole:admin']);
+Route::get('/medical/history/edit/{id}', 'MedicalController@edit')->middleware('auth')->middleware(['checkRole:admin']);
+
