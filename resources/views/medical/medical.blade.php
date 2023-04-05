@@ -27,25 +27,25 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-
-<div class="container">
-    <div class="card mt-5 d-flex p-2">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h5 class="m-0 font-weight-bold text-primary">Medical History</h5>
-        </div>
-        <div class="card-body">
+<div class="card shadow mb-4">
+    <!-- Card Header - Dropdown -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Medical History</h6>
+        <div class="text-right">
             <a href="/medical/entry" class="btn btn-primary btn-sm">New Request</a>
             <a href="" class="btn btn-primary btn-sm">View Report</a>
-            <br/>
-            <br/>
-            <table class="table table-bordered table-hover table-striped" id="dataTable">
+        </div>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body zoom90">
+        <table class="table table-bordered table-hover " id="dataTable">
                 <thead>
                     <tr style="font-size: 13px" class="text-center">
                         <th>Request Number</th>
                         <th>Request Date</th>
                         <th>Payment</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        <th width="120px">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +55,7 @@ active
                         <td>{{$q->med_date}}</td>
                         <td>{{$q->med_payment}}</td>
                         <td>{{$q->med_status}}</td>
-                        <td class="row-cols-2 justify-content-betwen" style="align-items: center">
+                        <td class="row-cols-2 justify-content-betwen text-center">
                             <a href="#" title="Edit" class="btn btn-warning btn-sm" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>
                             </a>
@@ -64,8 +64,8 @@ active
                     </tr>
                     @endforeach
                 </tbody>
-            </table>
-        </div>
+        </table>
     </div>
 </div>
+
 @endsection
