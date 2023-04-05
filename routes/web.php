@@ -69,7 +69,7 @@ Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middle
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth')->middleware(['checkRole:employee,consultant']);
 Route::get('/assignment', 'ProjectController@assigning')->name('project-assigning')->middleware('auth')->middleware(['checkRole:admin']);
 Route::post('/assignment/add-entries', 'ProjectController@add_project_assignment')->name('add_projects')->middleware('auth');
-Route::post('/assignment/add-member/{id}', 'ProjectController@add_project_assignment_member')->name('project-assigning')->middleware('auth');
+Route::post('/assignment/add-member/', 'ProjectController@add_project_assignment_member')->name('project-assigning')->middleware('auth');
 Route::get('/project_list', 'ProjectController@project_list')->name('project-list')->middleware('auth')->middleware(['checkRole:admin']);
 
 //manage users
