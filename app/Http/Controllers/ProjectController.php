@@ -39,19 +39,21 @@ class ProjectController extends Controller
         $this->validate($request,[
             'date_prepared' => 'required',
     		'po_req_number' => 'required',
-            'req_by' => 'required',
-            'ppnSel' => 'required',
-            'buyer' => 'required',
-            'assignment_cost' => 'required',
-            'vendor' => 'required',
-            'vendor_address' => 'required',
-            'vendor_email' => 'required',
-            'vendor_phone' => 'required',
-            'purpose_of_purchase' => 'required',
-            'top' => 'required',
-            'unitType' => 'required',
-            'notes' => 'required'
+            'req_by' => 'required'
     	]);
+
+        $uniqueId = hexdec(substr(uniqid(), 0, 8));
+
+        while (Project_assignment::where('id', $uniqueId)->exists()) {
+            $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        }
+
+        Project_assignment::create([
+            'id' => $uniqueId,
+    		'f_id' => 45000000 + intval($request->po_req_number),
+    		'f_req_by' => $request->req_by
+    	]);
+
         return view('projects.assigning', compact('assignment', 'project'));
     }
 
