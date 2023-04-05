@@ -26,12 +26,9 @@ class Medical extends Authenticatable
         'med_total_amount'
     ];
 
-    // public static function generateId()
-    // {
-    //     $lastId = Medical::orderBy('id', 'desc')->first();
-    //     $newId = $lastId ? $lastId->id + 1 : 1;
-    //     return 'MED_' . str_pad($newId, 4, '0', STR_PAD_LEFT);
-    // }
+    public function user(){
+        return $this->hasOne('App\Models\User');
+    }
     public function medical_details(){
     	return $this->ManyTo('App\Models\Medical_details');
     }

@@ -54,4 +54,8 @@ class User extends Authenticatable
     public function role(){
     	return $this->hasMany('App\Models\Role');
     }
+
+    public function medical(){
+    	return $this->belongsTo('App\Models\Medical');
+    }
 }
