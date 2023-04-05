@@ -57,12 +57,7 @@ INSERT INTO `users_details` (`id`, `employee_id`, `position`, `status`, `usr_dob
 
 
 INSERT INTO `roles` (`id`, `role_name`, `role_id`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '29', 'haekals', NULL, NULL),
-(2, 'director', '30', 'haekals', NULL, NULL),
-(3, 'manager', '20', 'haekals', NULL, NULL),
-(4, 'employee', '10', 'haekals', NULL, NULL),
-(5, 'employee', '10', 'haekals2', NULL, NULL),
-(6, 'admin', '29', 'dio', '2023-03-31 05:45:36', '2023-03-24 05:45:36'),
+(6, 'admin', '29', 'dio', '2023-03-31 05:45:36', '2023-03-24 05:45:36');
 (7, 'employee', NULL, 'adhi', '2023-04-03 00:52:48', '2023-04-03 00:52:48'),
 (9, 'employee', NULL, 'adip', '2023-04-03 01:20:24', '2023-04-03 01:20:24'),
 (10, 'admin', NULL, 'admin', '2023-04-03 01:20:49', '2023-04-03 01:20:49'),
@@ -104,7 +99,6 @@ INSERT INTO `roles` (`id`, `role_name`, `role_id`, `user_id`, `created_at`, `upd
 (46, 'employee', NULL, 'poppyw', '2023-04-03 01:37:23', '2023-04-03 01:37:23'),
 (47, 'employee', NULL, 'radityaa', '2023-04-03 01:37:35', '2023-04-03 01:37:35'),
 (48, 'employee', NULL, 'rafi', '2023-04-03 01:37:48', '2023-04-03 01:37:48'),
-(49, 'employee', NULL, 'rafi', '2023-04-03 01:40:33', '2023-04-03 01:40:33'),
 (50, 'employee', NULL, 'rherawan', '2023-04-03 01:44:58', '2023-04-03 01:44:58'),
 (51, 'employee', NULL, 'riyantog', '2023-04-03 01:45:09', '2023-04-03 01:45:09'),
 (52, 'employee', NULL, 'ronnyp', '2023-04-03 01:45:27', '2023-04-03 01:45:27'),

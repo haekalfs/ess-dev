@@ -99,13 +99,13 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="email">No :</label>
-                                            <input type="text" class="form-control" name="date_prepared" value="">
+                                            <input type="text" class="form-control" name="no_doc" value="">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Reference Doc :</label>
-                                            <input type="text" class="form-control" name="po_req_number" value="">
+                                            <input type="text" class="form-control" name="ref_doc" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -115,7 +115,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Project :</label>
-                                    <select class="form-control" id="update_location" name="update_location" required>
+                                    <select class="form-control" id="update_location" name="project" required>
                                             @foreach($project as $company_project)
                                             <option value="{{$company_project->project_name}}">{{ $company_project->project_name}}</option>
                                             @endforeach
@@ -126,8 +126,8 @@ active
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="update_activity" name="update_activity" required></textarea>
+                                    <label for="password">Notes Assigment :</label>
+                                    <textarea type="text" class="form-control" id="update_activity" name="notes" required></textarea>
                                 </div>
                             </div>
                         </div>

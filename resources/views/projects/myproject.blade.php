@@ -44,7 +44,7 @@ active
                         <th>Project Name</th>
                         <th>Project Start</th>
                         <th>Project End</th>
-                        <th width='80px'>Action</th>
+                        <th width='120px'>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,17 +55,7 @@ active
                         <td>{{ $record->project_name }}</td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
-                        <td>
-                            <div class=''>
-                                <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                    Action
-                                </a>
-                                <div class='dropdown-menu' aria-labelledby='dropdownMenu'>
-                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
-                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
-                                </div>
-                            </div>
-                        </td>
+                        <td><a class="btn btn-primary btn-sm" href='' onclick='isconfirm();'><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
                     
