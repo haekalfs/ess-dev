@@ -31,7 +31,7 @@ active
                 <table class="table table-borderless table-sm">
                     <tr>
                         <th>User ID</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->user_id}}</td>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
                     </tr>
                     <tr>
                         <th>Employee ID</th>
