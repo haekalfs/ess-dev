@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
 use App\Http\Middleware\CheckRole;
 
 /*
@@ -99,4 +101,5 @@ Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
 Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/medical/history/edit/{id}', 'MedicalController@edit')->middleware('auth')->middleware(['checkRole:admin']);
+
 
