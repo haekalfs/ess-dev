@@ -55,7 +55,7 @@ active
                         <td>{{ $record->project_name }}</td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
-                        <td><a class="btn btn-primary btn-sm" href='' onclick='isconfirm();'><i class='fas fa-fw fa-eye'></i> View</a></td>
+                        <td><a class="btn btn-primary btn-sm" href="/assignment/view/details/{{$record->id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
                     

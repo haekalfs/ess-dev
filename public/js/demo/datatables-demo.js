@@ -33,3 +33,12 @@ $(document).ready(function() {
     "pageLength": 50
   } );
 } );
+
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
+  $('#dataTableUser').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 10
+  } );
+} );

@@ -53,17 +53,7 @@ active
                         <td>{{ $assign->assignment_no }}</td>
                         <td>{{ $assign->project_name }}</td>
                         <td>New Request</td>
-                        <td>
-                            <div class=''>
-                                <a class='btn btn-danger btn-sm' type='button' id='dropdownMenu' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                    Action
-                                </a>
-                                <div class='dropdown-menu' aria-labelledby='dropdownMenu'>
-                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-edit'></i> Edit</a>
-                                    <a class='dropdown-item' href='' onclick='isconfirm();'><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
-                                </div>
-                            </div>
-                        </td>
+                        <td class="text-center"><a class="btn btn-primary btn-sm" href="/assignment/member/{{ $assign->id }}"><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -82,10 +72,9 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/assignment/add-entries" method="post">
+			<form action="/assignment/add_entries" method="post">
                 @csrf
 				<div class="modal-body" style="">
-                    <input type="hidden" id="update_clickedDate" name="update_clickedDate">
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-12">
@@ -99,13 +88,13 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="email">No :</label>
-                                            <input type="text" class="form-control" name="no_doc" value="">
+                                            <input type="text" class="form-control" name="no_doc">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Reference Doc :</label>
-                                            <input type="text" class="form-control" name="ref_doc" value="">
+                                            <input type="text" class="form-control" name="ref_doc">
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +106,7 @@ active
                                     <label for="password">Project :</label>
                                     <select class="form-control" id="update_location" name="project" required>
                                             @foreach($project as $company_project)
-                                            <option value="{{$company_project->project_name}}">{{ $company_project->project_name}}</option>
+                                            <option value="{{$company_project->id}}">{{ $company_project->project_name}}</option>
                                             @endforeach
                                     </select>
                                 </div>
@@ -127,7 +116,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Notes Assigment :</label>
-                                    <textarea type="text" class="form-control" id="update_activity" name="notes" required></textarea>
+                                    <textarea type="text" class="form-control" name="notes" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -135,7 +124,7 @@ active
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                   </div>
 			</form>
 		</div>

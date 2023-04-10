@@ -141,9 +141,17 @@ class TimesheetController extends Controller
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
-            ->select('project_assignment_users.*', 'company_projects.project_name', 'company_projects.project_code', 'project_assignments.assignment_no')
+            ->select('project_assignment_users.*', 'company_projects.project_name', 'company_projects.project_code', 'project_assignments.assignment_no', 'company_projects.id')
             ->where('project_assignment_users.user_id', '=', $userId)
             ->get();
+            $countRows = DB::table('timesheet')
+                ->selectRaw('ts_task, ts_location, count(*) as total_rows')
+                ->groupBy('ts_task', 'ts_location')
+                ->get();
+                // var_dump($countRows);
+                foreach($countRows as $row) {
+                    // echo "Task: " . $row->ts_task . ", Location: " . $row->ts_location . ", Total Rows: " . $row->total_rows;
+                }
         if($lastUpdate){
             if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
                 Session::flash('failed',"You've already submitted your timereport!");
@@ -357,6 +365,15 @@ class TimesheetController extends Controller
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
+        $countRows = DB::table('timesheet')
+                ->selectRaw('ts_task, ts_location, count(*) as total_rows')
+                ->groupBy('ts_task', 'ts_location')
+                ->get();
+                // var_dump($countRows);
+        foreach($countRows as $row) {
+            // echo "Task: " . $row->ts_task . ", Location: " . $row->ts_location . ", Total Rows: " . $row->total_rows;
+            Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month],['date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+        }
         // Get the Timesheet records between the start and end dates
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '20']);
         
