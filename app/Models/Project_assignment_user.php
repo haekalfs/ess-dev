@@ -10,6 +10,7 @@ class Project_assignment_user extends Model
     use HasFactory;
     protected $table = "Project_assignment_users";
 
+    protected $fillable = ['user_id', 'role', 'responsibility', 'periode_start', 'periode_end', 'project_assignment_id', 'company_project_id'];
 
     public function assigned(){
     	return $this->belongsTo('App\Models\Project_assignment');

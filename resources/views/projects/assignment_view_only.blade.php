@@ -99,9 +99,6 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Project Member</h6>
-                <div class="text-right">
-                    <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addMem" id="addMemModal">+ Add Member</a>
-                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -115,7 +112,6 @@ active
                                 <th>Responsibility</th>
                                 <th>Periode Start</th>
                                 <th>Periode End</th>
-                                <th width="80px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -130,9 +126,6 @@ active
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
-                                    <td>
-                                      <a href="/assignment/member/delete/{{ $usr->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

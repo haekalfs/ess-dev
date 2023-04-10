@@ -68,9 +68,12 @@ Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middle
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth')->middleware(['checkRole:employee,consultant']);
 Route::get('/assignment', 'ProjectController@assigning')->name('project-assigning')->middleware('auth')->middleware(['checkRole:admin']);
-Route::post('/assignment/add-entries', 'ProjectController@add_project_assignment')->name('add_projects')->middleware('auth');
-Route::post('/assignment/add-member/', 'ProjectController@add_project_assignment_member')->name('project-assigning')->middleware('auth');
+Route::post('/assignment/add_entries', 'ProjectController@add_project_assignment')->name('add_projects')->middleware('auth');
+Route::get('/assignment/member/{id}', 'ProjectController@project_assignment_member')->name('project-assigning')->middleware('auth');
+Route::post('/assignment/add_member_to_assignment/{assignment_id}', 'ProjectController@add_project_member')->name('add_projects')->middleware('auth');
 Route::get('/project_list', 'ProjectController@project_list')->name('project-list')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/assignment/view/details/{id}', 'ProjectController@project_assignment_member_view')->name('project-assigning-view')->middleware('auth');
+Route::get('/assignment/member/delete/{id}', 'ProjectController@project_assignment_member_delete')->name('project-assigning-delete')->middleware('auth');
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin']);
