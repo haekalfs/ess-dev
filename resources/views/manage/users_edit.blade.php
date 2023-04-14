@@ -83,7 +83,12 @@ active
                             </tr>
                             <tr class="table-sm">
                                 <td>Status</td>
-                                <td><input class="input-group-text flex"  style="font-size: 11px"  name="status" placeholder="Status..." value=" {{ $user->users_detail->status}}">
+                                <td>
+                                    <select class="form-control form-control-sm" name="status" style="width: 48%">
+                                        <option value="active" {{ old('status', $user->users_detail->status) == "active" ? 'selected' : '' }}>Active</option>
+                                        <option value="nonActive" {{ old('status', $user->users_detail->status) == "nonActive" ? 'selected' : '' }}>Non Active</option>
+                                    </select>
+                                    {{-- <input class="input-group-text flex"  style="font-size: 11px"  name="status" placeholder="Status..." value=" {{ $user->users_detail->status}}"> --}}
                                     @if($errors->has('status'))
                                         <div class="text-danger">
                                             {{ $errors->first('status')}}
@@ -229,7 +234,8 @@ active
                             </tr>
                             <tr class="table-sm">
                                 <td>Identity Type</td>
-                                <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_type" placeholder="ID Type..." value=" {{ $user->users_detail->usr_id_type}}">
+                                <td>
+                                    <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_type" placeholder="ID Type..." value=" {{ $user->users_detail->usr_id_type}}">
                                     @if($errors->has('usr_id_type'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_id_type')}}

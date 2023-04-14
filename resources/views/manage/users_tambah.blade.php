@@ -86,27 +86,39 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Status</td>
-                                        <td><input class="input-group-text flex"  style="font-size: 11px"  name="status" placeholder="Status...">
+                                         <td><select class="form-control form-control-sm" name="status" style="width: 48%">
+                                                <option selected value="Active">Active</option>
+                                                <option value="nonActive">Non Active</option>
+                                            </select>
+                                        </td>
+                                        {{-- <td><input class="input-group-text flex"  style="font-size: 11px"  name="status" placeholder="Status...">
                                             @if($errors->has('status'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('status')}}
                                                 </div>
                                             @endif
-                                        </td>
+                                        </td> --}}
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Employee Status</td>
-                                        <td><input class="input-group-text" style="font-size: 11px"  name="employee_status" placeholder="Status Employee...">
+                                        <td><select class="form-control form-control-sm" name="employee_status" style="width: 48%">
+                                                <option selected value="Active">Active</option>
+                                                <option value="nonActive">Non Active</option>
+                                            </select>
+                                        </td>
+                                        {{-- <td><input class="input-group-text" style="font-size: 11px"  name="employee_status" placeholder="Status Employee...">
                                             @if($errors->has('employee_status'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('employee_status')}}
                                                 </div>
                                             @endif
-                                        </td>
+                                        </td> --}}
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Hired Date</td>
-                                        <td><input class="input-group-text" style="font-size: 11px" name="hired_date" placeholder="Hired Date...">
+                                        <td>
+                                            <input class="input-group-text" type="date" name="hired_date" id="hired_date" value="" />
+                                            {{-- <input class="input-group-text" style="font-size: 11px" name="hired_date" placeholder="Hired Date..."> --}}
                                             @if($errors->has('hired_date'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('hired_date')}}
@@ -150,15 +162,6 @@ active
                                                         {{ $errors->first('usr_id')}}
                                                     </div>
                                                 @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="table-sm">
-                                            <td>Role Account</td>
-                                            <td><select class="form-control form-control-sm" name="role" style="width: 48%">
-                                                <option selected value="employee">Employee</option>
-                                                <option value="approval">Approval</option>
-                                                <option value="admin">Admin</option>
-                                            </select>
                                             </td>
                                         </tr>
                                         <tr class="table-sm">
@@ -264,7 +267,12 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Identity Type</td>
-                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_type" placeholder="ID Type...">
+                                        <td>
+                                            <select class="form-control form-control-sm" name="usr_id_type" style="width: 48%">
+                                                <option selected value="KTP">KTP</option>
+                                                <option value="SIM">SIM</option>
+                                            </select>
+                                            {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_type" placeholder="ID Type..."> --}}
                                             @if($errors->has('usr_id_type'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_id_type')}}
@@ -312,7 +320,9 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Birth Date :</td>
-                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_dob" placeholder="Date Of Birth...">
+                                        <td>
+                                            <input class="input-group-text" type="date" name="usr_dob" id="usr_dob" value="" />
+                                            {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_dob" placeholder="Date Of Birth..."> --}}
                                             @if($errors->has('usr_dob'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_dob')}}
@@ -332,7 +342,12 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Gender</td>
-                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_gender" placeholder="Gender...">
+                                        <td>
+                                            <select class="form-control form-control-sm" name="usr_gender" style="width: 48%">
+                                                <option selected value="M">Male</option>
+                                                <option value="F">Female</option>
+                                            </select>
+                                            {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_gender" placeholder="Gender..."> --}}
                                             @if($errors->has('usr_gender'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_gender')}}
@@ -342,7 +357,16 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Religion</td>
-                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_religion" placeholder="Religion...">
+                                        <td>
+                                            <select class="form-control form-control-sm" name="usr_religion" style="width: 48%">
+                                                <option selected value="Islam">Islam</option>
+                                                <option value="Kristen">Kristen</option>
+                                                <option value="Katholik">Katholik</option>
+                                                <option value="Konghucu">Konghucu</option>
+                                                <option value="Hindu">Hindu</option>
+                                                <option value="Buddha">Buddha</option>
+                                            </select>
+                                            {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_religion" placeholder="Religion..."> --}}
                                             @if($errors->has('usr_religion'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_religion')}}
@@ -352,7 +376,15 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Marital Status</td>
-                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_merital_status" placeholder="Merital Status...">
+                                        <td>
+                                            <select class="form-control form-control-sm" name="usr_merital_status" style="width: 48%">
+                                                <option selected value="S">Single</option>
+                                                <option value="M">Married</option>
+                                                <option value="Widow">Widow</option>
+                                                <option value="Widower">Widower</option>
+                                                <option value="Divorced">Divorced</option>
+                                            </select>
+                                            {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_merital_status" placeholder="Merital Status..."> --}}
                                             @if($errors->has('usr_merital_status'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_merital_status')}}
@@ -400,7 +432,7 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Bank Account Number</td>
-                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_bank_account" placeholder="Number of Childern...">
+                                        <td><input class="input-group-text" type="text" style="font-size: 11px"  name="usr_bank_account" placeholder="Bank Account Number...">
                                             @if($errors->has('usr_bank_account'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_bank_account')}}

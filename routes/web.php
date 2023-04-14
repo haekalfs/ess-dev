@@ -93,7 +93,7 @@ Route::get('/manage/roles/delete/{id}', 'ManagementController@delete')->middlewa
 Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-
+Route::get('/test/{id}', 'ManagementController@test')->middleware('auth')->middleware(['checkRole:admin,fm']);
 
 
 ///Mailer

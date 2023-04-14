@@ -41,7 +41,8 @@ active
                             <td>{{ $user['name'] }}</td>
                             <td>{{ $user['roles'] }}</td>
                             <td>
-                                <a href="/manage/roles/assign_delete/{{ $user['roles'] }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i></a>
+                                <button class="btn btn-danger btn-sm" type="button" onclick="fetchData({{ $user['mmk'] }})" id="manButton" style="margin-right: 10px;"><i class='fas fa-fw fa-trash-alt'></i></button>
+                                {{-- <a href="/manage/roles/assign_delete/{{ $user['roles'] }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i></a> --}}
                             </td>
                         </tr>
                     @endforeach
@@ -148,6 +149,64 @@ active
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="DeleteAssignRoleModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Delete Assign Role</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form action="/manage/roles/assign_delete" method="post">
+                @csrf
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Name :</label>
+                                    <input type="text" id="test1" name="name_user">
+                                    {{-- <select class="custom-select" id="inputUser" name="inputUser">
+                                        <option selected disabled>Choose...</option>
+                                        @foreach ($us_List as $userlist)
+                                            <option value="{{ $userlist->id}}">{{ $userlist->name }}</option>
+                                        @endforeach
+                                    </select> --}}
+                                    {{-- <input list="encodings" value="" class="col-sm-12 custom-select custom-select-sm">
+                                    <datalist id="encodings">
+                                        @foreach ($usersList as $userlist)
+                                            <option value="{{ $userlist->name }}">{{ $userlist->name }}</option>
+                                        @endforeach
+                                    </datalist> --}}
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Select Roles :</label>
+                                    <select class="custom-select" id="inputRole" name="inputRole">
+                                        <option selected disabled>Choose...</option>
+                                        @foreach($r_name as $rn)
+                                            <option value="{{ $rn ->role }}">{{ $rn ->role_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary btn-sm" value="Save">
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
 <div class="modal fade" id="addRoleModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -197,5 +256,17 @@ active
             return false;
         }
     }
+
+function fetchData(id) {
+    $.ajax({
+        url: "/test/" + id,
+        method: "GET",
+        success: function(data) {
+            data = JSON.parse(data);
+            $('#test1').val(data.name);
+            $('#DeleteAssignRoleModal').modal('show');
+        }
+    });
+}
 </script>
 @endsection
