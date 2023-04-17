@@ -14,4 +14,8 @@ class Company_project extends Model
     public function role(){
     	return $this->hasMany('App\Models\Role');
     }
+
+    public function project_assignment(){
+    	return $this->hasMany('App\Models\Project_assignment');
+    }
 }

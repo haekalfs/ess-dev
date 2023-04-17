@@ -46,7 +46,7 @@ class ProjectController extends Controller
             'notes' => 'required'
     	]);
 
-        $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        $uniqueId = hexdec(substr(uniqid(), 0, 4));
 
         while (Project_assignment::where('id', $uniqueId)->exists()) {
             $uniqueId = hexdec(substr(uniqid(), 0, 8));
@@ -58,6 +58,7 @@ class ProjectController extends Controller
     		'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
             'req_by' => Auth::user()->id,
+            'task_id' => $uniqueId,
             'company_project_id' => $request->project,
             'notes' => $request->notes
     	]);

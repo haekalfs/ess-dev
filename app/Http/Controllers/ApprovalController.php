@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\TimesheetExport;
+use App\Models\Project_assignment_user;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
@@ -31,13 +32,25 @@ class ApprovalController extends Controller
 		return view('approval.main', compact('workflows'));
 	}
 
-    public function approval_primary()
+    public function timesheet_approval()
     {
         $currentMonth = date('m');
         $currentYear = date('Y');
 
-        $approvals = Timesheet_workflow::where('ts_status_id', '20')->whereYear('date_submitted', $currentYear)->get();
-        return view('approval.approval_primary', compact('approvals'));
+        $userRoles = Auth::user()->role_id()->pluck('role_name')->toArray();
+
+        $checkRole = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'PM')->whereYear('date_submitted', $currentYear)->get();
+        foreach ($checkRole as $cr) {
+            $checkRoleProject = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $cr->ts_task_id)->pluck('user_id')->toArray();
+            if (in_array('hr', $userRoles)) {
+                $approvals = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'hr')->whereYear('date_submitted', $currentYear)->first();
+            } elseif (in_array(Auth::user()->id, $checkRoleProject)) {
+                $approvals = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'PM')->whereYear('date_submitted', $currentYear)->first();
+            } else {
+                $approvals = null; // set $approvals to null if neither condition is true
+            }
+        }
+        return view('approval.timesheet_approval', compact('approvals'));
     }
 
     public function approve_director($user_timesheet,$year,$month)

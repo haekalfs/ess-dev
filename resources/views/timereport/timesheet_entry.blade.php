@@ -184,7 +184,7 @@ active
                                         <option value="HO">HO</option>
                                         <optgroup label="Projects">
                                             @foreach($assignment as $assign)
-                                            <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
+                                            <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
                                             @endforeach
                                         </optgroup>
                                         <option>Standby</option>
