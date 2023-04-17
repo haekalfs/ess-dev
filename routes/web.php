@@ -93,8 +93,12 @@ Route::get('/manage/roles/delete/{id}', 'ManagementController@delete')->middlewa
 Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::get('/test/{id}', 'ManagementController@test')->middleware('auth')->middleware(['checkRole:admin,fm']);
-
+//Department and Position
+Route::get('/hrtools/manage/position', 'DepPosController@index')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::post('/manage/add_department', 'DepPosController@add_department')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::get('/manage/delete_department/{id}', 'DepPosController@delete_department')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::post('/manage/add_position', 'DepPosController@add_position')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::get('/manage/delete_position/{id}', 'DepPosController@delete_position')->middleware('auth')->middleware(['checkRole:admin,fm']);
 
 ///Mailer
 Route::get('/kirimemail','MailerController@index');

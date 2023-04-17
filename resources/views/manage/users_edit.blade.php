@@ -69,7 +69,14 @@ active
                         <tbody>
                             <tr class="table-sm">
                                 <td>Department</td>
-                                <td>Finances And General Affair</td>
+                                <td>
+                                    <select class="form-control form-control-sm" id="department" name="department" style="width: 48%">
+                                        <option selected disabled>Choose...</option>
+                                        @foreach($dep_data as $depart)
+                                        <option value="{{ $depart ->department_id }}">{{ $depart ->department_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
                             </tr>
                             <tr class="table-sm">
                                 <td>Position</td>

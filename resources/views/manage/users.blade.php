@@ -45,7 +45,6 @@ active
                     <th>User ID</th>
                     <th>Nama</th>
                     <th>Status</th>
-                    <th>Hired Date</th>
                     <th>Position</th>
                     <th>Department</th>
                     <th>Option</th>
@@ -58,9 +57,8 @@ active
                     <td>{{$p->id }}</td>
                     <td>{{$p->name}}</td>
                     <td>{{$p->users_detail->employee_status}}</td>
-                    <td>{{$p->users_detail->hired_date}}</td>
                     <td>{{$p->users_detail->position}}</td>
-                    <td>{{$p->users_detail->position}}</td>
+                    <td>{{$p->users_detail->department}}</td>
                     <td class="row-cols-2 justify-content-betwen text-center">
                         <a href="/users/edit/{{ $p->id }}" title="Edit" class="btn btn-primary btn-sm" >
                             <i class="fas fa-fw fa-edit justify-content-center"></i>

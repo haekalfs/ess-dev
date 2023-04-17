@@ -72,47 +72,43 @@ active
                                 <tbody>
                                     <tr class="table-sm">
                                         <td>Department</td>
-                                        <td>Finances And General Affair</td>
+                                        <td>
+                                            <select class="form-control form-control-sm" id="department" name="department" style="width: 48%">
+                                                <option selected disabled>Choose...</option>
+                                                @foreach($dep_data as $depart)
+                                                <option value="{{ $depart ->department_id }}">{{ $depart ->department_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Position</td>
-                                        <td><input class="input-group-text flex"  style="font-size: 11px"  name="position" placeholder="Position...">
-                                            @if($errors->has('position'))
-                                                <div class="text-danger">
-                                                    {{ $errors->first('position')}}
-                                                </div>
-                                            @endif
+                                        <td>
+                                            <select class="form-control form-control-sm" id="position" name="position" style="width: 48%">
+                                                <option selected disabled>Choose...</option>
+                                                @foreach($pos_data as $pos)
+                                                <option value="{{ $pos ->position_id }}">{{ $pos ->position_name }}</option>
+                                                @endforeach
+                                            </select>
                                         </td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Status</td>
                                          <td><select class="form-control form-control-sm" name="status" style="width: 48%">
-                                                <option selected value="Active">Active</option>
+                                                <option selected disabled>Choose...</option>
+                                                <option value="Active">Active</option>
                                                 <option value="nonActive">Non Active</option>
                                             </select>
                                         </td>
-                                        {{-- <td><input class="input-group-text flex"  style="font-size: 11px"  name="status" placeholder="Status...">
-                                            @if($errors->has('status'))
-                                                <div class="text-danger">
-                                                    {{ $errors->first('status')}}
-                                                </div>
-                                            @endif
-                                        </td> --}}
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Employee Status</td>
                                         <td><select class="form-control form-control-sm" name="employee_status" style="width: 48%">
-                                                <option selected value="Active">Active</option>
+                                                <option selected disabled>Choose...</option> 
+                                                <option value="Active">Active</option>
                                                 <option value="nonActive">Non Active</option>
                                             </select>
                                         </td>
-                                        {{-- <td><input class="input-group-text" style="font-size: 11px"  name="employee_status" placeholder="Status Employee...">
-                                            @if($errors->has('employee_status'))
-                                                <div class="text-danger">
-                                                    {{ $errors->first('employee_status')}}
-                                                </div>
-                                            @endif
-                                        </td> --}}
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Hired Date</td>
@@ -269,7 +265,8 @@ active
                                         <td>Identity Type</td>
                                         <td>
                                             <select class="form-control form-control-sm" name="usr_id_type" style="width: 48%">
-                                                <option selected value="KTP">KTP</option>
+                                                <option selected disabled>Choose...</option>
+                                                <option value="KTP">KTP</option>
                                                 <option value="SIM">SIM</option>
                                             </select>
                                             {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_id_type" placeholder="ID Type..."> --}}
@@ -344,7 +341,8 @@ active
                                         <td>Gender</td>
                                         <td>
                                             <select class="form-control form-control-sm" name="usr_gender" style="width: 48%">
-                                                <option selected value="M">Male</option>
+                                                <option selected disabled>Choose...</option>
+                                                <option value="M">Male</option>
                                                 <option value="F">Female</option>
                                             </select>
                                             {{-- <input class="input-group-text" type="text" style="font-size: 11px"  name="usr_gender" placeholder="Gender..."> --}}
@@ -359,7 +357,8 @@ active
                                         <td>Religion</td>
                                         <td>
                                             <select class="form-control form-control-sm" name="usr_religion" style="width: 48%">
-                                                <option selected value="Islam">Islam</option>
+                                                <option selected disabled>Choose...</option>
+                                                <option value="Islam">Islam</option>
                                                 <option value="Kristen">Kristen</option>
                                                 <option value="Katholik">Katholik</option>
                                                 <option value="Konghucu">Konghucu</option>
@@ -378,7 +377,8 @@ active
                                         <td>Marital Status</td>
                                         <td>
                                             <select class="form-control form-control-sm" name="usr_merital_status" style="width: 48%">
-                                                <option selected value="S">Single</option>
+                                                <option selected disabled>Choose...</option>
+                                                <option value="S">Single</option>
                                                 <option value="M">Married</option>
                                                 <option value="Widow">Widow</option>
                                                 <option value="Widower">Widower</option>

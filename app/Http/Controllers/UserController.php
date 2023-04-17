@@ -1,11 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Users_detail;
+use App\Models\Position;
+use App\Models\Department;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -18,7 +22,9 @@ class UserController extends Controller
     
     public function tambah()
     {
-    	return view('manage.users_tambah');
+        $dep_data = Department::all();
+        $pos_data = Position::all();
+    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data]);
     }
 
     public function store(Request $request)
@@ -110,7 +116,9 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::with('users_detail')->findOrFail($id);
-        return view('manage.users_edit', compact('user'));
+        $dep_data = Department::all();
+        $pos_data = Position::all();
+        return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data]);
     }
     
     public function update(Request $request, $id)
@@ -151,6 +159,7 @@ class UserController extends Controller
 
             $user_detail = Users_detail::where('user_id',$id)->first();
             $user_detail->status = $request->status;
+            $user_detail->department = $request->department;
             $user_detail->position = $request->position;
             $user_detail->employee_id = $request->employee_id;
             $user_detail->usr_dob = $request->usr_dob;

@@ -220,6 +220,7 @@
                         <h6 class="collapse-header">Administrator Access:</h6>
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
                         <a class="collapse-item" href="/hrtools/manage/roles">User Access & Privilege</a>
+                        <a class="collapse-item" href="/hrtools/manage/position">Department & Position</a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/users">List Employees</a>
                         <a class="collapse-item" href="/development">List Consultant</a>

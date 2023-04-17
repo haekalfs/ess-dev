@@ -29,7 +29,7 @@ class ManagementController extends Controller
                 
                 // If this is the first time we've seen this user, create a new entry in the $usersData array
                 $usersData[$user->id] = [
-                    'mmk' => $user->id,
+                    'us_Dat' => $user->id,
                     'name' => $user->name,
                     'roles' => [],
                     'created_at' => $user->created_at
@@ -46,7 +46,7 @@ class ManagementController extends Controller
         foreach ($usersData as $userData) {
             $rolesList = implode(', ', $userData['roles']);
             $usersList[] = [
-                'mmk' => $userData['mmk'],
+                'us_Dat' => $userData['us_Dat'],
                 'name' => $userData['name'],
                 'roles' => $rolesList,
                 'created_at' => $userData['created_at']

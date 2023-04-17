@@ -41,7 +41,7 @@ active
                             <td>{{ $user['name'] }}</td>
                             <td>{{ $user['roles'] }}</td>
                             <td>
-                                <button class="btn btn-danger btn-sm" type="button" onclick="fetchData({{ $user['mmk'] }})" id="manButton" style="margin-right: 10px;"><i class='fas fa-fw fa-trash-alt'></i></button>
+                                <button class="btn btn-danger btn-sm" type="button" onclick="fetchData({{ $user['us_Dat'] }})" id="manButton" style="margin-right: 10px;"><i class='fas fa-fw fa-trash-alt'></i></button>
                                 {{-- <a href="/manage/roles/assign_delete/{{ $user['roles'] }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i></a> --}}
                             </td>
                         </tr>
