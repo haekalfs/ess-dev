@@ -11297,4 +11297,19 @@ body.sidebar-toggled footer.sticky-footer {
   zoom: 70%;
 }
 
+.long-text {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 300px; /* adjust the max-width to fit your table design */
+}
+
+.shorter-text {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 200px; /* adjust the max-width to fit your table design */
+}
 

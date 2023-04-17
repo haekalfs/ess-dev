@@ -11,7 +11,7 @@ class Project_assignment extends Model
     protected $table = "Project_assignments";
 
 
-    protected $fillable = ['assignment_no', 'req_date', 'req_by', 'reference_doc', 'notes', 'company_project_id'];
+    protected $fillable = ['assignment_no', 'req_date', 'req_by', 'reference_doc', 'notes', 'company_project_id', 'task_id'];
 
     public function user(){
     	return $this->belongsTo('App\Models\Users');
@@ -19,5 +19,9 @@ class Project_assignment extends Model
 
     public function worker(){
     	return $this->hasMany('App\Models\Project_assignment_user');
+    }
+
+    public function company_project(){
+    	return $this->belongsTo('App\Models\Company_project');
     }
 }

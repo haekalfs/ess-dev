@@ -183,17 +183,18 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Timesheet Workflow</h6>
-                {{-- <div class="text-right">
-                    <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Reset">
-                </div> --}}
+                <div class="text-right">
+                    <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a>
+                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <table class="table table-sm zoom90">
-                    <thead>
+                    <thead class="thead-light">
                         <tr>
                             <th>Username</th>
                             <th>Activity</th>
+                            <th>Status</th>
                             <th>Updated at</th>
                             <th>Notes</th>
                     </thead>
@@ -201,8 +202,9 @@ active
                         @foreach($workflow as $workflows)
                         <tr>
                             <td>{{ $workflows->user_id }}</td>
+                            <td><span class="shorter-text">{{ $workflows->ts_task }}</span></td>
                             <td>{{ $workflows->activity }}</td>
-                            <td>{{ $workflows->created_at }}</td>
+                            <td>{{ $workflows->created_at->format('d-m-Y') }}</td>
                             <td>{{ $workflows->note }}</td>
                         </tr>
                         @endforeach

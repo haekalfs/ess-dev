@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\EssMailer;
 use App\Models\Company_project;
+use App\Models\Project_assignment;
+use App\Models\Project_assignment_user;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
 use App\Models\User;
@@ -137,21 +139,12 @@ class TimesheetController extends Controller
         }
         // Company_project::all();
         $userId = Auth::user()->id;
-
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
-            ->select('project_assignment_users.*', 'company_projects.project_name', 'company_projects.project_code', 'project_assignments.assignment_no', 'company_projects.id')
+            ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
             ->get();
-            $countRows = DB::table('timesheet')
-                ->selectRaw('ts_task, ts_location, count(*) as total_rows')
-                ->groupBy('ts_task', 'ts_location')
-                ->get();
-                // var_dump($countRows);
-                foreach($countRows as $row) {
-                    // echo "Task: " . $row->ts_task . ", Location: " . $row->ts_location . ", Total Rows: " . $row->total_rows;
-                }
         if($lastUpdate){
             if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
                 Session::flash('failed',"You've already submitted your timereport!");
@@ -265,11 +258,20 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
+
         $entry = new Timesheet;
+        $ts_task_id = $request->task;
+        $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
+        while (Project_assignment::where('id', $ts_task_id)->exists()){
+            foreach($task_project as $tp){
+                $ts_task_id = $tp->company_project->project_name;
+            }
+        }
         $entry->ts_user_id = Auth::user()->id;
         $entry->ts_id_date = str_replace('-','',$request->clickedDate);
         $entry->ts_date = $request->clickedDate;
-        $entry->ts_task = $request->task;
+        $entry->ts_task = $ts_task_id;
+        $entry->ts_task_id = $request->task;
         $entry->ts_location = $request->location;
         $entry->ts_from_time = date('H:i', strtotime($request->from));;
         $entry->ts_to_time = date('H:i', strtotime($request->to));
@@ -366,19 +368,27 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         $countRows = DB::table('timesheet')
-                ->selectRaw('ts_task, ts_location, count(*) as total_rows')
-                ->groupBy('ts_task', 'ts_location')
-                ->get();
+        ->selectRaw('ts_task, ts_location, max(ts_task_id) as ts_task_id, count(*) as total_rows')
+        ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->groupBy('ts_task', 'ts_location') // ts_task_id is calculated with max() function
+        ->get();
+    
                 // var_dump($countRows);
         foreach($countRows as $row) {
-            // echo "Task: " . $row->ts_task . ", Location: " . $row->ts_location . ", Total Rows: " . $row->total_rows;
-            Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month],['date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+            if (in_array($row->ts_task, ["HO", "Sick", "StandBy"])) {
+                Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+            } else {
+                Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => 'PM', 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+            }
+            
+            // Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
         }
-        // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '20']);
         
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month],['date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
-        
+        // Update Timesheet records between the start and end dates
+        Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '20']);
+      
         // return response()->json($activities);
         Session::flash('success',"Timereport $year - 0$month has been submitted!");
         return redirect()->back();

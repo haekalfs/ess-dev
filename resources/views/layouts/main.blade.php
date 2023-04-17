@@ -85,7 +85,7 @@
                         <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
                         <a class="collapse-item" href="/development">Summary</a>
-                        @if (Auth::user()->role == 'admin')
+                        @if (in_array('admin', session('allowed_roles')))
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
                         @else
@@ -93,7 +93,7 @@
                     </div>
                 </div>
             </li>
-            @if (Auth::user()->role == 'admin')
+            @if (in_array('admin', session('allowed_roles')))
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item @yield('active-page-approval')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -105,7 +105,7 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        @if (Auth::user()->role == 'admin')
+                        @if (in_array('admin', session('allowed_roles')))
                         <a class="collapse-item" href="/approval">Approval</a>
                         @else
                         <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Additional</i></small></a>
@@ -127,7 +127,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">My Leaves:</h6>
                         <a class="collapse-item" href="/development">History</a>
-                        @if (Auth::user()->role == 'admin')
+                        @if (in_array('admin', session('allowed_roles')))
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Leave Report</a>
                         <a class="collapse-item" href="/development">Manage</a>
@@ -149,7 +149,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">My Reimburse:</h6>
                         <a class="collapse-item" href="/development">History</a>
-                        @if (Auth::user()->role == 'admin')
+                        @if (in_array('admin', session('allowed_roles')))
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Manage Reimburse</a>
                         @else
@@ -169,7 +169,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">My Medical Reimburse:</h6>
                         <a class="collapse-item" href="/medical/history">History <small style="color: red;"><i> &nbsp;&nbsp;Medical</i></small></a>
-                        @if (Auth::user()->role == 'admin')
+                        @if (in_array('admin', session('allowed_roles')))
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Manage Reimburse</a>
                         @else
@@ -189,7 +189,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Project Assignment:</h6>
                         <a class="collapse-item" href="/myprojects">MyProjects</a>
-                        @if (Auth::user()->role == 'admin')
+                        @if (in_array('admin', session('allowed_roles')))
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/assignment">Project Assignment</a>
                         <a class="collapse-item" href="/project_list">Project Organization</a>
@@ -208,7 +208,7 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
-            @if (Auth::user()->role == 'admin')
+            @if (in_array('admin', session('allowed_roles')))
             <li class="nav-item @yield('active-page-system_management')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSystem"
                     aria-expanded="true" aria-controls="collapseSystem">
@@ -229,7 +229,7 @@
             @else
             @endif
             <!-- Nav Item - Pages Collapse Menu -->
-            @if (Auth::user()->role == 'admin')
+            @if (in_array('admin', session('allowed_roles')))
             <li class="nav-item @yield('active-page-HR')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHRSystem"
                     aria-expanded="true" aria-controls="collapseHRSystem">

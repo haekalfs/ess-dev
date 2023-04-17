@@ -15,9 +15,7 @@ use App\Http\Middleware\CheckRole;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-})->middleware('auth');
+Route::get('/',[App\Http\Controllers\HomeController::class, 'index'])->middleware('auth');
 
 Auth::routes();
 
@@ -56,7 +54,7 @@ Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->nam
 
 //Approval
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/approval/timesheet/p', 'ApprovalController@approval_primary')->name('approval_primary')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/director/preview/{id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth')->middleware(['checkRole:admin']);
@@ -76,7 +74,7 @@ Route::get('/assignment/view/details/{id}', 'ProjectController@project_assignmen
 Route::get('/assignment/member/delete/{id}', 'ProjectController@project_assignment_member_delete')->name('project-assigning-delete')->middleware('auth');
 
 //manage users
-Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin,manager']);
 Route::get('/users/tambah', 'UserController@tambah')->middleware('auth')->middleware(['checkRole:admin']);
 Route::post('/users/store', 'UserController@store')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth')->middleware(['checkRole:admin']);
