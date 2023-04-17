@@ -1,5 +1,31 @@
 @extends('layouts.main')
+
+@section('active-page-medicals')
+active
+@endsection
 @section('content')
+<!-- Page Heading -->
+
+@if ($message = Session::get('success'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('failed'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('warning'))
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
 <form method="post" action="/medical/entry/store" id="medForm">
 @csrf
 <!-- Page Heading -->
@@ -238,15 +264,6 @@ function formatRupiah(angka, prefix) {
 }
 
 
-// function calculate(firstNumberId, secondNumberId, thirdNumberId, totalAmount) {
-//     var amount = document.getElementById("amount").value.replace(/[^0-9]/g, '');
-//     var amount = document.getElementById("amount0").value;
-//     var amount = document.getElementById("amount1").value;
-
-//     var total = amount + amount0 + amount1;
-    
-//     document.getElementById(totalAmount).value = formatRupiah(totalAmount);
-// }
 
 document.getElementById("originalForm").addEventListener("input", function() {
     let attachment = formatInput("attach","custom-file-label");

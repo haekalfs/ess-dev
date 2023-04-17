@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Medical_details extends Authenticatable
 {
     use HasFactory;
-    use SoftDeletes;
+    // use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
-    protected $table = 'medical_details';
+    // protected $dates = ['deleted_at'];
+    protected $table = 'medicals_detail';
     protected $fillable = [
         'id',
         'mdet_number',
