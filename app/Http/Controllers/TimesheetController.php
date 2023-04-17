@@ -375,11 +375,12 @@ class TimesheetController extends Controller
     
                 // var_dump($countRows);
         foreach($countRows as $row) {
-            if (in_array($row->ts_task, ["HO", "Sick", "StandBy"])) {
+            if (in_array($row->ts_task, ["HO", "Sick", "Standby"])) {
                 Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
                 ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
             } else {
-                Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => 'PM', 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                $test = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $row->ts_task_id)->pluck('user_id')->first();
+                Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $test, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
                 ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
             }
             

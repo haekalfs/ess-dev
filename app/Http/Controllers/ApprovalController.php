@@ -39,18 +39,42 @@ class ApprovalController extends Controller
 
         $userRoles = Auth::user()->role_id()->pluck('role_name')->toArray();
 
-        $checkRole = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'PM')->whereYear('date_submitted', $currentYear)->get();
-        foreach ($checkRole as $cr) {
-            $checkRoleProject = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $cr->ts_task_id)->pluck('user_id')->toArray();
-            if (in_array('hr', $userRoles)) {
-                $approvals = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'hr')->whereYear('date_submitted', $currentYear)->first();
-            } elseif (in_array(Auth::user()->id, $checkRoleProject)) {
-                $approvals = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'PM')->whereYear('date_submitted', $currentYear)->first();
-            } else {
-                $approvals = null; // set $approvals to null if neither condition is true
-            }
-        }
+        $query = Timesheet_workflow::where('ts_status_id', '20')->whereYear('date_submitted', $currentYear);
+
+if (in_array('hr', $userRoles)) {
+    $query->orWhere('RequestTo', 'hr')->limit(1);
+}
+
+if (!empty(Auth::user())) {
+    $query->orWhere('RequestTo', Auth::user()->id)->limit(1);
+}
+
+$approvals = $query->get();
+        // foreach ($checkRole as $cr) {
+        //     $checkRoleProject = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $cr->ts_task_id)->pluck('user_id')->toArray();
+        //     if (in_array('hr', $userRoles)) {
+        //         $approvals = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'hr')->whereYear('date_submitted', $currentYear)->first();
+        //     } elseif (in_array(Auth::user()->id, $checkRoleProject)) {
+        //         $approvals = Timesheet_workflow::where('ts_status_id', '20')->where('RequestTo', 'PM')->whereYear('date_submitted', $currentYear)->first();
+        //     } else {
+        //         $approvals = null; // set $approvals to null if neither condition is true
+        //     }
+        // }
         return view('approval.timesheet_approval', compact('approvals'));
+    }
+
+    public function approve_hr($user_timesheet,$year,$month)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $activities = Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+        ->where('ts_user_id', $user_timesheet)
+        ->update(['ts_status_id' => '30']);
+
+        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id,'activity' => 'Approved', 'month_periode' => $year.$month, 'RequestTo' => 'dir_fin_ga'],['date_approved' => date('Y-m-d'), 'ts_status_id' => '30', 'note' => '', 'user_timesheet' => $user_timesheet]);
+        $yearA = substr($year, 4, 2);
+        $monthA = substr($month, 0, 4);
+        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        return redirect()->back();
     }
 
     public function approve_director($user_timesheet,$year,$month)
