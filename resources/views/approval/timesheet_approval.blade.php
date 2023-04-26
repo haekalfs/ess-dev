@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Timesheet Approval - ESS')
+
 @section('active-page-approval')
 active
 @endsection

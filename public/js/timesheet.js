@@ -87,21 +87,27 @@ $(document).ready(function () {
 });
 
 $(document).ready(function() {
-    if (localStorage.getItem('modalShown') == null) {
+    var currentDate = new Date().toLocaleDateString();
+    var lastModalShownDate = localStorage.getItem('modalShownDate');
+    
+    if (!lastModalShownDate || lastModalShownDate !== currentDate) {
         $('#infoModal').modal('show');
-        localStorage.setItem('modalShown', 'true');
+        localStorage.setItem('modalShownDate', currentDate);
     }
-    // localStorage.removeItem('modalShown');
 });
 
 $(document).ready(function() {
-    if (localStorage.getItem('modalHome') == null) {
+    var currentDate = new Date().toLocaleDateString();
+    var lastModalHomeDate = localStorage.getItem('modalHomeDate');
+    
+    if (!lastModalHomeDate || lastModalHomeDate !== currentDate) {
         $('#homeModal').modal('show');
-        localStorage.setItem('modalHome', 'true');
+        localStorage.setItem('modalHomeDate', currentDate);
     }
-    // localStorage.removeItem('modalHome');
 });
 
+// localStorage.removeItem('modalHomeDate');
+// localStorage.removeItem('modalShownDate');
 
 //this is my save function 
 $(document).ready(function() {

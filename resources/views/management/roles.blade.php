@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'UAC - ESS')
+
 @section('active-page-system_management')
 active
 @endsection

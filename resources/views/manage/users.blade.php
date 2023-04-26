@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Manage Users - ESS')
+
 @section('active-page-users')
 active
 @endsection

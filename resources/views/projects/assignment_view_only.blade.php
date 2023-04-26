@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Project Assignment (View Only) - ESS')
+
 @section('active-page-project')
 active
 @endsection

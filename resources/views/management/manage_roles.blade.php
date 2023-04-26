@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Manage Roles - ESS')
+
 @section('active-page-system_management')
 active
 @endsection

@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Project Organization - ESS')
+
 @section('active-page-project')
 active
 @endsection

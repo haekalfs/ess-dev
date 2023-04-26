@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Timesheet Entry - ESS')
+
 @section('active-page-timesheet')
 active
 @endsection

@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Home Page - ESS')
+
 @section('active-page-db')
 active
 @endsection
