@@ -22,18 +22,18 @@ active
 </div>
 @endif
 
-<div class="alert alert-success" role="alert" style="display: none;">
+<div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
     Your entry has been saved successfully.
 </div>
 
 <div class="alert alert-danger" role="alert" style="display: none;">
     An error occurred while saving your entry. Please try again.
 </div>
-<div class="alert bg-success text-white shadow alert-success-delete" role="alert" style="display: none;">
+<div class="alert alert-success shadow alert-success-delete" role="alert" style="display: none;">
     Your entry has been deleted.
 </div>
 
-<div class="alert bg-danger text-white shadow alert-danger-delete" role="alert" style="display: none;">
+<div class="alert shadow alert-danger-delete" role="alert" style="display: none;">
     An error occurred while deleting your entry. Please try again.
 </div>
 <div class="row">
@@ -52,7 +52,7 @@ active
                 <table class="table zoom80 table-bordered calendar">
                     <colgroup>
                         @foreach ($calendar[0] as $dayName)
-                          <col style="width: {{ 100 / count($calendar[0]) }}%;">
+                            <col style="width: {{ 100 / count($calendar[0]) }}%;">
                         @endforeach
                     </colgroup>
                     <thead class="thead-dark">
@@ -63,26 +63,37 @@ active
                     <tbody>
                         @foreach (array_slice($calendar, 1) as $week)
                             <tr>
+                                @php
+                                    $isCurrentMonth = false;
+                                @endphp
                                 @foreach ($week as $day)
-                                    @if ($day !== '' && date('n', strtotime($year.'-'.$month.'-'.$day)) == $month)
-                                        @if (date('j', strtotime($year.'-'.$month.'-'.$day)) == 1)
+                                    @if ($day !== '')
+                                        @if (date('n', strtotime($year.'-'.$month.'-'.$day)) == $month)
                                             @php
-                                                $prevMonth = date('n', strtotime($year.'-'.$month.'-'.$day.' -1 day'));
+                                                $isCurrentMonth = true;
+                                                if (date('j', strtotime($year.'-'.$month.'-'.$day)) == 1) {
+                                                    $prevMonth = date('n', strtotime($year.'-'.$month.'-'.$day.' -1 day'));
+                                                }
+                                            @endphp
+                                            @if (date('N', strtotime($year.'-'.$month.'-'.$day)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
+                                                <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                            @else
+                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                            @endif
+                                        @else
+                                            @php
+                                                $isCurrentMonth = false;
                                             @endphp
                                         @endif
-                                        @if (date('N', strtotime($year.'-'.$month.'-'.$day)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
-                                            <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
-                                        @else
-                                            <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
-                                        @endif
-                                    @else
+                                    @endif
+                                    @if (!$isCurrentMonth)
                                         <td class="prev-month-day">&nbsp;</td>
                                     @endif
                                 @endforeach
                             </tr>
                         @endforeach
                     </tbody>
-                </table>
+                </table>                
             </div>
         </div>
     </div>
@@ -154,7 +165,7 @@ active
             </table>
         </div>
         <div class="text-right zoom90">
-            <a class="btn btn-danger btn-sm" type="button" href="" id="">Reset All</a>
+            <a class="btn btn-danger btn-sm delete-all" data-year="{{ $year }}" data-month="{{ $month }}" type="button">Reset All</a>
         </div>
     </div>
 </div>
@@ -214,27 +225,15 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                    <input type="time" class="form-control time-input" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
+                                    <input type="time" class="form-control time-input" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
-                            {{-- <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="email">From :</label>
-                                    <input type="time" class="form-control" required step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">To :</label>
-                                    <input type="time" class="form-control" required step="60" min="00:00" max="23:59" required pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:mm" autocomplete="off" name="to" id="end-time">
-                                </div>
-                            </div> --}}
                         </div>
                         <div class="row">
                             <div class="col-md-12">
@@ -306,13 +305,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="update_from" id="update_from">
+                                    <input type="time" class="form-control time-input" required autocomplete="off" name="update_from" id="update_from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="update_to" id="update_to">
+                                    <input type="time" class="form-control time-input" required autocomplete="off" name="update_to" id="update_to">
                                 </div>
                             </div>
                         </div>
@@ -344,22 +343,21 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form method="post" id="update-form">
+			<form method="post" id="multiple-entry-form">
                 @csrf
 				<div class="modal-body" style="">
-                    <input type="hidden" id="update_clickedDate" name="update_clickedDate">
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Date :</label>
-                                    <input type="date" class="form-control" required autocomplete="off" name="update_from">
+                                    <input type="text" class="form-control" name="daterange" id="daterange"/>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
-                                    <select class="form-control" id="update_task" name="update_task" required>
+                                    <select class="form-control" id="task" name="task" required>
                                         <option value="HO">HO</option>
                                         <option value="Sick">Sick</option>
                                         <option value="Other">Other</option>
@@ -377,7 +375,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="update_location" name="update_location" required>
+                                    <select class="form-control" id="location" name="location" required>
                                         <option value="DK">Dalam Kota</option>
                                         <option value="LK">Luar Kota</option>
                                         <option value="HO">Head Office</option>
@@ -392,13 +390,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="update_from" id="update_from">
+                                    <input type="time" class="form-control time-input" required autocomplete="off" name="from" id="from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control" required autocomplete="off" name="update_to" id="update_to">
+                                    <input type="time" class="form-control time-input" required autocomplete="off" name="to" id="to">
                                 </div>
                             </div>
                         </div>
@@ -406,7 +404,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="update_activity" name="update_activity" required></textarea>
+                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -414,7 +412,7 @@ active
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" id="update-entry" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                    <button type="submit" id="multiple-entries" class="btn btn-primary" data-dismiss="modal">Save changes</button>
                   </div>
 			</form>
 		</div>
@@ -467,6 +465,54 @@ active
         document.getElementById("location").removeAttribute("readonly");
         document.getElementById("start-time").removeAttribute("readonly");
         document.getElementById("end-time").removeAttribute("readonly");
+    }
+});
+
+$('.time-input').datetimepicker({
+    format: 'HH:mm'
+});
+
+const timeInputs = document.querySelectorAll('.time-input');
+
+timeInput.addEventListener("input", function (event) {
+    const input = event.target.value;
+    const regex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/; // regex for valid time format (24-hour)
+
+    if (regex.test(input)) { // input is valid time
+        timeInput.value = input; // no need to reformat
+    } else {
+        let formatted = input.replace(/\D/g, ""); // remove non-digits
+        if (formatted.length > 4) formatted = formatted.substring(0, 4); // limit to 4 digits
+
+        // insert colon between hours and minutes
+        const hours = formatted.substring(0, 2);
+        let minutes = formatted.substring(2);
+
+        // allow user to delete leading zero
+        if (minutes === "0" && formatted.length > 2) {
+            minutes = "";
+        } else if (minutes.length > 0 && minutes[0] === "0" && minutes[1] !== undefined) {
+            minutes = "0" + minutes[1];
+        }
+
+        // add colon between hours and minutes if necessary
+        if (hours.length > 0 && minutes.length > 0) {
+            timeInput.value = `${hours}:${minutes}`;
+        } else {
+            timeInput.value = formatted;
+        }
+    }
+});
+
+timeInput.addEventListener("keydown", function (event) {
+    if (event.key === "Backspace") {
+        const input = event.target.value;
+        const regex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/; // regex for valid time format (24-hour)
+
+        if (regex.test(input)) { // input is valid time
+            // remove last character (colon)
+            timeInput.value = input.substring(0, input.length - 1);
+        }
     }
 });
 </script>

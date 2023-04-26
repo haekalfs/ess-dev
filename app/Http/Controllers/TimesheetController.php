@@ -7,10 +7,12 @@ use App\Models\Company_project;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Timesheet;
-use App\Models\Timesheet_workflow;
+use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Users_detail;
 use Carbon\Carbon;
+use DateInterval;
+use DateTime;
 use Session;
 use Illuminate\Support\Facades\Crypt;
 use PDF;
@@ -19,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+
+use function PHPUnit\Framework\isEmpty;
 
 class TimesheetController extends Controller
 {
@@ -66,7 +70,26 @@ class TimesheetController extends Controller
         return view('timereport.timesheet', compact('entries'));
     }
 
+    public function getDayStatus($date)
+    {
+        $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"), true);
 
+        // Check tanggal merah berdasarkan libur nasional
+        if (isset($array[$date->format('Y-m-d')])) {
+            return "tanggal merah " . $array[$date->format('Y-m-d')]["deskripsi"];
+        }
+
+        // Check tanggal merah berdasarkan hari minggu
+        elseif ($date->format('D') === "Sun") {
+            return "tanggal merah hari minggu";
+        }
+
+        // Bukan tanggal merah
+        else {
+            return "bukan tanggal merah";
+        }
+    }
+    
     public function timesheet_entry($year, $month)
     {
         $year = Crypt::decrypt($year);
@@ -77,62 +100,40 @@ class TimesheetController extends Controller
                 ->orderBy('updated_at', 'desc')
                 ->where('ts_user_id', Auth::user()->id)
                 ->first();
-        // Set the default time zone to Jakarta
+
         date_default_timezone_set("Asia/Jakarta");
-    
-        // Get the number of days in the selected month
         $numDays = Carbon::create($year, $month)->daysInMonth;
-    
-        // Create an empty array to store the calendar data
+
         $calendar = [];
-    
-        // Add the days of the week as the first row
+
         $calendar[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-        // Get the last day of the previous month
+
         $lastDayPrevMonth = Carbon::create($year, $month, 1)->subDay()->day;
-    
-        // Get the day of the week that the 1st of the month falls on
+
         $dayOfWeek = Carbon::create($year, $month, 1)->dayOfWeek;
-    
-        // Create a counter to keep track of the day we're on
+
         $dayCounter = 1;
-    
-        // Create a flag to indicate whether we've added the first day of the month
+
         $firstDayAdded = false;
-    
-        // Loop through each day of the month and check if it is a holiday
+
         for ($i = 0; $i < 6; $i++) {
-            // Create an empty array to represent the current week
             $week = [];
-    
-            // Add the days from the previous month for the first week
             if (!$firstDayAdded) {
                 for ($j = $dayOfWeek - 1; $j >= 0; $j--) {
                     $week[] = $lastDayPrevMonth - $j;
                 }
-    
-                // Add the first day of the month
                 $week[] = $dayCounter;
                 $dayCounter++;
                 $firstDayAdded = true;
             }
-    
-            // Add the rest of the days of the week
             for ($j = count($week); $j < 7 && $dayCounter <= $numDays; $j++) {
                 $week[] = $dayCounter;
                 $dayCounter++;
             }
-    
-            // Pad out the end of the last week with empty cells
             while (count($week) < 7) {
                 $week[] = '';
             }
-    
-            // Add the week to the calendar array
             $calendar[] = $week;
-    
-            // If we've added all the days in the month, we're done
             if ($dayCounter > $numDays) {
                 break;
             }
@@ -238,22 +239,6 @@ class TimesheetController extends Controller
             'to' => 'required',
             'activity' => 'required',
         ]);
-    
-        $inputFromTime = $request->from;
-        $inputToTime = $request->to;
-        // check if time is in 24-hour format
-        if (preg_match('/^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $inputFromTime)) {
-            $formattedFromTime = $inputFromTime;
-        } else {
-            // convert time from 12-hour format to 24-hour format
-            $formattedFromTime = date('H:i', strtotime($inputFromTime));
-        }
-        if (preg_match('/^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $inputToTime)) {
-            $formattedToTime = $inputToTime;
-        } else {
-            // convert time from 12-hour format to 24-hour format
-            $formattedToTime = date('H:i', strtotime($inputToTime));
-        }
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
@@ -279,7 +264,7 @@ class TimesheetController extends Controller
         $entry->ts_status_id = '10';
         $entry->save();
     
-        Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
         return response()->json(['success' => 'Entry saved successfully.']);
     }
@@ -294,7 +279,7 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('created_at', 'desc')->where('ts_user_id', Auth::user()->id)->get();
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
         
         return response()->json($activities);
     }
@@ -302,6 +287,24 @@ class TimesheetController extends Controller
     public function destroy($id)
     {
         $activity = Timesheet::find($id);
+
+        if ($activity) {
+            $activity->delete();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Activity not found']);
+        }
+    }
+
+    public function destroy_all($year, $month)
+    {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+        $activity = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
 
         if ($activity) {
             $activity->delete();
@@ -327,7 +330,7 @@ class TimesheetController extends Controller
         
         $user_info = User::find(Auth::user()->id);
 
-        $workflow = Timesheet_workflow::where('user_id', Auth::user()->id)->where('month_periode', $year.$month)->get();
+        $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year.$month)->get();
 
         $info = [];
         $lastUpdate = DB::table('timesheet')
@@ -368,23 +371,30 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         $countRows = DB::table('timesheet')
-        ->selectRaw('ts_task, ts_location, max(ts_task_id) as ts_task_id, count(*) as total_rows')
+        ->selectRaw('ts_task, ts_location, ts_user_id, MAX(ts_task_id) AS ts_task_id, COUNT(*) AS total_rows')
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->groupBy('ts_task', 'ts_location') // ts_task_id is calculated with max() function
+        ->where('ts_user_id', Auth::user()->id)
+        ->groupBy('ts_task', 'ts_location', 'ts_user_id')
         ->get();
     
                 // var_dump($countRows);
         foreach($countRows as $row) {
             if (in_array($row->ts_task, ["HO", "Sick", "Standby"])) {
-                Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
                 ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
             } else {
                 $test = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $row->ts_task_id)->pluck('user_id')->first();
-                Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $test, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                if($test == NULL){
+                    $straighToPA = 'pa';
+                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $straighToPA, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
                 ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+                } else {
+                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $test, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                    ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+                }
             }
             
-            // Timesheet_workflow::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+            // Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
         }
         
         // Update Timesheet records between the start and end dates
@@ -449,5 +459,63 @@ class TimesheetController extends Controller
         $entry->save();
 
         return response()->json(['success' => 'Entry updated successfully.']);
+    }
+
+    public function save_multiple_entries(Request $request)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'task' => 'required',
+            'daterange' => 'required',
+            'location' => 'required',
+            'from' => 'required',
+            'to' => 'required',
+            'activity' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $dateString = $request->daterange;
+        list($startDateString, $endDateString) = explode(' - ', $dateString);
+        $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
+        $endDate = DateTime::createFromFormat('m/d/Y', $endDateString);
+        $interval = new DateInterval('P1D'); // Interval of 1 day
+
+        // Loop through each day between start and end dates
+        while ($startDate <= $endDate) {
+            $dayOfWeek = $startDate->format('N');
+            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
+                $startDate->add($interval);
+                continue;
+            }
+
+            // Insert the entry to the database for this day
+            $entry = new Timesheet;
+            $ts_task_id = $request->task;
+            $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
+            while (Project_assignment::where('id', $ts_task_id)->exists()){
+                foreach($task_project as $tp){
+                    $ts_task_id = $tp->company_project->project_name;
+                }
+            }
+            $entry->ts_user_id = Auth::user()->id;
+            $entry->ts_id_date = $startDate->format('Ymd');
+            $entry->ts_date = $startDate->format('Y-m-d');
+            $entry->ts_task = $ts_task_id;
+            $entry->ts_task_id = $request->task;
+            $entry->ts_location = $request->location;
+            $entry->ts_from_time = date('H:i', strtotime($request->from));;
+            $entry->ts_to_time = date('H:i', strtotime($request->to));
+            $entry->ts_activity = $request->activity;
+            $entry->ts_status_id = '10';
+            $entry->save();
+        
+            // Move to the next day
+            $startDate->add($interval);
+        }
+
+        return response()->json(['success' => "Entry saved successfully. $request->daterange"]);
     }
 }
