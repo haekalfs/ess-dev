@@ -73,7 +73,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/management/security_&_roles/add/access/" method="post">
+			<form action="/management/security_roles/add/access/" method="post">
                 @csrf
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
