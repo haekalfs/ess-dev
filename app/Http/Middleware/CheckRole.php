@@ -22,7 +22,6 @@ class CheckRole
         $userRoles = $user->role_id()->whereIn('role_name', $roles)->get();
 
         if ($userRoles->count() > 0) {
-            $request->session()->put('allowed_roles', $roles);
             return $next($request);
         }
         Session::flash('failed', "You don't have rights to access this page!");

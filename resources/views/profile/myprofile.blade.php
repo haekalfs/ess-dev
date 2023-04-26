@@ -33,7 +33,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Employee Information</h6>
                 <div class="text-right">
                     <a class="btn btn-danger btn-sm" type="button" data-toggle="modal" data-target="#changePass" id="manButton">Change Password</a>
                 </div>
@@ -48,7 +48,7 @@ active
                                     <td><img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 225px;" /></td>
                                 </tr>
                                 <tr>
-                                    <td><a class="btn btn-primary btn-sm" type="button" href="#" id="manButton">Upload CV</a></td>
+                                    <td><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" href="#" id="manButton">Upload CV</a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -80,7 +80,7 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Contact Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Contact Information</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -123,7 +123,7 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Profile Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Profile Information</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -160,7 +160,7 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Document Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Document Information</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -187,7 +187,7 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary h5" colspan="2">Bank Account</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Bank Account</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

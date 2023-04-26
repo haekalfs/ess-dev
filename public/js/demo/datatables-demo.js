@@ -16,6 +16,22 @@ $(document).ready(function() {
   } );
 } );
 
+$(document).ready(function() {
+  $('#dataTableProject').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 10
+  } );
+} );
+
+$(document).ready(function() {
+  $('#dataTableClient').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 10
+  } );
+} );
+
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
   $('#dataTableMonth').DataTable({
@@ -28,6 +44,15 @@ $(document).ready(function() {
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
   $('#dataTableRoles').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 25
+  } );
+} );
+
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
+  $('#dataTableUsersAcc').DataTable({
     "order": [[ 0, "asc" ]],
     "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
     "pageLength": 50

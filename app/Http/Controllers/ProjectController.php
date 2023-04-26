@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Company_project;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
+use App\Models\Project_location;
 use App\Models\Project_role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
 {
@@ -49,11 +52,11 @@ class ProjectController extends Controller
         $uniqueId = hexdec(substr(uniqid(), 0, 4));
 
         while (Project_assignment::where('id', $uniqueId)->exists()) {
-            $uniqueId = hexdec(substr(uniqid(), 0, 8));
+            $uniqueId = hexdec(substr(uniqid(), 0, 4));
         }
 
         Project_assignment::create([
-            // 'id' => $uniqueId,
+            'id' => $uniqueId,
     		'assignment_no' => $request->no_doc,
     		'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
@@ -63,19 +66,23 @@ class ProjectController extends Controller
             'notes' => $request->notes
     	]);
 
-        return redirect('/assignment')->with('success', 'Assignment Create successfully');
+        return redirect("/assignment/member/$uniqueId")->with('success', 'Assignment Create successfully');
     }
 
     public function project_assignment_member($assignment_id)
     {
-        $project = Company_project::all();
         $assignment = DB::table('project_assignments')
             ->join('company_projects', 'project_assignments.company_project_id', '=', 'company_projects.id')
             // ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignments.*', 'company_projects.*')
             ->where('project_assignments.id', '=', $assignment_id)
             ->get();
-        
+        // var_dump($assignment);
+        foreach ($assignment as $as){
+            $project = Client::where('id', $as->client_id)->first();
+        }
+        // $projects = $project->client->client_name;
+        // var_dump($project);
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
@@ -102,6 +109,25 @@ class ProjectController extends Controller
     {
         Project_assignment_user::where('id', $usr_id)->delete();
         return redirect()->back()->with('failed', 'Member deleted!');
+    }
+
+    public function project_assignment_delete(Request $request, $id)
+    {
+        $assignment = Project_assignment::find($id);
+        $member = Project_assignment_user::where('project_assignment_id', $id);
+
+        if (!$assignment) {
+            return redirect('/assignment')->with('failed', 'Project Assignment not found!');
+        }
+
+        $assignment->delete();
+        $member->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect('/assignment')->with('success', 'Project Assignment has been deleted!');
     }
 
     public function add_project_member(Request $request, $assignment_id)
@@ -141,6 +167,68 @@ class ProjectController extends Controller
     public function project_list()
     {
         $projects = Company_project::all();
-        return view('projects.list', compact('projects'));
+        $p_location = Project_location::all();
+        $client = Client::all();
+        return view('projects.list', ['projects' => $projects, 'locations' => $p_location, 'clients' => $client]);
+    }
+
+    public function getClientsRows()
+    {
+        // Get the Timesheet records between the start and end dates
+        $activities = Client::all();
+        
+        return response()->json($activities);
+    }
+
+    public function create_new_project(Request $request)
+    {
+        $this->validate($request,[
+            'p_code' => 'required',
+            'p_name' => 'required',
+            'p_client' => 'required',
+    		'p_location' => 'required',
+            'address' => 'required',
+            'from' => 'required',
+            'to' => 'required'
+    	]);
+
+        $uniqueId = hexdec(substr(uniqid(), 0, 4));
+
+        while (Company_project::where('id', $uniqueId)->exists()) {
+            $uniqueId = hexdec(substr(uniqid(), 0, 8));
+        }
+
+        $location = Project_location::find($request->p_location);
+        Company_project::create([
+            // 'id' => $uniqueId,
+    		'project_code' => $request->p_code,
+    		'alias' => $location->location_code,
+            'project_name' => $request->p_name,
+            'address' => $request->address,
+            'periode_start' => $request->from,
+            'periode_end' => $request->to,
+            'client_id' => $request->p_client
+    	]);
+
+        return redirect('/project_list')->with('success', 'Project Create successfully');
+    }
+
+    public function create_new_client(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'client_name' => 'required',
+            'address' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $client = new Client;
+        $client->client_name = $request->input('client_name');
+        $client->address = $request->input('address');
+        $client->save();
+        
+        return response()->json(['success'=>'Client created successfully.', 'client' => $client]);
     }
 }

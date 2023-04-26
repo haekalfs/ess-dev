@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Crypt;
 use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -70,26 +71,53 @@ class TimesheetController extends Controller
         return view('timereport.timesheet', compact('entries'));
     }
 
-    public function getDayStatus($date)
-    {
-        $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"), true);
+    public function tanggalMerah($value) {
+        $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"),true);
 
-        // Check tanggal merah berdasarkan libur nasional
-        if (isset($array[$date->format('Y-m-d')])) {
-            return "tanggal merah " . $array[$date->format('Y-m-d')]["deskripsi"];
+        //check tanggal merah berdasarkan libur nasional
+        if(isset($array[$value])) {
+            return "tanggal merah ".$array[$value]["deskripsi"];
         }
 
-        // Check tanggal merah berdasarkan hari minggu
-        elseif ($date->format('D') === "Sun") {
+        //check tanggal merah berdasarkan hari minggu
+        elseif(date("D",strtotime($value))==="Sun") {
             return "tanggal merah hari minggu";
         }
 
-        // Bukan tanggal merah
+        //bukan tanggal merah
         else {
             return "bukan tanggal merah";
         }
     }
-    
+
+    public function getDayStatus($date)
+    {
+        $cachedData = Cache::get('holiday_data');
+
+        if (!$cachedData) {
+            $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"), true);
+            Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+        } else {
+            $array = $cachedData;
+        }
+
+        // Check tanggal merah berdasarkan libur nasional
+        if (isset($array[$date->format('Ymd')])) {
+            return "red";
+        }
+        // Check tanggal merah berdasarkan hari minggu
+        elseif ($date->format('D') === "Sun") {
+            return "red";
+        }
+        elseif ($date->format('D') === "Sat") {
+            return "red";
+        }
+        // Bukan tanggal merah
+        else {
+            return "";
+        }
+    }
+
     public function timesheet_entry($year, $month)
     {
         $year = Crypt::decrypt($year);
@@ -127,7 +155,12 @@ class TimesheetController extends Controller
                 $firstDayAdded = true;
             }
             for ($j = count($week); $j < 7 && $dayCounter <= $numDays; $j++) {
-                $week[] = $dayCounter;
+                $date = Carbon::create($year, $month, $dayCounter);
+                $holiday = $this->getDayStatus($date);
+                $week[] = [
+                    'day' => $dayCounter,
+                    'status' => $holiday
+                ];
                 $dayCounter++;
             }
             while (count($week) < 7) {
@@ -138,6 +171,7 @@ class TimesheetController extends Controller
                 break;
             }
         }
+                
         // Company_project::all();
         $userId = Auth::user()->id;
         $assignment = DB::table('project_assignment_users')
@@ -207,25 +241,6 @@ class TimesheetController extends Controller
 
         // Return the calendar view with the calendar data
         return view('timereport.testing', compact('calendar'));
-    }
-
-    public function tanggalMerah($value) {
-        $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"),true);
-
-        //check tanggal merah berdasarkan libur nasional
-        if(isset($array[$value])) {
-            return "tanggal merah ".$array[$value]["deskripsi"];
-        }
-
-        //check tanggal merah berdasarkan hari minggu
-        elseif(date("D",strtotime($value))==="Sun") {
-            return "tanggal merah hari minggu";
-        }
-
-        //bukan tanggal merah
-        else {
-            return "bukan tanggal merah";
-        }
     }
 
     public function save_entries(Request $request)

@@ -19,7 +19,7 @@ class Users_detail extends Model
     }
     public function role()
     {
-        return $this->hasMany('App\Models\Role');
+        return $this->hasMany('App\Models\Usr_role');
     }
 
     public function department()

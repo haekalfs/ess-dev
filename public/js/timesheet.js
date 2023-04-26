@@ -101,6 +101,8 @@ $(document).ready(function() {
     }
     // localStorage.removeItem('modalHome');
 });
+
+
 //this is my save function 
 $(document).ready(function() {
 
@@ -108,9 +110,35 @@ $(document).on('click', '.delete-btn', function(event) {
     var activityId = $(event.target).data('id');
     deleteActivity(activityId);
 });
+
 function deleteActivity(activityId) {
     $.ajax({
         url: '/activities/' + activityId,
+        type: 'DELETE',
+        success: function(response) {
+            $('.alert-success-delete').show();
+            setTimeout(function() {
+                $('.alert-success-delete').fadeOut('slow');
+            }, 3000);
+            fetchActivities(yearput, monthput);
+        },
+        error: function(response,jqXHR, textStatus, errorThrown) {
+            $('.alert-danger-delete').show();
+            setTimeout(function() {
+                $('.alert-danger-delete').fadeOut('slow');
+            }, 3000);
+            console.log(response);
+        }
+        });
+    }
+$(document).on('click', '.delete-all', function(event) {
+    var activityYear = $(event.target).data('year');
+    var activityMonth = $(event.target).data('month');
+    deleteAllActivity(activityYear, activityMonth);
+});
+function deleteAllActivity(activityYear, activityMonth) {
+    $.ajax({
+        url: '/activities/all/' + activityYear + '/' + activityMonth,
         type: 'DELETE',
         success: function(response) {
             $('.alert-success-delete').show();
@@ -262,14 +290,45 @@ function fetchActivities(yearput, monthput) {
         url: '/entries',
         data: formData,
         success: function(response) {
-            $('.alert-success').show();
+            $('.alert-success-saving').show();
             document.getElementById("activity").removeAttribute("readonly");
             document.getElementById("location").removeAttribute("readonly");
             document.getElementById("start-time").removeAttribute("readonly");
             document.getElementById("end-time").removeAttribute("readonly");
             $('#entry-form')[0].reset();
                 setTimeout(function() {
-                    $('.alert-success').fadeOut('slow');
+                    $('.alert-success-saving').fadeOut('slow');
+                }, 3000);
+            // Fetch the updated list of activities
+            fetchActivities(yearput, monthput);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').show();
+                setTimeout(function() {
+                    $('.alert-danger').fadeOut('slow');
+                }, 3000);
+            }
+        });
+    });
+
+    $('#multiple-entries').click(function(e) {
+        e.preventDefault();
+        // Serialize the form data
+        var formData = $('#multiple-entry-form').serialize();
+        // Send an AJAX request to the entries.store route
+        $.ajax({
+        type: 'POST',
+        url: '/multiple_entries',
+        data: formData,
+        success: function(response) {
+            $('.alert-success-saving').show();
+            document.getElementById("activity").removeAttribute("readonly");
+            document.getElementById("location").removeAttribute("readonly");
+            document.getElementById("start-time").removeAttribute("readonly");
+            document.getElementById("end-time").removeAttribute("readonly");
+            $('#multiple-entry-form')[0].reset();
+                setTimeout(function() {
+                    $('.alert-success-saving').fadeOut('slow');
                 }, 3000);
             // Fetch the updated list of activities
             fetchActivities(yearput, monthput);
@@ -284,5 +343,117 @@ function fetchActivities(yearput, monthput) {
     });
 });
 
+$(function() {
+    var year = $('#yearSel').val();
+    var month = $('#monthSel').val();
+    var startDate = moment().year(year).month(month - 1).startOf('month');
+    var endDate = moment().year(year).month(month - 1).endOf('month');
+
+    $('input[name="daterange"]').daterangepicker({
+    "startDate": startDate,
+    "endDate": endDate,
+    "opens": "right",
+    "isInvalidDate": function(date) {
+        // Disable Saturdays and Sundays
+        return (date.day() === 0 || date.day() === 6);
+    },
+    "minDate": startDate,
+    "maxDate": endDate
+    }, function(start, end, label) {
+    console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+    });
+  });
 
 
+$(document).ready(function () {
+    $('#save-client-entry').click(function(e) {
+        e.preventDefault();
+        // Serialize the form data
+        var formData = $('#new-client-form').serialize();
+        // Send an AJAX request to the entries.store route
+        $.ajax({
+        type: 'POST',
+        url: '/client/create',
+        data: formData,
+        success: function(response) {
+            var cardBody = $('.Clients');
+            $('.alert-success-saving').show();
+            $('#new-client-form')[0].reset();
+            setTimeout(function() {
+                $('.alert-success-saving').fadeOut('slow');
+            }, 3000);
+            fetchClients();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').show();
+                setTimeout(function() {
+                    $('.alert-danger').fadeOut('slow');
+                }, 3000);
+            }
+        });
+    });
+});
+function fetchClients() {
+    $.ajax({
+        url: '/retrieveClients',
+        type: 'GET',
+        success: function(response) {
+            // Clear the table body
+            $('#Clients').empty();
+            // Check if the response is empty or null
+            if (response.length === 0) {
+                // Display a message to the user
+                $('#Clients').append($('<tr><td class="text-center" colspan="4">No data available in table.</td></tr>'));
+            } else {
+                // Loop through the activities and append each row to the table
+                $.each(response, function(index, activity) {
+                    var row = $('<tr></tr>').attr('data-id', activity.id);
+                    row.append($('<td></td>').text(activity.id));
+                    row.append($('<td></td>').text(activity.client_name));
+                    row.append($('<td></td>').text(activity.address));
+                    var actions = $('<td></td>');
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
+                    row.append(actions);
+                    $('#Clients').append(row);
+                });
+                // // Add click handlers for the edit and delete buttons
+                // $('.delete-btn').click(deleteActivity);
+            }
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+
+
+
+function deleteAssignment(event, id) {
+    event.preventDefault();
+    swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this assignment!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // perform the actual delete request
+                axios.delete('/assignment/delete/' + id)
+                    .then(response => {
+                        // show success message using SweetAlert
+                        swal("Poof! The assignment has been deleted!", {
+                            icon: "success",
+                        });
+
+                        // remove the assignment from the page
+                        window.location.href = '/assignment';
+                    })
+                    .catch(error => {
+                        // show error message using SweetAlert
+                        swal("Oops!", "Something went wrong while deleting the assignment!", "error");
+                    });
+            }
+        });
+}

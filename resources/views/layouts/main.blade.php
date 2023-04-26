@@ -22,11 +22,11 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script src="{{ asset('js/timesheet.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/file_icon_download.css') }}">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -34,12 +34,19 @@
     <link href="{{ asset('css/sb-admin-2.css') }}" rel="stylesheet">
     <!-- Custom styles for this page -->
     <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
 </head>
 
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav @role('freelancer') bg-gradient-success @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
@@ -85,15 +92,15 @@
                         <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
                         <a class="collapse-item" href="/development">Summary</a>
-                        @if (in_array('admin', session('allowed_roles')))
+                        @usr_acc(999)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
                         @else
-                        @endif
+                        @endusr_acc
                     </div>
                 </div>
             </li>
-            @if (in_array('admin', session('allowed_roles')))
+            @usr_acc(201)
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item @yield('active-page-approval')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -104,18 +111,23 @@
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        @if (in_array('admin', session('allowed_roles')))
+                        @usr_acc(202)
+                        <h6 class="collapse-header">Prior Approval:</h6>
                         <a class="collapse-item" href="/approval">Approval</a>
                         @else
-                        <a class="collapse-item" href="/approval">Approval <small style="color: red;"><i> &nbsp;&nbsp;Additional</i></small></a>
-                        @endif
+                        @endusr_acc
+                        @usr_acc(203)
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
+                        <a class="collapse-item" href="/approval">Manage Approval</a>
+                        @else
+                        @endusr_acc
                     </div>
                 </div>
             </li>
             @else
-            @endif
+            @endusr_acc
 
+            @usr_acc(301)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-leave')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLeave"
@@ -125,19 +137,31 @@
                 </a>
                 <div id="collapseLeave" class="collapse" aria-labelledby="headingLeave" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
+                        @usr_acc(302)
                         <h6 class="collapse-header">My Leaves:</h6>
                         <a class="collapse-item" href="/development">History</a>
-                        @if (in_array('admin', session('allowed_roles')))
+                        @else
+                        @endusr_acc
+                        @usr_acc(303)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Leave Report</a>
+                        @else
+                        @endusr_acc
+                        @usr_acc(304)
                         <a class="collapse-item" href="/development">Manage</a>
+                        @else
+                        @endusr_acc
+                        @usr_acc(305)
                         <a class="collapse-item" href="/development">Timesheet &nbsp;<i class="fas fa-fw fa-exchange-alt"></i>&nbsp; Leave</a>
                         @else
-                        @endif
+                        @endusr_acc
                     </div>
                 </div>
             </li>
+            @else
+            @endusr_acc
 
+            @usr_acc(501)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-reimburse')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReimburse"
@@ -147,17 +171,23 @@
                 </a>
                 <div id="collapseReimburse" class="collapse" aria-labelledby="headingReimburse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
+                        @usr_acc(502)
                         <h6 class="collapse-header">My Reimburse:</h6>
                         <a class="collapse-item" href="/development">History</a>
-                        @if (in_array('admin', session('allowed_roles')))
+                        @else
+                        @endusr_acc
+                        @usr_acc(503)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Manage Reimburse</a>
                         @else
-                        @endif
+                        @endusr_acc
                     </div>
                 </div>
             </li>
+            @else
+            @endusr_acc
 
+            @usr_acc(601)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-med-reimburse')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMedReimburse"
@@ -167,17 +197,23 @@
                 </a>
                 <div id="collapseMedReimburse" class="collapse" aria-labelledby="headingMedReimburse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
+                        @usr_acc(602)
                         <h6 class="collapse-header">My Medical Reimburse:</h6>
                         <a class="collapse-item" href="/medical/history">History <small style="color: red;"><i> &nbsp;&nbsp;Medical</i></small></a>
-                        @if (in_array('admin', session('allowed_roles')))
+                        @else
+                        @endusr_acc
+                        @usr_acc(603)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/development">Manage Reimburse</a>
                         @else
-                        @endif
+                        @endusr_acc
                     </div>
                 </div>
             </li>
+            @else
+            @endusr_acc
 
+            @usr_acc(401)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-project')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
@@ -189,16 +225,18 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Project Assignment:</h6>
                         <a class="collapse-item" href="/myprojects">MyProjects</a>
-                        @if (in_array('admin', session('allowed_roles')))
+                        @usr_acc(403)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/assignment">Project Assignment</a>
                         <a class="collapse-item" href="/project_list">Project Organization</a>
                         <a class="collapse-item" href="/development">Project Monitor</a>
                         @else
-                        @endif
+                        @endusr_acc
                     </div>
                 </div>
             </li>
+            @else
+            @endusr_acc
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -208,7 +246,7 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
-            @if (in_array('admin', session('allowed_roles')))
+            @usr_acc(901)
             <li class="nav-item @yield('active-page-system_management')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSystem"
                     aria-expanded="true" aria-controls="collapseSystem">
@@ -219,8 +257,8 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Administrator Access:</h6>
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
-                        <a class="collapse-item" href="/hrtools/manage/roles">User Access & Privilege</a>
                         <a class="collapse-item" href="/hrtools/manage/position">Department & Position</a>
+                        <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>User Access Controller (UAC)</i></a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/users">List Employees</a>
                         <a class="collapse-item" href="/development">List Consultant</a>
@@ -228,9 +266,9 @@
                 </div>
             </li>
             @else
-            @endif
+            @endusr_acc
             <!-- Nav Item - Pages Collapse Menu -->
-            @if (in_array('admin', session('allowed_roles')))
+            @usr_acc(999)
             <li class="nav-item @yield('active-page-HR')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHRSystem"
                     aria-expanded="true" aria-controls="collapseHRSystem">
@@ -250,7 +288,7 @@
                 </div>
             </li>
             @else
-            @endif
+            @endusr_acc
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('logout') }}"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -411,7 +449,7 @@
     </a>
 
     <!-- Bootstrap core JavaScript-->
-    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    {{-- <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script> --}}
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <!-- Core plugin JavaScript-->

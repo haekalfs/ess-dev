@@ -9631,6 +9631,14 @@ a.text-warning:hover, a.text-warning:focus {
   color: #dda20a !important;
 }
 
+.text-pink {
+  color: #fc30f6 !important;
+}
+
+.text-cyan {
+  color: #30d5f2 !important;
+}
+
 .text-danger {
   color: #e74a3b !important;
 }
@@ -10074,6 +10082,14 @@ a:focus {
 
 .border-left-warning {
   border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-project_a {
+  border-left: 0.25rem solid #30d5f2 !important;
+}
+
+.border-left-project_b {
+  border-left: 0.25rem solid #fc30f6 !important;
 }
 
 .border-bottom-warning {
@@ -11305,6 +11321,14 @@ body.sidebar-toggled footer.sticky-footer {
     max-width: 300px; /* adjust the max-width to fit your table design */
 }
 
+.long-text-2 {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 600px; /* adjust the max-width to fit your table design */
+}
+
 .shorter-text {
   display: block;
   overflow: hidden;
@@ -11313,3 +11337,48 @@ body.sidebar-toggled footer.sticky-footer {
   max-width: 200px; /* adjust the max-width to fit your table design */
 }
 
+.timesheet:hover .card {
+    animation-name: zoomIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.medical:hover .card {
+    animation-name: zoomIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.leave:hover .card {
+    animation-name: zoomIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.reimburse:hover .card {
+    animation-name: zoomIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.p_assign_mem:hover .card {
+  animation-name: zoomIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.p_assignment:hover .card {
+  animation-name: zoomIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}

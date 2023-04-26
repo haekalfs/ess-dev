@@ -56,9 +56,11 @@ active
                         @endforeach
                     </colgroup>
                     <thead class="thead-dark">
-                        @foreach ($calendar[0] as $dayName)
-                            <th>{{ $dayName }}</th>
-                        @endforeach
+                        <tr>
+                            @foreach ($calendar[0] as $dayName)
+                                <th>{{ $dayName }}</th>
+                            @endforeach
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach (array_slice($calendar, 1) as $week)
@@ -68,32 +70,45 @@ active
                                 @endphp
                                 @foreach ($week as $day)
                                     @if ($day !== '')
-                                        @if (date('n', strtotime($year.'-'.$month.'-'.$day)) == $month)
+                                        @if (is_array($day) && isset($day['status']))
                                             @php
-                                                $isCurrentMonth = true;
-                                                if (date('j', strtotime($year.'-'.$month.'-'.$day)) == 1) {
-                                                    $prevMonth = date('n', strtotime($year.'-'.$month.'-'.$day.' -1 day'));
-                                                }
+                                                $dayValue = $day['day'];
+                                                $status = $day['status'];
                                             @endphp
-                                            @if (date('N', strtotime($year.'-'.$month.'-'.$day)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$day)) == 7)
-                                                <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                            @if ($status === "red")
+                                                <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}<br></td>
                                             @else
-                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $day }}" id="task_entry{{ $day }}">{{ $day }}</td>
+                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}<br></td>
                                             @endif
                                         @else
                                             @php
-                                                $isCurrentMonth = false;
+                                                $dayValue = $day;
+                                                $status = '';
                                             @endphp
+                                            @if (date('j', strtotime($year.'-'.$month.'-'.$dayValue)) == 1)
+                                                @php
+                                                    $isCurrentMonth = true;
+                                                    $prevMonth = date('n', strtotime($year.'-'.$month.'-'.$dayValue.' -1 day'));
+                                                @endphp
+                                            @endif
+                                            @if ($isCurrentMonth)
+                                                @if (date('N', strtotime($year.'-'.$month.'-'.$dayValue)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$dayValue)) == 7)
+                                                    <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}</td>
+                                                @else
+                                                    <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}</td>
+                                                @endif
+                                            @else
+                                                <td class="prev-month-day">{{ $dayValue }}</td>
+                                            @endif
                                         @endif
-                                    @endif
-                                    @if (!$isCurrentMonth)
-                                        <td class="prev-month-day">&nbsp;</td>
+                                    @else
+                                        <td>&nbsp;</td>
                                     @endif
                                 @endforeach
                             </tr>
                         @endforeach
                     </tbody>
-                </table>                
+                </table>                 
             </div>
         </div>
     </div>
@@ -468,53 +483,68 @@ active
     }
 });
 
-$('.time-input').datetimepicker({
-    format: 'HH:mm'
-});
+function setupTimeInputs() {
+    $('.time-input').datetimepicker({
+      format: 'HH:mm'
+    });
 
-const timeInputs = document.querySelectorAll('.time-input');
+    const timeInputs = document.querySelectorAll('.time-input');
 
-timeInput.addEventListener("input", function (event) {
-    const input = event.target.value;
-    const regex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/; // regex for valid time format (24-hour)
-
-    if (regex.test(input)) { // input is valid time
-        timeInput.value = input; // no need to reformat
-    } else {
-        let formatted = input.replace(/\D/g, ""); // remove non-digits
-        if (formatted.length > 4) formatted = formatted.substring(0, 4); // limit to 4 digits
-
-        // insert colon between hours and minutes
-        const hours = formatted.substring(0, 2);
-        let minutes = formatted.substring(2);
-
-        // allow user to delete leading zero
-        if (minutes === "0" && formatted.length > 2) {
-            minutes = "";
-        } else if (minutes.length > 0 && minutes[0] === "0" && minutes[1] !== undefined) {
-            minutes = "0" + minutes[1];
-        }
-
-        // add colon between hours and minutes if necessary
-        if (hours.length > 0 && minutes.length > 0) {
-            timeInput.value = `${hours}:${minutes}`;
-        } else {
-            timeInput.value = formatted;
-        }
-    }
-});
-
-timeInput.addEventListener("keydown", function (event) {
-    if (event.key === "Backspace") {
+    timeInputs.forEach(function(timeInput) {
+      timeInput.addEventListener("input", function (event) {
         const input = event.target.value;
         const regex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/; // regex for valid time format (24-hour)
 
         if (regex.test(input)) { // input is valid time
+          timeInput.value = input; // no need to reformat
+        } else {
+          let formatted = input.replace(/\D/g, ""); // remove non-digits
+          if (formatted.length > 4) formatted = formatted.substring(0, 4); // limit to 4 digits
+
+          // insert colon between hours and minutes
+          const hours = formatted.substring(0, 2);
+          let minutes = formatted.substring(2);
+
+          // allow user to delete leading zero
+          if (minutes === "0" && formatted.length > 2) {
+            minutes = "";
+          } else if (minutes.length > 0 && minutes[0] === "0" && minutes[1] !== undefined) {
+            minutes = "0" + minutes[1];
+          }
+
+          // add colon between hours and minutes if necessary
+          if (hours.length > 0 && minutes.length > 0) {
+            timeInput.value = `${hours}:${minutes}`;
+          } else {
+            timeInput.value = formatted;
+          }
+        }
+      });
+
+      timeInput.addEventListener("keydown", function (event) {
+        if (event.key === "Backspace") {
+          const input = event.target.value;
+          const regex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/; // regex for valid time format (24-hour)
+
+          if (regex.test(input)) { // input is valid time
             // remove last character (colon)
             timeInput.value = input.substring(0, input.length - 1);
+          }
         }
-    }
-});
+      });
+    });
+  }
+
+  // Call the setupTimeInputs function initially
+  setupTimeInputs();
+
+  // Handle form submission or page refresh event
+  function handleFormSubmit() {
+    // Handle form submission or page refresh logic here
+
+    // After form submission or page refresh, call the setupTimeInputs function again
+    setupTimeInputs();
+  }
 </script>
 <style>
     td {

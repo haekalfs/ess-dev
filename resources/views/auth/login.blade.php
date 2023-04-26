@@ -48,6 +48,136 @@
         </div>
     </div>
 </div>
+
+<div class="lc-block position-relative">
+    <div id="carouselExampleControls2" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active w-100">
+                <div class="row row-cols-1 row-cols-md-3 g-4 w-100">
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/AMS_headline.png') }}" class="card-img-top"
+                          alt="Hollywood Sign on The Hill" />
+                        <div class="card-body">
+                          <h5 class="card-title">AMS</h5>
+                          <p class="card-text long-text-2">
+                            AMS is a tools to managing company's assets and monitoring their assets. In this tools you could see how much assets that company's owned, manage holders of the assets, monitoring location of the assets.
+                          </p>
+                          <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/pr-po.jpg') }}" class="card-img-top"
+                          alt="Palm Springs Road" />
+                        <div class="card-body">
+                          <h5 class="card-title">e-Form</h5>
+                          <p class="card-text long-text-2">
+                            PR-PO Controller is an app to manage purchase orders. It streamlines the process of creating and tracking purchase orders, and makes it easy to stay on top of your spending. PR-PO Controller lets you create and track purchase orders from anywhere, so you can always know where your money is going.
+                          </p>
+                          <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/PASS.jpg') }}" class="card-img-top"
+                          alt="Los Angeles Skyscrapers" />
+                        <div class="card-body">
+                          <h5 class="card-title">PASS</h5>
+                          <p class="card-text long-text-2">PASS V2 For managing tickets issue in perdana's projects.</p>
+                            <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            <div class="carousel-item w-100">
+                <div class="row row-cols-1 row-cols-md-3 g-4 w-100">
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/AMS_headline.png') }}" class="card-img-top"
+                          alt="Hollywood Sign on The Hill" />
+                        <div class="card-body">
+                          <h5 class="card-title">AMS</h5>
+                          <p class="card-text long-text-2">
+                            AMS is a tools to managing company's assets and monitoring their assets. In this tools you could see how much assets that company's owned, manage holders of the assets, monitoring location of the assets.
+                          </p>
+                          <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/pr-po.jpg') }}" class="card-img-top"
+                          alt="Palm Springs Road" />
+                        <div class="card-body">
+                          <h5 class="card-title">e-Form</h5>
+                          <p class="card-text long-text-2">
+                            PR-PO Controller is an app to manage purchase orders. It streamlines the process of creating and tracking purchase orders, and makes it easy to stay on top of your spending. PR-PO Controller lets you create and track purchase orders from anywhere, so you can always know where your money is going.
+                          </p>
+                          <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/PASS.jpg') }}" class="card-img-top"
+                          alt="Los Angeles Skyscrapers" />
+                        <div class="card-body">
+                          <h5 class="card-title">PASS</h5>
+                          <p class="card-text long-text-2">PASS V2 For managing tickets issue in perdana's projects.</p>
+                            <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+            <div class="carousel-item w-100">
+                <div class="row row-cols-1 row-cols-md-3 g-4 w-100">
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/AMS_headline.png') }}" class="card-img-top"
+                          alt="Hollywood Sign on The Hill" />
+                        <div class="card-body">
+                          <h5 class="card-title">AMS</h5>
+                          <p class="card-text long-text-2">
+                            AMS is a tools to managing company's assets and monitoring their assets. In this tools you could see how much assets that company's owned, manage holders of the assets, monitoring location of the assets.
+                          </p>
+                          <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/pr-po.jpg') }}" class="card-img-top"
+                          alt="Palm Springs Road" />
+                        <div class="card-body">
+                          <h5 class="card-title">e-Form</h5>
+                          <p class="card-text long-text-2">
+                            PR-PO Controller is an app to manage purchase orders. It streamlines the process of creating and tracking purchase orders, and makes it easy to stay on top of your spending. PR-PO Controller lets you create and track purchase orders from anywhere, so you can always know where your money is going.
+                          </p>
+                          <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card">
+                        <img src="{{ asset('img/PASS.jpg') }}" class="card-img-top"
+                          alt="Los Angeles Skyscrapers" />
+                        <div class="card-body">
+                          <h5 class="card-title">PASS</h5>
+                          <p class="card-text long-text-2">PASS V2 For managing tickets issue in perdana's projects.</p>
+                            <button class="btn btn-primary btn-sm">Enter</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 
