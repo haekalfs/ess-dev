@@ -109,7 +109,7 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
     Route::get('/management/security_&_roles/remove/access/{id}', 'ManagementController@remove_access')->middleware('auth')->middleware(['checkRole:admin,fm']);
 
     Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-    Route::post('/management/security_roles/add/access/', 'ManagementController@grant_access_to_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+    Route::match(['get', 'post'], '/management/security_roles/add/access/', 'ManagementController@grant_access_to_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
 
     Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
     Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
