@@ -12,7 +12,7 @@ class Department extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\Users');
+        return $this->hasMany('App\Models\Users');
     }
 
 }

@@ -17,10 +17,6 @@ class Users_detail extends Model
     public function user(){
     	return $this->belongsTo('App\Models\User');
     }
-    public function role()
-    {
-        return $this->hasMany('App\Models\Role');
-    }
 
     public function department()
     {
