@@ -44,29 +44,29 @@ class ProjectController extends Controller
     {
         $this->validate($request,[
             'no_doc' => 'required',
-    		'ref_doc' => 'required',
+    		'ref_doc' => 'sometimes',
             'project' => 'required',
-            'notes' => 'required'
+            'notes' => 'sometimes'
     	]);
 
-        $uniqueId = hexdec(substr(uniqid(), 0, 4));
+        $uniqueIdP = hexdec(substr(uniqid(), 0, 3));
 
-        while (Project_assignment::where('id', $uniqueId)->exists()) {
-            $uniqueId = hexdec(substr(uniqid(), 0, 4));
+        while (Project_assignment::where('id', $uniqueIdP)->exists()) {
+            $uniqueIdP = hexdec(substr(uniqid(), 0, 3));
         }
 
         Project_assignment::create([
-            'id' => $uniqueId,
+            'id' => $uniqueIdP,
     		'assignment_no' => $request->no_doc,
     		'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
             'req_by' => Auth::user()->id,
-            'task_id' => $uniqueId,
+            'task_id' => $uniqueIdP,
             'company_project_id' => $request->project,
             'notes' => $request->notes
     	]);
 
-        return redirect("/assignment/member/$uniqueId")->with('success', 'Assignment Create successfully');
+        return redirect("/assignment/member/$uniqueIdP")->with('success', "Assignment #$uniqueIdP Create successfully");
     }
 
     public function project_assignment_member($assignment_id)
@@ -151,6 +151,7 @@ class ProjectController extends Controller
         foreach ($company_code as $project) {
             $company_project_id = $project->company_project_id;
         }
+        $userAdded = $request->emp_name;
         Project_assignment_user::create([
             // 'id' => $uniqueId,
     		'user_id' => $request->emp_name,
@@ -161,7 +162,7 @@ class ProjectController extends Controller
             'project_assignment_id' => $assignment_id,
             'company_project_id' => $company_project_id
     	]);
-        return redirect()->back()->with('success', 'Assignment saved successfully.');
+        return redirect()->back()->with('success', "$userAdded has been added to the assignment!");
     }
 
     public function project_list()
@@ -195,7 +196,7 @@ class ProjectController extends Controller
         $uniqueId = hexdec(substr(uniqid(), 0, 4));
 
         while (Company_project::where('id', $uniqueId)->exists()) {
-            $uniqueId = hexdec(substr(uniqid(), 0, 8));
+            $uniqueId = hexdec(substr(uniqid(), 0, 4));
         }
 
         $location = Project_location::find($request->p_location);

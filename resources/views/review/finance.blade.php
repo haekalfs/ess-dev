@@ -6,8 +6,10 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Timesheet Review <small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></h1>
-<p class="mb-4">Review Page.</p>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-2 text-gray-800">Timesheet Review <small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></h1>
+    <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -31,9 +33,9 @@ active
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Timereport Employees</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Approved Timesheets</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/review/fm/export" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export (XLS)</a>
+            <a class="btn btn-secondary btn-sm" type="button" href="#" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export Selected</a>
         </div>
     </div>
     <div class="card-body">
@@ -42,7 +44,7 @@ active
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Status</th>
+                        <th>Date Requested</th>
                         <th>Timesheet Periode</th>
                         <th>Action</th>
                     </tr>
@@ -55,9 +57,10 @@ active
                         <td>{{ $approval->date_submitted }}</td>
                         <td>{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
                         <td class="action text-center">
-                            <a href="/timesheet/review/fm/export" class="btn btn-primary btn-sm">
-                                <i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download
-                            </a>
+                            {{-- <a href="/timesheet/review/fm/export" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a> --}}
+                            <div class="form-check form-check-inline larger-checkbox">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                            </div>
                         </td>
                         @else
                         <td></td>

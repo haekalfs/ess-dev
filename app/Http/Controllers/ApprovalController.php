@@ -358,7 +358,11 @@ class ApprovalController extends Controller
 		$currentMonth = date('m');
         $currentYear = date('Y');
 
-        $approvals = Timesheet_detail::where('ts_status_id', '29')->whereYear('date_submitted', $currentYear)->get();
+        $approvals = Timesheet_detail::where('ts_status_id', 29)
+        ->whereYear('date_submitted', $currentYear)
+        ->where('RequestTo', '-')
+        ->groupBy('user_timesheet', 'month_periode')
+        ->get();
 		return view('review.finance', compact('approvals'));
 	}
 

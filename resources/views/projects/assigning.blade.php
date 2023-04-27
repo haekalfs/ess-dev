@@ -94,7 +94,7 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="email">No :</label>
-                                            <input type="text" class="form-control" name="no_doc">
+                                            <input type="text" class="form-control" required name="no_doc">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -122,7 +122,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Notes Assigment :</label>
-                                    <textarea type="text" class="form-control" name="notes" required></textarea>
+                                    <textarea type="text" class="form-control" name="notes"></textarea>
                                 </div>
                             </div>
                         </div>
