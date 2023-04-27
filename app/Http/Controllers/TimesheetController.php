@@ -174,11 +174,16 @@ class TimesheetController extends Controller
                 
         // Company_project::all();
         $userId = Auth::user()->id;
+        //Check Assignment Expiration
+        Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '<', date('Y-m-d'))->whereNull('deleted_at')->delete();
+        Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '>', date('Y-m-d'))->onlyTrashed()->restore();
+
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
+            ->whereNull('deleted_at')
             ->get();
         if($lastUpdate){
             if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
