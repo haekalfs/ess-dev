@@ -31,11 +31,11 @@ active
 <div class="alert alert-danger" role="alert" style="display: none;">
     An error occurred while saving your entry. Please try again.
 </div>
-<div class="alert alert-success shadow alert-success-delete" role="alert" style="display: none;">
+<div class="alert alert-success alert-success-delete" role="alert" style="display: none;">
     Your entry has been deleted.
 </div>
 
-<div class="alert shadow alert-danger-delete" role="alert" style="display: none;">
+<div class="alert alert-danger-delete" role="alert" style="display: none;">
     An error occurred while deleting your entry. Please try again.
 </div>
 <div class="row">
@@ -242,13 +242,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                    <input type="text" class="form-control time-input" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
+                                    <input type="text" class="form-control time-input" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                         </div>
@@ -547,6 +547,23 @@ function setupTimeInputs() {
     // After form submission or page refresh, call the setupTimeInputs function again
     setupTimeInputs();
   }
+  
+  var locale = "{{ app()->getLocale() }}";
+
+// Set the 24-hour format for the moment.js library
+if (locale === 'en') {
+        moment.locale('en', {
+            meridiem: function (hour, minute, isLowercase) {
+                return '';
+            }
+        });
+    } else {
+        moment.locale('default', {
+            meridiem: function (hour, minute, isLowercase) {
+                return '';
+            }
+        });
+    }
 </script>
 <style>
     td {
