@@ -189,7 +189,6 @@ active
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 
-<script></script>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -242,13 +241,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="text" class="form-control time-input" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                    <input type="text" class="form-control validate time-input" required autocomplete="off" placeholder="HH:mm" name="from" id="start-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="text" class="form-control time-input" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
+                                    <input type="text" class="form-control validate time-input" required autocomplete="off" placeholder="HH:mm" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                         </div>
@@ -256,7 +255,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validate" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -322,13 +321,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="update_from" id="update_from">
+                                    <input type="text" class="form-control time-input" required autocomplete="off" name="update_from" id="update_from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="update_to" id="update_to">
+                                    <input type="text" class="form-control time-input" required autocomplete="off" name="update_to" id="update_to">
                                 </div>
                             </div>
                         </div>
@@ -368,7 +367,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Date :</label>
-                                    <input type="text" class="form-control" name="daterange" id="daterange"/>
+                                    <input type="text" class="form-control validateMult" name="daterange" id="daterange"/>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -407,13 +406,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="from" id="from">
+                                    <input type="text" class="form-control validateMult time-input" required autocomplete="off" name="from" id="from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="to" id="to">
+                                    <input type="text" class="form-control validateMult time-input" required autocomplete="off" name="to" id="to">
                                 </div>
                             </div>
                         </div>
@@ -421,7 +420,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validateMult" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -547,23 +546,6 @@ function setupTimeInputs() {
     // After form submission or page refresh, call the setupTimeInputs function again
     setupTimeInputs();
   }
-  
-  var locale = "{{ app()->getLocale() }}";
-
-// Set the 24-hour format for the moment.js library
-if (locale === 'en') {
-        moment.locale('en', {
-            meridiem: function (hour, minute, isLowercase) {
-                return '';
-            }
-        });
-    } else {
-        moment.locale('default', {
-            meridiem: function (hour, minute, isLowercase) {
-                return '';
-            }
-        });
-    }
 </script>
 <style>
     td {
