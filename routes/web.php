@@ -47,7 +47,7 @@ Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/timesheet/review/fm/export', 'ApprovalController@export_excel')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/timesheet/review/fm/export', 'ExportTimesheet@export_excel')->middleware('auth')->middleware(['checkRole:admin']);
 
 
 // Testing
@@ -63,14 +63,14 @@ Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->na
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/director/preview/{user_id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth')->middleware(['checkRole:admin']);
 
-Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/fin_ga_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/service_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_service_dir')->middleware('auth')->middleware(['checkRole:admin']);
     //Sub Approval
 Route::get('/approval/pm/{user_id}/{year}/{month}', 'ApprovalController@approve_pm')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/pa/{user_id}/{year}/{month}', 'ApprovalController@approve_pa')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_hr')->middleware('auth')->middleware(['checkRole:admin']);
     //Sub Approval for Finances Dept
-Route::get('/approval/finance/{user_id}/{year}/{month}', 'ApprovalController@approve_fm')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/fm/{user_id}/{year}/{month}', 'ApprovalController@approve_fm')->middleware('auth')->middleware(['checkRole:admin']);
 
 
 

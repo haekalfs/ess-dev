@@ -22,17 +22,6 @@ class ExportTimesheet extends Controller
 {
     public function export_excel()
 	{
-        // $date = date('Y-m');
-		// return Excel::download(new TimesheetExport, $date.'TimesheetEmployees_PerdanaConsulting.xlsx');
-        // $path = public_path('template_fm.xlsx');
-        // $excel = Excel::load($path);
-
-        // $worksheet = $excel->getActiveSheet();
-        // $worksheet->each(function($row, $index) {
-        //     $row->setCellValue('A' . $index, 'New Value');
-        // });
-
-        // $excel->store('xlsx', $path);
         $templatePath = public_path('template_fm.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
@@ -45,13 +34,14 @@ class ExportTimesheet extends Controller
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
-        $result = DB::table('timesheet')
-        ->select('ts_user_id as User', 'ts_task as Type', 'ts_location as Area', 'ts_from_time', DB::raw('count(*) as Count'))
-        ->groupBy('User', 'Type', 'Area', 'ts_from_time')
-        ->orderBy('User')
-        ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->where('ts_status_id', '29')
-        ->get();
+
+        $result = DB::table('timesheet_details')
+            ->select('*')
+            ->where('ts_status_id', 29)
+            ->whereYear('date_submitted', 2023)
+            ->where('RequestTo', '-')
+            ->groupBy('user_timesheet', 'ts_task')
+            ->get();
 
 
        // Set up the starting row and column for the data
@@ -60,40 +50,29 @@ class ExportTimesheet extends Controller
 
         // Initialize the last printed user name
         $lastUser = '';
+        $lastWorkhours = '';
 
         // Loop through the query results and populate the values
         foreach ($result as $row) {
+            $yearNum = substr($row->month_periode, 0, 4);
+            $monthNum = substr($row->month_periode, 4, 2);
+            $monthName = date("F", mktime(0, 0, 0, $month, 1));
             // Print the user name if it is different from the last printed user name
-            if ($row->User !== $lastUser) {
-                $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->User);
-                $lastUser = $row->User;
+            if ($row->user_timesheet !== $lastUser) {
+                $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->user_timesheet);
+                $lastUser = $row->user_timesheet;
             }
-            $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->Type);
-            $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->Area);
-            $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->Count);
-            $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $monthName.' - '.$year);
+            $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
+            $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
+            $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays.' Days');
+            if ($row->workhours !== $lastWorkhours) {
+                $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours');
+                $lastWorkhours = $row->workhours;
+            }
+            $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $monthName.' - '.$yearNum);
+            $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
         
             $startRow++;
-        
-            $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-                ->where('ts_user_id', $row->User)
-                ->where('ts_task', $row->Type)
-                ->where('ts_location', $row->Area)
-                ->orderBy('ts_date', 'asc')
-                ->get();
-        
-            $total_work_hours = 0;
-        
-            foreach ($activities as $timesheets) {
-                $start_time = strtotime($timesheets->ts_from_time);
-                $end_time = strtotime($timesheets->ts_to_time);
-                $time_diff_seconds = $end_time - $start_time;
-                $time_diff_hours = gmdate('H', $time_diff_seconds);
-                $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-                $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
-            }
-        
-            $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow - 1, intval($total_work_hours)." Hours");
         }
         
 

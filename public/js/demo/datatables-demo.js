@@ -67,3 +67,11 @@ $(document).ready(function() {
     "pageLength": 10
   } );
 } );
+
+$(document).ready(function() {
+  $('#tsPreview').DataTable({
+    "order": [[ 1, "asc" ]],
+    "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
+    "pageLength": 30
+  } );
+} );

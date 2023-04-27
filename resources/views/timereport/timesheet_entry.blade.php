@@ -380,7 +380,7 @@ active
                                         <option>Standby</option>
                                         <optgroup label="Projects">
                                             @foreach($assignment as $assign)
-                                            <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
+                                            <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
                                             @endforeach
                                         </optgroup>
                                     </select>
@@ -406,13 +406,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="text" class="form-control validateMult time-input" required autocomplete="off" name="from" id="from">
+                                    <input type="text" class="form-control validateMult time-input" placeholder="HH:mm" required autocomplete="off" name="from" id="from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="text" class="form-control validateMult time-input" required autocomplete="off" name="to" id="to">
+                                    <input type="text" class="form-control validateMult time-input" placeholder="HH:mm" required autocomplete="off" name="to" id="to">
                                 </div>
                             </div>
                         </div>

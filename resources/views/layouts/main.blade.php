@@ -92,7 +92,7 @@
                         <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
                         <a class="collapse-item" href="/development">Summary</a>
-                        @usr_acc(999)
+                        @usr_acc(104)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
                         @else
