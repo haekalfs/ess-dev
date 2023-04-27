@@ -214,9 +214,15 @@ class ManagementController extends Controller
         Role::create([
             'id' => $nextId,
             'role' => $request->new_role_code,
-            'role_name' => $request->new_role
+            'description' => $request->new_role
         ]);
         return redirect('/management/security_&_roles/manage/roles')->with('success', 'Role Create successfully');
+    }
+
+    public function delete_roles($id)
+    {
+        DB::table('roles')->where('id', $id)->delete();
+        return redirect('/management/security_&_roles/manage/roles')->with('failed', 'Role has been deleted!');
     }
 
     public function assign_delete($id)
@@ -230,12 +236,6 @@ class ManagementController extends Controller
     {
         $kntl = User::where('id', $id)->get();
         return response()->json($kntl);
-    }
-
-    public function delete_roles($id)
-    {
-        DB::table('Roles')->where('id', $id)->delete();
-        return redirect('/management/security_&_roles/manage/roles')->with('success', 'Role delete successfully');
     }
 
     public function edit($id)

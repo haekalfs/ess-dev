@@ -29,7 +29,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Users Roles</h6>
         <div class="text-right">
-            <button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addRoleModal" id="addButton" style="margin-right: 10px;">+ New Role</button> 
+            <button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addRoleModal" id="addButton">+ New Role</button> 
         </div>
     </div>
     <div class="card-body">
@@ -148,7 +148,7 @@ active
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary btn-sm" value="Save">
+                    <input type="submit" class="btn btn-primary" value="Save">
                   </div>
 			</form>
 		</div>
