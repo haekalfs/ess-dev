@@ -1,11 +1,17 @@
 @extends('layouts.main')
 
+@section('title', 'Project Assignment - ESS')
+
 @section('active-page-project')
 active
 @endsection
 
 @section('content')
 <!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h4 mb-0 text-gray-800">Project Assignment</h1>
+    <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Assignment</a>
+</div>
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -30,9 +36,9 @@ active
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Project Assignment</h6>
-        <div class="text-right">
+        {{-- <div class="text-right">
             <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addModal" id="addButton">+ New Assignment</a>
-        </div>
+        </div> --}}
     </div>
     <div class="card-body">
         <div class="table-responsive">

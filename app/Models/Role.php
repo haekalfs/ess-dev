@@ -4,17 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Role extends Model
 {
-    protected $table = "roles";
-    protected $fillable = ["id", "role_name", "role_id", "user_id", "created_at", "updated_at"];
+    use HasFactory;
 
-    public function user(){
-    	return $this->belongsTo('App\Models\Users');
+    protected $table = "roles";
+    protected $fillable = ["id", "role", "description", "role_id", "created_at", "updated_at"];
+
+    public function role(){
+    	return $this->hasMany('App\Models\Usr_role');
     }
 
-    public function role_template(){
-    	return $this->hasOne('App\Models\Role_template');
+    public function user_access(){
+    	return $this->hasMany('App\Models\User_access');
     }
 }

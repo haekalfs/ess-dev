@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Timesheet Approval - ESS')
+
 @section('active-page-approval')
 active
 @endsection
@@ -42,25 +44,25 @@ active
                     <tr>
                         <th>Name</th>
                         <th>Request Date</th>
-                        <th>Project</th>
                         <th>Timesheet Periode</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach ($approvals as $approval)
                     <tr>
-                        <td>{{ $approvals->user_timesheet }}</td>
-                        <td>{{ $approvals->ts_task }}</td>
-                        <td>{{ $approvals->date_submitted }}</td>
-                        <td>{{ date("F", mktime(0, 0, 0, substr($approvals->month_periode, 4, 2), 1)) }} - {{ substr($approvals->month_periode, 0, 4) }}</td>
+                        <td>{{ $approval->user_timesheet }}</td>
+                        <td>{{ $approval->date_submitted }}</td>
+                        <td>{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
                         <td class="action text-center">
-                            <a href="/approval/director/{{$approvals->user_timesheet}}/{{ substr($approvals->month_periode, 0, 4) }}/{{ substr($approvals->month_periode, 4, 2) }}" class="btn btn-primary btn-sm">
+                            <a href="/approval/{{ $button }}/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve
                             </a>
-                            <a href="/reject/director/{{$approvals->user_timesheet}}/{{ substr($approvals->month_periode, 0, 4) }}/{{ substr($approvals->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
-                            <a href="/approval/director/preview/{{$approvals->user_timesheet}}/{{ substr($approvals->month_periode, 0, 4) }}/{{ substr($approvals->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;">Preview</a>
+                            <a href="/reject/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
+                            <a href="/approval/director/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;">Preview</a>
                         </td>
                     </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

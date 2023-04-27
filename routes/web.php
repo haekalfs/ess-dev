@@ -35,8 +35,11 @@ Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')
 Route::get('/timesheet', 'TimesheetController@index')->middleware('auth')->name('timesheet');
 Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry')->middleware('auth');
 Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
+Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store');
 Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
+    //DELETE
 Route::delete('/activities/{id}', 'TimesheetController@destroy')->middleware('auth');
+Route::delete('/activities/all/{year}/{month}', 'TimesheetController@destroy_all')->middleware('auth');
     //Preview
 Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview.timesheet')->middleware('auth');
 Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print')->middleware('auth');
@@ -57,16 +60,25 @@ Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->nam
 //Approval
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_director')->name('approve-director')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/approval/director/preview/{id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/director/preview/{user_id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth')->middleware(['checkRole:admin']);
+
+Route::get('/approval/director/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/service_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_service_dir')->middleware('auth')->middleware(['checkRole:admin']);
+    //Sub Approval
+Route::get('/approval/pm/{user_id}/{year}/{month}', 'ApprovalController@approve_pm')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/pa/{user_id}/{year}/{month}', 'ApprovalController@approve_pa')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_hr')->middleware('auth')->middleware(['checkRole:admin']);
+    //Sub Approval for Finances Dept
+Route::get('/approval/finance/{user_id}/{year}/{month}', 'ApprovalController@approve_fm')->middleware('auth')->middleware(['checkRole:admin']);
+
 
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
 
 //Project Assignment
-Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth')->middleware(['checkRole:employee,consultant']);
+Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth')->middleware(['checkRole:employee,consultant,admin']);
 Route::get('/assignment', 'ProjectController@assigning')->name('project-assigning')->middleware('auth')->middleware(['checkRole:admin']);
 Route::post('/assignment/add_entries', 'ProjectController@add_project_assignment')->name('add_projects')->middleware('auth');
 Route::get('/assignment/member/{id}', 'ProjectController@project_assignment_member')->name('project-assigning')->middleware('auth');
@@ -74,6 +86,11 @@ Route::post('/assignment/add_member_to_assignment/{assignment_id}', 'ProjectCont
 Route::get('/project_list', 'ProjectController@project_list')->name('project-list')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/assignment/view/details/{id}', 'ProjectController@project_assignment_member_view')->name('project-assigning-view')->middleware('auth');
 Route::get('/assignment/member/delete/{id}', 'ProjectController@project_assignment_member_delete')->name('project-assigning-delete')->middleware('auth');
+Route::delete('/assignment/delete/{id}', 'ProjectController@project_assignment_delete')->name('project-assignment-delete')->middleware('auth');
+Route::post('/client/create', 'ProjectController@create_new_client')->middleware('auth')->name('insert.new.client')->middleware(['checkRole:admin']);
+Route::get('/retrieveClients', 'ProjectController@getClientsRows')->name('client-list')->middleware('auth')->middleware(['checkRole:admin']);
+
+Route::post('/project_list/new', 'ProjectController@create_new_project')->name('project-list-create')->middleware('auth')->middleware(['checkRole:admin']);
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin,manager']);
@@ -83,14 +100,24 @@ Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth')->middl
 Route::put('/users/update/{id}', 'UserController@update')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth')->middleware(['checkRole:admin']);
 
+//Management
+Route::get('/management/security_&_roles/', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::get('/management/security_&_roles/manage/access', 'ManagementController@manage_access')->middleware('auth')->middleware(['checkRole:admin,fm']);
+Route::get('/management/security_&_roles/manage/roles', 'ManagementController@manage_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+    //link non-page
+    Route::get('/management/security_&_roles/remove/roles/{id}', 'ManagementController@remove_roles_from_user')->middleware('auth')->middleware(['checkRole:admin,fm']);
+    Route::get('/management/security_&_roles/remove/access/{id}', 'ManagementController@remove_access')->middleware('auth')->middleware(['checkRole:admin,fm']);
+
+    Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+    Route::match(['get', 'post'], '/management/security_&_roles/add/access/', 'ManagementController@grant_access_to_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+
+    Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+    Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
+    Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
 
 //HR TOOLS
-Route::get('/hrtools/manage/roles', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::get('/manage/roles/delete/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin,fm']);
-Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth')->middleware(['checkRole:admin,fm']);
+
 //Department and Position
 Route::get('/hrtools/manage/position', 'DepPosController@index')->middleware('auth')->middleware(['checkRole:admin,fm']);
 Route::post('/manage/add_department', 'DepPosController@add_department')->middleware('auth')->middleware(['checkRole:admin,fm']);

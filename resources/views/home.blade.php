@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Home Page - ESS')
+
 @section('active-page-db')
 active
 @endsection
@@ -18,13 +20,12 @@ active
 </div>
 @endif
 <div class="row zoom90">
-    
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Employee Information</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -60,7 +61,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Leave Balance</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Leave Balance</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -95,7 +96,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">News Information</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -137,7 +138,7 @@ active
                                 Thank you for your attention.
                                 <br>Sincerely,<br><br>
                                 Perdana Consulting</p>
-                              <a class="btn btn-sm btn-primary" href="https://perdana365-my.sharepoint.com/personal/admin_office365_perdana_co_id/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fadmin%5Foffice365%5Fperdana%5Fco%5Fid%2FDocuments%2FPeraturan%20Perusahaan%20%2D%20Konsulindo%20Informatika%20Perdana%202023%2Epdf&parent=%2Fpersonal%2Fadmin%5Foffice365%5Fperdana%5Fco%5Fid%2FDocuments&ga=1" class="card-link">Read more</a>
+                              <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/personal/admin_office365_perdana_co_id/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fadmin%5Foffice365%5Fperdana%5Fco%5Fid%2FDocuments%2FPeraturan%20Perusahaan%20%2D%20Konsulindo%20Informatika%20Perdana%202023%2Epdf&parent=%2Fpersonal%2Fadmin%5Foffice365%5Fperdana%5Fco%5Fid%2FDocuments&ga=1" class="card-link">Read more</a>
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">Peraturan Perusahaan 2021 - PT Konsulindo Informatika Perdana</h5>
@@ -146,7 +147,7 @@ active
                                   Thank you for your attention.
                                   <br>Sincerely,<br><br>
                                   Perdana Consulting</p>
-                                <a class="btn btn-sm btn-primary" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_perdana365_onmicrosoft_com/ET8qcmGYOk9LtyebhqZmJroBM1FHsHF3OZ3sg_s3lxvTVg" class="card-link">Read more</a>
+                                <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_perdana365_onmicrosoft_com/ET8qcmGYOk9LtyebhqZmJroBM1FHsHF3OZ3sg_s3lxvTVg" class="card-link">Read more</a>
                             </div>
                         </div>
                     </div>

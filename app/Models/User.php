@@ -51,7 +51,7 @@ class User extends Authenticatable
     }
 
     public function role_id(){
-    	return $this->hasMany('App\Models\Role');
+    	return $this->hasMany('App\Models\Usr_role');
     }
 
     public function medical(){

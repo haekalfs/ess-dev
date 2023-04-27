@@ -1,11 +1,19 @@
 @extends('layouts.main')
 
+@section('title', 'Project Assignment - ESS')
+
 @section('active-page-project')
 active
 @endsection
 
 @section('content')
 <!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h4 mb-0 text-gray-800">Project Assignment #{{ $assignment_id }}</h1>
+    <a href="#" onclick="deleteAssignment(event, {{$assignment_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
+        <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Assignment
+    </a>
+</div>
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -54,7 +62,7 @@ active
                                 <td>: {{ $row->reference_doc }}</td>
                             </tr>
                             <tr class="table-sm">
-                                <td style="width: 200px;">Notes</td>
+                                <td style="width: 200px;">Notes Assignment</td>
                                 <td>: {{ $row->notes }}</td>
                             </tr>
                             @endforeach
@@ -85,6 +93,10 @@ active
                             <tr class="table-sm">
                                 <td style="width: 150px;">Location</td>
                                 <td>: {{ $row->alias }}</td>
+                            </tr>
+                            <tr class="table-sm">
+                                <td style="width: 150px;">Client</td>
+                                <td>: {{ $project->client_name }}</td>
                             </tr>
                             @endforeach
                         </tbody>

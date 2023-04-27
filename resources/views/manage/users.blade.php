@@ -1,11 +1,17 @@
 @extends('layouts.main')
 
+@section('title', 'Manage Users - ESS')
+
 @section('active-page-users')
 active
 @endsection
 
 @section('content')
 <!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h4 mb-0 text-gray-800">Manage Users</h1>
+    <a  href="/users/tambah" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add User</a>
+</div>
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -31,10 +37,10 @@ active
 <div class="card shadow mb-4">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Manage Users</h6>
-        <div class="text-right">
+        <h6 class="m-0 font-weight-bold text-primary">Users List</h6>
+        {{-- <div class="text-right">
             <a class="btn btn-primary btn-sm" type="button" href="/users/tambah">+ Add User</a>
-        </div>
+        </div> --}}
     </div>
     <!-- Card Body -->
     <div class="card-body">

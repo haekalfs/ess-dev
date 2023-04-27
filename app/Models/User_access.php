@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Role_template extends Model
+class User_access extends Model
 {
     use HasFactory;
+    protected $table = "user_access";
+    protected $primaryKey = 'id';
 
-    protected $table = "role_templates";
-    protected $fillable = ["id", "role", "role_name", "role_id", "created_at", "updated_at"];
+    protected $fillable = ["id", "page_id", "role_id", "created_at", "updated_at"];
 
     public function role(){
     	return $this->belongsTo('App\Models\Role');

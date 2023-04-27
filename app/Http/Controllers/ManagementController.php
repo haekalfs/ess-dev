@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Role_template;
 use App\Models\User;
+use App\Models\User_access;
+use App\Models\Usr_role;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Row;
 
 class ManagementController extends Controller
@@ -15,15 +19,18 @@ class ManagementController extends Controller
     {
 
         $users = DB::table('users')
-            ->join('roles', 'users.id', '=', 'roles.user_id')
-            ->select('users.id', 'users.name', 'roles.role_name', 'roles.created_at')
-            ->orderBy('users.name')
-            ->get();
+        ->leftjoin('usr_roles', 'users.id', '=', 'usr_roles.user_id')
+        ->leftjoin('roles', 'roles.id', '=', 'usr_roles.role_id')
+        ->select('users.id', 'users.name', 'roles.description', 'usr_roles.role_name', 'usr_roles.created_at')
+        ->orderBy('users.name')
+        ->get();
 
         $usersData = [];
         $u_List = User::all();
-        $r_name = Role_template::all();
+        $r_name = Role::all();
         $Assign = User::all();
+
+        $pages = Page::all();
         foreach ($users as $user) {
             if (!isset($usersData[$user->id])) {
                 
@@ -37,7 +44,7 @@ class ManagementController extends Controller
             }
 
             // Add the role to the list of roles for this user
-            $usersData[$user->id]['roles'][] = $user->role_name;
+            $usersData[$user->id]['roles'][] = $user->description;
         }
 
         // Convert the $usersData array into a simple list of users with comma-delimited roles
@@ -53,35 +60,107 @@ class ManagementController extends Controller
             ];
         }
 
-        return view('management.roles', ['users' => $usersList, 'r_name' => $r_name, 'us_List' => $u_List, 'Assign' => $Assign]);
+        $user_access = DB::table('roles')
+        ->select('roles.id', 'pages.description AS pageDesc', 'roles.description', 'pages.id AS page_id', 'user_access.created_at')
+        ->leftJoin('user_access', 'roles.id', '=', 'user_access.role_id')
+        ->rightJoin('pages', 'pages.id', '=', 'user_access.page_id')
+        ->orderBy('page_id', 'asc')
+        ->get();
+    
+        $usersAcData = [];
+        foreach ($user_access as $userAc) {
+            if (!isset($usersAcData[$userAc->page_id])) {
+                
+                // If this is the first time we've seen this user, create a new entry in the $usersData array
+                $usersAcData[$userAc->page_id] = [
+                    'page_id' => $userAc->page_id,
+                    'page' => $userAc->pageDesc,
+                    'GrantAcc' => [],
+                    'created_at' => $userAc->created_at
+                ];
+            }
+
+            // Add the role to the list of roles for this user
+            $usersAcData[$userAc->page_id]['GrantAcc'][] = $userAc->description;
+        }
+
+        // Convert the $usersData array into a simple list of users with comma-delimited roles
+        $usersAcList = [];
+        $autoIncrement = 1;
+        foreach ($usersAcData as $userAcData) {
+            $grantList = implode(', ', $userAcData['GrantAcc']);
+            $usersAcList[] = [
+                'id' => $autoIncrement++,
+                'page_id' => $userAcData['page_id'],
+                'page' => $userAcData['page'],
+                'grantTo' => $grantList,
+                'created_at' => $userAcData['created_at']
+            ];
+        }
+        
+        return view('management.roles', ['users' => $usersList, 'access' => $usersAcList, 'pages' => $pages,'r_name' => $r_name, 'us_List' => $u_List, 'Assign' => $Assign]);
     }
 
+    public function manage_access(){
 
-    public function add_roles(Request $request)
-    {
-        // $latestForm = Role_template::whereNull('deleted_at')->orderBy('id')->pluck('id')->first();
-        // $nextForm = intval(substr($latestForm, 4))+ 1;
-        $lastId = Role_template::orderBy('id', 'desc')->first();
-        $nextId = ($lastId) ? $lastId->id + 1 : 1;
-        $randomNumber = mt_rand(10, 90);
+        $r_name = Role::all();
 
-        $this->validate($request, [
-            'new_role' => 'required',
-            'new_role_code' => 'required'
-        ]);
+        $pages = Page::all();
 
-        Role_template::create([
-            'id' => $nextId,
-            'role' => $request->new_role_code,
-            'role_name' => $request->new_role,
-            'role_id' => $randomNumber
-        ]);
-        return redirect('/hrtools/manage/roles')->with('success', 'Role Create successfully');
+        $user_access = DB::table('roles')
+        ->select('roles.id', 'pages.description AS pageDesc', 'roles.description', 'pages.id AS page_id', 'user_access.created_at')
+        ->leftJoin('user_access', 'roles.id', '=', 'user_access.role_id')
+        ->rightJoin('pages', 'pages.id', '=', 'user_access.page_id')
+        ->orderBy('page_id', 'asc')
+        ->get();
+    
+        $usersAcData = [];
+        foreach ($user_access as $userAc) {
+            if (!isset($usersAcData[$userAc->page_id])) {
+                
+                // If this is the first time we've seen this user, create a new entry in the $usersData array
+                $usersAcData[$userAc->page_id] = [
+                    'page_id' => $userAc->page_id,
+                    'page' => $userAc->pageDesc,
+                    'GrantAcc' => [],
+                    'created_at' => $userAc->created_at
+                ];
+            }
+
+            // Add the role to the list of roles for this user
+            $usersAcData[$userAc->page_id]['GrantAcc'][] = $userAc->description;
+        }
+
+        // Convert the $usersData array into a simple list of users with comma-delimited roles
+        $usersAcList = [];
+        $autoIncrement = 1;
+        foreach ($usersAcData as $userAcData) {
+            $grantList = implode(', ', $userAcData['GrantAcc']);
+            $usersAcList[] = [
+                'id' => $autoIncrement++,
+                'page_id' => $userAcData['page_id'],
+                'page' => $userAcData['page'],
+                'grantTo' => $grantList,
+                'created_at' => $userAcData['created_at']
+            ];
+        }
+        
+        return view('management.manage_access', ['access' => $usersAcList, 'pages' => $pages,'r_name' => $r_name]);
+    }
+
+    public function manage_roles(){
+        $r_name = Role::all();
+        return view('management.manage_roles', ['r_name' => $r_name]);
+    }
+
+    public function remove_roles_from_user($id){
+        Usr_role::where('user_id', $id)->delete();
+        return redirect('/management/security_&_roles/')->with('failed', 'User Roles has been Removed!');
     }
 
     public function assign_roles(Request $request)
     {
-        $lastId = Role::orderBy('id', 'desc')->first();
+        $lastId = Usr_role::orderBy('id', 'desc')->first();
         $nextId = ($lastId) ? $lastId->id + 1 : 1;
 
         $this->validate($request, [
@@ -89,18 +168,68 @@ class ManagementController extends Controller
             'inputRole' => 'required'
         ]);
 
-        Role::create([
+        $roleName = Role::where('id', $request->inputRole)->pluck('role')->first();
+
+        Usr_role::create([
             'id' => $nextId,
             'user_id' => $request->inputUser,
-            'role_name' => $request->inputRole,
+            'role_id' => $request->inputRole,
+            'role_name' => $roleName,
         ]);
-        return redirect('/hrtools/manage/roles')->with('success', 'Role Assign successfully');
+        return redirect('/management/security_&_roles/')->with('success', 'Role Assign successfully');
     }
+
+    public function remove_access($id){
+        User_access::where('page_id', $id)->delete();
+        return redirect('/management/security_&_roles/manage/access')->with('failed', 'All Access has been Removed!');
+    }
+
+    public function grant_access_to_roles(Request $request)
+    {
+        $this->validate($request, [
+            'inputPage' => 'required',
+            'inputRole' => 'required'
+        ]);
+
+        $roleName = Role::where('id', $request->inputRole)->pluck('description')->first();
+        User_access::create([
+            'page_id' => $request->inputPage,
+            'role_id' => $request->inputRole
+        ]);
+        return redirect('/management/security_&_roles/manage/access')->with('success', "Access Granted to $roleName");
+    }
+
+    public function add_roles(Request $request)
+    {
+        // $latestForm = Role_template::whereNull('deleted_at')->orderBy('id')->pluck('id')->first();
+        // $nextForm = intval(substr($latestForm, 4))+ 1;
+        $lastId = Role::orderBy('id', 'desc')->first();
+        $nextId = ($lastId) ? $lastId->id + 1 : 1;
+
+        $this->validate($request, [
+            'new_role' => 'required',
+            'new_role_code' => 'required'
+        ]);
+
+        Role::create([
+            'id' => $nextId,
+            'role' => $request->new_role_code,
+            'description' => $request->new_role
+        ]);
+        return redirect('/management/security_&_roles/manage/roles')->with('success', 'Role Create successfully');
+    }
+
+    public function delete_roles($id)
+    {
+        DB::table('roles')->where('id', $id)->delete();
+        return redirect('/management/security_&_roles/manage/roles')->with('failed', 'Role has been deleted!');
+    }
+
     public function assign_delete($id)
     {
         // $users = DB::table('roles')->where('user_id', $user_id)->delete();
         $Assign = User::where('id', $id);
-        return redirect('/hrtools/manage/roles')->with('success', 'Role delete successfully');
+        return redirect('/management/security_&_roles/')->with('success', 'Role delete successfully');
     }
 
     public function test($id)
@@ -109,15 +238,9 @@ class ManagementController extends Controller
         return response()->json($kntl);
     }
 
-    public function delete($id)
-    {
-        $r_name = DB::table('role_templates')->where('id', $id)->delete();
-        return redirect('/hrtools/manage/roles')->with('success', 'Role delete successfully');
-    }
-
     public function edit($id)
     {
-        $r_name = Role_template::findOrFail($id);
+        $r_name = Role::findOrFail($id);
         return view('/hrtools/manage/roles', compact('role_template'));
     }
 }
