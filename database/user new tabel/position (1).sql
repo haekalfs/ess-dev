@@ -1,0 +1,89 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Apr 28, 2023 at 05:35 PM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.0.25
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `ess`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `position`
+--
+
+CREATE TABLE `position` (
+  `id` int(50) NOT NULL,
+  `position_name` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `position`
+--
+
+INSERT INTO `position` (`id`, `position_name`, `created_at`, `updated_at`) VALUES
+(1, 'MANAGING PARTNER', '2023-04-28 03:50:34', '2023-04-28 03:50:34'),
+(2, 'PARTNER', '2023-04-28 03:50:46', '2023-04-28 03:50:46'),
+(3, 'COMMISSIONER', '2023-04-28 03:51:02', '2023-04-28 03:51:02'),
+(4, 'CONSULTANT', '2023-04-28 03:51:22', '2023-04-28 03:51:22'),
+(5, 'PROJECT ADMIN', '2023-04-28 03:51:36', '2023-04-28 03:51:36'),
+(6, 'MANAGER', '2023-04-28 03:51:50', '2023-04-28 03:51:50'),
+(7, 'PRESIDENT DIRECTOR', '2023-04-28 03:52:03', '2023-04-28 03:52:03'),
+(8, 'DIRECTOR', '2023-04-28 03:52:32', '2023-04-28 03:52:32'),
+(9, 'SUPERVISOR', '2023-04-28 03:52:42', '2023-04-28 03:52:42'),
+(10, 'STAFF', '2023-04-28 03:52:56', '2023-04-28 03:52:56'),
+(11, 'JUNIOR SALES', '2023-04-28 03:53:07', '2023-04-28 03:53:07'),
+(12, 'VICE PRESIDENT', '2023-04-28 03:53:34', '2023-04-28 03:53:34'),
+(13, 'SALES ADMIN', '2023-04-28 03:53:46', '2023-04-28 03:53:46'),
+(14, 'SENIOR SALES', '2023-04-28 03:54:06', '2023-04-28 03:54:06'),
+(15, 'SALES', '2023-04-28 03:54:21', '2023-04-28 03:54:21'),
+(16, 'SECRETARY', '2023-04-28 03:54:29', '2023-04-28 03:54:29'),
+(17, 'SOLUTION ARCHITECT', '2023-04-28 03:54:45', '2023-04-28 03:54:45'),
+(18, 'ANALYST CONSULTANT', '2023-04-28 03:55:04', '2023-04-28 03:55:04'),
+(19, 'SENIOR CONSULTANT', '2023-04-28 03:55:12', '2023-04-28 03:55:12'),
+(20, 'HEAD OF INTERNAL AUDIT', '2023-04-28 03:55:33', '2023-04-28 03:55:33'),
+(21, 'SUPERVISOR ACCOUNTING', '2023-04-28 03:55:51', '2023-04-28 03:55:51'),
+(22, 'MANAGER ACCOUNTING', '2023-04-28 03:55:59', '2023-04-28 03:55:59'),
+(23, 'STAFF ACCOUNTING', '2023-04-28 03:56:07', '2023-04-28 03:56:07');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `position`
+--
+ALTER TABLE `position`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `position`
+--
+ALTER TABLE `position`
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
