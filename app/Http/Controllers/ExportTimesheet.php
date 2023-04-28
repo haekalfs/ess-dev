@@ -64,7 +64,7 @@ class ExportTimesheet extends Controller
             }
             $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
             $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
-            $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays.' Days');
+            $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays);
             if ($row->workhours !== $lastWorkhours) {
                 $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours');
                 $lastWorkhours = $row->workhours;

@@ -85,7 +85,7 @@ class ProjectController extends Controller
         // var_dump($project);
         $emp = User::all();
         $roles = Project_role::all();
-        $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->withTrashed()->get();
+        $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
         return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
     
