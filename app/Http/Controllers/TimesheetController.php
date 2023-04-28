@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EssMailer;
+use App\Models\Approval_timesheet;
 use App\Models\Company_project;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
@@ -41,18 +42,14 @@ class TimesheetController extends Controller
                 ->where('ts_user_id', Auth::user()->id)
                 ->first();
             if ($lastUpdate) {
-                if($lastUpdate->ts_status_id == '10'){
-                    $status = "Saved";
-                }elseif($lastUpdate->ts_status_id == '20'){
-                    $status = "Submitted";
-                }elseif($lastUpdate->ts_status_id == '29'){
-                    $status = "Approved";
-                }else{
-                    $status = "Rejected";
+                $status = Approval_timesheet::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
+                if(!$status){
+                    $status = "Unknown Status";
                 }
                 $encryptYear = Crypt::encrypt($currentYear);
                 $encryptMonth = Crypt::encrypt($entry);
-                $isSubmitted = ($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29');
+                $validStatusIDs = ['20', '29', '30', '40'];
+                $isSubmitted = in_array($lastUpdate->ts_status_id, $validStatusIDs);
                 $lastUpdatedAt = $lastUpdate->updated_at;
                 $editUrl = "/timesheet/entry/".$encryptYear."/".$encryptMonth;
             } else {
@@ -69,25 +66,6 @@ class TimesheetController extends Controller
             $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
         }
         return view('timereport.timesheet', compact('entries'));
-    }
-
-    public function tanggalMerah($value) {
-        $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"),true);
-
-        //check tanggal merah berdasarkan libur nasional
-        if(isset($array[$value])) {
-            return "tanggal merah ".$array[$value]["deskripsi"];
-        }
-
-        //check tanggal merah berdasarkan hari minggu
-        elseif(date("D",strtotime($value))==="Sun") {
-            return "tanggal merah hari minggu";
-        }
-
-        //bukan tanggal merah
-        else {
-            return "bukan tanggal merah";
-        }
     }
 
     public function getDayStatus($date)
