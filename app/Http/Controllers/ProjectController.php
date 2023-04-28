@@ -49,10 +49,10 @@ class ProjectController extends Controller
             'notes' => 'sometimes'
     	]);
 
-        $uniqueIdP = hexdec(substr(uniqid(), 0, 3));
+        $uniqueIdP = hexdec(substr(uniqid(), 0, 5));
 
         while (Project_assignment::where('id', $uniqueIdP)->exists()) {
-            $uniqueIdP = hexdec(substr(uniqid(), 0, 3));
+            $uniqueIdP = hexdec(substr(uniqid(), 0, 5));
         }
 
         Project_assignment::create([
