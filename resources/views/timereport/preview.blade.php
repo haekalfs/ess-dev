@@ -128,14 +128,14 @@ active
     <!-- Card Body -->
     <div class="card-body">
         <div class="table-responsive zoom90 table-sm">
-            <table class="table table-bordered" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered" id="tsPreview" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
-                        <th style="width: 80px;">Day</th>
+                        <th>Day</th>
                         <th>Date</th>
                         <th>Task</th>
                         <th>Location</th>
-                        <th style="width: 600px;">Activity</th>
+                        <th>Activity</th>
                         <th>From</th>
                         <th>To</th>
                         <th>Hours</th>
@@ -165,13 +165,13 @@ active
                     @endforeach
                 </tbody>
             </table>
-        </div>
+        </div><br>
         <div class="table-responsive zoom90 table-sm">
-            <table class="table table-bordered">
+            <table class="table table-borderless">
                 <tbody>
                     <tr class="table-sm">
-                        <td class="m-0 font-weight-bold text-danger" width="1160px">Total Workhours</td>
-                        <td class="text-center"><?php echo intval($total_work_hours); ?> Hours</td>
+                        <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
+                        <td class="text-center font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
                     </tr>
                 </tbody>
             </table>

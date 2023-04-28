@@ -174,11 +174,16 @@ class TimesheetController extends Controller
                 
         // Company_project::all();
         $userId = Auth::user()->id;
+        //Check Assignment Expiration
+        // Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '<', date('Y-m-d'))->whereNull('deleted_at')->delete();
+        // Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '>', date('Y-m-d'))->onlyTrashed()->restore();
+
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
+            ->whereNull('deleted_at')
             ->get();
         if($lastUpdate){
             if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
@@ -385,6 +390,19 @@ class TimesheetController extends Controller
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
+        // Get the Timesheet records between the start and end dates
+        $tsOfTheMonth = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
+
+        $total_work_hours = 0;
+        foreach($tsOfTheMonth as $sum){
+            $start_time = strtotime($sum->ts_from_time);
+            $end_time = strtotime($sum->ts_to_time);
+            $time_diff_seconds = $end_time - $start_time;
+            $time_diff_hours = gmdate('H', $time_diff_seconds);
+            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes;
+        }
+
         $countRows = DB::table('timesheet')
         ->selectRaw('ts_task, ts_location, ts_user_id, MAX(ts_task_id) AS ts_task_id, COUNT(*) AS total_rows')
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
@@ -392,20 +410,26 @@ class TimesheetController extends Controller
         ->groupBy('ts_task', 'ts_location', 'ts_user_id')
         ->get();
     
-                // var_dump($countRows);
+        // var_dump($countRows);
         foreach($countRows as $row) {
-            if (in_array($row->ts_task, ["HO", "Sick", "Standby"])) {
-                Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+            if (in_array($row->ts_task, ["HO", "Sick", "Standby", "Other"])) {
+                if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray())) {
+                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'RequestTo' => 'fm', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                    ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+                } else {
+                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                    ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+                }
             } else {
                 $test = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $row->ts_task_id)->pluck('user_id')->first();
+                $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
                 if($test == NULL){
                     $straighToPA = 'pa';
-                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $straighToPA, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $straighToPA, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                ['ts_mandays' => $row->total_rows, 'roleAs' => $checkRole, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '30', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
                 } else {
-                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $test, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                    ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
+                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $test, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
+                    ['ts_mandays' => $row->total_rows, 'roleAs' => $checkRole, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
                 }
             }
             
@@ -498,6 +522,8 @@ class TimesheetController extends Controller
         $endDate = DateTime::createFromFormat('m/d/Y', $endDateString);
         $interval = new DateInterval('P1D'); // Interval of 1 day
 
+        $month_periode = $startDate->format('Yn');
+
         // Loop through each day between start and end dates
         while ($startDate <= $endDate) {
             $dayOfWeek = $startDate->format('N');
@@ -530,6 +556,7 @@ class TimesheetController extends Controller
             // Move to the next day
             $startDate->add($interval);
         }
+        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => $month_periode],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
         return response()->json(['success' => "Entry saved successfully. $request->daterange"]);
     }

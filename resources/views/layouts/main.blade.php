@@ -80,6 +80,7 @@
                     <span>My Profile</span>
                 </a>
             </li>
+            @usr_acc(101)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-timesheet')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -89,10 +90,16 @@
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
+                        @usr_acc(102)
                         <h6 class="collapse-header">My Timereport:</h6>
                         <a class="collapse-item" href="/timesheet">Timesheet</a>
+                        @else
+                        @endusr_acc
+                        @usr_acc(103)
                         <a class="collapse-item" href="/development">Summary</a>
-                        @usr_acc(999)
+                        @else
+                        @endusr_acc
+                        @usr_acc(104)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/timesheet/review/fm">Review<small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
                         @else
@@ -100,6 +107,8 @@
                     </div>
                 </div>
             </li>
+            @else
+            @endusr_acc
             @usr_acc(201)
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item @yield('active-page-approval')">

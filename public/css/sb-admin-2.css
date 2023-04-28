@@ -11382,3 +11382,8 @@ body.sidebar-toggled footer.sticky-footer {
         transform: scale(1.05);
     }
 }
+
+.larger-checkbox .form-check-input {
+  width: 20px;
+  height: 20px;
+}

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Project_assignment extends Model
 {
     use HasFactory;
-    protected $table = "Project_assignments";
+    protected $table = "project_assignments";
 
 
     protected $fillable = ['id','assignment_no', 'req_date', 'req_by', 'reference_doc', 'notes', 'company_project_id', 'task_id'];

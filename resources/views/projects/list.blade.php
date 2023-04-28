@@ -110,7 +110,7 @@ active
                                     <label for="password">Client :</label>
                                     <select class="form-control" id="update_location" name="p_client" required>
                                         @foreach($clients as $client)
-                                        <option value="{{$client->client_id}}">{{ $client->client_name}}</option>
+                                        <option value="{{$client->id}}">{{ $client->client_name}}</option>
                                         @endforeach
                                     </select>
                                 </div>

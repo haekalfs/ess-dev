@@ -31,11 +31,11 @@ active
 <div class="alert alert-danger" role="alert" style="display: none;">
     An error occurred while saving your entry. Please try again.
 </div>
-<div class="alert alert-success shadow alert-success-delete" role="alert" style="display: none;">
+<div class="alert alert-success alert-success-delete" role="alert" style="display: none;">
     Your entry has been deleted.
 </div>
 
-<div class="alert shadow alert-danger-delete" role="alert" style="display: none;">
+<div class="alert alert-danger-delete" role="alert" style="display: none;">
     An error occurred while deleting your entry. Please try again.
 </div>
 <div class="row">
@@ -189,7 +189,6 @@ active
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 
-<script></script>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -242,13 +241,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="from" id="start-time" timeFormat="HH:mm">
+                                    <input type="text" class="form-control validate time-input" required autocomplete="off" placeholder="HH:mm" name="from" id="start-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="to" id="end-time" timeFormat="HH:mm">
+                                    <input type="text" class="form-control validate time-input" required autocomplete="off" placeholder="HH:mm" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
                         </div>
@@ -256,7 +255,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validate" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -322,13 +321,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="update_from" id="update_from">
+                                    <input type="text" class="form-control time-input" required autocomplete="off" name="update_from" id="update_from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="update_to" id="update_to">
+                                    <input type="text" class="form-control time-input" required autocomplete="off" name="update_to" id="update_to">
                                 </div>
                             </div>
                         </div>
@@ -368,7 +367,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Date :</label>
-                                    <input type="text" class="form-control" name="daterange" id="daterange"/>
+                                    <input type="text" class="form-control validateMult" name="daterange" id="daterange"/>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -381,7 +380,7 @@ active
                                         <option>Standby</option>
                                         <optgroup label="Projects">
                                             @foreach($assignment as $assign)
-                                            <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
+                                            <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
                                             @endforeach
                                         </optgroup>
                                     </select>
@@ -407,13 +406,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="from" id="from">
+                                    <input type="text" class="form-control validateMult time-input" placeholder="HH:mm" required autocomplete="off" name="from" id="from">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="time" class="form-control time-input" required autocomplete="off" name="to" id="to">
+                                    <input type="text" class="form-control validateMult time-input" placeholder="HH:mm" required autocomplete="off" name="to" id="to">
                                 </div>
                             </div>
                         </div>
@@ -421,7 +420,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
-                                    <textarea type="text" class="form-control" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validateMult" id="activity" name="activity" required></textarea>
                                 </div>
                             </div>
                         </div>
