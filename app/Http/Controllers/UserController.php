@@ -37,6 +37,7 @@ class UserController extends Controller
             'status' => 'required',
             'employee_status' => 'required',
             'position' => 'required',
+            'department' => 'required',
             'hired_date'=> 'required',
             'employee_id'=> 'required',
             'usr_address'=> 'required',
@@ -66,7 +67,6 @@ class UserController extends Controller
         $hash_pwd = Hash::make($request->password);
 
         User::create([
-    		// 'id' => $request->id,
             'id' => $request->usr_id,
             'name' => $request->name,
             'email' => $request->email,
@@ -77,8 +77,9 @@ class UserController extends Controller
             'id' => $nextId,
             'user_id' => $request->usr_id,
             'employee_id' => $request->employee_id,
-            'position' => $request->position,
-            'status' => $request->status,
+            'position_id' => $request->position,
+            'department_id' => $request->department,
+            'status_active' => $request->status,
             'employee_status' => $request->employee_status,
             'hired_date'=> $request->hired_date,
             'usr_address'=> $request->usr_address,
@@ -129,8 +130,10 @@ class UserController extends Controller
             'email' => 'required',
             'status' => 'required',
             'position' => 'required',
+            'department' => 'required',
             'hired_date'=> 'required',
-            'employee_id'=> 'required',
+            'employee_id' => 'required',
+            'employee_status' => 'required',
             'usr_address'=> 'required',
             'current_address'=> 'required',
             'usr_address_city'=> 'required',
@@ -158,9 +161,9 @@ class UserController extends Controller
             $user->save();
 
             $user_detail = Users_detail::where('user_id',$id)->first();
-            $user_detail->status = $request->status;
-            $user_detail->department = $request->department;
-            $user_detail->position = $request->position;
+            $user_detail->status_active = $request->status;
+            $user_detail->department_id = $request->department;
+            $user_detail->position_id = $request->position;
             $user_detail->employee_id = $request->employee_id;
             $user_detail->usr_dob = $request->usr_dob;
             $user_detail->usr_birth_place = $request->usr_birth_place;

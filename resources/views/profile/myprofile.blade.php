@@ -45,7 +45,7 @@ active
                         <table class="table table-borderless">
                             <tbody>
                                 <tr>
-                                    <td><img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 225px;" /></td>
+                                    <td><img src="{{ asset('img/profile.jpg') }}" style="height: 100px; width: 100px;" /></td>
                                 </tr>
                                 <tr>
                                     <td><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" href="#" id="manButton">Upload CV</a></td>
@@ -61,13 +61,23 @@ active
                                     <tbody>
                                         <tr class="table-sm">
                                             <td style="width: 150px;">Department</td>
-                                            <td style="width: 300px;">: Finances And General Affair</td>
+                                            <td style="width: 300px;">: @if($user_info->users_detail->department_id)
+                                                    {{ $user_info->users_detail->department->department_name }}
+                                                @endif
+                                            </td>
                                             <td style="width: 200px;">Employment Status</td>
-                                            <td>: {{$user_info->users_detail->status}}</td>
+                                            <td>: {{$user_info->users_detail->employee_status}}</td>
                                         </tr>
                                         <tr class="table-sm">
-                                            <td style="width: 150px;">Status</td>
-                                            <td style="width: 200px;">: {{$user_info->users_detail->hired_date}}</td>
+                                            <td style="width: 150px;">Position</td>
+                                            <td style="width: 300px;">: @if($user_info->users_detail->position_id)
+                                                    {{ $user_info->users_detail->position->position_name }}
+                                                @endif
+                                            </td>
+                                            <td style="width: 150px;">Status Active</td>
+                                            <td style="width: 200px;">: {{$user_info->users_detail->status_active}}</td>
+                                        </tr>
+                                        <tr class="table-sm">
                                             <td style="width: 200px;">Hired Date</td>
                                             <td>: {{$user_info->users_detail->hired_date}}</td>
                                         </tr>
@@ -100,10 +110,6 @@ active
                                                     <td>Postal Code</td>
                                                     <td>: {{$user_info->users_detail->usr_address_postal}}</td>
                                                 </tr>
-                                                {{-- <tr class="table-sm">
-                                                    <td>Province</td>
-                                                    <td>: {{$user_info->users_detail->employee_id}}</td>
-                                                </tr> --}}
                                                 <tr class="table-sm">
                                                     <td>Email</td>
                                                     <td>: {{$user_info->email}}</td>
@@ -137,15 +143,31 @@ active
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td>Gender</td>
-                                                    <td>: {{$user_info->users_detail->usr_gender}}</td>
+                                                    <td>: @switch($user_info->users_detail->usr_gender)@case('M') Male @break @case('F') Female @break @default Unknown Gender @endswitch</td>
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td>Religion</td>
-                                                    <td>: {{$user_info->users_detail->usr_religion}}</td>
+                                                    <td>: @switch($user_info->users_detail->usr_religion)
+                                                        @case('Islam') Islam @break 
+                                                        @case('Kristen') Kristen Protestan @break 
+                                                        @case('Katholik') Kristen Katholik @break 
+                                                        @case('Hindu') Hindu @break 
+                                                        @case('Buddha') Buddha @break 
+                                                        @case('Konghucu') Konghucu @break 
+                                                        @case('O') Other @break 
+                                                        @default Unknown Religion @endswitch
+                                                    </td>
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td>Marital Status</td>
-                                                    <td>: {{$user_info->users_detail->usr_merital_status}}</td>
+                                                    <td>: @switch($user_info->users_detail->usr_merital_status)
+                                                        @case('S') Single @break 
+                                                        @case('M') Married @break 
+                                                        @case('Widow') Widow / Janda @break 
+                                                        @case('Widower') Widower / Duda @break 
+                                                        @case('Divorced') Divorced @break
+                                                        @default Unknown Merital Status @endswitch
+                                                    </td>
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td>Num of Children</td>
@@ -170,7 +192,12 @@ active
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td style="width: 150px;">Identity Type</td>
-                                                    <td>: {{$user_info->users_detail->usr_id_type}}</td>
+                                                    <td>: @switch($user_info->users_detail->usr_id_type)
+                                                        @case('KTP') KTP @break 
+                                                        @case('SIM') SIM @break
+                                                        @case('Passport') Passport @break
+                                                        @default Unknown Identity Type @endswitch
+                                                    </td>
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td style="width: 150px;">Identity No</td>

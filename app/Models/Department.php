@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Department extends Model
 {
     protected $table = "department";
-    protected $fillable = ["id", "department_name", "department_id","created_at", "updated_at"];
+    protected $fillable = ["id", "department_name","created_at", "updated_at"];
 
     public function user()
     {
-        return $this->hasMany('App\Models\Users');
+        return $this->hasOne('App\Models\Users');
     }
 
 }

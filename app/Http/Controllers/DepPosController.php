@@ -26,12 +26,10 @@ class DepPosController extends Controller
         
         $this->validate($request, [
             'new_department' => 'required',
-            'new_department_code' => 'required'
         ]);
 
         Department::create([
             'id' => $nextId,
-            'department_id' => $request->new_department_code,
             'department_name' => $request->new_department,
         ]);
         return redirect('/hrtools/manage/position')->with('Success', 'Department Create successfully');
@@ -51,12 +49,10 @@ class DepPosController extends Controller
 
         $this->validate($request, [
             'new_Position' => 'required',
-            'new_Position_code' => 'required'
         ]);
 
         Position::create([
             'id' => $nextId,
-            'position_id' => $request->new_Position_code,
             'position_name' => $request->new_Position,
         ]);
         return redirect('/hrtools/manage/position')->with('Success', 'Position Create successfully');

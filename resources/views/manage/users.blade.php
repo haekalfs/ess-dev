@@ -7,11 +7,6 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Manage Users</h1>
-    <a  href="/users/tambah" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add User</a>
-</div>
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -33,7 +28,14 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h4 mb-0 text-gray-800">Manage Users</h1>
+    <div>
+        <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" href="/users/tambah" ><i class="fas fa-plus fa-sm text-white-50"></i> Add User</a>
+        <a class="btn btn-success btn-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Add Position & Department</a>
+    </div>
+</div>
 <div class="card shadow mb-4">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -50,7 +52,8 @@ active
                     <th>Emp ID</th>
                     <th>User ID</th>
                     <th>Nama</th>
-                    <th>Status</th>
+                    <th>Status Active</th>
+                    <th>Employee Status</th>
                     <th>Position</th>
                     <th>Department</th>
                     <th>Option</th>
@@ -62,9 +65,10 @@ active
                     <td>{{$p->users_detail->employee_id}}</td>
                     <td>{{$p->id }}</td>
                     <td>{{$p->name}}</td>
+                    <td>{{$p->users_detail->status_active}}</td>
                     <td>{{$p->users_detail->employee_status}}</td>
-                    <td>{{$p->users_detail->position}}</td>
-                    <td>{{$p->users_detail->department}}</td>
+                    <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
+                    <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
                     <td class="row-cols-2 justify-content-betwen text-center">
                         <a href="/users/edit/{{ $p->id }}" title="Edit" class="btn btn-primary btn-sm" >
                             <i class="fas fa-fw fa-edit justify-content-center"></i>

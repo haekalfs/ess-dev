@@ -257,7 +257,6 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Administrator Access:</h6>
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
-                        <a class="collapse-item" href="/hrtools/manage/position">Department & Position</a>
                         <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>User Access Controller (UAC)</i></a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/users">List Employees</a>

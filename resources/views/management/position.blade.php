@@ -32,7 +32,6 @@ active
                     <tr>
                         <th>No</th>
                         <th>Department Name</th>
-                        <th>Department Code</th>
                         <th width="80px">Action</th>
                     </tr>
                 </thead>
@@ -41,7 +40,6 @@ active
                         <tr>
                             <td>{{ $d_List['id'] }}</td>
                             <td>{{ $d_List['department_name'] }}</td>
-                            <td>{{ $d_List['department_id'] }}</td>
                             <td>
                                <a href="/manage/delete_department/{{ $d_List->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i></a>                                
                             </td>
@@ -66,7 +64,6 @@ active
                     <tr>
                         <th>No</th>
                         <th>Position Name</th>
-                        <th>Position Code</th>
                         <th width="80px">Action</th>
                     </tr>
                 </thead>
@@ -75,7 +72,6 @@ active
                         <tr>
                             <td>{{ $p_List['id'] }}</td>
                             <td>{{ $p_List['position_name'] }}</td>
-                            <td>{{ $p_List['position_id'] }}</td>
                             <td>
                                <a href="/manage/delete_position/{{ $p_List->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i></a>                                
                             </td>
@@ -104,10 +100,6 @@ active
                                 <div class="form-group">
                                     <label for="password">Department Name :</label>
                                     <input type="text" class="form-control" id="input-new_department" name="new_department">
-                                </div>
-                                <div class="form-group">
-                                    <label for="password">Department Code :</label>
-                                    <input type="text" class="form-control" id="input-new_department" name="new_department_code">
                                 </div>
                             </div>
                         </div>
@@ -139,11 +131,7 @@ active
                                 <div class="form-group">
                                     <label for="password">Position Name :</label>
                                     <input type="text" class="form-control" id="input-new_Position" name="new_Position">
-                                </div>
-                                <div class="form-group">
-                                    <label for="password">Position Code :</label>
-                                    <input type="text" class="form-control" id="input-new_Position" name="new_Position_code">
-                                </div>
+                                </div>                                
                             </div>
                         </div>
 				    </div>

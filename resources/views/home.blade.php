@@ -48,8 +48,11 @@ active
                     </tr>
                     <tr>
                         <th>Position</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->position}}</td>
-                    </tr>
+                        <td style="text-align: start; font-weight:500">: 
+                        @if(Auth::user()->users_detail->position)
+                            {{ Auth::user()->users_detail->position->position_name }}
+                        @endif
+                        </tr>
                   </tr>
               </table>
             </div>
