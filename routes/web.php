@@ -103,7 +103,7 @@ Route::get('/project_list/view/details/{id}', 'ProjectController@company_project
 Route::delete('/project_list/delete/{id}', 'ProjectController@project_delete')->name('project-delete')->middleware('auth');
 Route::get('/retrieveProjectRoles', 'ProjectController@listProjectRoles')->name('list-project-roles')->middleware('auth');
 Route::post('/projectRole/create', 'ProjectController@create_new_project_roles')->middleware('auth')->name('insert.new.role');
-Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delete_client')->name('role-delete')->middleware('auth');
+Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delete_project_role')->name('role-delete')->middleware('auth');
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin,manager']);

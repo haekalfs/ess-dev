@@ -45,22 +45,44 @@ active
                 <!-- Card Body -->
             <div class="card-body">
                 <div class="col-md-12">
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr class="table-sm">
-                                <td style="width: 150px;">Project</td>
-                                <td>: {{ $project->project_name }}</td>
-                            </tr>
-                            <tr class="table-sm">
-                                <td style="width: 150px;">Location</td>
-                                <td>: {{ $project->alias }}</td>
-                            </tr>
-                            <tr class="table-sm">
-                                <td style="width: 150px;">Client</td>
-                                <td>: {{ $project->client->client_name }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;">Project Name</td>
+                                        <td>: {{ $project->project_name }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;">Client</td>
+                                        <td>: {{ $project->client->client_name }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;">Address</td>
+                                        <td>: {{ $project->address }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr class="table-sm">
+                                        <td style="width: 200px;">Project Code</td>
+                                        <td>: {{ $project->project_code }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;">Periode Start</td>
+                                        <td>: {{ $project->periode_start }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;">Periode End</td>
+                                        <td>: {{ $project->periode_end }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,7 +92,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Project Member</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">All Project Member</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">

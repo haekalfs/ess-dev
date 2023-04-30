@@ -108,6 +108,7 @@ $(document).ready(function() {
             });
         });
     });
+    
     $(document).on('click', '.delete-btn', function(event) {
         var activityId = $(event.target).data('id');
         deleteActivity(activityId);
@@ -171,6 +172,12 @@ $(document).ready(function() {
     // Fetch the activities when the page loads
     fetchActivities(yearput, monthput);
     
+    var dataTable = $('#timesheetsTable').DataTable({
+        "order": [[ 1, "asc" ]],
+        "lengthMenu": [[10, 20, 25, 50, -1], [10, 20, 25, 50, "All"]],
+        "pageLength": 10,
+        "data": [] // Initialize with an empty dataset
+      });
     // Function to fetch the activities via AJAX
     function fetchActivities(yearput, monthput) {
         $.ajax({
@@ -200,15 +207,17 @@ $(document).ready(function() {
                         var date = new Date(activity.ts_date);
                         var options = { weekday: 'short' };
                         row.append($('<td></td>').text(date.toLocaleDateString('en-US', options)));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal "></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
+                        var formattedDate = moment(activity.ts_date).format('D-MMM-YYYY');
+                        row.append($('<td width="150px" data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(formattedDate));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                         var actions = $('<td></td>');
                         actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
                         row.append(actions);
+
                         $('#activity-table').append(row);
                         
                         // Increment the count for the location of this activity
@@ -449,6 +458,7 @@ $(document).ready(function () {
 
 
 $(document).on('click', '.delete-btn-client', function(event) {
+    isconfirm();
     var clientId = $(event.target).data('id');
     deleteClient(clientId);
 });
@@ -512,6 +522,7 @@ function fetchClients() {
 
 
 $(document).on('click', '.delete-btn-location', function(event) {
+    isconfirm();
     var locationId = $(event.target).data('id');
     deleteLocation(locationId);
 });
@@ -604,7 +615,8 @@ $(document).ready(function () {
 });
 
 
-$(document).on('click', '.delete-btn-role', function(event) {
+$(document).on('click', '.deleteRole', function(event) {
+    isconfirm();
     var roleId = $(event.target).data('id');
     deleteRole(roleId);
 });
@@ -652,12 +664,12 @@ function fetchProjectRoles() {
                     row.append($('<td></td>').text(activity.role_code));
                     row.append($('<td></td>').text(activity.role_name));
                     var actions = $('<td class="text-center"></td>');
-                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn-role').text('Delete').attr('data-id', activity.id));
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger deleteRole').text('Delete').attr('data-id', activity.id));
                     row.append(actions);
                     $('#projectRoles').append(row);
                 });
                 // Add click handlers for the edit and delete buttons
-                $('.delete-btn-role').click(deleteRole);
+                $('.deleteRole').click(deleteRole);
             }
         },
         error: function(response) {
