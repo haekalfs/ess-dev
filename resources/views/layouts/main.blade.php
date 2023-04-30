@@ -125,11 +125,11 @@
                         <a class="collapse-item" href="/approval">Approval</a>
                         @else
                         @endusr_acc
-                        @usr_acc(203)
+                        {{-- @usr_acc(203)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/approval">Manage Approval</a>
                         @else
-                        @endusr_acc
+                        @endusr_acc --}}
                     </div>
                 </div>
             </li>
@@ -286,7 +286,8 @@
                 <div id="collapseHRSystem" class="collapse" aria-labelledby="headingHRSystem" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">HR Access:</h6>
-                        <a class="collapse-item" href="/development">Manage IDs</a>
+                        <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
+                        <a class="collapse-item" href="/development">A2. Exit Clearance</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>

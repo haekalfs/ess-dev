@@ -17,6 +17,8 @@ class ManagementController extends Controller
 {
     public function roles()
     {
+        $accessController = new AccessController();
+        $result = $accessController->usr_acc(901);
 
         $users = DB::table('users')
         ->leftjoin('usr_roles', 'users.id', '=', 'usr_roles.user_id')

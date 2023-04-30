@@ -11,7 +11,7 @@ class Project_assignment extends Model
     protected $table = "project_assignments";
 
 
-    protected $fillable = ['id','assignment_no', 'req_date', 'req_by', 'reference_doc', 'notes', 'company_project_id', 'task_id'];
+    protected $fillable = ['id','assignment_no', 'req_date', 'req_by', 'reference_doc', 'notes', 'company_project_id', 'task_id', 'approval_status'];
 
     public function user(){
     	return $this->belongsTo('App\Models\Users');

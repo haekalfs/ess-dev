@@ -10,7 +10,13 @@ active
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Project Assignment</h1>
-    <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Assignment</a>
+    <div>
+        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}">{{ $year }}</option>
+            @endforeach
+        </select>
+    </div>
 </div>
 
 @if ($message = Session::get('success'))
@@ -36,14 +42,14 @@ active
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Project Assignment</h6>
-        {{-- <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addModal" id="addButton">+ New Assignment</a>
-        </div> --}}
+        <div class="text-right">
+            <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Assignment</a>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
                         <th>Request Date</th>
                         <th>Assignment No.</th>
@@ -58,7 +64,14 @@ active
                         <td>{{ $assign->req_date }}</td>
                         <td>{{ $assign->assignment_no }}</td>
                         <td>{{ $assign->project_name }}</td>
-                        <td>New Request</td>
+                        <td>@if($assign->approval_status == 40)
+                            <p class="m-0 font-weight-bold text-danger">Waiting for Approval Service Diretor</p>
+                            @elseif($assign->approval_status == 29) 
+                            <p class="m-0 font-weight-bold text-primary">Approved by Service Director</p>
+                            @else 
+                            <a class="text-danger">Rejected</a>
+                            @endif
+                        </td>
                         <td class="text-center"><a class="btn btn-primary btn-sm" href="/assignment/member/{{ $assign->id }}"><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
@@ -141,4 +154,14 @@ active
     width: 180px;
 }
 </style>
+<script>
+    function redirectToPageAssignment() {
+        var selectedOption = document.getElementById("yearSelected").value;
+        var url = "{{ url('/assignment') }}"; // Specify the base URL
+
+        url += "/" + selectedOption;
+
+        window.location.href = url; // Redirect to the desired page
+    }
+</script>
 @endsection

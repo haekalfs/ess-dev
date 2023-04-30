@@ -75,3 +75,19 @@ $(document).ready(function() {
     "pageLength": 30
   } );
 } );
+
+$(document).ready(function() {
+  $('#myProjects').DataTable({
+    "order": [[ 1, "asc" ]],
+    "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
+    "pageLength": 10
+  } );
+} );
+
+$(document).ready(function() {
+  $('#listAssignments').DataTable({
+    "order": [[ 1, "asc" ]],
+    "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
+    "pageLength": 20
+  } );
+} );

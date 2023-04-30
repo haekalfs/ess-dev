@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\TimesheetExport;
+use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
@@ -23,6 +24,9 @@ class ApprovalController extends Controller
 {
     public function index()
 	{
+        $accessController = new AccessController();
+        $result = $accessController->usr_acc(202);
+
         $tsCount = Timesheet_detail::whereIn('ts_status_id', ['20', '30', '40'])
              ->where(function($query) {
                  $query->where('RequestTo', Auth::user()->id)
@@ -35,7 +39,9 @@ class ApprovalController extends Controller
              })
              ->count();
 
-		return view('approval.main', ['tsCount' => $tsCount]);
+        $pCount = Project_assignment::where('approval_status', 40)->count();
+
+		return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount]);
 	}
 
     public function timesheet_approval()
@@ -185,7 +191,7 @@ class ApprovalController extends Controller
 
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -212,7 +218,7 @@ class ApprovalController extends Controller
 
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -226,7 +232,7 @@ class ApprovalController extends Controller
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id,'activity' => 'Approved', 'month_periode' => $year.$month, 'RequestTo' => 'dir_fin_ga'],['date_approved' => date('Y-m-d'), 'ts_status_id' => '30', 'note' => '', 'user_timesheet' => $user_timesheet]);
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -254,7 +260,7 @@ class ApprovalController extends Controller
 
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -282,7 +288,7 @@ class ApprovalController extends Controller
 
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -309,7 +315,7 @@ class ApprovalController extends Controller
         
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -336,7 +342,7 @@ class ApprovalController extends Controller
         
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('success',"Your approved $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -349,7 +355,7 @@ class ApprovalController extends Controller
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'month_periode' => $year.$month],['activity' => 'Approved', 'ts_status_id' => '404', 'note' => '', 'user_timesheet' => $user_timesheet]);
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('warning',"Your rejected $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('warning',"You rejected $user_timesheet $yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -410,6 +416,6 @@ class ApprovalController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
 	}
 }

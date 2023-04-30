@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Project_role extends Model
+class Cutoffdate extends Model
 {
     use HasFactory;
-    protected $table = "project_roles";
-    protected $fillable = ['id', 'role_code', 'role_name'];
+    protected $table = "cutoffdate";
+    protected $fillable = ['date'];
 }

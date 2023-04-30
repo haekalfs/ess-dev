@@ -11,9 +11,10 @@ active
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Timesheet</h1>
     <div>
-        <select class="form-control" id="task" name="task" required>
-            <option value="2022">2022</option>
-            <option>2023</option>
+        <select class="form-control" id="task" name="task" required onchange="redirectToPage()">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}">{{ $year }}</option>
+            @endforeach
         </select>
     </div>
 </div>
@@ -73,4 +74,14 @@ active
     width: 180px;
 }
 </style>
+<script>
+    function redirectToPage() {
+        var selectedOption = document.getElementById("task").value;
+        var url = "{{ url('/timesheet') }}"; // Specify the base URL
+
+        url += "/" + selectedOption;
+
+        window.location.href = url; // Redirect to the desired page
+    }
+</script>
 @endsection

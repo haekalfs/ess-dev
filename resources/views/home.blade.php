@@ -71,7 +71,7 @@ active
                 <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                     <tr>
                       <tr>
-                          <th>Leaves Balance</th>
+                          <th width="300px">Leaves Balance</th>
                           <td style="text-align: start; font-weight:500">: N/A</td>
                       </tr>
                       <tr>

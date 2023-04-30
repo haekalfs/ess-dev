@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Approval_status;
 use App\Models\Client;
 use App\Models\Company_project;
 use App\Models\Project_assignment;
@@ -25,19 +26,28 @@ class ProjectController extends Controller
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.project_name', 'company_projects.project_code', 'project_assignments.assignment_no')
             ->where('project_assignment_users.user_id', '=', $userId)
+            ->where('project_assignments.approval_status', 29)
             ->get();
         return view('projects.myproject', ['records' => $records]);
     }
 
-    public function assigning()
+    public function assigning($yearSelected = null)
     {
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $currentYear = date('Y');
+        if($yearSelected){
+            $currentYear = $yearSelected;
+        }
         $project = Company_project::all();
         $assignment = DB::table('project_assignments')
             ->join('company_projects', 'project_assignments.company_project_id', '=', 'company_projects.id')
             // ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignments.*', 'company_projects.project_name', 'company_projects.project_code')
+            ->whereYear('req_date', $currentYear)
             ->get();
-        return view('projects.assigning', compact('assignment', 'project'));
+        return view('projects.assigning', compact('assignment', 'project', 'yearsBefore'));
     }
 
     public function add_project_assignment(Request $request)
@@ -63,7 +73,8 @@ class ProjectController extends Controller
             'req_by' => Auth::user()->id,
             'task_id' => $uniqueIdP,
             'company_project_id' => $request->project,
-            'notes' => $request->notes
+            'notes' => $request->notes,
+            'approval_status' => '40'
     	]);
 
         return redirect("/assignment/member/$uniqueIdP")->with('success', "Assignment #$uniqueIdP Create successfully");
@@ -91,18 +102,26 @@ class ProjectController extends Controller
     
     public function project_assignment_member_view($assignment_id)
     {
-        $project = Company_project::all();
         $assignment = DB::table('project_assignments')
             ->join('company_projects', 'project_assignments.company_project_id', '=', 'company_projects.id')
             // ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignments.*', 'company_projects.*')
             ->where('project_assignments.id', '=', $assignment_id)
             ->get();
-        
+        foreach ($assignment as $as){
+            $project = Client::where('id', $as->client_id)->first();
+            if ($as->approval_status == 40){
+                $status = "Waiting for Approval";
+            } elseif($as->approval_status == 29) {
+                $status = "Approved";
+            } else {
+                $status = "Unknown Status";
+            }
+        }
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
-        return view('projects.assignment_view_only', ['assignment' => $assignment, 'project' => $project, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
+        return view('projects.assignment_view_only', ['assignment' => $assignment, 'stat' => $status, 'project' => $project, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
 
     public function project_assignment_member_delete($usr_id)
@@ -231,5 +250,64 @@ class ProjectController extends Controller
         $client->save();
         
         return response()->json(['success'=>'Client created successfully.', 'client' => $client]);
+    }
+
+    public function listLocations()
+    {
+        $p_location = Project_location::all();
+        return response()->json($p_location);
+    }
+
+    public function create_new_location(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'loc_code' => 'required',
+            'loc_desc' => 'required',
+            'loc_fare' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $loc = new Project_location;
+        $loc->location_code = $request->input('loc_code');
+        $loc->description = $request->input('loc_desc');
+        $loc->fare = $request->input('loc_fare');
+        $loc->save();
+        
+        return response()->json(['success'=>'Client created successfully.']);
+    }
+
+    public function listProjectRoles()
+    {
+        $p_role = Project_role::all();
+        return response()->json($p_role);
+    }
+
+    public function create_new_project_roles(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_code' => 'required',
+            'role_desc' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $role = new Project_role;
+        $role->role_code = $request->input('role_code');
+        $role->role_name = $request->input('role_desc');
+        $role->save();
+        
+        return response()->json(['success'=>'Client created successfully.']);
+    }
+
+    public function company_project_view($id)
+    {
+        $project = Company_project::find($id);
+        $project_member = Project_assignment_user::where('company_project_id', $id)->get();
+        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member]);
     }
 }

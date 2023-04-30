@@ -15,68 +15,6 @@ $(function() {
     });
 });
 
-$(function() {
-    $('#updateModal').on('show.bs.modal', function (event) {
-        var activityId = $(event.relatedTarget).data('id');
-        var date = $(event.relatedTarget).data('date');
-        var formattedDate = new Date(date).toLocaleDateString('en-US', { 
-            day: 'numeric', 
-            month: 'short', 
-            year: 'numeric' 
-        }).replace(',', '').split(' ');
-        var month = formattedDate[0];
-        var day = formattedDate[1];
-        var year = formattedDate[2];
-        var formattedDateStr = day + '-' + month + '-' + year;
-        $.ajax({
-            url: '/get-data/' + year + '/' + month + '/' + activityId,
-            type: 'GET',
-            success: function(response) {
-                // Set the values of the form fields with the data received from the server
-                $('#updateModal').find('#update_task').val(response.ts_task);
-                $('#updateModal').find('#update_location').val(response.ts_location);
-                $('#updateModal').find('#update_activity').val(response.ts_activity);
-                $('#updateModal').find('#update_from').val(response.ts_from_time);
-                $('#updateModal').find('#update_to').val(response.ts_to_time);
-    
-            },
-            error: function(response, jqXHR, textStatus, errorThrown) {
-                console.log(response);
-            }
-        });
-        $('#entry-date-update').text(formattedDateStr);
-
-        $('#update-entry').click(function(e) {
-            e.preventDefault();
-            var yearput = $('#yearSel').val();
-            var monthput = $('#monthSel').val();
-            // Serialize the form data
-            var updateData = $('#update-form').serialize();
-            // Send an AJAX request to the entries.store route
-            $.ajax({
-            type: 'POST',
-            url: '/update-entries/' + activityId,
-            data: updateData,
-            success: function(response) {
-                $('.alert-success').show();
-                $('#update-form')[0].reset();
-                    setTimeout(function() {
-                        $('.alert-success').fadeOut('slow');
-                    }, 3000);
-                // Fetch the updated list of activities
-                window.location.reload();
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                    $('.alert-danger').show();
-                    setTimeout(function() {
-                        $('.alert-danger').fadeOut('slow');
-                    }, 3000);
-                }
-            });
-        });
-    });
-});
-
 $(document).ready(function () {
     $('.clickable').click(function () {
         var clickedDate = $(this).data('date');
@@ -111,7 +49,65 @@ $(document).ready(function() {
 
 //this is my save function 
 $(document).ready(function() {
-
+    $(function() {
+        $('#updateModal').on('show.bs.modal', function (event) {
+            var activityId = $(event.relatedTarget).data('id');
+            var date = $(event.relatedTarget).data('date');
+            var formattedDate = new Date(date).toLocaleDateString('en-US', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            }).replace(',', '').split(' ');
+            var month = formattedDate[0];
+            var day = formattedDate[1];
+            var year = formattedDate[2];
+            var formattedDateStr = day + '-' + month + '-' + year;
+            $.ajax({
+                url: '/get-data/' + year + '/' + month + '/' + activityId,
+                type: 'GET',
+                success: function(response) {
+                    // Set the values of the form fields with the data received from the server
+                    $('#updateModal').find('#update_task').val(response.ts_task);
+                    $('#updateModal').find('#update_location').val(response.ts_location);
+                    $('#updateModal').find('#update_activity').val(response.ts_activity);
+                    $('#updateModal').find('#update_from').val(response.ts_from_time);
+                    $('#updateModal').find('#update_to').val(response.ts_to_time);
+        
+                },
+                error: function(response, jqXHR, textStatus, errorThrown) {
+                    console.log(response);
+                }
+            });
+            $('#entry-date-update').text(formattedDateStr);
+    
+            $('#update-entry').click(function(e) {
+                e.preventDefault();
+                // Serialize the form data
+                var updateData = $('#update-form').serialize();
+                // Send an AJAX request to the entries.store route
+                $.ajax({
+                type: 'POST',
+                url: '/update-entries/' + activityId,
+                data: updateData,
+                success: function(response) {
+                    $('.alert-success-saving').show();
+                    $('#update-form')[0].reset();
+                        setTimeout(function() {
+                            $('.alert-success-saving').fadeOut('slow');
+                        }, 3000);
+                    // Fetch the updated list of activities
+                    fetchActivities(yearput, monthput);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                        $('.alert-danger').show();
+                        setTimeout(function() {
+                            $('.alert-danger').fadeOut('slow');
+                        }, 3000);
+                    }
+                });
+            });
+        });
+    });
     $(document).on('click', '.delete-btn', function(event) {
         var activityId = $(event.target).data('id');
         deleteActivity(activityId);
@@ -196,7 +192,7 @@ $(document).ready(function() {
                         'LN': 0,
                         'DK': 0,
                         'WFH': 0,
-                        'Outer Ring' : 0
+                        'OR' : 0
                     };
                     // Loop through the activities and append each row to the table
                     $.each(response, function(index, activity) {
@@ -232,7 +228,7 @@ $(document).ready(function() {
                         'LN': 400000,
                         'DK': 115000,
                         'WFH': 45000,
-                        'Outer Ring' : 140000
+                        'OR' : 140000
                     };
 
                     // Create an object to store the total for each location
@@ -242,7 +238,7 @@ $(document).ready(function() {
                         'LN': 0,
                         'DK': 0,
                         'WFH': 0,
-                        'Outer Ring' : 0
+                        'OR' : 0
                     };
                     // Update the card body with the counts for each location
                     var cardBody = $('.calculations');
@@ -471,7 +467,7 @@ function fetchClients() {
                     row.append($('<td></td>').text(activity.id));
                     row.append($('<td></td>').text(activity.client_name));
                     row.append($('<td></td>').text(activity.address));
-                    var actions = $('<td></td>');
+                    var actions = $('<td class="text-center"></td>');
                     actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
                     row.append(actions);
                     $('#Clients').append(row);
@@ -486,7 +482,127 @@ function fetchClients() {
     });
 }
 
+function fetchLocations() {
+    $.ajax({
+        url: '/retrieveLocations',
+        type: 'GET',
+        success: function(response) {
+            // Clear the table body
+            $('#Locations').empty();
+            // Check if the response is empty or null
+            if (response.length === 0) {
+                // Display a message to the user
+                $('#Locations').append($('<tr><td class="text-center" colspan="4">No data available in table.</td></tr>'));
+            } else {
+                // Loop through the activities and append each row to the table
+                $.each(response, function(index, activity) {
+                    var row = $('<tr></tr>').attr('data-id', activity.id);
+                    row.append($('<td></td>').text(activity.id));
+                    row.append($('<td></td>').text(activity.location_code));
+                    row.append($('<td></td>').text(activity.description));
+                    row.append($('<td></td>').text(activity.fare));
+                    var actions = $('<td class="text-center"></td>');
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
+                    row.append(actions);
+                    $('#Locations').append(row);
+                });
+                // // Add click handlers for the edit and delete buttons
+                // $('.delete-btn').click(deleteActivity);
+            }
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+$(document).ready(function () {
+    $('#save-location-entry').click(function(e) {
+        e.preventDefault();
+        // Serialize the form data
+        var formData = $('#new-location-form').serialize();
+        // Send an AJAX request to the entries.store route
+        $.ajax({
+        type: 'POST',
+        url: '/location/create',
+        data: formData,
+        success: function(response) {
+            var cardBody = $('.Locations');
+            $('.alert-success-saving').show();
+            $('#new-location-form')[0].reset();
+            setTimeout(function() {
+                $('.alert-success-saving').fadeOut('slow');
+            }, 3000);
+            fetchLocations();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').show();
+                setTimeout(function() {
+                    $('.alert-danger').fadeOut('slow');
+                }, 3000);
+            }
+        });
+    });
+});
 
+function fetchProjectRoles() {
+    $.ajax({
+        url: '/retrieveProjectRoles',
+        type: 'GET',
+        success: function(response) {
+            // Clear the table body
+            $('#projectRoles').empty();
+            // Check if the response is empty or null
+            if (response.length === 0) {
+                // Display a message to the user
+                $('#projectRoles').append($('<tr><td class="text-center" colspan="4">No data available in table.</td></tr>'));
+            } else {
+                // Loop through the activities and append each row to the table
+                $.each(response, function(index, activity) {
+                    var row = $('<tr></tr>').attr('data-id', activity.id);
+                    row.append($('<td></td>').text(activity.id));
+                    row.append($('<td></td>').text(activity.role_code));
+                    row.append($('<td></td>').text(activity.role_name));
+                    var actions = $('<td class="text-center"></td>');
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
+                    row.append(actions);
+                    $('#projectRoles').append(row);
+                });
+                // // Add click handlers for the edit and delete buttons
+                // $('.delete-btn').click(deleteActivity);
+            }
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
+$(document).ready(function () {
+    $('#save-project-roles-entry').click(function(e) {
+        e.preventDefault();
+        // Serialize the form data
+        var formData = $('#new-project-roles-form').serialize();
+        // Send an AJAX request to the entries.store route
+        $.ajax({
+        type: 'POST',
+        url: '/projectRole/create',
+        data: formData,
+        success: function(response) {
+            $('.alert-success-saving').show();
+            $('#new-project-roles-form')[0].reset();
+            setTimeout(function() {
+                $('.alert-success-saving').fadeOut('slow');
+            }, 3000);
+            fetchLocations();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').show();
+                setTimeout(function() {
+                    $('.alert-danger').fadeOut('slow');
+                }, 3000);
+            }
+        });
+    });
+});
 
 function deleteAssignment(event, id) {
     event.preventDefault();

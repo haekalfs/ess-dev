@@ -158,7 +158,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">+ Add Entries</a> <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
+            <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Add Entries</a> <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
         </div>
     </div>
     <!-- Card Body -->
@@ -226,12 +226,9 @@ active
                                 <div class="form-group">
                                     <label for="password">Location :</label>
                                     <select class="form-control" id="location" name="location" required>
-                                        <option value="DK">Dalam Kota</option>
-                                        <option value="LK">Luar Kota</option>
-                                        <option value="HO">Head Office</option>
-                                        <option value="Outer Ring">Outer Ring (Bogor, Depok, Tangerang, Bekasi)</option>
-                                        <option value="LN">Luar Negeri</option>
-                                        <option value="WFH">WFH/WFA (Work From Home/Anywhere)</option>
+                                        @foreach($pLocations as $loc)
+                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                        @endforeach
                                         <option hidden value="N/a">N/a</option>
                                     </select>
                                 </div>
@@ -307,11 +304,9 @@ active
                                 <div class="form-group">
                                     <label for="password">Location :</label>
                                     <select class="form-control" id="update_location" name="update_location" required>
-                                        <option value="DK">Dalam Kota</option>
-                                        <option value="LK">Luar Kota</option>
-                                        <option value="HO">Head Office</option>
-                                        <option value="Outer Ring">Outer Ring (Bogor, Depok, Tangerang, Bekasi)</option>
-                                        <option value="WFH">WFH/WFA (Work From Home/Anywhere)</option>
+                                        @foreach($pLocations as $loc)
+                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                        @endforeach
                                         <option hidden value="N/a">N/a</option>
                                     </select>
                                 </div>
@@ -392,11 +387,9 @@ active
                                 <div class="form-group">
                                     <label for="password">Location :</label>
                                     <select class="form-control" id="location" name="location" required>
-                                        <option value="DK">Dalam Kota</option>
-                                        <option value="LK">Luar Kota</option>
-                                        <option value="HO">Head Office</option>
-                                        <option value="Outer Ring">Outer Ring (Bogor, Depok, Tangerang, Bekasi)</option>
-                                        <option value="WFH">WFH/WFA (Work From Home/Anywhere)</option>
+                                        @foreach($pLocations as $loc)
+                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                        @endforeach
                                         <option hidden value="N/a">N/a</option>
                                     </select>
                                 </div>

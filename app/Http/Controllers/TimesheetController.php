@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EssMailer;
-use App\Models\Approval_timesheet;
+use App\Models\Approval_status;
 use App\Models\Company_project;
+use App\Models\Cutoffdate;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
+use App\Models\Project_location;
 use App\Models\Timesheet;
 use App\Models\Timesheet_detail;
 use App\Models\User;
@@ -14,7 +16,8 @@ use App\Models\Users_detail;
 use Carbon\Carbon;
 use DateInterval;
 use DateTime;
-use Session;
+use Exception;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Crypt;
 use PDF;
 use Illuminate\Http\Request;
@@ -28,10 +31,17 @@ use function PHPUnit\Framework\isEmpty;
 
 class TimesheetController extends Controller
 {
-    public function index()
+    public function index($yearSelected = null)
     {
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
         $currentMonth = date('m');
         $currentYear = date('Y');
+        if($yearSelected){
+            $currentMonth = 12;
+            $currentYear = $yearSelected;
+        }
         $entries = [];
         foreach (range(1, $currentMonth) as $entry) {
             $month = date("F", mktime(0, 0, 0, $entry, 1));
@@ -42,7 +52,7 @@ class TimesheetController extends Controller
                 ->where('ts_user_id', Auth::user()->id)
                 ->first();
             if ($lastUpdate) {
-                $status = Approval_timesheet::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
+                $status = Approval_status::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
                 if(!$status){
                     $status = "Unknown Status";
                 }
@@ -65,19 +75,36 @@ class TimesheetController extends Controller
             $previewUrl = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
             $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
         }
-        return view('timereport.timesheet', compact('entries'));
+        return view('timereport.timesheet', compact('entries', 'yearsBefore'));
     }
 
     public function getDayStatus($date)
     {
         $cachedData = Cache::get('holiday_data');
+        $maxAttempts = 15;
+        $attempts = 0;
+
+        while (!$cachedData && $attempts < $maxAttempts) {
+            try {
+                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json");
+                $array = json_decode($json, true);
+                Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+                $cachedData = $array;
+            } catch (Exception $e) {
+                // Handle exception or log error
+                sleep(5); // Wait for 5 seconds before retrying
+                $attempts++;
+            }
+        }
 
         if (!$cachedData) {
-            $array = json_decode(file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json"), true);
-            Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
         } else {
             $array = $cachedData;
+            // Use the cached data
         }
+
 
         // Check tanggal merah berdasarkan libur nasional
         if (isset($array[$date->format('Ymd')])) {
@@ -149,7 +176,7 @@ class TimesheetController extends Controller
                 break;
             }
         }
-                
+        $pLocations = Project_location::all();
         // Company_project::all();
         $userId = Auth::user()->id;
         //Check Assignment Expiration
@@ -161,23 +188,25 @@ class TimesheetController extends Controller
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
-            ->whereNull('deleted_at')
+            ->where('project_assignment_users.periode_end', '>', date('Y-m-d'))
+            ->where('project_assignments.approval_status', 29)
             ->get();
+        $validStatusIDs = ['20', '29', '30', '40'];
         if($lastUpdate){
-            if($lastUpdate->ts_status_id == '20' || $lastUpdate->ts_status_id == '29') {
+            if(in_array($lastUpdate->ts_status_id, $validStatusIDs)) {
                 Session::flash('failed',"You've already submitted your timereport!");
                 return redirect()->route('timesheet');
             }else{
                 $encryptYear = Crypt::encrypt($year);
                 $encryptMonth = Crypt::encrypt($month);
                 $previewButton = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
-                return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment'));
+                return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations'));
             }
         } else {
             $encryptYear = Crypt::encrypt($year);
             $encryptMonth = Crypt::encrypt($month);
             $previewButton = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
-            return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment'));
+            return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations'));
         }
         // // Return the calendar view with the calendar data
         // return view('timereport.timesheet_entry', compact('calendar', 'year', 'month'));
@@ -338,16 +367,9 @@ class TimesheetController extends Controller
                 ->where('ts_user_id', Auth::user()->id)
                 ->first();
         if ($lastUpdate) {
-            if($lastUpdate->ts_status_id == '10'){
-                $status = "Saved";
-            }elseif($lastUpdate->ts_status_id == '20'){
-                $status = "Submitted";
-            }elseif($lastUpdate->ts_status_id == '29'){
-                $status = "Approved";
-            }elseif($lastUpdate->ts_status_id == '404'){
-                $status = "Rejected";
-            }else{
-                $status = "404";
+            $status = Approval_status::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
+            if(!$status){
+                $status = "Unknown Status";
             }
             $lastUpdatedAt = $lastUpdate->updated_at;
         } else {
@@ -363,6 +385,20 @@ class TimesheetController extends Controller
     {
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
+
+        // Get the current date
+        $currentDate = Carbon::now();
+
+        $dateCut = Cutoffdate::first();
+        // Get the cutoff date for submitting timesheets (7th of the next month)
+        $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->date - 1));
+        // $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-04-$dateCut->date");
+
+        // Check if the current date is on or after the cutoff date
+        if ($currentDate->gte($cutoffDate)) {
+            Session::flash('failed', 'Timesheet submission is closed for this month.');
+            return redirect()->back();
+        }
 
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
@@ -467,12 +503,19 @@ class TimesheetController extends Controller
         $inputToTimeUpdate = $request->update_to;
 
         $entry = Timesheet::find($id);
-        $entry->ts_task = $request->update_task;
+        $ts_task_id = $request->update_task;
+        $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
+        while (Project_assignment::where('id', $ts_task_id)->exists()){
+            foreach($task_project as $tp){
+                $ts_task_id = $tp->company_project->project_name;
+            }
+        }
+        $entry->ts_task = $ts_task_id;
+        $entry->ts_task_id = $request->update_task;
         $entry->ts_location = $request->update_location;
         $entry->ts_from_time = date('H:i', strtotime($inputFromTimeUpdate));
         $entry->ts_to_time = date('H:i', strtotime($inputToTimeUpdate));
         $entry->ts_activity = $request->update_activity;
-        $entry->ts_status_id = '10';
         $entry->save();
 
         return response()->json(['success' => 'Entry updated successfully.']);

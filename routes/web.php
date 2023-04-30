@@ -32,7 +32,7 @@ Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name(
 Route::get('/get-data/{year}/{month}/{id}', 'TimesheetController@getActivitiesEntry');
 Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')->name('entries.update');
 
-Route::get('/timesheet', 'TimesheetController@index')->middleware('auth')->name('timesheet');
+Route::get('/timesheet/{yearSelected?}', 'TimesheetController@index')->middleware('auth')->name('timesheet');
 Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry')->middleware('auth');
 Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
 Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store');
@@ -72,14 +72,17 @@ Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_
     //Sub Approval for Finances Dept
 Route::get('/approval/fm/{user_id}/{year}/{month}', 'ApprovalController@approve_fm')->middleware('auth');
 
-
+    //Approval Project
+Route::get('/approval/project/assignment/', 'ApprovalProjectController@index')->name('approval.project')->middleware('auth');
+Route::get('/approval/project/assignment/preview/{id}', 'ApprovalProjectController@preview_assignment')->name('preview.project.assignment')->middleware('auth');
+Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectController@approve_assignment')->name('approve.project.assignment')->middleware('auth');
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
 
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth');
-Route::get('/assignment', 'ProjectController@assigning')->name('project-assigning')->middleware('auth');
+Route::get('/assignment/{yearSelected?}', 'ProjectController@assigning')->name('project-assigning')->middleware('auth');
 Route::post('/assignment/add_entries', 'ProjectController@add_project_assignment')->name('add_projects')->middleware('auth');
 Route::get('/assignment/member/{id}', 'ProjectController@project_assignment_member')->name('project-assigning')->middleware('auth');
 Route::post('/assignment/add_member_to_assignment/{assignment_id}', 'ProjectController@add_project_member')->name('add_projects')->middleware('auth');
@@ -91,6 +94,11 @@ Route::post('/client/create', 'ProjectController@create_new_client')->middleware
 Route::get('/retrieveClients', 'ProjectController@getClientsRows')->name('client-list')->middleware('auth');
 
 Route::post('/project_list/new', 'ProjectController@create_new_project')->name('project-list-create')->middleware('auth');
+Route::get('/retrieveLocations', 'ProjectController@listLocations')->name('list-location')->middleware('auth');
+Route::post('/location/create', 'ProjectController@create_new_location')->middleware('auth')->name('insert.new.location');
+Route::get('/project_list/view/details/{id}', 'ProjectController@company_project_view')->name('company-project-view')->middleware('auth');
+Route::get('/retrieveProjectRoles', 'ProjectController@listProjectRoles')->name('list-project-roles')->middleware('auth');
+Route::post('/projectRole/create', 'ProjectController@create_new_project_roles')->middleware('auth')->name('insert.new.role');
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin,manager']);
@@ -117,6 +125,9 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
 
 //HR TOOLS
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth');
+Route::get('/hr/compliance/', 'HrController@index')->middleware('auth');
+Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet')->middleware('auth');
+Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save')->middleware('auth');
 
 //Department and Position
 Route::get('/hrtools/manage/position', 'DepPosController@index')->middleware('auth');

@@ -42,7 +42,7 @@ active
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
+            <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
                         <th>No</th>
@@ -61,7 +61,7 @@ active
                         <td>{{ $record->project_name }}</td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
-                        <td><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" href="/assignment/view/details/{{$record->project_assignment_id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
+                        <td class="action text-center"><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" href="/assignment/view/details/{{$record->project_assignment_id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
                     

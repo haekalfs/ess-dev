@@ -10,8 +10,13 @@ active
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Project Organization</h1>
-    <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Project</a>
+    <div>
+        <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target=".listProjectRoles" id="pRoles" style="margin-right: 10px;"><i class="fas fa-users-cog fa-sm text-white-50"></i> Project Roles</a>
+            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target=".listLocations" id="listLoc" style="margin-right: 10px;"><i class="fas fa-map-marker-alt fa-sm text-white-50"></i> Locations</a>
+            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target=".bd-example-modal-lg" id="new"><i class="fas fa-building fa-sm text-white-50"></i> Clients</a>
+    </div>
 </div>
+
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -37,15 +42,13 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Projects Organization</h6>
         <div class="text-right">
-            <button class="btn btn-primary btn-sm" type="button" id="manButton" style="margin-right: 10px;"><i class="fas fa-users-cog fa-sm text-white-50"></i> Project Roles</button>
-            <button class="btn btn-primary btn-sm" type="button" id="manButton" style="margin-right: 10px;"><i class="fas fa-map-marker-alt fa-sm text-white-50"></i> Locations</button>
-            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target=".bd-example-modal-lg" id="new"><i class="fas fa-building fa-sm text-white-50"></i> Clients</a>
+            <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Project</a>
         </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered zoom90" id="dataTableProject" width="100%" cellspacing="0">
-                <thead>
+                <thead class="thead-light">
                     <tr>
                         <th>No</th>
                         <th>Project Code</th>
@@ -65,7 +68,7 @@ active
                         <td>{{ $project->client->client_name}}</td>
                         <td>{{ $project->periode_start}}</td>
                         <td>{{ $project->periode_end}}</td>
-                        <td><a class="btn btn-primary btn-sm"><i class='fas fa-fw fa-eye'></i> View</a></td>
+                        <td class="text-center"><a class="btn btn-primary btn-sm" href="/project_list/view/details/{{$project->id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -227,6 +230,144 @@ active
         </div>
     </div>
 </div>
+<div class="modal fade listLocations" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Locations</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form id="new-location-form" method="post">
+                @csrf
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="email">Location Code :</label>
+                                    <input type="text" class="form-control" name="loc_code">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label for="password">Description :</label>
+                                    <input type="text" class="form-control" name="loc_desc">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="password">Fare :</label>
+                                    <input type="text" class="form-control" name="loc_fare">
+                                </div>
+                            </div>
+                            <div class="col-md-1 d-flex justify-content-center align-items-end">
+                                <div class="form-group">
+                                    <button type="button" id="save-location-entry" class="btn btn-primary">Insert</button>
+                                </div>
+                            </div>
+                            <div class="col-md-12"><br>
+                                <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
+                                    Your entry has been saved successfully.
+                                </div>
+                                <div class="alert alert-danger" role="alert" style="display: none;">
+                                    An error occurred while saving your entry. Please try again.
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered zoom90" width="100%"
+                                        cellspacing="0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Locations Code</th>
+                                                <th>Description</th>
+                                                <th>Fare</th>
+                                                <th width="150px">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="Locations">
+                                            <!-- Ajax Data -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+			</form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade listProjectRoles" tabindex="-1" role="dialog" aria-labelledby="listProjectRoles" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Locations</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form id="new-project-roles-form" method="post">
+                @csrf
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label for="email">Role Code :</label>
+                                    <input type="text" class="form-control" name="role_code">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Description :</label>
+                                    <input type="text" class="form-control" name="role_desc">
+                                </div>
+                            </div>
+                            <div class="col-md-1 d-flex justify-content-center align-items-end">
+                                <div class="form-group">
+                                    <button type="button" id="save-project-roles-entry" class="btn btn-primary">Insert</button>
+                                </div>
+                            </div>
+                            <div class="col-md-12"><br>
+                                <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
+                                    Your entry has been saved successfully.
+                                </div>
+                                <div class="alert alert-danger" role="alert" style="display: none;">
+                                    An error occurred while saving your entry. Please try again.
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered zoom90" width="100%"
+                                        cellspacing="0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Role Code</th>
+                                                <th>Description</th>
+                                                <th width="150px">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="projectRoles">
+                                            <!-- Ajax Data -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+			</form>
+        </div>
+    </div>
+</div>
 <style>
 .action{
     width: 180px;
@@ -234,5 +375,7 @@ active
 </style>
 <script>
 fetchClients();
+fetchLocations();
+fetchProjectRoles();
 </script>
 @endsection

@@ -100,6 +100,23 @@ active
         </div>
     </div>
 
+    <div class="col-xl-3 col-md-6 mb-4 p_assignment">
+        <div class="card border-left-project_a shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-cyan text-uppercase mb-1">
+                            Project Assignment</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pCount }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-network-wired fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="col-xl-3 col-md-6 mb-4 p_assign_mem">
         <div class="card border-left-project_b shadow h-100 py-2">
             <div class="card-body">
@@ -111,23 +128,6 @@ active
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-users fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4 p_assignment">
-        <div class="card border-left-project_a shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-cyan text-uppercase mb-1">
-                            Project Assignment</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-network-wired fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
@@ -163,7 +163,7 @@ active
     });
 
     cardP_assignment.addEventListener('click', function() {
-    window.location.href = '/approval/reimburse/';
+    window.location.href = '/approval/project/assignment/';
     });
 
     cardTimesheet.addEventListener('mouseover', function() {
