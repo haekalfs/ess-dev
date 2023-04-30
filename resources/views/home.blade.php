@@ -50,9 +50,9 @@ active
                         <th>Position</th>
                         <td style="text-align: start; font-weight:500">: 
                         @if(Auth::user()->users_detail->position)
-                            {{ Auth::user()->users_detail->position->position_name }}
+                            {{ Auth::user()->users_detail->position->position_name }}</td>
                         @endif
-                        </tr>
+                    </tr>
                   </tr>
               </table>
             </div>
