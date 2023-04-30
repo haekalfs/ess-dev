@@ -170,7 +170,7 @@ active
                                                     </td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td>Num of Children</td>
+                                                    <td>Number of Children</td>
                                                     <td>: {{$user_info->users_detail->usr_children}}</td>
                                                 </tr>
                                             </tbody>
@@ -227,7 +227,7 @@ active
                                                     <td>: {{$user_info->users_detail->usr_bank_branch}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
-                                                    <td style="width: 150px;">Bank Account Num</td>
+                                                    <td style="width: 150px;">Bank Account Number</td>
                                                     <td>: {{$user_info->users_detail->usr_bank_account}}</td>
                                                 </tr>
                                                 <tr class="table-sm">
