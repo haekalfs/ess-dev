@@ -203,7 +203,7 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Responsibility :</label>
-                                            <input type="text" class="form-control" name="emp_resp">
+                                            <input type="text" class="form-control" name="emp_resp" required>
                                         </div>
                                     </div>
                                 </div>
@@ -213,13 +213,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">From :</label>
-                                    <input type="date" class="form-control" name="fromTime">
+                                    <input type="date" class="form-control" name="fromTime" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">To :</label>
-                                    <input type="date" class="form-control" name="toTime">
+                                    <input type="date" class="form-control" name="toTime" required>
                                 </div>
                             </div>
                         </div>

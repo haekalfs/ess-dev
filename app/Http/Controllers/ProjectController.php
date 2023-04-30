@@ -252,10 +252,34 @@ class ProjectController extends Controller
         return response()->json(['success'=>'Client created successfully.', 'client' => $client]);
     }
 
+    public function delete_client($id)
+    {
+        $client = Client::find($id);
+
+        if ($client) {
+            $client->delete();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['failed' => false, 'message' => 'Client not found!']);
+        }
+    }
+
     public function listLocations()
     {
         $p_location = Project_location::all();
         return response()->json($p_location);
+    }
+
+    public function delete_location($id)
+    {
+        $location = Project_location::find($id);
+
+        if ($location) {
+            $location->delete();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['failed' => false, 'message' => 'Location not found!']);
+        }
     }
 
     public function create_new_location(Request $request)
@@ -285,6 +309,18 @@ class ProjectController extends Controller
         return response()->json($p_role);
     }
 
+    public function delete_project_role($id)
+    {
+        $role = Project_role::find($id);
+
+        if ($role) {
+            $role->delete();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['failed' => false, 'message' => 'Client not found!']);
+        }
+    }
+
     public function create_new_project_roles(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -308,6 +344,28 @@ class ProjectController extends Controller
     {
         $project = Company_project::find($id);
         $project_member = Project_assignment_user::where('company_project_id', $id)->get();
-        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member]);
+        $project_id = Company_project::where('id', $id)->pluck('id')->first();
+        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member, 'project_id' => $project_id]);
+    }
+
+    public function project_delete(Request $request, $id)
+    {
+        $project = Company_project::find($id);
+        $assignment = Project_assignment::where('company_project_id', $id);
+        $member = Project_assignment_user::where('project_assignment_id', $id);
+
+        if (!$project) {
+            return redirect('/project_list')->with('failed', 'Project not found!');
+        }
+
+        $project->delete();
+        $assignment->delete();
+        $member->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect('/project_list')->with('success', "Project Organization #$id has been deleted!");
     }
 }

@@ -203,6 +203,12 @@ active
                                 <div class="alert alert-danger" role="alert" style="display: none;">
                                     An error occurred while saving your entry. Please try again.
                                 </div>
+                                <div class="alert alert-success alert-success-delete" role="alert" style="display: none;">
+                                    Your entry has been saved successfully.
+                                </div>
+                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
+                                    An error occurred while saving your entry. Please try again.
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered zoom90" width="100%"
                                         cellspacing="0">
@@ -274,6 +280,12 @@ active
                                 <div class="alert alert-danger" role="alert" style="display: none;">
                                     An error occurred while saving your entry. Please try again.
                                 </div>
+                                <div class="alert alert-success alert-success-delete" role="alert" style="display: none;">
+                                    Your entry has been saved successfully.
+                                </div>
+                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
+                                    An error occurred while saving your entry. Please try again.
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered zoom90" width="100%"
                                         cellspacing="0">
@@ -307,7 +319,7 @@ active
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Locations</h5>
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Project Role</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
