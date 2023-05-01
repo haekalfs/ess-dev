@@ -31,13 +31,6 @@ active
 <div class="alert alert-danger" role="alert" style="display: none;">
     An error occurred while saving your entry. Please try again.
 </div>
-<div class="alert alert-success alert-success-delete" role="alert" style="display: none;">
-    Your entry has been deleted.
-</div>
-
-<div class="alert alert-danger-delete" role="alert" style="display: none;">
-    An error occurred while deleting your entry. Please try again.
-</div>
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
@@ -64,7 +57,7 @@ active
                             @endforeach
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="calendarBody">
                         @foreach (array_slice($calendar, 1) as $week)
                             <tr>
                                 @php
@@ -163,7 +156,14 @@ active
     </div>
     <!-- Card Body -->
     <div class="card-body">
-        <div class="table-responsive zoom80">
+        <div class="table-responsive zoom90">
+            <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+                Your entry has been deleted.
+            </div>
+            
+            <div class="alert alert-danger-delete" role="alert" style="display: none;">
+                An error occurred while deleting your entry. Please try again.
+            </div>
             <table class="table table-bordered" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
@@ -171,7 +171,7 @@ active
                         <th>Date</th>
                         <th>Task</th>
                         <th>Location</th>
-                        <th style="width: 600px;">Activity</th>
+                        <th>Activity</th>
                         <th>From</th>
                         <th>To</th>
                         <th style="width: 10px;">Action</th>
@@ -180,7 +180,7 @@ active
                     <!-- Display the data fetched via AJAX here -->
                 </tbody>
             </table>
-        </div>
+        </div><br>
         <div class="text-right zoom90">
             <a class="btn btn-danger btn-sm delete-all" data-year="{{ $year }}" data-month="{{ $month }}" type="button">Reset All</a>
         </div>

@@ -169,14 +169,14 @@ active
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Client</h5>
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Clients</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<form id="new-client-form" method="post">
                 @csrf
-				<div class="modal-body" style="">
+				<div class="modal-body" style="height: 500px; overflow-y: auto;">
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-5">
@@ -201,6 +201,12 @@ active
                                     Your entry has been saved successfully.
                                 </div>
                                 <div class="alert alert-danger" role="alert" style="display: none;">
+                                    An error occurred while saving your entry. Please try again.
+                                </div>
+                                <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+                                    Client has been deleted successfully.
+                                </div>
+                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
                                     An error occurred while saving your entry. Please try again.
                                 </div>
                                 <div class="table-responsive">
@@ -234,14 +240,14 @@ active
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Locations</h5>
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Project Locations</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<form id="new-location-form" method="post">
                 @csrf
-				<div class="modal-body" style="">
+				<div class="modal-body" style="height: 500px; overflow-y: auto;">
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-3">
@@ -273,6 +279,12 @@ active
                                 </div>
                                 <div class="alert alert-danger" role="alert" style="display: none;">
                                     An error occurred while saving your entry. Please try again.
+                                </div>
+                                <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+                                    Location has been deleted successfully.
+                                </div>
+                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
+                                    An error occurred while fetching your entries. Please try again.
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered zoom90" width="100%"
@@ -307,14 +319,14 @@ active
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add New Locations</h5>
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Project Roles</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<form id="new-project-roles-form" method="post">
                 @csrf
-				<div class="modal-body" style="">
+				<div class="modal-body" style="height: 500px; overflow-y: auto;">
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-5">
@@ -339,6 +351,12 @@ active
                                     Your entry has been saved successfully.
                                 </div>
                                 <div class="alert alert-danger" role="alert" style="display: none;">
+                                    An error occurred while saving your entry. Please try again.
+                                </div>
+                                <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+                                    Your entry has been delete successfully.
+                                </div>
+                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
                                     An error occurred while saving your entry. Please try again.
                                 </div>
                                 <div class="table-responsive">

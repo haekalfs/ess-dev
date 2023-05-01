@@ -24,12 +24,12 @@ class Users_detail extends Model
 
     public function department()
     {
-        return $this->belongsTO('App\Models\Department');
+        return $this->belongsTo('App\Models\Department');
     }
 
     public function position()
     {
-        return $this->belongsTO('App\Models\Position');
+        return $this->belongsTo('App\Models\Position');
     }
 
 }

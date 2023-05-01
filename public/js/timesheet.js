@@ -108,6 +108,7 @@ $(document).ready(function() {
             });
         });
     });
+    
     $(document).on('click', '.delete-btn', function(event) {
         var activityId = $(event.target).data('id');
         deleteActivity(activityId);
@@ -171,6 +172,12 @@ $(document).ready(function() {
     // Fetch the activities when the page loads
     fetchActivities(yearput, monthput);
     
+    var dataTable = $('#timesheetsTable').DataTable({
+        "order": [[ 1, "asc" ]],
+        "lengthMenu": [[10, 20, 25, 50, -1], [10, 20, 25, 50, "All"]],
+        "pageLength": 10,
+        "data": [] // Initialize with an empty dataset
+      });
     // Function to fetch the activities via AJAX
     function fetchActivities(yearput, monthput) {
         $.ajax({
@@ -200,15 +207,17 @@ $(document).ready(function() {
                         var date = new Date(activity.ts_date);
                         var options = { weekday: 'short' };
                         row.append($('<td></td>').text(date.toLocaleDateString('en-US', options)));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_date));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal "></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
-                        row.append($('<td data-toggle="modal" class="clickable" data-target="#updateModal"></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
+                        var formattedDate = moment(activity.ts_date).format('D-MMM-YYYY');
+                        row.append($('<td width="150px" data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(formattedDate));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
+                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                         var actions = $('<td></td>');
                         actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
                         row.append(actions);
+
                         $('#activity-table').append(row);
                         
                         // Increment the count for the location of this activity
@@ -418,8 +427,6 @@ $(function() {
 initializeDateRangePicker();
 });
   
-
-
 $(document).ready(function () {
     $('#save-client-entry').click(function(e) {
         e.preventDefault();
@@ -449,6 +456,37 @@ $(document).ready(function () {
     });
 });
 
+
+$(document).on('click', '.delete-btn-client', function(event) {
+    isconfirm();
+    var clientId = $(event.target).data('id');
+    deleteClient(clientId);
+});
+
+function deleteClient(clientId) {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+        url: '/project_list/delete/client/' + clientId,
+        type: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+        },
+        success: function(response) {
+            $('.alert-success-delete').show();
+            setTimeout(function() {
+                $('.alert-success-delete').fadeOut('slow');
+            }, 3000);
+            fetchClients();
+        },
+        error: function(response,jqXHR, textStatus, errorThrown) {
+            $('.alert-danger-delete').show();
+            setTimeout(function() {
+                $('.alert-danger-delete').fadeOut('slow');
+            }, 3000);
+            console.log(response);
+        }
+    });
+}
 function fetchClients() {
     $.ajax({
         url: '/retrieveClients',
@@ -468,12 +506,12 @@ function fetchClients() {
                     row.append($('<td></td>').text(activity.client_name));
                     row.append($('<td></td>').text(activity.address));
                     var actions = $('<td class="text-center"></td>');
-                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn-client').text('Delete').attr('data-id', activity.id));
                     row.append(actions);
                     $('#Clients').append(row);
                 });
-                // // Add click handlers for the edit and delete buttons
-                // $('.delete-btn').click(deleteActivity);
+                // Add click handlers for the edit and delete buttons
+                $('.delete-btn-client').click(deleteClient);
             }
         },
         error: function(response) {
@@ -482,6 +520,37 @@ function fetchClients() {
     });
 }
 
+
+$(document).on('click', '.delete-btn-location', function(event) {
+    isconfirm();
+    var locationId = $(event.target).data('id');
+    deleteLocation(locationId);
+});
+
+function deleteLocation(locationId) {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+        url: '/project_list/delete/location/' + locationId,
+        type: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+        },
+        success: function(response) {
+            $('.alert-success-delete').show();
+            setTimeout(function() {
+                $('.alert-success-delete').fadeOut('slow');
+            }, 3000);
+            fetchLocations();
+        },
+        error: function(response,jqXHR, textStatus, errorThrown) {
+            $('.alert-danger-delete').show();
+            setTimeout(function() {
+                $('.alert-danger-delete').fadeOut('slow');
+            }, 3000);
+            console.log(response);
+        }
+    });
+}
 function fetchLocations() {
     $.ajax({
         url: '/retrieveLocations',
@@ -502,12 +571,12 @@ function fetchLocations() {
                     row.append($('<td></td>').text(activity.description));
                     row.append($('<td></td>').text(activity.fare));
                     var actions = $('<td class="text-center"></td>');
-                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn-location').text('Delete').attr('data-id', activity.id));
                     row.append(actions);
                     $('#Locations').append(row);
                 });
                 // // Add click handlers for the edit and delete buttons
-                // $('.delete-btn').click(deleteActivity);
+                $('.delete-btn-location').click(deleteLocation);
             }
         },
         error: function(response) {
@@ -515,6 +584,7 @@ function fetchLocations() {
         }
     });
 }
+
 $(document).ready(function () {
     $('#save-location-entry').click(function(e) {
         e.preventDefault();
@@ -544,6 +614,37 @@ $(document).ready(function () {
     });
 });
 
+
+$(document).on('click', '.deleteRole', function(event) {
+    isconfirm();
+    var roleId = $(event.target).data('id');
+    deleteRole(roleId);
+});
+
+function deleteRole(roleId) {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+        url: '/project_list/delete/project_role/' + roleId,
+        type: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+        },
+        success: function(response) {
+            $('.alert-success-delete').show();
+            setTimeout(function() {
+                $('.alert-success-delete').fadeOut('slow');
+            }, 3000);
+            fetchProjectRoles();
+        },
+        error: function(response,jqXHR, textStatus, errorThrown) {
+            $('.alert-danger-delete').show();
+            setTimeout(function() {
+                $('.alert-danger-delete').fadeOut('slow');
+            }, 3000);
+            console.log(response);
+        }
+    });
+}
 function fetchProjectRoles() {
     $.ajax({
         url: '/retrieveProjectRoles',
@@ -563,12 +664,12 @@ function fetchProjectRoles() {
                     row.append($('<td></td>').text(activity.role_code));
                     row.append($('<td></td>').text(activity.role_name));
                     var actions = $('<td class="text-center"></td>');
-                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Delete').attr('data-id', activity.id));
+                    actions.append($('<a></a>').addClass('btn-sm btn btn-danger deleteRole').text('Delete').attr('data-id', activity.id));
                     row.append(actions);
                     $('#projectRoles').append(row);
                 });
-                // // Add click handlers for the edit and delete buttons
-                // $('.delete-btn').click(deleteActivity);
+                // Add click handlers for the edit and delete buttons
+                $('.deleteRole').click(deleteRole);
             }
         },
         error: function(response) {
@@ -592,7 +693,7 @@ $(document).ready(function () {
             setTimeout(function() {
                 $('.alert-success-saving').fadeOut('slow');
             }, 3000);
-            fetchLocations();
+            fetchProjectRoles();
         },
         error: function(jqXHR, textStatus, errorThrown) {
                 $('.alert-danger').show();
@@ -629,6 +730,36 @@ function deleteAssignment(event, id) {
                     .catch(error => {
                         // show error message using SweetAlert
                         swal("Oops!", "Something went wrong while deleting the assignment!", "error");
+                    });
+            }
+        });
+}
+
+function deleteProject(event, id) {
+    event.preventDefault();
+    swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this project!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                // perform the actual delete request
+                axios.delete('/project_list/delete/' + id)
+                    .then(response => {
+                        // show success message using SweetAlert
+                        swal("Poof! The project has been deleted!", {
+                            icon: "success",
+                        });
+
+                        // remove the assignment from the page
+                        window.location.href = '/project_list';
+                    })
+                    .catch(error => {
+                        // show error message using SweetAlert
+                        swal("Oops!", "Something went wrong while deleting the project!", "error");
                     });
             }
         });
