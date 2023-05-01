@@ -80,6 +80,9 @@ Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectControll
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
 
+//
+Route::get('/leave/history/{yearSelected?}', 'LeaveController@history')->name('leave')->middleware('auth');
+
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth');
 Route::get('/assignment/{yearSelected?}', 'ProjectController@assigning')->name('project-assigning')->middleware('auth');

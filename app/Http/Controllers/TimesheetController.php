@@ -40,6 +40,9 @@ class TimesheetController extends Controller
         $currentYear = date('Y');
         if($yearSelected){
             $currentMonth = 12;
+            if($yearSelected == date('Y')){
+                $currentMonth = date('m');
+            }
             $currentYear = $yearSelected;
         }
         $entries = [];
@@ -75,7 +78,7 @@ class TimesheetController extends Controller
             $previewUrl = "/timesheet/entry/preview/".$encryptYear."/".$encryptMonth;
             $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
         }
-        return view('timereport.timesheet', compact('entries', 'yearsBefore'));
+        return view('timereport.timesheet', compact('entries', 'yearsBefore', 'yearSelected'));
     }
 
     public function getDayStatus($date)
