@@ -86,7 +86,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>User ID</td>
-                                            <td><input class="form-control flex"    name="usr_id" placeholder="User ID..." value="{{ $user->id }}" readonly/>
+                                            <td><input class="form-control flex"    name="usr_id" placeholder="User ID..." value="{{ $user->id }}"/>
                                                 @if($errors->has('usr_id'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_id')}}
