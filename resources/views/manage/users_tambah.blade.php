@@ -446,6 +446,16 @@ active
                                                 @endif
                                             </td>
                                         </tr>
+                                        <tr class="table-sm">
+                                            <td>Bank Account Name</td>
+                                            <td><input class="form-control" type="text" name="usr_bank_account_name" placeholder="Bank Account Name..."/>
+                                                @if($errors->has('usr_bank_account_name'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_bank_account_name')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>

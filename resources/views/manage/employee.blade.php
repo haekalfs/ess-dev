@@ -50,7 +50,7 @@ active
             </thead>
             <tbody>
                 @foreach($employee as $p)
-                    @if($p->usr_role){{ $p->usr_role->role_name === 'employee' }}
+                    @if($p->users_detail->position_id !== '4' && $p->users_detail->position_id !== '18' && $p->users_detail->position_id !=='19' && $p->users_detail->position_id !== NULL)
                         <tr>
                             <td>{{$p->users_detail->employee_id}}</td>
                             <td>{{$p->id }}</td>

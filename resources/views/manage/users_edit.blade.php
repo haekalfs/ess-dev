@@ -86,7 +86,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>User ID</td>
-                                            <td><input class="form-control flex"    name="usr_id" placeholder="User ID..." value="{{ $user->id }}" />
+                                            <td><input class="form-control flex"    name="usr_id" placeholder="User ID..." value="{{ $user->id }}" readonly/>
                                                 @if($errors->has('usr_id'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_id')}}
@@ -436,6 +436,16 @@ active
                                                 @if($errors->has('usr_bank_account'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_bank_account')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Bank Account Name</td>
+                                            <td><input class="form-control" type="text" name="usr_bank_account_name" placeholder="Bank Account Name..." value="{{ $user->users_detail->usr_bank_account_name }}"/>
+                                                @if($errors->has('usr_bank_account_name'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_bank_account_name')}}
                                                     </div>
                                                 @endif
                                             </td>

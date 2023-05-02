@@ -61,6 +61,7 @@ class UserController extends Controller
             'usr_bank_name'=> 'required',
             'usr_bank_branch'=> 'required',
             'usr_bank_account'=> 'required',
+            'usr_bank_account_name'=> 'required'
             ]);
         
         $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
@@ -102,6 +103,7 @@ class UserController extends Controller
             'usr_bank_name'=> $request->usr_bank_name,
             'usr_bank_branch'=> $request->usr_bank_branch,
             'usr_bank_account'=> $request->usr_bank_account,
+            'usr_bank_account_name' => $request->usr_bank_account_name
         ]);
 
     	return redirect('/manage/users')->with('success', 'User Create successfully');
@@ -154,6 +156,7 @@ class UserController extends Controller
             'usr_bank_name'=> 'required',
             'usr_bank_branch'=> 'required',
             'usr_bank_account'=> 'required',
+            'usr_bank_account_name' => 'required'
             ]);
             
             $user = User::find($id);
@@ -187,6 +190,7 @@ class UserController extends Controller
             $user_detail->usr_bank_name = $request->usr_bank_name;
             $user_detail->usr_bank_branch = $request->usr_bank_branch;
             $user_detail->usr_bank_account = $request->usr_bank_account;
+            $user_detail->usr_bank_account_name = $request->usr_bank_account_name;
             $user_detail->current_address = $request->current_address;
             $user_detail->save();
 
