@@ -13,7 +13,7 @@ active
     <div>
         <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
             @foreach (array_reverse($yearsBefore) as $year)
-                <option value="{{ $year }}">{{ $year }}</option>
+                <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
             @endforeach
         </select>
     </div>

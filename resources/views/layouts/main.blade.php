@@ -148,7 +148,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         @usr_acc(302)
                         <h6 class="collapse-header">My Leaves:</h6>
-                        <a class="collapse-item" href="/development">History</a>
+                        <a class="collapse-item" href="/leave/history">History</a>
                         @else
                         @endusr_acc
                         @usr_acc(303)

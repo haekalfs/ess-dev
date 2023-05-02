@@ -171,13 +171,7 @@ $(document).ready(function() {
     var monthput = $('#monthSel').val();
     // Fetch the activities when the page loads
     fetchActivities(yearput, monthput);
-    
-    var dataTable = $('#timesheetsTable').DataTable({
-        "order": [[ 1, "asc" ]],
-        "lengthMenu": [[10, 20, 25, 50, -1], [10, 20, 25, 50, "All"]],
-        "pageLength": 10,
-        "data": [] // Initialize with an empty dataset
-      });
+
     // Function to fetch the activities via AJAX
     function fetchActivities(yearput, monthput) {
         $.ajax({
@@ -226,6 +220,30 @@ $(document).ready(function() {
                         var day = date.getDate();
                         var taskEntry = $('#task_entry' + day);
                         taskEntry.addClass('border-bottom-primary');
+                    });
+
+                    var rowsPerPageSelect = $('#rowsPerPage');
+                    var activityTable = $('#activity-table');
+                    var rows = activityTable.find('tr');
+
+                    // Event listener for select change
+                    rowsPerPageSelect.on('change', function() {
+                    var rowsPerPage = parseInt($(this).val());
+
+                    // Show or hide rows based on the selected number of rows per page
+                    if (rowsPerPage === -1) {
+                        rows.show();
+                    } else {
+                        rows.hide();
+                        rows.slice(0, rowsPerPage).show();
+                    }
+                    });
+                     // Perform search when the search input value changes
+                    $('#searchInput').on('keyup', function() {
+                        var searchText = $(this).val().toLowerCase();
+                        $('#activity-table tr').filter(function() {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1);
+                        });
                     });
                     // Add click handlers for the edit and delete buttons
                     $('.delete-btn').click(deleteActivity);

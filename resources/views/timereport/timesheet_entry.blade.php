@@ -151,12 +151,12 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Add Entries</a> <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
+            <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Bulk Entries</a> <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
         </div>
     </div>
     <!-- Card Body -->
     <div class="card-body">
-        <div class="table-responsive zoom90">
+        <div class="table-responsive zoom90" style="overflow: hidden;">
             <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
                 Your entry has been deleted.
             </div>
@@ -164,7 +164,20 @@ active
             <div class="alert alert-danger-delete" role="alert" style="display: none;">
                 An error occurred while deleting your entry. Please try again.
             </div>
-            <table class="table table-bordered" width="100%" cellspacing="0">
+            <div class="row-toolbar">
+                <div class="col">
+                    <select style="max-width: 13%;" class="form-control" id="rowsPerPage">
+                        <option value="-1">All</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="col-auto text-right">
+                    <input class="form-control" type="text" id="searchInput" placeholder="Search...">
+                </div>
+            </div>
+            <table class="table table-bordered" id="timesheetsTable" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
                         <th style="width: 10px;">Day</th>
@@ -541,6 +554,11 @@ function setupTimeInputs() {
   }
 </script>
 <style>
+    .row-toolbar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px; /* Adjust the desired bottom spacing value */
+    }
     td {
         cursor: pointer;
         transition: background-color 0.3s ease-in-out;

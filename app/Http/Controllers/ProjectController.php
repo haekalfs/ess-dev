@@ -47,7 +47,7 @@ class ProjectController extends Controller
             ->select('project_assignments.*', 'company_projects.project_name', 'company_projects.project_code')
             ->whereYear('req_date', $currentYear)
             ->get();
-        return view('projects.assigning', compact('assignment', 'project', 'yearsBefore'));
+        return view('projects.assigning', compact('assignment', 'project', 'yearsBefore', 'yearSelected'));
     }
 
     public function add_project_assignment(Request $request)
