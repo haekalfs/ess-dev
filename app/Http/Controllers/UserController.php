@@ -24,7 +24,9 @@ class UserController extends Controller
     {
         $dep_data = Department::all();
         $pos_data = Position::all();
-    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data]);
+        $latestForm = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('employee_id')->max();
+        $nextEmpID = $latestForm + 1;
+    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID]);
     }
 
     public function store(Request $request)
@@ -32,7 +34,7 @@ class UserController extends Controller
     	$this->validate($request,[
             'name' => 'required',
             'password' => 'required',
-            'usr_id' => 'required',
+            'usr_id' => 'required|unique:users,id',
             'email' => 'required',
             'status' => 'required',
             'employee_status' => 'required',
@@ -59,10 +61,10 @@ class UserController extends Controller
             'usr_bank_name'=> 'required',
             'usr_bank_branch'=> 'required',
             'usr_bank_account'=> 'required',
+            'usr_bank_account_name'=> 'required'
             ]);
         
-        $uniqueId = hexdec(substr(uniqid(), 0, 8));
-        $lastId = Users_detail::orderBy('id')->pluck('id')->first();
+        $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
         $nextId = intval(substr($lastId, 4)) + 1;
         $hash_pwd = Hash::make($request->password);
 
@@ -101,6 +103,7 @@ class UserController extends Controller
             'usr_bank_name'=> $request->usr_bank_name,
             'usr_bank_branch'=> $request->usr_bank_branch,
             'usr_bank_account'=> $request->usr_bank_account,
+            'usr_bank_account_name' => $request->usr_bank_account_name
         ]);
 
     	return redirect('/manage/users')->with('success', 'User Create successfully');
@@ -153,6 +156,7 @@ class UserController extends Controller
             'usr_bank_name'=> 'required',
             'usr_bank_branch'=> 'required',
             'usr_bank_account'=> 'required',
+            'usr_bank_account_name' => 'required'
             ]);
             
             $user = User::find($id);
@@ -186,10 +190,24 @@ class UserController extends Controller
             $user_detail->usr_bank_name = $request->usr_bank_name;
             $user_detail->usr_bank_branch = $request->usr_bank_branch;
             $user_detail->usr_bank_account = $request->usr_bank_account;
+            $user_detail->usr_bank_account_name = $request->usr_bank_account_name;
             $user_detail->current_address = $request->current_address;
             $user_detail->save();
 
 
         return redirect('/manage/users')->with('success', 'User updated successfully');
+    }
+
+
+    // List consul and employee
+    public function consultant()
+    {
+        $consultants = User::all();
+        return view('manage.consultant', ['consultants' => $consultants]);
+    }
+    public function employee()
+    {
+        $employee = User::all();
+        return view('manage.employee', ['employee' => $employee]);
     }
 }

@@ -67,6 +67,50 @@ active
                             </div>
                             <div class="col-md-4">
                                 <table class="table table-borderless ">
+                                    
+                                    {{-- Account Information --}}
+                                    <thead>
+                                        <tr>
+                                            <th class="m-0 font-weight-bold text-primary" colspan="2">Account Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="table-sm">
+                                            <td>Employee ID</td>
+                                            <td><input class="form-control"  name="employee_id" placeholder="Employee ID..." style="width: 95%" value="{{ $nextEmpID }}"readonly/>
+                                            @if($errors->has('employee_id'))
+                                                <div class="text-danger">
+                                                    {{ $errors->first('employee_id')}}
+                                                </div>
+                                            @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>User ID</td>
+                                            <td><input class="form-control flex" name="usr_id" placeholder="User ID..." style="width: 95%"/>
+                                                @if($errors->has('usr_id'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_id')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Email</td>
+                                            <td><input class="form-control" name="email" placeholder="Email..." style="width: 95%"/>
+                                                @if($errors->has('email'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('email')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Password</td>
+                                            <td><input class="form-control" name="password" value="" placeholder="****" style="width: 95%"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                     {{-- Informasi Pribadi --}}
                                     <thead>
                                         <tr>
@@ -76,7 +120,7 @@ active
                                     <tbody>
                                         <tr class="table-sm">
                                             <td>Name</td>
-                                            <td><input class="form-control" type="text" name="name" placeholder="Name...">
+                                            <td><input class="form-control" type="text" name="name" placeholder="Name..."/>
                                                 @if($errors->has('name'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('name')}}
@@ -237,44 +281,6 @@ active
                                             </td>
                                         </tr>
                                     </tbody>
-                                    {{-- Informasi bank --}}
-                                    <thead>
-                                        <tr>
-                                            <th class="m-0 font-weight-bold text-primary" colspan="2">Bank Account</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-sm">
-                                            <td>Bank Name</td>
-                                            <td><input class="form-control" type="text"   name="usr_bank_name" placeholder="Bank Name...">
-                                                @if($errors->has('usr_bank_name'))
-                                                    <div class="text-danger">
-                                                        {{ $errors->first('usr_bank_name')}}
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="table-sm">
-                                            <td>Bank Branch</td>
-                                            <td><input class="form-control" type="text"   name="usr_bank_branch" placeholder="Bank Branch ...">
-                                                @if($errors->has('usr_bank_branch'))
-                                                    <div class="text-danger">
-                                                        {{ $errors->first('usr_bank_branch')}}
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="table-sm">
-                                            <td>Bank Account Number</td>
-                                            <td><input class="form-control" type="text"   name="usr_bank_account" placeholder="Bank Account Number...">
-                                                @if($errors->has('usr_bank_account'))
-                                                    <div class="text-danger">
-                                                        {{ $errors->first('usr_bank_account')}}
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    </tbody>
                                 </table>
                             </div>
                             <div class="col-md-4">
@@ -349,49 +355,6 @@ active
                                         </td>
                                     </tr>
                                 </tbody>
-                                    {{-- Account Information --}}
-                                    <thead>
-                                        <tr>
-                                            <th class="m-0 font-weight-bold text-primary" colspan="2">Account Details</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-sm">
-                                            <td>Employee ID</td>
-                                            <td><input class="form-control"  name="employee_id" placeholder="Employee ID..." style="width: 95%">
-                                            @if($errors->has('employee_id'))
-                                                <div class="text-danger">
-                                                    {{ $errors->first('employee_id')}}
-                                                </div>
-                                            @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="table-sm">
-                                            <td>User ID</td>
-                                            <td><input class="form-control flex" name="usr_id" placeholder="User ID..." style="width: 95%">
-                                                @if($errors->has('usr_id'))
-                                                    <div class="text-danger">
-                                                        {{ $errors->first('usr_id')}}
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="table-sm">
-                                            <td>Email</td>
-                                            <td><input class="form-control" name="email" placeholder="Email..." style="width: 95%">
-                                                @if($errors->has('email'))
-                                                    <div class="text-danger">
-                                                        {{ $errors->first('email')}}
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="table-sm">
-                                            <td>Password</td>
-                                            <td><input class="form-control" name="password" value="" placeholder="****" style="width: 95%">
-                                            </td>
-                                        </tr>
-                                    </tbody>
                                 {{-- Dokumen Informasi --}}
                                     <thead>
                                         <tr>
@@ -441,6 +404,54 @@ active
                                                 @if($errors->has('usr_id_expiration'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_id_expiration')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    {{-- Informasi bank --}}
+                                    <thead>
+                                        <tr>
+                                            <th class="m-0 font-weight-bold text-primary" colspan="2">Bank Account</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="table-sm">
+                                            <td>Bank Name</td>
+                                            <td><input class="form-control" type="text"   name="usr_bank_name" placeholder="Bank Name...">
+                                                @if($errors->has('usr_bank_name'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_bank_name')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Bank Branch</td>
+                                            <td><input class="form-control" type="text"   name="usr_bank_branch" placeholder="Bank Branch ...">
+                                                @if($errors->has('usr_bank_branch'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_bank_branch')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Bank Account Number</td>
+                                            <td><input class="form-control" type="text"   name="usr_bank_account" placeholder="Bank Account Number...">
+                                                @if($errors->has('usr_bank_account'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_bank_account')}}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr class="table-sm">
+                                            <td>Bank Account Name</td>
+                                            <td><input class="form-control" type="text" name="usr_bank_account_name" placeholder="Bank Account Name..."/>
+                                                @if($errors->has('usr_bank_account_name'))
+                                                    <div class="text-danger">
+                                                        {{ $errors->first('usr_bank_account_name')}}
                                                     </div>
                                                 @endif
                                             </td>

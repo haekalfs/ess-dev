@@ -116,6 +116,10 @@ Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth');
 Route::put('/users/update/{id}', 'UserController@update')->middleware('auth');
 Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth');
 
+//list consul and employee
+Route::get('/manage/consultant', 'UserController@consultant')->middleware('auth')->middleware(['checkRole:admin,manager']);
+Route::get('/manage/employee', 'UserController@employee')->middleware('auth')->middleware(['checkRole:admin,manager']);
+
 //Management
 Route::get('/management/security_&_roles/', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin']);
 Route::get('/management/security_&_roles/manage/access', 'ManagementController@manage_access')->middleware('auth')->middleware(['checkRole:admin']);
