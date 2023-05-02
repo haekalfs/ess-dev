@@ -184,7 +184,7 @@ $(document).ready(function() {
                 if (response.length === 0) {
                     // Display a message to the user
                     $('#activity-table').append($('<tr><td class="text-center" colspan="8">No data available in table.</td></tr>'));
-                    $('.calculations').text('No data available.');
+                    $('.calculations').html('<i>No data available.</i>');
                 } else {
                     // Create an object to store the counts for each location
                     var counts = {
@@ -443,6 +443,31 @@ function initializeDateRangePicker() {
   
 $(function() {
 initializeDateRangePicker();
+});
+
+function initializeDateRangePickerLeave() {
+    var currentDate = new Date();
+    var year = currentDate.getFullYear();
+    var month = currentDate.getMonth() + 1;
+    var startDate = moment().year(year).month(month - 1).startOf('month');
+    var endDate = moment().year(year).month(month - 1).endOf('month');
+  
+    $('input[name="daterangeLeave"]').daterangepicker({
+      "startDate": startDate,
+      "endDate": endDate,
+      "opens": "right",
+      "isInvalidDate": function(date) {
+        var currentDate = moment();
+        // Disable all dates before the current date
+        return date.isBefore(currentDate, 'day');
+    }
+    }, function(start, end, label) {
+      console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+    });
+}
+  
+$(function() {
+initializeDateRangePickerLeave();
 });
   
 $(document).ready(function () {

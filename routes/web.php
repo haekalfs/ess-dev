@@ -135,6 +135,9 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
     Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles')->middleware('auth')->middleware(['checkRole:admin']);
     Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin']);
 
+//Employees Database
+Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');
+
 //HR TOOLS
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth');
 Route::get('/hr/compliance/', 'HrController@index')->middleware('auth');
