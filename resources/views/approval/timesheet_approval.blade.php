@@ -59,7 +59,7 @@ active
                                 <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve
                             </a>
                             <a href="/reject/director/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
-                            <a href="/approval/director/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;">Preview</a>
+                            <a href="/approval/timesheet/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;">Preview</a>
                         </td>
                     </tr>
                     @endforeach

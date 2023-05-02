@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Review by Finance Manager - ESS')
+
 @section('active-page-timesheet')
 active
 @endsection
@@ -81,7 +83,7 @@ active
                     <div class="col-md-12"><br>
                         <div class="table-responsive">
                             <table class="table table-bordered zoom90" width="100%" cellspacing="0">
-                                <thead>
+                                <thead class="thead-light">
                                     <tr>
                                         <th>Emp ID</th>
                                         <th>Name</th>
@@ -98,17 +100,22 @@ active
                                         @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
                                         <td></td>
                                         <td></td>
+                                        <td>{{ $approval->ts_task }}</td>
+                                        <td>{{ $approval->ts_location }}</td>
+                                        <td>{{ $approval->roleAs }}</td>
+                                        <td>{{ $approval->ts_mandays }}</td>
+                                        <td></td>
                                         @else
                                         <td>{{ $approval->user->users_detail->employee_id }}</td>
                                         <td>{{ $approval->user->name }}</td>
-                                        @endif
                                         <td>{{ $approval->ts_task }}</td>
                                         <td>{{ $approval->ts_location }}</td>
                                         <td>{{ $approval->roleAs }}</td>
                                         <td>{{ $approval->ts_mandays }}</td>
                                         <td class="action text-center">
-                                            <a href="/timesheet/review/fm/export" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
+                                            <a href="/approval/timesheet/preview/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
                                         </td>
+                                        @endif
                                     </tr>
                                     @endforeach
                                 </tbody>
