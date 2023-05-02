@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Session;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -362,17 +363,39 @@ class ApprovalController extends Controller
         return redirect()->back();
     }
 
-    public function review()
+    public function review(Request $request)
 	{
-		$currentMonth = date('m');
-        $currentYear = date('Y');
+		$Month = date('m');
+        $Year = date('Y');
 
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $employees = User::all();
+        
+        $validator = Validator::make($request->all(), [
+            'showOpt' => 'required',
+            'yearOpt' => 'required',
+            'monthOpt' => 'required'
+        ]);
+
+        // var_dump($Year.intval($Month));
         $approvals = Timesheet_detail::where('ts_status_id', 29)
-        ->whereYear('date_submitted', $currentYear)
-        ->where('RequestTo', '-')
-        ->groupBy('user_timesheet', 'month_periode')
-        ->get();
-		return view('review.finance', compact('approvals'));
+            ->where('RequestTo', '-')
+            ->groupBy('user_timesheet', 'ts_task');
+
+        if ($validator->passes()) {
+            $Year = $request->yearOpt;
+            $Month = $request->monthOpt;
+            $approvals->whereYear('date_submitted', $Year);
+            $approvals->where('month_periode', $Year.intval($Month));
+        } else {
+            $approvals->whereYear('date_submitted', $Year);
+            $approvals->where('month_periode', $Month);
+        }
+
+        $approvals = $approvals->get();
+		return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year','employees'));
 	}
 
     public function ts_preview($id, $year, $month)

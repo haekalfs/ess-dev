@@ -47,7 +47,7 @@ Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
-Route::get('/timesheet/review/fm/export', 'ExportTimesheet@export_excel')->middleware('auth');
+Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
 
 
 // Testing

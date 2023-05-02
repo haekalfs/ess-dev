@@ -17,4 +17,8 @@ class Project_assignment_user extends Model
     public function assigned(){
     	return $this->belongsTo('App\Models\Project_assignment');
     }
+
+    public function timesheet_detail(){
+    	return $this->hasMany('App\Models\Timesheet_detail');
+    }
 }

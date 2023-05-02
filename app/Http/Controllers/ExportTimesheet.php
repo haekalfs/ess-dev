@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ExportTimesheet extends Controller
 {
-    public function export_excel()
+    public function export_excel($Month, $Year)
 	{
         $templatePath = public_path('template_fm.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
@@ -36,12 +36,22 @@ class ExportTimesheet extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         $result = DB::table('timesheet_details')
-            ->select('*')
-            ->where('ts_status_id', 29)
-            ->whereYear('date_submitted', 2023)
-            ->where('RequestTo', '-')
-            ->groupBy('user_timesheet', 'ts_task')
-            ->get();
+        ->select('timesheet_details.*', 'users.name', 'users_details.employee_id')
+        ->join('users', 'timesheet_details.user_timesheet', '=', 'users.id')
+        ->join('users_details', 'timesheet_details.user_timesheet', '=', 'users_details.user_id')
+        ->where('timesheet_details.ts_status_id', 29)
+        ->whereYear('timesheet_details.date_submitted', $Year)
+        ->where('timesheet_details.RequestTo', '-')
+        ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task')
+        ->get();
+            
+        $getTotalMandays = DB::table('timesheet_details')
+        ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
+        ->where('ts_status_id', 29)
+        ->whereYear('date_submitted', $Year)
+        ->where('RequestTo', '-')
+        ->groupBy('user_timesheet')
+        ->get(); 
 
 
        // Set up the starting row and column for the data
@@ -51,30 +61,48 @@ class ExportTimesheet extends Controller
         // Initialize the last printed user name
         $lastUser = '';
         $lastWorkhours = '';
-
-        // Loop through the query results and populate the values
+        $lastTotalMandays = 0;
+        $firstRow = true; // Flag to check if it's the first row for each user
+        
         foreach ($result as $row) {
-            $yearNum = substr($row->month_periode, 0, 4);
-            $monthNum = substr($row->month_periode, 4, 2);
-            $monthName = date("F", mktime(0, 0, 0, $month, 1));
+            // Calculate the total mandays for each user
+            if ($row->user_timesheet !== $lastUser) {
+                // Find the total mandays for the current user
+                $totalMandays = 0;
+                foreach ($getTotalMandays as $userMandays) {
+                    if ($userMandays->user_timesheet === $row->user_timesheet) {
+                        $totalMandays = $userMandays->total_mandays;
+                        break;
+                    }
+                }
+                $firstRow = true; // Reset the firstRow flag for a new user
+            }
+            
             // Print the user name if it is different from the last printed user name
             if ($row->user_timesheet !== $lastUser) {
-                $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->user_timesheet);
+                $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->name);
+                $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $totalMandays);
+                $sheet->setCellValueByColumnAndRow(1, $startRow, $row->employee_id);
                 $lastUser = $row->user_timesheet;
             }
+            
             $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
             $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
             $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays);
+            
             if ($row->workhours !== $lastWorkhours) {
                 $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours');
                 $lastWorkhours = $row->workhours;
             }
-            $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $monthName.' - '.$yearNum);
+            
+            
             $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
-        
+            
             $startRow++;
+            $firstRow = false; // Set the firstRow flag to false after the first row for each user
         }
         
+
 
 
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');

@@ -14,4 +14,12 @@ class Timesheet_detail extends Model
     public function workflow(){
     	return $this->belongsTo('App\Models\Timesheet_workflow');
     }
+
+    public function user(){
+    	return $this->belongsTo('App\Models\User', 'user_timesheet', 'id');
+    }
+
+    public function project_assignment_user(){
+    	return $this->belongsTo('App\Models\Project_assignment_user');
+    }
 }
