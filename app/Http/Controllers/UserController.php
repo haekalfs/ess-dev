@@ -160,11 +160,13 @@ class UserController extends Controller
             ]);
             
             $user = User::find($id);
+            $user->id = $request->usr_id;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->save();
 
             $user_detail = Users_detail::where('user_id',$id)->first();
+            $user_detail->user_id = $request->usr_id;
             $user_detail->status_active = $request->status;
             $user_detail->department_id = $request->department;
             $user_detail->position_id = $request->position;
