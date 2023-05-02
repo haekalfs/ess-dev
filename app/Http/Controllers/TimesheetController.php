@@ -410,6 +410,10 @@ class TimesheetController extends Controller
         // Get the Timesheet records between the start and end dates
         $tsOfTheMonth = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
 
+        if ($tsOfTheMonth->isEmpty()) {
+            Session::flash('failed', "You have to fill your timesheet first!");
+            return redirect(url()->previous());
+        }
         $total_work_hours = 0;
         foreach($tsOfTheMonth as $sum){
             $start_time = strtotime($sum->ts_from_time);

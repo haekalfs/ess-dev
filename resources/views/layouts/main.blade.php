@@ -268,8 +268,7 @@
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
                         <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>User Access Controller (UAC)</i></a>
                         <h6 class="collapse-header">Master Data:</h6>
-                        <a class="collapse-item" href="/manage/users">List Employees</a>
-                        <a class="collapse-item" href="/development">List Consultant</a>
+                        <a class="collapse-item" href="/manage/list/employees">Employees Database</a>
                     </div>
                 </div>
             </li>
@@ -289,6 +288,7 @@
                         <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
                         <a class="collapse-item" href="/development">A2. Exit Clearance</a>
                         <a class="collapse-item" href="/development">A3. Vendor List</a>
+                        <a class="collapse-item" href="/development">A4. News Feed</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>

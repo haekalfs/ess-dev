@@ -132,13 +132,15 @@ active
                 <div class="card shadow mb-4">
                     <!-- Card Header - Dropdown -->
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">MyProjects Assignment</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">MyProjects</h6>
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
-                        @foreach($assignment as $assign)
-                        <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name}}</li>
-                        @endforeach
+                        @forelse($assignment as $assign)
+                            <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name }}</li>
+                        @empty
+                            <a><small><i>No Project Assigned</i></small></a>
+                        @endforelse
                         {{-- <small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small> --}}
                     </div>
                 </div>
