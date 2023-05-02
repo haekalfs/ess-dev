@@ -24,7 +24,7 @@ class UserController extends Controller
     {
         $dep_data = Department::all();
         $pos_data = Position::all();
-        $latestForm = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('employee_id')->first();
+        $latestForm = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('employee_id')->max();
         $nextEmpID = $latestForm + 1;
     	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID]);
     }
@@ -34,7 +34,7 @@ class UserController extends Controller
     	$this->validate($request,[
             'name' => 'required',
             'password' => 'required',
-            'usr_id' => 'required',
+            'usr_id' => 'required|unique:users,id',
             'email' => 'required',
             'status' => 'required',
             'employee_status' => 'required',
