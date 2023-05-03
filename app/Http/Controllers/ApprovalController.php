@@ -353,13 +353,16 @@ class ApprovalController extends Controller
     public function reject_director($user_timesheet,$year,$month)
     {
         date_default_timezone_set("Asia/Jakarta");
-        $activities = Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
-        ->where('ts_user_id', "haekals")
+        Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+        ->where('ts_user_id', $user_timesheet)
         ->update(['ts_status_id' => '404']);
-        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'month_periode' => $year.$month],['activity' => 'Approved', 'ts_status_id' => '404', 'note' => '', 'user_timesheet' => $user_timesheet]);
+
+        // Timesheet_detail::where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->delete();
+        // Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
-        Session::flash('warning',"You rejected $user_timesheet $yearA - $monthA timereport!");
+        Session::flash('failed',"You rejected $user_timesheet #$yearA - $monthA timereport!");
         return redirect()->back();
     }
 
@@ -442,6 +445,6 @@ class ApprovalController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month','info', 'id'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
 	}
 }

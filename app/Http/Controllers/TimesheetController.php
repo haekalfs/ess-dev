@@ -485,6 +485,26 @@ class TimesheetController extends Controller
     	return $pdf->download('timesheet - '. $year . $month.'.pdf');
     }
 
+    public function print_selected($year, $month, $user_timesheet)
+    {
+    	// Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        $user_info = User::find(Auth::user()->id);
+
+        $user_info_details = Users_detail::where('user_id', $user_timesheet)->first();
+        $user_info_emp_id = $user_info_details->employee_id;
+        // Get the Timesheet records between the start and end dates
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', $user_timesheet)->orderBy('ts_date', 'asc')->get();
+ 
+    	$pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'),['timesheet' => $activities,  'user_info' => $user_info,]);
+    	return $pdf->download('timesheet #'.$user_timesheet . '-' . $year . $month.'.pdf');
+    }
+
     public function getActivitiesEntry($year, $month, $id)
     {
         // Use the $year, $month, and $id parameters to fetch data from your database or other data source

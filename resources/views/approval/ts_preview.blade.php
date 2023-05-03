@@ -121,8 +121,10 @@ active
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Timesheet Preview</h6>
+        <div class="text-right">
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}/{{$id}}" id="manButton">Download</a>
+        </div>
     </div>
-    <!-- Card Body -->
     <div class="card-body">
         <div class="table-responsive zoom90 table-sm">
             <table class="table table-bordered" id="tsPreview" width="100%" cellspacing="0">
