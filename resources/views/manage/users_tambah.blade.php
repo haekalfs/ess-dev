@@ -60,7 +60,7 @@ active
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="password">User ID :</label>
-                                <input class="form-control flex" name="usr_id" placeholder="User ID..." style="width: 95%"/>
+                                <input class="form-control flex" name="usr_id" placeholder="User ID..."/>
                                 @if($errors->has('usr_id'))
                                     <div class="text-danger">
                                         {{ $errors->first('usr_id')}}
@@ -73,7 +73,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Email :</label>
-                                    <input class="form-control" name="email" placeholder="Email..." style="width: 95%"/>
+                                    <input class="form-control" name="email" placeholder="Email..." />
                                     @if($errors->has('email'))
                                         <div class="text-danger">
                                             {{ $errors->first('email')}}
@@ -84,7 +84,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Password :</label>
-                                    <input class="form-control" name="password" value="" placeholder="****" style="width: 95%"/>
+                                    <input class="form-control" name="password" value="" placeholder="****"/>
                                 </div>
                             </div>
                         </div>
@@ -107,7 +107,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="comment">Position :</label>
-                                    <select class="form-control " id="position" name="position"  style="width: 95%">
+                                    <select class="form-control " id="position" name="position"  >
                                         <option selected disabled>Choose...</option>
                                         @foreach($pos_data as $pos)
                                         <option value="{{ $pos ->id }}">{{ $pos ->position_name }}</option>
@@ -118,7 +118,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Department :</label>
-                                    <select class="form-control " id="department" name="department"  style="width: 95%">
+                                    <select class="form-control " id="department" name="department"  >
                                         <option selected disabled>Choose...</option>
                                         @foreach($dep_data as $depart)
                                         <option value="{{ $depart ->id }}">{{ $depart ->department_name }}</option>
@@ -131,7 +131,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Status :</label>
-                                    <select class="form-control " name="status"  style="width: 95%">
+                                    <select class="form-control " name="status"  >
                                         <option selected disabled>Choose...</option>
                                         <option value="Active">Active</option>
                                         <option value="nonActive">Non Active</option>
@@ -142,8 +142,9 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Employement Status :</label>
-                                    <select class="form-control " name="employee_status" style="width: 95%">
+                                    <select class="form-control " name="employee_status" >
                                         <option selected disabled>Choose...</option> 
+                                        <option value="Freelance">Freelance</option>
                                         <option value="Probation">Probation</option>
                                         <option value="Contract">Contract</option>
                                         <option value="Permanent">Permanent</option>
@@ -155,7 +156,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Hired Date :</label>
-                                    <input class="form-control" type="date" style="width: 95%" name="hired_date" id="hired_date" value="" />
+                                    <input class="form-control" type="date"  name="hired_date" id="hired_date" value="" />
                                     @if($errors->has('hired_date'))
                                         <div class="text-danger">
                                             {{ $errors->first('hired_date')}}
@@ -167,7 +168,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Resignation Date :</label>
-                                    <input class="form-control" type="date" style="width: 95%" name="resignation_date" id="resignation_date" value="" />
+                                    <input class="form-control" type="date"  name="resignation_date" id="resignation_date" value="" />
                                     @if($errors->has('resignation_date'))
                                         <div class="text-danger">
                                             {{ $errors->first('resignation_date')}}
@@ -269,7 +270,7 @@ active
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="password">Merital Status :</label>
+                                    <label for="password">Marital Status :</label>
                                     <select class="form-control " name="usr_merital_status">
                                         <option selected disabled>Choose...</option>
                                         <option value="S">Single</option>
@@ -338,7 +339,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">City :</label>
-                                    <input class="form-control"   name="usr_address_city" placeholder="Addres City...">
+                                    <input class="form-control"   name="usr_address_city" placeholder="Address City...">
                                     @if($errors->has('usr_address_city'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_address_city')}}
@@ -398,7 +399,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="comment">NPWP :</label>
-                                    <input class="form-control" type="text" name="usr_npwp" placeholder="NPWP Number..." style="width: 95%">
+                                    <input class="form-control" type="text" name="usr_npwp" placeholder="NPWP Number..." >
                                     @if($errors->has('usr_npwp'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_npwp')}}
@@ -422,7 +423,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Identity Type :</label>
-                                    <select class="form-control " name="usr_id_type" style="width: 95%">
+                                    <select class="form-control " name="usr_id_type" >
                                         <option selected disabled>Choose...</option>
                                         <option value="KTP">KTP</option>
                                         <option value="SIM">SIM</option>
@@ -452,7 +453,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Identity No :</label>
-                                    <input class="form-control" type="text"   name="usr_id_no" placeholder="Number Identity..." style="width: 95%">
+                                    <input class="form-control" type="text"   name="usr_id_no" placeholder="Number Identity..." >
                                     @if($errors->has('usr_id_no'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_id_no')}}
@@ -475,7 +476,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Identity Expiration :</label>
-                                    <input class="form-control" type="text"   name="usr_id_expiration" placeholder="User Identity Expiration..." style="width: 95%">
+                                    <input class="form-control" type="text"   name="usr_id_expiration" placeholder="User Identity Expiration..." >
                                     @if($errors->has('usr_id_expiration'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_id_expiration')}}
@@ -547,7 +548,7 @@ active
                                     <tbody>
                                         <tr class="table-sm">
                                             <td>Employee ID</td>
-                                            <td><input class="form-control"  name="employee_id" placeholder="Employee ID..." style="width: 95%" value="{{ $nextEmpID }}"readonly/>
+                                            <td><input class="form-control"  name="employee_id" placeholder="Employee ID..."  value="{{ $nextEmpID }}"readonly/>
                                             @if($errors->has('employee_id'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('employee_id')}}
@@ -557,7 +558,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>User ID</td>
-                                            <td><input class="form-control flex" name="usr_id" placeholder="User ID..." style="width: 95%"/>
+                                            <td><input class="form-control flex" name="usr_id" placeholder="User ID..." />
                                                 @if($errors->has('usr_id'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_id')}}
@@ -567,7 +568,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>Email</td>
-                                            <td><input class="form-control" name="email" placeholder="Email..." style="width: 95%"/>
+                                            <td><input class="form-control" name="email" placeholder="Email..." />
                                                 @if($errors->has('email'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('email')}}
@@ -577,7 +578,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>Password</td>
-                                            <td><input class="form-control" name="password" value="" placeholder="****" style="width: 95%"/>
+                                            <td><input class="form-control" name="password" value="" placeholder="****" />
                                             </td>
                                         </tr>
                                     </tbody>
@@ -763,7 +764,7 @@ active
                                     <tr class="table-sm">
                                         <td>Department</td>
                                         <td>
-                                            <select class="form-control " id="department" name="department"  style="width: 95%">
+                                            <select class="form-control " id="department" name="department"  >
                                                 <option selected disabled>Choose...</option>
                                                 @foreach($dep_data as $depart)
                                                 <option value="{{ $depart ->id }}">{{ $depart ->department_name }}</option>
@@ -774,7 +775,7 @@ active
                                     <tr class="table-sm">
                                         <td>Position</td>
                                         <td>
-                                            <select class="form-control " id="position" name="position"  style="width: 95%">
+                                            <select class="form-control " id="position" name="position"  >
                                                 <option selected disabled>Choose...</option>
                                                 @foreach($pos_data as $pos)
                                                 <option value="{{ $pos ->id }}">{{ $pos ->position_name }}</option>
@@ -784,7 +785,7 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Status Active</td>
-                                            <td><select class="form-control " name="status"  style="width: 95%">
+                                            <td><select class="form-control " name="status"  >
                                                 <option selected disabled>Choose...</option>
                                                 <option value="Active">Active</option>
                                                 <option value="nonActive">Non Active</option>
@@ -793,7 +794,7 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td>Employee Status</td>
-                                        <td><select class="form-control " name="employee_status" style="width: 95%">
+                                        <td><select class="form-control " name="employee_status" >
                                                 <option selected disabled>Choose...</option> 
                                                 <option value="Probation">Probation</option>
                                                 <option value="Contract">Contract</option>
@@ -804,7 +805,7 @@ active
                                     <tr class="table-sm">
                                         <td>Hired Date</td>
                                         <td>
-                                            <input class="form-control" type="date" style="width: 95%" name="hired_date" id="hired_date" value="" />
+                                            <input class="form-control" type="date"  name="hired_date" id="hired_date" value="" />
                                             @if($errors->has('hired_date'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('hired_date')}}
@@ -815,7 +816,7 @@ active
                                     <tr class="table-sm">
                                     <td>Resign Date</td>
                                         <td>
-                                            <input class="form-control" type="date" style="width: 95%" name="resignation_date" id="resignation_date" value="" />
+                                            <input class="form-control" type="date"  name="resignation_date" id="resignation_date" value="" />
                                             @if($errors->has('resignation_date'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('resignation_date')}}
@@ -832,7 +833,7 @@ active
                                     <tbody>
                                         <tr class="table-sm">
                                             <td>NPWP</td>
-                                            <td><input class="form-control" type="text" name="usr_npwp" placeholder="NPWP Number..." style="width: 95%">
+                                            <td><input class="form-control" type="text" name="usr_npwp" placeholder="NPWP Number..." >
                                                 @if($errors->has('usr_npwp'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_npwp')}}
@@ -843,7 +844,7 @@ active
                                         <tr class="table-sm">
                                             <td>Identity Type</td>
                                             <td>
-                                                <select class="form-control " name="usr_id_type" style="width: 95%">
+                                                <select class="form-control " name="usr_id_type" >
                                                     <option selected disabled>Choose...</option>
                                                     <option value="KTP">KTP</option>
                                                     <option value="SIM">SIM</option>
@@ -858,7 +859,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>Identity No</td>
-                                            <td><input class="form-control" type="text"   name="usr_id_no" placeholder="Number Identity..." style="width: 95%">
+                                            <td><input class="form-control" type="text"   name="usr_id_no" placeholder="Number Identity..." >
                                                 @if($errors->has('usr_id_no'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_id_no')}}
@@ -868,7 +869,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td>Identity Expiration</td>
-                                            <td><input class="form-control" type="text"   name="usr_id_expiration" placeholder="User Identity Expiration..." style="width: 95%">
+                                            <td><input class="form-control" type="text"   name="usr_id_expiration" placeholder="User Identity Expiration..." >
                                                 @if($errors->has('usr_id_expiration'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('usr_id_expiration')}}

@@ -45,7 +45,7 @@ active
     </div>
     <!-- Card Body -->
     <div class="card-body">
-        <table class="table table-bordered table-hover text-center" id="dataTableUser">
+        <table class="table table-bordered table-hover" id="dataTableUser">
             <thead>
                 <tr style="font-size: 13px">
                     <th>Emp ID</th>
@@ -68,7 +68,7 @@ active
                     <td>{{$p->users_detail->employee_status}}</td>
                     <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
                     <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
-                    <td class="row-cols-2 justify-content-betwen text-center">
+                    <td class="row-cols-2 justify-content-betwen ">
                         <a href="/users/edit/{{ $p->id }}" title="Edit" class="btn btn-primary btn-sm" >
                             <i class="fas fa-fw fa-edit justify-content-center"></i>
                         </a>
