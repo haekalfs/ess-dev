@@ -34,7 +34,7 @@ class UserController extends Controller
     	$this->validate($request,[
             'name' => 'required',
             'password' => 'required',
-            'usr_id' => 'required|unique:users,id',
+            'usr_id' => ['required','unique:users,id','regex:/^[a-z0-9]+$/'],
             'email' => 'required',
             'status' => 'required',
             'employee_status' => 'required',

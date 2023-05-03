@@ -37,7 +37,8 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">Database</h6>
         <div class="text-right">
-            <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton"><i class="fas fa-download fa-sm text-white-50"></i> Export Selected</button>
+            <button class="btn @role('freelancer') btn-success @else btn-danger @endrole btn-sm" type="button" id="manButton"><i class="fas fa-sort fa-sm text-white-50"></i> Sort by Consultant</button>
+            <button class="btn @role('freelancer') btn-primary @else btn-success @endrole btn-sm" type="button" id="manButton"><i class="fas fa-download fa-sm text-white-50"></i> Export Selected</button>
         </div>
     </div>
     <div class="card-body">

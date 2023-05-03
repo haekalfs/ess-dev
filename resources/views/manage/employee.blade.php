@@ -35,7 +35,7 @@ active
     </div>
     <!-- Card Body -->
     <div class="card-body">
-        <table class="table table-bordered table-hover text-center" id="dataTableUser">
+        <table class="table table-bordered table-hover" id="dataTableUser">
             <thead>
                 <tr style="font-size: 13px">
                     <th>Emp ID</th>
