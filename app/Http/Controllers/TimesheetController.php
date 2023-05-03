@@ -494,7 +494,7 @@ class TimesheetController extends Controller
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
-        $user_info = User::find(Auth::user()->id);
+        $user_info = User::find($user_timesheet);
 
         $user_info_details = Users_detail::where('user_id', $user_timesheet)->first();
         $user_info_emp_id = $user_info_details->employee_id;
