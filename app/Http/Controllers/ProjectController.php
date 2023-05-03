@@ -59,10 +59,10 @@ class ProjectController extends Controller
             'notes' => 'sometimes'
     	]);
 
-        $uniqueIdP = hexdec(substr(uniqid(), 0, 6));
+        $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
 
         while (Project_assignment::where('id', $uniqueIdP)->exists()) {
-            $uniqueIdP = hexdec(substr(uniqid(), 0, 6));
+            $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
         }
 
         Project_assignment::create([
@@ -82,6 +82,7 @@ class ProjectController extends Controller
 
     public function project_assignment_member($assignment_id)
     {
+        Project_assignment_user::where('id', )->count();
         $assignment = DB::table('project_assignments')
             ->join('company_projects', 'project_assignments.company_project_id', '=', 'company_projects.id')
             // ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
@@ -91,13 +92,20 @@ class ProjectController extends Controller
         // var_dump($assignment);
         foreach ($assignment as $as){
             $project = Client::where('id', $as->client_id)->first();
+            if ($as->approval_status == 40){
+                $status = "Waiting for Approval";
+            } elseif($as->approval_status == 29) {
+                $status = 1;
+            } else {
+                $status = "Unknown Status";
+            }
         }
         // $projects = $project->client->client_name;
         // var_dump($project);
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
-        return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
+        return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'stat' => $status, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
     
     public function project_assignment_member_view($assignment_id)
@@ -126,6 +134,11 @@ class ProjectController extends Controller
 
     public function project_assignment_member_delete($usr_id)
     {
+        $pau = Project_assignment_user::where('id', $usr_id)->pluck('project_assignment_id')->first();
+        $paun = Project_assignment_user::where('id', $usr_id)->pluck('user_id')->first();
+
+        $checkTotal = Project_assignment::where('id', $pau)->count();
+
         Project_assignment_user::where('id', $usr_id)->delete();
         return redirect()->back()->with('failed', 'Member deleted!');
     }
