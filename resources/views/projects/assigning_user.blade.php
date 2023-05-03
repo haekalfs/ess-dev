@@ -145,8 +145,8 @@ active
                             @foreach ($project_member as $usr)
                                 <tr>
                                     <td>{{ $row_number++ }}</td>
-                                    <td>{{ $usr->user_id }}</td>
-                                    <td>{{ $usr->role }}</td>
+                                    <td>{{ $usr->user->name }}</td>
+                                    <td>{{ $usr->project_role->role_name }}</td>
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>

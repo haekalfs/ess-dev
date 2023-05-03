@@ -360,6 +360,10 @@ class ApprovalController extends Controller
         // Timesheet_detail::where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->delete();
         // Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
+        Timesheet_detail::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+        ->where('ts_user_id', $user_timesheet)
+        ->update(['ts_status_id' => '29']);
+
         $yearA = substr($year, 4, 2);
         $monthA = substr($month, 0, 4);
         Session::flash('failed',"You rejected $user_timesheet #$yearA - $monthA timereport!");

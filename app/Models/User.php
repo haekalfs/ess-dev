@@ -54,6 +54,10 @@ class User extends Authenticatable
     	return $this->hasMany('App\Models\Usr_role');
     }
 
+    public function project_assignment_user(){
+    	return $this->hasMany('App\Models\Project_assignment_user');
+    }
+
     public function medical(){
     	return $this->belongsTo('App\Models\Medical');
     }
