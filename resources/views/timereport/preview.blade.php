@@ -145,7 +145,7 @@ active
                     @foreach($timesheet as $timesheets)
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
-                            <td>{{ date('j-M-Y', strtotime($timesheets->ts_date)) }}</td>
+                            <td>{{ date('d-m-Y', strtotime($timesheets->ts_date)) }}</td>
                             <td>{{ $timesheets->ts_task }}</td>
                             <td>{{ $timesheets->ts_location }}</td>
                             <td>{{ $timesheets->ts_activity }}</td>
