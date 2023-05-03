@@ -336,7 +336,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">City :</label>
-                                    <input class="form-control"   name="usr_address_city" placeholder="Addres City..." value="{{ $user->users_detail->usr_address_city }}"/>
+                                    <input class="form-control"   name="usr_address_city" placeholder="Address City..." value="{{ $user->users_detail->usr_address_city }}"/>
                                     @if($errors->has('usr_address_city'))
                                         <div class="text-danger">
                                             {{ $errors->first('usr_address_city')}}
