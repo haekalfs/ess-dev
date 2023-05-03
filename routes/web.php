@@ -43,7 +43,7 @@ Route::delete('/activities/all/{year}/{month}', 'TimesheetController@destroy_all
     //Preview
 Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview.timesheet')->middleware('auth');
 Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print')->middleware('auth');
-Route::get('/timesheet/entry/preview/print/{year}/{month}/{user_timesheet}', 'TimesheetController@print_selected')->middleware('auth');
+Route::get('/timesheet/approval/preview/print/{year}/{month}/{user_timesheet}', 'TimesheetController@print_selected')->middleware('auth');
     //submit
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
