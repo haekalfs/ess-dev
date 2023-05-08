@@ -71,7 +71,7 @@ active
     </div>
 </div>
 
-<div class="card shadow mb-4" style="display: none;">
+<div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center bg-info justify-content-between">
         <h6 class="m-0 font-weight-bold text-light" id="judul">Requested Assignment</h6>
         {{-- <div class="text-right">
