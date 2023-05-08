@@ -64,7 +64,7 @@ active
                     <tr>
                         <td>{{ $project->id }}</td>
                         <td>{{ $project->project_code}}</td>
-                        <td>{{ $project->project_name}}</td>
+                        <td><span class="long-text">{{ $project->project_name}}</span></td>
                         <td>{{ $project->client->client_name}}</td>
                         <td>{{ $project->periode_start}}</td>
                         <td>{{ $project->periode_end}}</td>
