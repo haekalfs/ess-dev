@@ -54,7 +54,7 @@ active
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-1 d-flex justify-content-center align-items-end">
+                    <div class="d-flex justify-content-center align-items-end">
                         <div class="form-group">
                             <input type="submit" class="btn btn-primary" value="Filter"/>
                         </div>
