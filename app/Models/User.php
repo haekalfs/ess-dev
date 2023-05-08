@@ -65,4 +65,8 @@ class User extends Authenticatable
     public function timesheet_detail(){
     	return $this->hasMany('App\Models\Timesheet_detail');
     }
+
+    public function requested_assignment(){
+    	return $this->hasMany('App\Models\Requested_assignment');
+    }
 }

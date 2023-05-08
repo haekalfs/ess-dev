@@ -173,6 +173,31 @@ class ApprovalController extends Controller
         return view('approval.timesheet_approval', ['approvals' => $approvals, 'button' => $button]);
     }
 
+    public function approve_pa_project($user_timesheet,$year,$month)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+
+        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
+        // Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->update(['ts_status_id' => '30', 'activity' => 'Approved']);
+        // var_dump($countRows);
+        foreach($countRows as $row) {
+            Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Approved', 'month_periode' => $row->month_periode, 'ts_status_id' => '30', 'RequestTo' => "pa", 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location, 'user_timesheet' => $row->user_timesheet],
+            ['ts_mandays' => $row->ts_mandays, 'roleAs' => $row->roleAs, 'date_submitted' => date('Y-m-d'), 'workhours' => $row->workhours, 'note' => '', 'ts_task_id' => $row->ts_task_id]);
+        }
+        foreach($countRows as $row) { ///test buat dihapus nnti karna double loops
+            Timesheet_detail::where('month_periode', $year.$month)
+            ->where('user_timesheet', $user_timesheet)
+            ->where('RequestTo', Auth::user()->id)
+            ->where('ts_task_id', $row->ts_task_id)
+            ->update(['ts_status_id' => '30']);
+        }
+
+        $yearA = substr($year, 4, 2);
+        $monthA = substr($month, 0, 4);
+        Session::flash('success',"You approved $user_timesheet $yearA - $monthA timereport!");
+        return redirect()->back();
+    }
+
     public function approve_pm($user_timesheet,$year,$month)
     {
         date_default_timezone_set("Asia/Jakarta");

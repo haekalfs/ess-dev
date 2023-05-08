@@ -191,7 +191,7 @@ class TimesheetController extends Controller
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
-            ->where('project_assignment_users.periode_end', '>', date($year . '-' . $month . '-31'))
+            // ->where('project_assignment_users.periode_end', '>', date('Y-m-d'))
             ->where('project_assignments.approval_status', 29)
             ->get();
         $validStatusIDs = ['20', '29', '30', '40'];

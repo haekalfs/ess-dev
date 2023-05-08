@@ -9,10 +9,12 @@ use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;
 use App\Models\Project_role;
+use App\Models\Requested_assignment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
@@ -28,7 +30,11 @@ class ProjectController extends Controller
             ->where('project_assignment_users.user_id', '=', $userId)
             ->where('project_assignments.approval_status', 29)
             ->get();
-        return view('projects.myproject', ['records' => $records]);
+        $roles = Project_role::all();
+        $project = Company_project::all();
+
+        $myRequest = Requested_assignment::where('req_by', Auth::user()->id)->where('status', '0')->get();
+        return view('projects.myproject', ['records' => $records, 'usr_roles' => $roles, 'project' => $project, 'myRequest' => $myRequest]);
     }
 
     public function assigning($yearSelected = null)
@@ -134,12 +140,20 @@ class ProjectController extends Controller
 
     public function project_assignment_member_delete($usr_id)
     {
-        $pau = Project_assignment_user::where('id', $usr_id)->pluck('project_assignment_id')->first();
-        $paun = Project_assignment_user::where('id', $usr_id)->pluck('user_id')->first();
-
-        $checkTotal = Project_assignment::where('id', $pau)->count();
-
         Project_assignment_user::where('id', $usr_id)->delete();
+        return redirect()->back()->with('failed', 'Member deleted!');
+    }
+
+    public function project_assignment_member_delete_two($usr_id, $project_assignment_id)
+    {
+        $checkTotal = Project_assignment_user::where('project_assignment_id', $project_assignment_id)->count();
+        if ($checkTotal == 1) {
+            Project_assignment::where('id', $project_assignment_id)->delete();
+            Project_assignment_user::where('id', $usr_id)->delete();
+        } else {
+            Project_assignment_user::where('id', $usr_id)->delete();
+        }
+        
         return redirect()->back()->with('failed', 'Member deleted!');
     }
 
@@ -171,12 +185,6 @@ class ProjectController extends Controller
             'fromTime' => 'required',
             'toTime' => 'required'
     	]);
-
-        $uniqueId = hexdec(substr(uniqid(), 0, 8));
-
-        while (Project_assignment::where('id', $uniqueId)->exists()) {
-            $uniqueId = hexdec(substr(uniqid(), 0, 8));
-        }
 
         $company_code = Project_assignment::where('id', $assignment_id)->get();
         
@@ -380,5 +388,92 @@ class ProjectController extends Controller
         }
 
         return redirect('/project_list')->with('success', "Project Organization #$id has been deleted!");
+    }
+
+    public function requested_assignment()
+    {
+        $request = Requested_assignment::all();
+        return view('projects.requested_assignment', ['request' => $request]);
+    }
+    
+    public function requested_assignment_entry(Request $request)
+    {
+        $this->validate($request,[
+            'emp_name' => 'required',
+            'emp_role' => 'required',
+            'project' => 'required',
+    		'emp_resp' => 'required',
+            'fromTime' => 'required',
+            'toTime' => 'required'
+    	]);
+
+        Requested_assignment::create([
+    		'req_date' => date('Y-m-d'),
+    		'req_by' => $request->emp_name,
+            'role' => $request->emp_role,
+            'responsibility' => $request->emp_resp,
+            'company_project_id' => $request->project,
+            'periode_start' => $request->fromTime,
+            'periode_end' => $request->toTime,
+            'status' => 0
+    	]);
+
+        return redirect('/myprojects')->with('success', 'Assignment has been requested!');
+    }
+
+    public function requested_assignment_view($id)
+    {
+        $request = Requested_assignment::find($id);
+        return view('projects.requested_assignment_view', ['request' => $request]);
+    }
+
+    public function requested_assignment_approve($id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        Requested_assignment::where('id', $id)->update(['status' => '1']);
+
+        Session::flash('success',"You approved the assignment request!");
+        return redirect()->back();
+    }
+
+    public function add_project_assignment_from_request(Request $request, $id)
+    {
+        $this->validate($request,[
+            'no_doc' => 'required',
+    		'ref_doc' => 'sometimes',
+            'notes' => 'sometimes'
+    	]);
+
+        $requestAss = Requested_assignment::find($id);
+
+        $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
+
+        while (Project_assignment::where('id', $uniqueIdP)->exists()) {
+            $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
+        }
+
+        Project_assignment::create([
+            'id' => $uniqueIdP,
+    		'assignment_no' => $request->no_doc,
+    		'reference_doc' => $request->ref_doc,
+            'req_date' => date('Y-m-d'),
+            'req_by' => Auth::user()->id,
+            'task_id' => $uniqueIdP,
+            'company_project_id' => $requestAss->company_project_id,
+            'notes' => $request->notes,
+            'approval_status' => '40'
+    	]);
+
+        Project_assignment_user::create([
+    		'user_id' => $requestAss->req_by,
+    		'role' => $requestAss->role,
+            'responsibility' => $requestAss->responsibility,
+            'periode_start' => $requestAss->periode_start,
+            'periode_end' => $requestAss->periode_end,
+            'project_assignment_id' => $uniqueIdP,
+            'company_project_id' => $requestAss->company_project_id
+    	]);
+
+        return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
     }
 }

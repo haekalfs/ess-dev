@@ -19,6 +19,10 @@ class Company_project extends Model
     public function project_assignment(){
     	return $this->hasMany('App\Models\Project_assignment');
     }
+
+    public function requested_assignment(){
+    	return $this->hasMany('App\Models\Requested_assignment');
+    }
     
     public function client(){
         return $this->belongsTo('App\Models\Client');

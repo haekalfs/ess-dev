@@ -94,6 +94,8 @@ Route::get('/project_list', 'ProjectController@project_list')->name('project-lis
 Route::get('/assignment/view/details/{id}', 'ProjectController@project_assignment_member_view')->name('project-assigning-view')->middleware('auth');
 Route::get('/assignment/member/delete/{id}', 'ProjectController@project_assignment_member_delete')->name('project-assigning-delete')->middleware('auth');
 
+Route::get('/project_list/delete/assignment/member/{id}/{project_assignment_id}', 'ProjectController@project_assignment_member_delete_two')->name('project-assigning-delete-two')->middleware('auth');
+
 Route::delete('/assignment/delete/{id}', 'ProjectController@project_assignment_delete')->name('project-assignment-delete')->middleware('auth');
 Route::post('/client/create', 'ProjectController@create_new_client')->middleware('auth')->name('insert.new.client');
 Route::get('/retrieveClients', 'ProjectController@getClientsRows')->name('client-list')->middleware('auth');
@@ -108,6 +110,12 @@ Route::delete('/project_list/delete/{id}', 'ProjectController@project_delete')->
 Route::get('/retrieveProjectRoles', 'ProjectController@listProjectRoles')->name('list-project-roles')->middleware('auth');
 Route::post('/projectRole/create', 'ProjectController@create_new_project_roles')->middleware('auth')->name('insert.new.role');
 Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delete_project_role')->name('role-delete')->middleware('auth');
+
+Route::get('/assignment/requested/by/user', 'ProjectController@requested_assignment')->name('myproject')->middleware('auth');
+Route::post('/assignment/request/', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');
+Route::get('/assignment/requested/by/user/view/{id}', 'ProjectController@requested_assignment_view')->middleware('auth');
+Route::get('/assignment/requested/by/user/approve/{id}', 'ProjectController@requested_assignment_approve')->middleware('auth');
+Route::post('/assignment/add_entries/based_on/request/{id}', 'ProjectController@add_project_assignment_from_request')->middleware('auth');
 
 //manage users
 Route::get('/manage/users', 'UserController@index')->middleware('auth')->middleware(['checkRole:admin,manager']);
