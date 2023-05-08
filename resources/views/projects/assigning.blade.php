@@ -63,7 +63,7 @@ active
                     <tr>
                         <td>{{ $assign->req_date }}</td>
                         <td>{{ $assign->assignment_no }}</td>
-                        <td><span class="">{{ $assign->project_name }}</span></td>
+                        <td><span class="long-text">{{ $assign->project_name }}</span></td>
                         <td>@if($assign->approval_status == 40)
                             <span class="m-0 font-weight-bold text-danger">Waiting for Approval Service Diretor</span>
                             @elseif($assign->approval_status == 29) 
