@@ -436,44 +436,44 @@ class ProjectController extends Controller
         return redirect()->back();
     }
 
-    // public function add_project_assignment_from_request(Request $request, $id)
-    // {
-    //     $this->validate($request,[
-    //         'no_doc' => 'required',
-    // 		'ref_doc' => 'sometimes',
-    //         'notes' => 'sometimes'
-    // 	]);
+    public function add_project_assignment_from_request(Request $request, $id)
+    {
+        $this->validate($request,[
+            'no_doc' => 'required',
+    		'ref_doc' => 'sometimes',
+            'notes' => 'sometimes'
+    	]);
 
-    //     $requestAss = Requested_assignment::find($id);
+        $requestAss = Requested_assignment::find($id);
 
-    //     $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
+        $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
 
-    //     while (Project_assignment::where('id', $uniqueIdP)->exists()) {
-    //         $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
-    //     }
+        while (Project_assignment::where('id', $uniqueIdP)->exists()) {
+            $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
+        }
 
-    //     Project_assignment::create([
-    //         'id' => $uniqueIdP,
-    // 		'assignment_no' => $request->no_doc,
-    // 		'reference_doc' => $request->ref_doc,
-    //         'req_date' => date('Y-m-d'),
-    //         'req_by' => Auth::user()->id,
-    //         'task_id' => $uniqueIdP,
-    //         'company_project_id' => $requestAss->company_project_id,
-    //         'notes' => $request->notes,
-    //         'approval_status' => '40'
-    // 	]);
+        Project_assignment::create([
+            'id' => $uniqueIdP,
+    		'assignment_no' => $request->no_doc,
+    		'reference_doc' => $request->ref_doc,
+            'req_date' => date('Y-m-d'),
+            'req_by' => Auth::user()->id,
+            'task_id' => $uniqueIdP,
+            'company_project_id' => $requestAss->company_project_id,
+            'notes' => $request->notes,
+            'approval_status' => '40'
+    	]);
 
-    //     Project_assignment_user::create([
-    // 		'user_id' => $requestAss->req_by,
-    // 		'role' => $requestAss->role,
-    //         'responsibility' => $requestAss->responsibility,
-    //         'periode_start' => $requestAss->periode_start,
-    //         'periode_end' => $requestAss->periode_end,
-    //         'project_assignment_id' => $uniqueIdP,
-    //         'company_project_id' => $requestAss->company_project_id
-    // 	]);
+        Project_assignment_user::create([
+    		'user_id' => $requestAss->req_by,
+    		'role' => $requestAss->role,
+            'responsibility' => $requestAss->responsibility,
+            'periode_start' => $requestAss->periode_start,
+            'periode_end' => $requestAss->periode_end,
+            'project_assignment_id' => $uniqueIdP,
+            'company_project_id' => $requestAss->company_project_id
+    	]);
 
-    //     return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
-    // }
+        return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
+    }
 }

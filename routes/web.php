@@ -112,7 +112,7 @@ Route::post('/projectRole/create', 'ProjectController@create_new_project_roles')
 Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delete_project_role')->name('role-delete')->middleware('auth');
 
 Route::get('/assignment/requested/by/user', 'ProjectController@requested_assignment')->name('myproject')->middleware('auth');
-Route::post('/assignment/request/', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');
+Route::post('/assignment/request', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');
 Route::get('/assignment/requested/by/user/view/{id}', 'ProjectController@requested_assignment_view')->middleware('auth');
 Route::get('/assignment/requested/by/user/approve/{id}', 'ProjectController@requested_assignment_approve')->middleware('auth');
 Route::post('/assignment/add_entries/based_on/request/{id}', 'ProjectController@add_project_assignment_from_request')->middleware('auth');
