@@ -39,16 +39,23 @@ class ApprovalProjectController extends Controller
             $project = Client::where('id', $as->client_id)->first();
             if ($as->approval_status == 40){
                 $status = "Waiting for Approval";
+                $btnApprove = '<div class="col-auto">
+                    <a href="/approval/project/assignment/approve/' . $assignment_id . '" class="btn btn-primary btn-sm">
+                        <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Approve
+                    </a>
+                </div>';
             } elseif($as->approval_status == 29) {
                 $status = "Approved";
+                $btnApprove = "";
             } else {
                 $status = "Unknown Status";
+                $btnApprove = "";
             }
         }
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
-        return view('projects.assignment_view_only', ['assignment' => $assignment, 'stat' => $status, 'project' => $project, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
+        return view('approval.assignment_preview', ['btnApprove' => $btnApprove,'assignment' => $assignment, 'stat' => $status, 'project' => $project, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
 
     public function approve_assignment($assignment_id)

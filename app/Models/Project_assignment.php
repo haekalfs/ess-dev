@@ -24,4 +24,9 @@ class Project_assignment extends Model
     public function company_project(){
     	return $this->belongsTo('App\Models\Company_project');
     }
+
+    public function projectAssignment()
+    {
+        return $this->belongsTo(Project_assignment::class, 'company_project_id');
+    }
 }

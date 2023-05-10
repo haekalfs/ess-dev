@@ -197,7 +197,7 @@ active
                             <th>Username</th>
                             <th>Activity</th>
                             <th>Status</th>
-                            <th>Updated at</th>
+                            <th>Approver</th>
                             <th>Notes</th>
                     </thead>
                     <tbody>
@@ -206,7 +206,7 @@ active
                             <td>{{ $workflows->user_id }}</td>
                             <td><span class="shorter-text">{{ $workflows->ts_task }}</span></td>
                             <td>{{ $workflows->activity }}</td>
-                            <td>{{ $workflows->created_at->format('d-m-Y') }}</td>
+                            <td>{{ $workflows->RequestTo }}</td>
                             <td>{{ $workflows->note }}</td>
                         </tr>
                         @endforeach
