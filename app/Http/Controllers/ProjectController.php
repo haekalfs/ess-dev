@@ -398,7 +398,7 @@ class ProjectController extends Controller
     
     public function requested_assignment_entry(Request $request)
     {
-        $this->validate($request,[
+        $validator = Validator::make($request->all(), [
             'emp_name' => 'required',
             'emp_role' => 'required',
             'project' => 'required',

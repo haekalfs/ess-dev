@@ -445,7 +445,7 @@ class TimesheetController extends Controller
                 $test = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $row->ts_task_id)->pluck('user_id')->first();
                 $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
                 if($test == NULL){
-                    $straighToPA = 'pa';
+                    $straighToPA = Project_assignment_user::where('role', "PA")->where('project_assignment_id', $row->ts_task_id)->pluck('user_id')->first();
                     Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $straighToPA, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
                 ['ts_mandays' => $row->total_rows, 'roleAs' => $checkRole, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '30', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
                 } else {
