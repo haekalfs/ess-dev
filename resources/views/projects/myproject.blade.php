@@ -10,7 +10,7 @@ active
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">MyProjects</h1>
-    <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Request Assignment</a>
+    <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Request Assignment</a>
 </div>
 
 @if ($message = Session::get('success'))
@@ -34,8 +34,8 @@ active
 </div>
 @endif
 <div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">My Projects</h6>
+    <div class="card-header py-3 d-flex flex-row align-items-center bg-primary justify-content-between">
+        <h6 class="m-0 font-weight-bold text-light" id="judul">Active Projects</h6>
         {{-- <div class="text-right">
             <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
         </div> --}}
@@ -70,6 +70,48 @@ active
         </div>
     </div>
 </div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center bg-info justify-content-between">
+        <h6 class="m-0 font-weight-bold text-light" id="judul">Requested Assignment</h6>
+        {{-- <div class="text-right">
+            <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
+        </div> --}}
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered zoom90" id="dataTableRoles" width="100%" cellspacing="0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Request Date</th>
+                        <th>Project</th>
+                        <th>Periode Start</th>
+                        <th>Periode End</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($myRequest as $record)
+                    <tr>
+                        <td>{{ $record->req_date }}</td>
+                        <td>{{ $record->company_project->project_name }}</td>
+                        <td>{{ $record->periode_start }}</td>
+                        <td>{{ $record->periode_end }}</td>
+                        <td>
+                            @if($record->status == 0)
+                            <a style='font-size: small;'><i class='fas fa-fw fa-spinner'></i></a>
+                            @else
+                            <a style='font-size: small;'><i class='fas fa-fw fa-check'></i></a>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="addMem" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
@@ -79,7 +121,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/assignment/add_member_to_assignment/" method="post">
+			<form action="/assignment/request/" method="post">
                 @csrf
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
@@ -89,16 +131,27 @@ active
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="email">Employee Name :</label>
-                                            <select class="form-control" id="update_location" name="emp_name" required>
-                                                
+                                            <input class="form-control" name="emp_name" readonly hidden value="{{ Auth::user()->id }}">
+                                            <input class="form-control" name="emp_name_placeholder" readonly required value="{{ Auth::user()->name }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="password">Project :</label>
+                                            <select class="form-control" name="project" required>
+                                                    @foreach($project as $company_project)
+                                                    <option value="{{$company_project->id}}">{{ $company_project->project_name}}</option>
+                                                    @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Role :</label>
-                                            <select class="form-control" id="update_location" name="emp_role" required>
-                                                
+                                            <select class="form-control" name="emp_role" required>
+                                                @foreach($usr_roles as $roles)
+                                                <option value="{{$roles->role_code}}">{{ $roles->role_name}}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>

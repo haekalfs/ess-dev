@@ -106,6 +106,7 @@ active
                                 <th>Responsibility</th>
                                 <th>Periode Start</th>
                                 <th>Periode End</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,11 +116,12 @@ active
                             @foreach ($project_member as $usr)
                                 <tr>
                                     <td>{{ $row_number++ }}</td>
-                                    <td>{{ $usr->user_id }}</td>
-                                    <td>{{ $usr->role }}</td>
+                                    <td>{{ $usr->user->name }}</td>
+                                    <td>{{ $usr->project_role->role_name }}</td>
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
+                                    <td class="text-center"><a href="#" onclick='isconfirm();'class="btn btn-primary btn-sm" ><i class='fas fa-fw fa-edit'></i> Edit</a> <a href="/project_list/delete/assignment/member/{{ $usr->id }}/{{ $usr->project_assignment_id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a></td>
                                 </tr>
                             @endforeach
                         </tbody>

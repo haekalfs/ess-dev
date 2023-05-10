@@ -238,7 +238,7 @@
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
                         <a class="collapse-item" href="/assignment">Project Assignment</a>
                         <a class="collapse-item" href="/project_list">Project Organization</a>
-                        <a class="collapse-item" href="/development">Project Monitor</a>
+                        <a class="collapse-item" href="/assignment/requested/by/user">Requested Assignment</a>
                         @else
                         @endusr_acc
                     </div>

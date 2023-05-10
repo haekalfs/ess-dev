@@ -7,12 +7,13 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Project Assignment #{{ $assignment_id }}</h1>
+    @if($stat == 1)
+    @else
     <a href="#" onclick="deleteAssignment(event, {{$assignment_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-        <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Assignment
-    </a>
+        <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Assignment</a>
+    @endif
 </div>
 
 @if ($message = Session::get('success'))
@@ -119,9 +120,12 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Project Member</h6>
+                @if($stat == 1)
+                @else
                 <div class="text-right">
                     <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addMem" id="addMemModal">+ Add Member</a>
                 </div>
+                @endif
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -135,7 +139,10 @@ active
                                 <th>Responsibility</th>
                                 <th>Periode Start</th>
                                 <th>Periode End</th>
-                                <th width="80px">Action</th>
+                                @if($stat == 1)
+                                @else
+                                <th width="170px">Action</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -150,9 +157,13 @@ active
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
-                                    <td>
-                                      <a href="/assignment/member/delete/{{ $usr->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                    @if($stat == 1)
+                                    @else
+                                    <td class="text-center">
+                                        <a href="#" onclick='isconfirm();'class="btn btn-primary btn-sm" ><i class='fas fa-fw fa-edit'></i> Edit</a> 
+                                        <a href="/assignment/member/delete/{{ $usr->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
