@@ -124,6 +124,18 @@ Route::post('/users/store', 'UserController@store')->middleware('auth');
 Route::get('/users/edit/{id}', 'UserController@edit')->middleware('auth');
 Route::put('/users/update/{id}', 'UserController@update')->middleware('auth');
 Route::get('/users/hapus/{id}', 'UserController@delete')->middleware('auth');
+Route::post('/check-user-id', 
+function () {
+    $userId = request('usr_id');
+    $user = App\Models\User::where('id', $userId)->first();
+
+    if ($user) {
+        return response()->json(['exists' => true]);
+    } else {
+        return response()->json(['exists' => false]);
+    }
+});
+
 
 //list consul and employee
 Route::get('/manage/consultant', 'UserController@consultant')->middleware('auth')->middleware(['checkRole:admin,manager']);

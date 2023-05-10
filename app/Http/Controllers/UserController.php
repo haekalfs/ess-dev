@@ -42,13 +42,6 @@ class UserController extends Controller
             'department' => 'required',
             'hired_date'=> 'required',
             'employee_id'=> 'required',
-            'usr_address'=> 'required',
-            'current_address'=> 'required',
-            'usr_address_city'=> 'required',
-            'usr_address_postal'=> 'required',
-            'usr_phone_home'=> 'required',
-            'usr_phone_mobile'=> 'required',
-            'usr_npwp'=> 'required',
             'usr_id_type'=> 'required',
             'usr_id_no'=> 'required',
             'usr_id_expiration'=> 'required',
@@ -56,12 +49,6 @@ class UserController extends Controller
             'usr_birth_place'=> 'required',
             'usr_gender'=> 'required',
             'usr_religion'=> 'required',
-            'usr_merital_status'=> 'required',
-            'usr_children'=> 'required',
-            'usr_bank_name'=> 'required',
-            'usr_bank_branch'=> 'required',
-            'usr_bank_account'=> 'required',
-            'usr_bank_account_name'=> 'required'
             ]);
         
         $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
@@ -137,13 +124,6 @@ class UserController extends Controller
             'hired_date'=> 'required',
             'employee_id' => 'required',
             'employee_status' => 'required',
-            'usr_address'=> 'required',
-            'current_address'=> 'required',
-            'usr_address_city'=> 'required',
-            'usr_address_postal'=> 'required',
-            'usr_phone_home'=> 'required',
-            'usr_phone_mobile'=> 'required',
-            'usr_npwp'=> 'required',
             'usr_id_type'=> 'required',
             'usr_id_no'=> 'required',
             'usr_id_expiration'=> 'required',
@@ -151,12 +131,6 @@ class UserController extends Controller
             'usr_birth_place'=> 'required',
             'usr_gender'=> 'required',
             'usr_religion'=> 'required',
-            'usr_merital_status'=> 'required',
-            'usr_children'=> 'required',
-            'usr_bank_name'=> 'required',
-            'usr_bank_branch'=> 'required',
-            'usr_bank_account'=> 'required',
-            'usr_bank_account_name' => 'required'
             ]);
             
             $user = User::find($id);
