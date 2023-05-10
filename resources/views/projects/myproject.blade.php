@@ -72,7 +72,7 @@ active
 </div>
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center bg-info justify-content-between">
+    <div class="card-header py-3 d-flex flex-row align-items-center bg-dark justify-content-between">
         <h6 class="m-0 font-weight-bold text-light" id="judul">Requested Assignment</h6>
         {{-- <div class="text-right">
             <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>

@@ -7,12 +7,15 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
+
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Project Organization #{{ $project_id }}</h1>
-    <a href="#" onclick="deleteProject(event, {{$project_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-        <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Project
-    </a>
+    <div>
+        <a href="#" class="btn btn-primary btn-sm" ><i class='fas fa-fw fa-edit' style="margin-right: 10px;"></i> Edit</a>
+        <a href="#" onclick="deleteProject(event, {{$project_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
+            <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Project
+        </a>
+    </div>
 </div>
 
 @if ($message = Session::get('success'))
@@ -41,6 +44,9 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Project Information</h6>
+                {{-- <div class="text-right">
+                    <a href="#" class="btn btn-primary btn-sm" ><i class='fas fa-fw fa-edit'></i> Edit</a> 
+                </div> --}}
             </div>
                 <!-- Card Body -->
             <div class="card-body">
@@ -121,7 +127,7 @@ active
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
-                                    <td class="text-center"><a href="#" onclick='isconfirm();'class="btn btn-primary btn-sm" ><i class='fas fa-fw fa-edit'></i> Edit</a> <a href="/project_list/delete/assignment/member/{{ $usr->id }}/{{ $usr->project_assignment_id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a></td>
+                                    <td class="text-center"><a href="/project_list/delete/assignment/member/{{ $usr->id }}/{{ $usr->project_assignment_id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a></td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -51,7 +51,7 @@ active
                         <th>Periode Start</th>
                         <th>Periode End</th>
                         <th>Status</th>
-                        <th width='200px'>Action</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,7 +74,7 @@ active
                             <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/view/{{$record->id}}"><i class='fas fa-fw fa-eye'></i> View</a>
                             @else
                             <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/view/{{$record->id}}"><i class='fas fa-fw fa-eye'></i> View</a>
-                            <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/approve/{{$record->id}}"><i class='fas fa-fw fa-check'></i> Approve</a>
+                            <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/approve/{{$record->id}}"><i class='fas fa-fw fa-check'></i> Process</a>
                             @endif
                         </td>
                     </tr>
