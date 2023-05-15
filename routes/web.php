@@ -49,7 +49,7 @@ Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
 Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
-
+Route::get('/timesheet/summary/e', 'TimesheetController@summary')->name('summary')->middleware('auth');
 
 // Testing
 Route::get('/development', 'HomeController@notification_indev');
@@ -113,6 +113,9 @@ Route::delete('/project_list/delete/{id}', 'ProjectController@project_delete')->
 Route::get('/retrieveProjectRoles', 'ProjectController@listProjectRoles')->name('list-project-roles')->middleware('auth');
 Route::post('/projectRole/create', 'ProjectController@create_new_project_roles')->middleware('auth')->name('insert.new.role');
 Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delete_project_role')->name('role-delete')->middleware('auth');
+
+Route::get('/retrieveProjectData/{id}', 'ProjectController@retrieveProjectData')->middleware('auth');
+Route::put('/project_list/edit/save/{project}', 'ProjectController@updateProjectData')->middleware('auth');
 
 Route::get('/assignment/requested/by/user', 'ProjectController@requested_assignment')->name('myproject')->middleware('auth');
 Route::post('/assignment/request', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');

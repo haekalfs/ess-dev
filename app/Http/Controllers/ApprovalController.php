@@ -8,6 +8,7 @@ use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
+use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Usr_role;
@@ -50,12 +51,12 @@ class ApprovalController extends Controller
         $currentDay = date('j');
 
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 5 && $currentDay <= 12) {
+        if ($currentDay >= 5 && $currentDay <= 20) {
             $approvals = DB::table('timesheet_details')
                 ->select('*')
                 ->whereYear('date_submitted', $currentYear)
                 ->where('RequestTo', Auth::user()->id)
-                ->whereNotIn('ts_status_id', [29, 404])
+                ->whereNotIn('ts_status_id', [29, 404, 30])
                 ->groupBy('user_timesheet', 'month_periode')
                 ->get();
             return view('approval.timesheet_approval', ['approvals' => $approvals]);
@@ -71,13 +72,32 @@ class ApprovalController extends Controller
 
         $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
 
-        foreach($countRows as $row) { ///test buat dihapus nnti karna double loops
+        $timesheetApproversDir = Timesheet_approver::whereIn('id', [45, 40])->pluck('approver');
+        $checkUserDir = $timesheetApproversDir->toArray();
+        foreach ($countRows as $row) {
+            $tsStatusId = '30';
+            $activity = 'Approved';
+        
+            switch (true) {
+                case in_array(Auth::user()->id, $checkUserDir):
+                    $tsStatusId = '29';
+                    $activity = 'All Approved';
+                    break;
+                default:
+                    $tsStatusId = '30';
+                    break;
+            }
+        
             Timesheet_detail::where('month_periode', $year.$month)
-            ->where('user_timesheet', $user_timesheet)
-            ->where('RequestTo', Auth::user()->id)
-            ->where('ts_task_id', $row->ts_task_id)
-            ->update(['ts_status_id' => '29', 'activity' => 'Approved']);
-        }
+                ->where('user_timesheet', $user_timesheet)
+                ->where('RequestTo', Auth::user()->id)
+                ->where('ts_task_id', $row->ts_task_id)
+                ->update(['ts_status_id' => $tsStatusId, 'activity' => $activity]);
+
+            Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+                ->where('ts_user_id', $user_timesheet)
+                ->update(['ts_status_id' => $tsStatusId]);
+        }        
 
         Session::flash('success',"You approved $user_timesheet timereport!");
         return redirect()->back();
@@ -122,7 +142,6 @@ class ApprovalController extends Controller
 
         // var_dump($Year.intval($Month));
         $approvals = Timesheet_detail::where('ts_status_id', 29)
-            ->where('RequestTo', '-')
             ->groupBy('user_timesheet', 'ts_task');
 
         if ($validator->passes()) {
@@ -132,7 +151,7 @@ class ApprovalController extends Controller
             $approvals->where('month_periode', $Year.intval($Month));
         } else {
             $approvals->whereYear('date_submitted', $Year);
-            $approvals->where('month_periode', $Month);
+            $approvals->where('month_periode', $Year.intval($Month));
         }
 
         $approvals = $approvals->get();

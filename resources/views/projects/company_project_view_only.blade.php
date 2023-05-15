@@ -44,7 +44,7 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Project Information</h6>
                 <div class="text-right">
-                    <a data-toggle="modal" data-target="#editModal" data-project-id="{{ $project_id }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-edit"></i> Edit</a>
+                    <a data-toggle="modal" data-target="#editModal" data-project-id="{{ $project_id }}" class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-edit"></i> Edit</a>
                 </div>
             </div>
                 <!-- Card Body -->
@@ -136,7 +136,7 @@ active
         </div>
     </div>
 </div>
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">
 			<div class="modal-header border-bottom-1">
@@ -147,6 +147,7 @@ active
 			</div>
 			<form action="/project_list/update" method="post" id="editForm">
                 @csrf
+                <input type="hidden" name="project_id" id="project_id" value="">
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
                         <div class="row">
@@ -154,14 +155,14 @@ active
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="email">Project Code :</label>
-                                            <input type="text" class="form-control" name="p_code">
+                                            <label for="p_code">Project Code :</label>
+                                            <input type="text" class="form-control" name="p_code" id="p_code" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="password">Project Name :</label>
-                                            <input type="text" class="form-control" name="p_name">
+                                            <label for="p_name">Project Name :</label>
+                                            <input type="text" class="form-control" name="p_name" id="p_name" required>
                                         </div>
                                     </div>
                                 </div>
@@ -170,17 +171,23 @@ active
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="password">Client :</label>
-                                    <select class="form-control" id="update_location" name="p_client" required>
-
+                                    <label for="p_client">Client :</label>
+                                    <select class="form-control" id="p_client" name="p_client" required>
+                                        <option disabled selected>Select to update...</option>
+                                        @foreach($clients as $key => $client)
+                                            <option value="{{$client->id}}">{{ $client->client_name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="password">Location :</label>
-                                    <select class="form-control" id="update_location" name="p_location" required>
-
+                                    <label for="p_location">Location :</label>
+                                    <select class="form-control" id="p_location" name="p_location" required>
+                                        <option disabled selected>Select to update...</option>
+                                        @foreach($locations as $key => $location)
+                                            <option value="{{$location->location_code}}">{{ $location->description }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -188,8 +195,8 @@ active
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="password">Address :</label>
-                                    <textarea type="text" class="form-control" name="address" required></textarea>
+                                    <label for="address">Address :</label>
+                                    <textarea type="text" class="form-control" name="address" id="address" required autocomplete="off"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -198,14 +205,14 @@ active
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="email">From :</label>
-                                            <input type="date" class="form-control" name="from">
+                                            <label for="from">From :</label>
+                                            <input type="date" class="form-control" name="from" id="from" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="password">To :</label>
-                                            <input type="date" class="form-control" name="to">
+                                            <label for="to">To :</label>
+                                            <input type="date" class="form-control" name="to" id="to" required>
                                         </div>
                                     </div>
                                 </div>
@@ -233,18 +240,13 @@ active
         
         // Make an AJAX request to fetch the project data and populate the form fields
         $.ajax({
-            url: '/project_list/' + projectId + '/edit',
+            url: '/retrieveProjectData/' + projectId,
             method: 'GET',
             success: function(response) {
-                // Assuming the response is a JSON object containing the project data
                 // Populate the form fields with the received data
-                $('#p_code').val(response.p_code);
-                $('#p_name').val(response.p_name);
-                $('#p_client').val(response.p_client);
-                $('#p_location').val(response.p_location);
+                $('#p_code').val(response.project_code);
+                $('#p_name').val(response.project_name);
                 $('#address').val(response.address);
-                $('#from').val(response.from);
-                $('#to').val(response.to);
             },
             error: function(xhr) {
                 // Handle error
@@ -260,7 +262,7 @@ active
         
         // Make an AJAX request to update the project data
         $.ajax({
-            url: '/project_list/' + projectId,
+            url: '/project_list/edit/save/' + projectId,
             method: 'PUT',
             data: formData,
             success: function(response) {
@@ -269,6 +271,7 @@ active
                 
                 // Close the modal
                 $('#editModal').modal('hide');
+                window.location.href = '/project_list/view/details/' + projectId;
                 
                 // Reload or update the project list on the page
                 // Implement the appropriate logic based on your requirements

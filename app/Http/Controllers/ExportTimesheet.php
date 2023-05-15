@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Exports\TimesheetExport;
 use App\Models\Project_assignment_user;
+use App\Models\Project_location;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
 use App\Models\Timesheet_workflow;
@@ -26,30 +27,28 @@ class ExportTimesheet extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        $month = date('m') - 1;
-        $year = date('Y');
-        $monthName = date("F", mktime(0, 0, 0, $month, 1));
-        // Set the default time zone to Jakarta
-        date_default_timezone_set("Asia/Jakarta");
-        // Get the start and end dates for the selected month
-        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
-        $endDate = Carbon::create($year, $month)->endOfMonth();
+        // $month = date('m') - 1;
+        // $year = date('Y');
+        // $monthName = date("F", mktime(0, 0, 0, $month, 1));
+        // // Set the default time zone to Jakarta
+        // date_default_timezone_set("Asia/Jakarta");
+        // // Get the start and end dates for the selected month
+        // $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        // $endDate = Carbon::create($year, $month)->endOfMonth();
 
         $result = DB::table('timesheet_details')
         ->select('timesheet_details.*', 'users.name', 'users_details.employee_id')
         ->join('users', 'timesheet_details.user_timesheet', '=', 'users.id')
         ->join('users_details', 'timesheet_details.user_timesheet', '=', 'users_details.user_id')
         ->where('timesheet_details.ts_status_id', 29)
-        ->whereYear('timesheet_details.date_submitted', $Year)
-        ->where('timesheet_details.RequestTo', '-')
+        ->where('timesheet_details.month_periode', $Year.$Month)
         ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task')
         ->get();
             
         $getTotalMandays = DB::table('timesheet_details')
         ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
         ->where('ts_status_id', 29)
-        ->whereYear('date_submitted', $Year)
-        ->where('RequestTo', '-')
+        ->where('timesheet_details.month_periode', $Year.$Month)
         ->groupBy('user_timesheet')
         ->get(); 
 
@@ -64,6 +63,12 @@ class ExportTimesheet extends Controller
         $lastTotalMandays = 0;
         $firstRow = true; // Flag to check if it's the first row for each user
         
+        $totalSum = 0;
+
+        foreach ($result as $row) {
+            $mandays = $row->ts_mandays;
+            $totalSum += $mandays;
+        }
         foreach ($result as $row) {
             // Calculate the total mandays for each user
             if ($row->user_timesheet !== $lastUser) {
@@ -94,10 +99,12 @@ class ExportTimesheet extends Controller
                 $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours');
                 $lastWorkhours = $row->workhours;
             }
-            
+            $fare = Project_location::where('location_code', $row->ts_location)->pluck('fare')->first();
+            $countAllowances = $row->ts_mandays * $fare;
+            $sheet->setCellValueByColumnAndRow($startCol + 7, $startRow, $countAllowances);
             
             $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
-            
+        
             $startRow++;
             $firstRow = false; // Set the firstRow flag to false after the first row for each user
         }

@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'My Profile - ESS')
+
 @section('active-page-myprofile')
 active
 @endsection

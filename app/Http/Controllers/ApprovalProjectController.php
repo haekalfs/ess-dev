@@ -23,7 +23,7 @@ class ApprovalProjectController extends Controller
             return view('approval.project_approval', ['queue' => $listAssignment]);
         } else {
             // Redirect to a URL with a session
-            return redirect()->route('approval.main')->with('message', 'You do not have permission to access this page.');
+            return redirect()->route('approval.main')->with('failed', 'You do not have permission to access this page.');
         }
 	}
 

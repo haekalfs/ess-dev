@@ -160,7 +160,6 @@ active
                                     @if($stat == 1)
                                     @else
                                     <td class="text-center">
-                                        <a href="#" onclick='isconfirm();'class="btn btn-primary btn-sm" ><i class='fas fa-fw fa-edit'></i> Edit</a> 
                                         <a href="/assignment/member/delete/{{ $usr->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
                                     </td>
                                     @endif

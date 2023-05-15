@@ -11,6 +11,7 @@ use App\Models\Project_location;
 use App\Models\Project_role;
 use App\Models\Requested_assignment;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -191,18 +192,42 @@ class ProjectController extends Controller
         foreach ($company_code as $project) {
             $company_project_id = $project->company_project_id;
         }
-        $userAdded = $request->emp_name;
-        Project_assignment_user::create([
-            // 'id' => $uniqueId,
-    		'user_id' => $request->emp_name,
-    		'role' => $request->emp_role,
-            'responsibility' => $request->emp_resp,
-            'periode_start' => $request->fromTime,
-            'periode_end' => $request->toTime,
-            'project_assignment_id' => $assignment_id,
-            'company_project_id' => $company_project_id
-    	]);
-        return redirect()->back()->with('success', "$userAdded has been added to the assignment!");
+
+        $userFind = User::find($request->emp_name);
+        $userAdded = $userFind->name;
+        $from = Carbon::createFromFormat('Y-m-d', $request->fromTime);
+        $to = Carbon::createFromFormat('Y-m-d', $request->toTime);
+        $userId = $request->emp_name;
+        $companyProjectId = $company_project_id;
+
+        $existingAssignment = Project_assignment_user::where('user_id', $userId)
+            ->where('company_project_id', $companyProjectId)
+            ->where(function ($query) use ($from, $to) {
+                $query->where(function ($query) use ($from, $to) {
+                    $query->where('periode_start', '<=', $from->format('Y-m-d'))
+                        ->where('periode_end', '>=', $from->format('Y-m-d'));
+                })->orWhere(function ($query) use ($from, $to) {
+                    $query->where('periode_start', '<=', $to->format('Y-m-d'))
+                        ->where('periode_end', '>=', $to->format('Y-m-d'));
+                });
+            })
+            ->get();
+
+        if ($existingAssignment->isNotEmpty()) {
+            return redirect()->back()->with('failed', "$userAdded already have an assignment that intersect with current periode!");
+        } else {
+            Project_assignment_user::create([
+                // 'id' => $uniqueId,
+                'user_id' => $request->emp_name,
+                'role' => $request->emp_role,
+                'responsibility' => $request->emp_resp,
+                'periode_start' => $request->fromTime,
+                'periode_end' => $request->toTime,
+                'project_assignment_id' => $assignment_id,
+                'company_project_id' => $company_project_id
+            ]);
+            return redirect()->back()->with('success', "$userAdded has been added to the assignment!");
+        }
     }
 
     public function project_list()
@@ -366,7 +391,9 @@ class ProjectController extends Controller
         $project = Company_project::find($id);
         $project_member = Project_assignment_user::where('company_project_id', $id)->get();
         $project_id = Company_project::where('id', $id)->pluck('id')->first();
-        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member, 'project_id' => $project_id]);
+        $p_location = Project_location::all();
+        $client = Client::all();
+        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member, 'project_id' => $project_id, 'clients' => $client, 'locations' => $p_location]);
     }
 
     public function project_delete(Request $request, $id)
@@ -475,5 +502,39 @@ class ProjectController extends Controller
     	]);
 
         return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
+    }
+
+    public function retrieveProjectData($id)
+    {
+        // Get the Timesheet records between the start and end dates
+        $project = Company_project::find($id);
+        
+        return response()->json($project);
+    }
+
+    public function updateProjectData(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'p_code' => 'required',
+            'p_name' => 'required',
+            'from' => 'required',
+            'to' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $cp = Company_project::find($id);
+        $cp->project_code = $request->input('p_code');
+        $cp->alias = $request->input('p_location');
+        $cp->project_name = $request->input('p_name');
+        $cp->address = $request->input('address');
+        $cp->periode_start = $request->input('from');
+        $cp->periode_end = $request->input('to');
+        $cp->client_id = $request->input('p_client');
+        $cp->save();
+        
+        return response()->json(['success'=>'Project updated successfully.']);
     }
 }
