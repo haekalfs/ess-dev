@@ -58,7 +58,7 @@ active
                         <td>{{ $approval->company_project->project_name }}</td>
                         <td class="action text-center">
                             <a href="/approval/project/assignment/preview/{{ $approval->id }}" class="btn btn-secondary btn-sm" style="margin-right: 3%;">Preview</a>
-                            <a href="#" class="btn btn-danger btn-sm">Reject</a>
+                            <a href="/approval/project/assignment/reject/{{ $approval->id }}" class="btn btn-danger btn-sm">Reject</a>
                         </td>
                     </tr>
                     @endforeach

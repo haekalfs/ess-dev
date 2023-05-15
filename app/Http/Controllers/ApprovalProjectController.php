@@ -47,6 +47,9 @@ class ApprovalProjectController extends Controller
             } elseif($as->approval_status == 29) {
                 $status = "Approved";
                 $btnApprove = "";
+            } elseif($as->approval_status == 404) {
+                $status = "Rejected";
+                $btnApprove = "";
             } else {
                 $status = "Unknown Status";
                 $btnApprove = "";
@@ -64,6 +67,15 @@ class ApprovalProjectController extends Controller
         Project_assignment::where('id', $assignment_id)->update(['approval_status' => '29']);
 
         Session::flash('success',"You approved Assignment #$assignment_id!");
+        return redirect()->back();
+    }
+
+    public function reject_assignment($assignment_id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        Project_assignment::where('id', $assignment_id)->update(['approval_status' => '404']);
+
+        Session::flash('failed',"You rejected Assignment #$assignment_id!");
         return redirect()->back();
     }
 }

@@ -116,12 +116,14 @@ class ProjectController extends Controller
                 $status = "Waiting for Approval";
             } elseif($as->approval_status == 29) {
                 $status = 1;
+            } elseif($as->approval_status == 404) {
+                $status = 404;
             } else {
                 $status = "Unknown Status";
             }
         }
         // $projects = $project->client->client_name;
-        // var_dump($project);
+        // var_dump($status);
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
@@ -142,6 +144,8 @@ class ProjectController extends Controller
                 $status = "Waiting for Approval";
             } elseif($as->approval_status == 29) {
                 $status = "Approved";
+            } elseif($as->approval_status == 404) {
+                $status = "Rejected";
             } else {
                 $status = "Unknown Status";
             }

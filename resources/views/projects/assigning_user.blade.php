@@ -8,7 +8,7 @@ active
 
 @section('content')
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Project Assignment #{{ $assignment_id }}</h1>
+    <h1 class="h4 mb-0 text-gray-800">@if($stat == 404)<span class="text-danger"> @else @endif Project Assignment #{{ $assignment_id }}</span></h1>
     @if($stat == 1)
     @else
     <a href="#" onclick="deleteAssignment(event, {{$assignment_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
@@ -120,7 +120,7 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Project Member</h6>
-                @if($stat == 1)
+                @if($stat == 1 || $stat == 404)
                 @else
                 <div class="text-right">
                     <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addMem" id="addMemModal">+ Add Member</a>
@@ -139,7 +139,7 @@ active
                                 <th>Responsibility</th>
                                 <th>Periode Start</th>
                                 <th>Periode End</th>
-                                @if($stat == 1)
+                                @if($stat == 1 || $stat == 404)
                                 @else
                                 <th width="170px">Action</th>
                                 @endif
@@ -157,7 +157,7 @@ active
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
-                                    @if($stat == 1)
+                                    @if($stat == 1 || $stat == 404)
                                     @else
                                     <td class="text-center">
                                         <a href="/assignment/member/delete/{{ $usr->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
