@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApprovalAssignment;
 use App\Models\Approval_status;
 use App\Models\Client;
 use App\Models\Company_project;
@@ -11,7 +12,9 @@ use App\Models\Project_location;
 use App\Models\Project_role;
 use App\Models\Requested_assignment;
 use App\Models\User;
+use App\Models\Usr_role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -84,6 +87,16 @@ class ProjectController extends Controller
             'approval_status' => '40'
     	]);
 
+        $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
+        $employees = User::whereIn('id', $roleToApprove)->get();
+
+        foreach ($employees as $employee) {
+            $notification = new ApprovalAssignment($employee);
+            Mail::send('mailer.approval_assignment', $notification->data(), function ($message) use ($notification) {
+                $message->to($notification->emailTo())
+                        ->subject($notification->emailSubject());
+            });
+        }
         return redirect("/assignment/member/$uniqueIdP")->with('success', "Assignment #$uniqueIdP Create successfully");
     }
 
