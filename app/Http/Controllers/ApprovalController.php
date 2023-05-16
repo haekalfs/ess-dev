@@ -6,6 +6,7 @@ use App\Exports\TimesheetExport;
 use App\Mail\ApprovalTimesheet;
 use App\Mail\RejectedTimesheet;
 use App\Models\Approval_status;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use Maatwebsite\Excel\Facades\Excel;
@@ -68,9 +69,13 @@ class ApprovalController extends Controller
         }
     }
 
-    public function approve($user_timesheet,$year,$month)
+    public function approve(Request $request, $user_timesheet, $year, $month)
     {
         date_default_timezone_set("Asia/Jakarta");
+
+        $validator = Validator::make($request->all(), [
+            'approval_notes' => 'sometimes'
+        ]);
 
         $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
 
@@ -90,32 +95,52 @@ class ApprovalController extends Controller
                     break;
             }
         
-            Timesheet_detail::where('month_periode', $year.$month)
+            $approve = Timesheet_detail::where('month_periode', $year.$month)
                 ->where('user_timesheet', $user_timesheet)
                 ->where('RequestTo', Auth::user()->id)
-                ->where('ts_task_id', $row->ts_task_id)
-                ->update(['ts_status_id' => $tsStatusId, 'activity' => $activity]);
+                ->where('ts_task_id', $row->ts_task_id);
+
+            // $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_status_id', 'RequestTo');
+
+            if ($validator->passes()) {
+                $notes = $request->approval_notes;
+                $approve->update(['ts_status_id' => $tsStatusId, 'activity' => $activity, 'note' => $notes]);
+            } else {
+                $approve->update(['ts_status_id' => $tsStatusId, 'activity' => $activity]);
+            }
 
             Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
                 ->where('ts_user_id', $user_timesheet)
                 ->update(['ts_status_id' => $tsStatusId]);
-        }        
-
-        Session::flash('success',"You approved $user_timesheet timereport!");
-        return redirect()->back();
+        }
+        return redirect('/approval/timesheet/p')->with('success',"You approved $user_timesheet timereport!");
     }
 
-    public function reject($user_timesheet,$year,$month)
+    public function reject(Request $request, $user_timesheet, $year, $month)
     {
         date_default_timezone_set("Asia/Jakarta");
+
+        $validator = Validator::make($request->all(), [
+            'reject_notes' => 'sometimes'
+        ]);
+
         $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
 
         foreach($countRows as $row) { ///test buat dihapus nnti karna double loops
-            Timesheet_detail::where('month_periode', $year.$month)
-            ->where('user_timesheet', $user_timesheet)
-            ->where('RequestTo', Auth::user()->id)
-            ->where('ts_task_id', $row->ts_task_id)
-            ->update(['ts_status_id' => '404', 'activity' => 'Rejected']);
+
+            $reject = Timesheet_detail::where('month_periode', $year.$month)
+                ->where('user_timesheet', $user_timesheet)
+                ->where('RequestTo', Auth::user()->id)
+                ->where('ts_task_id', $row->ts_task_id);
+
+            // $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_status_id', 'RequestTo');
+
+            if ($validator->passes()) {
+                $notes = $request->reject_notes;
+                $reject->update(['ts_status_id' => '404', 'activity' => 'Rejected', 'note' => $notes]);
+            } else {
+                $reject->update(['ts_status_id' => '404', 'activity' => 'Rejected']);
+            }
         }
 
         Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
@@ -124,6 +149,7 @@ class ApprovalController extends Controller
 
         $employees = User::where('id', $user_timesheet)->get();
 
+        //add notes to reject notification email
         foreach ($employees as $employee) {
             $notification = new RejectedTimesheet($employee, $year, $month);
             Mail::send('mailer.rejected_timesheet', $notification->data(), function ($message) use ($notification) {
@@ -131,8 +157,14 @@ class ApprovalController extends Controller
                         ->subject($notification->emailSubject());
             });
         }
-        Session::flash('failed',"You rejected $user_timesheet timereport!");
-        return redirect()->back();
+        $entry = new Notification_alert;
+        $entry->user_id = $user_timesheet;
+        $ts_name = date("F", mktime(0, 0, 0, $month, 1)).' - '.$year;
+        $entry->message = "Your Timesheet of $ts_name has been rejected!";
+        $entry->importance = 1;
+        $entry->save();
+
+        return redirect('/approval/timesheet/p')->with('failed',"You rejected $user_timesheet timereport!");
     }
 
     public function review(Request $request)
@@ -187,6 +219,23 @@ class ApprovalController extends Controller
 
         $workflow = Timesheet_detail::where('user_timesheet', $id)->where('month_periode', $year.intval($month))->get();
 
+        $assignment = DB::table('project_assignment_users')
+            ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
+            ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
+            ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
+            ->where('project_assignment_users.user_id', '=', $id)
+            ->whereMonth('project_assignment_users.periode_start', '<=', $month)
+            ->whereMonth('project_assignment_users.periode_end', '>=', $month)
+            ->whereYear('project_assignment_users.periode_start', $year)
+            ->whereYear('project_assignment_users.periode_end', $year)
+            ->where('project_assignments.approval_status', 29)
+            ->get();
+
+        $assignmentNames = $assignment->pluck('project_name')->implode(', ');
+        if($assignment->isEmpty()){
+            $assignmentNames = "None";
+        }
+
         $info = [];
         $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $month)
@@ -206,6 +255,6 @@ class ApprovalController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month','info', 'id'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month','info', 'id', 'assignmentNames'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
 	}
 }

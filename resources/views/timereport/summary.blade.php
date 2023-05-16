@@ -119,7 +119,6 @@ active
                                         <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
                                     </tr>
                                 </tbody>
-                                
                             </table>
                         </div>
                     </div>

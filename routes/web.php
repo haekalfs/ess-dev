@@ -65,12 +65,12 @@ Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->na
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth');
 Route::get('/approval/timesheet/preview/{user_id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth');
 
-Route::get('/approval/timesheet/approve/{user_id}/{year}/{month}', 'ApprovalController@approve')->middleware('auth');
-Route::get('/approval/timesheet/reject/{user_id}/{year}/{month}', 'ApprovalController@reject')->middleware('auth');
+Route::match(['get', 'post'], '/approval/timesheet/approve/{user_id}/{year}/{month}', 'ApprovalController@approve')->middleware('auth');
+Route::match(['get', 'post'], '/approval/timesheet/reject/{user_id}/{year}/{month}', 'ApprovalController@reject')->middleware('auth');
 
+    //Sub Approval
 Route::get('/approval/fin_ga_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth');
 Route::get('/approval/service_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_service_dir')->middleware('auth');
-    //Sub Approval
 Route::get('/approval/pm/{user_id}/{year}/{month}', 'ApprovalController@approve_pm')->middleware('auth');
 Route::get('/approval/pa/{user_id}/{year}/{month}', 'ApprovalController@approve_pa')->middleware('auth');
 Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_hr')->middleware('auth');

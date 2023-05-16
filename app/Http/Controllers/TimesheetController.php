@@ -389,6 +389,9 @@ class TimesheetController extends Controller
             ->get();
 
         $assignmentNames = $assignment->pluck('project_name')->implode(', ');
+        if($assignment->isEmpty()){
+            $assignmentNames = "None";
+        }
 
         $info = [];
         $lastUpdate = DB::table('timesheet')
@@ -526,7 +529,7 @@ class TimesheetController extends Controller
                         'ts_task_id' => $row->ts_task_id,
                         'user_timesheet' => Auth::user()->id
                     ]);
-                    break;
+                break;
                 case "HO":
                 case "Sick":
                 case "Standby":

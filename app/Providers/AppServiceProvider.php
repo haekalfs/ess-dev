@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User_access;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use App\Providers\NotificationServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->register(NotificationServiceProvider::class);
     }
 
     /**
