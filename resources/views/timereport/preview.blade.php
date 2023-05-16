@@ -57,7 +57,7 @@ active
                             </thead>
                             <tbody>
                                 <tr class="table-sm">
-                                    <td>Nama</td>
+                                    <td>Name</td>
                                     <td>: {{$user_info->name}}</td>
                                 </tr>
                                 <tr class="table-sm">
@@ -82,7 +82,7 @@ active
                                 </tr>
                                 <tr class="table-sm">
                                     <td>Assignment</td>
-                                    <td>: {{$user_info->users_detail->hired_date}}</td>
+                                    <td class="clickable"><span class="long-text" title="{{ $assignmentNames }}">: {{ $assignmentNames }}</span></td>
                                 </tr>
                             </tbody>
                         </table>

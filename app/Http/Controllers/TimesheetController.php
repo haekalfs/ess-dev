@@ -374,6 +374,22 @@ class TimesheetController extends Controller
 
         $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year.$month)->get();
 
+        $userId = Auth::user()->id;
+
+        $assignment = DB::table('project_assignment_users')
+            ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
+            ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
+            ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
+            ->where('project_assignment_users.user_id', '=', $userId)
+            ->whereMonth('project_assignment_users.periode_start', '<=', $month)
+            ->whereMonth('project_assignment_users.periode_end', '>=', $month)
+            ->whereYear('project_assignment_users.periode_start', $year)
+            ->whereYear('project_assignment_users.periode_end', $year)
+            ->where('project_assignments.approval_status', 29)
+            ->get();
+
+        $assignmentNames = $assignment->pluck('project_name')->implode(', ');
+
         $info = [];
         $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $month)
@@ -393,7 +409,7 @@ class TimesheetController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month','info', 'assignmentNames'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
