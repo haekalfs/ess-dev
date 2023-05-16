@@ -22,7 +22,7 @@ class ApprovalTimesheet extends Mailable
             $data = [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/'
+                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
             ];
     
             $subject = 'Timesheet Approval Reminder';
@@ -47,7 +47,7 @@ class ApprovalTimesheet extends Mailable
             return [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/'
+                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
             ];
         }
     }

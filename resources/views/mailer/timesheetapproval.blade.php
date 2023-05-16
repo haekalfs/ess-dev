@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>This is timesheet approval reminder, and there's timesheets that require your approval. Kindly request your review for the documents.</p>
+<p>This is timesheet approval reminder, and some user's timesheets require your approval. Kindly request your review for the documents.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>

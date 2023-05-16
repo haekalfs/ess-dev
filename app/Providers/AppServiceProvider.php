@@ -26,16 +26,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Blade::if('role', function ($role) {
-            return in_array($role, session('allowed_roles'));
+            return in_array($role, session('allowed_roles', []));
         });
 
-        Blade::if('usr_acc', 
-        function ($usr_acc) {
+        Blade::if('usr_acc', function ($usr_acc) {
             $allowedRole = User_access::where('page_id', $usr_acc)
-                    ->join('roles', 'user_access.role_id', '=', 'roles.id')
-                    ->pluck('roles.role')
-                    ->toArray();
-            $allowedRolesInSession = session('allowed_roles');
+                ->join('roles', 'user_access.role_id', '=', 'roles.id')
+                ->pluck('roles.role')
+                ->toArray();
+            $allowedRolesInSession = session('allowed_roles', []);
             return array_intersect($allowedRole, $allowedRolesInSession);
         });
     }
