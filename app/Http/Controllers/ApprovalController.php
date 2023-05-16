@@ -53,7 +53,7 @@ class ApprovalController extends Controller
         $currentDay = date('j');
 
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 5 && $currentDay <= 20) {
+        if ($currentDay >= 5 && $currentDay <= 8) {
             $approvals = DB::table('timesheet_details')
                 ->select('*')
                 ->whereYear('date_submitted', $currentYear)

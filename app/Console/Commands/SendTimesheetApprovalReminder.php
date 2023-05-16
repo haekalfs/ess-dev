@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Mail\ApprovalTimesheet;
+use App\Models\Timesheet_detail;
 use App\Models\User;
+use App\Models\Usr_role;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Mail;
@@ -41,7 +43,9 @@ class SendTimesheetApprovalReminder extends Command
      */
     public function handle()
     {
-        $users = User::where('id', 'haekals')->get();
+        // $users = User::where('id', 'haekals')->get();
+        $userToApprove = Timesheet_detail::groupBy('RequestTo')->pluck('RequestTo')->toArray();
+        $users = User::whereIn('id', $userToApprove)->get();
 
         foreach ($users as $user) {
             $notification = new ApprovalTimesheet($user);
