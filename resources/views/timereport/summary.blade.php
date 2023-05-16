@@ -110,7 +110,7 @@ active
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
                                         <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                            <a href="/approval/timesheet/preview/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
+                                            <a href="/timesheet/summary/remind/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
                                         </td>
                                         @endif
                                     </tr>

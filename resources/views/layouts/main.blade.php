@@ -96,7 +96,7 @@
                         @else
                         @endusr_acc
                         @usr_acc(103)
-                        <a class="collapse-item" href="/timesheet/summary/e">Summary</a>
+                        <a class="collapse-item" href="/timesheet/summary/all">Summary</a>
                         @else
                         @endusr_acc
                         @usr_acc(104)

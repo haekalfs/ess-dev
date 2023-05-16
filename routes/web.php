@@ -49,14 +49,15 @@ Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
 Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
-Route::get('/timesheet/summary/e', 'TimesheetController@summary')->name('summary')->middleware('auth');
+Route::get('/timesheet/summary/all', 'TimesheetController@summary')->name('summary')->middleware('auth');
+Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController@remind')->name('remind')->middleware('auth');
 
-// Testing
-Route::get('/development', 'HomeController@notification_indev');
-Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar');
-Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update');
-Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
-Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities');
+// // Testing
+// Route::get('/development', 'HomeController@notification_indev');
+// Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar');
+// Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update');
+// Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
+// Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities');
 
 //Approval
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth');

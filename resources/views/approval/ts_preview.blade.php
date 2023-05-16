@@ -144,7 +144,7 @@ active
                     @foreach($timesheet as $timesheets)
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
-                            <td>{{ date('d-m-Y', strtotime($timesheets->ts_date)) }}</td>
+                            <td>{{ date('d-M-Y', strtotime($timesheets->ts_date)) }}</td>
                             <td>{{ $timesheets->ts_task }}</td>
                             <td>{{ $timesheets->ts_location }}</td>
                             <td>{{ $timesheets->ts_activity }}</td>
@@ -205,7 +205,7 @@ active
                             <td>{{ $workflows->user_id }}</td>
                             <td><span class="shorter-text">{{ $workflows->ts_task }}</span></td>
                             <td>{{ $workflows->activity }}</td>
-                            <td>{{ $workflows->created_at->format('d-m-Y') }}</td>
+                            <td>{{ $workflows->RequestTo }}</td>
                             <td>{{ $workflows->note }}</td>
                         </tr>
                         @endforeach

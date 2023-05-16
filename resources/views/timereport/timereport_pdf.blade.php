@@ -35,9 +35,9 @@
             <tr>
                 <th style="width: 10px;">Day</th>
                 <th>Date</th>
-                <th style="width: 100px;">Task</th>
+                <th>Task</th>
                 <th style="width: 20px;">Location</th>
-                <th style="width: 240px;">Activity</th>
+                <th>Activity</th>
                 <th>From</th>
                 <th>To</th>
                 <th>Hours</th>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EssMailer;
+use App\Mail\TimesheetReminderEmployee;
 use App\Models\Approval_status;
 use App\Models\Company_project;
 use App\Models\Cutoffdate;
@@ -400,7 +401,19 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
-        $checkisSubmitted = Timesheet_detail::where('month_periode', $year.$month)->where('ts_status_id', [20, 30, 29])->get();
+        $checkisSubmitted = DB::table('timesheet_details')
+        ->select('*')
+        ->whereYear('date_submitted', $year)
+        ->whereNotIn('ts_status_id', [10,404])
+        ->where('month_periode', $year.intval($month))
+        ->whereNotExists(function ($query) use ($year, $month) {
+            $query->select(DB::raw(1))
+                ->from('timesheet_details')
+                ->where('month_periode', $year.intval($month))
+                ->where('ts_status_id', [404]);
+        })
+        ->groupBy('user_timesheet', 'month_periode')
+        ->get();
 
         if (!$checkisSubmitted->isEmpty()) {
             Session::flash('failed', 'Your Timesheet has already been submitted!');
@@ -413,7 +426,7 @@ class TimesheetController extends Controller
         $dateCut = Cutoffdate::first();
         // Get the cutoff date for submitting timesheets (7th of the next month)
         $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->date - 1));
-        // $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-07-$dateCut->date");
+        $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-07-$dateCut->date");
 
         // Check if the current date is on or after the cutoff date
         if ($currentDate->gte($cutoffDate)) {
@@ -982,4 +995,18 @@ class TimesheetController extends Controller
         // dd($approvals);
 		return view('timereport.summary', compact('approvals', 'yearsBefore', 'Month', 'Year','employees'));
 	}
+
+    public function remind($id, $year, $month)
+    {
+        $employees = User::where('id', $id)->get();
+
+        foreach ($employees as $employee) {
+            $notification = new TimesheetReminderEmployee($employee, $year, $month);
+            Mail::send('mailer.timesheet_entry', $notification->data(), function ($message) use ($notification) {
+                $message->to($notification->emailTo())
+                        ->subject($notification->emailSubject());
+            });
+        }
+        return redirect()->back()->with('success', "An email has been sent!");
+    }
 }

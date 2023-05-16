@@ -98,26 +98,29 @@ active
                                     @foreach($approvals as $index => $approval)
                                     <tr>
                                         @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
-                                        <td></td>
-                                        <td></td>
-                                        <td>{{ $approval->ts_task }}</td>
-                                        <td>{{ $approval->ts_location }}</td>
-                                        <td>{{ $approval->roleAs }}</td>
-                                        <td>{{ $approval->ts_mandays }}</td>
-                                        <td></td>
+                                        <td style="border-bottom: none; border-top: none;"></td>
+                                        <td style="border-bottom: none; border-top: none;"></td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_location }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
+                                        <td style="border-bottom: none; border-top: none;"></td>
                                         @else
-                                        <td>{{ $approval->user->users_detail->employee_id }}</td>
-                                        <td>{{ $approval->user->name }}</td>
-                                        <td>{{ $approval->ts_task }}</td>
-                                        <td>{{ $approval->ts_location }}</td>
-                                        <td>{{ $approval->roleAs }}</td>
-                                        <td>{{ $approval->ts_mandays }}</td>
-                                        <td class="action text-center">
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->user->users_detail->employee_id }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->user->name }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_location }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
+                                        <td style="border-bottom: none; border-top: none;" class="action text-center">
                                             <a href="/approval/timesheet/preview/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
                                         </td>
                                         @endif
                                     </tr>
                                     @endforeach
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                    </tr>
                                 </tbody>
                             </table>
                             

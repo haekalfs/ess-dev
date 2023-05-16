@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exports\TimesheetExport;
 use App\Mail\ApprovalTimesheet;
+use App\Mail\RejectedTimesheet;
+use App\Models\Approval_status;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use Maatwebsite\Excel\Facades\Excel;
@@ -120,6 +122,15 @@ class ApprovalController extends Controller
         ->where('ts_user_id', $user_timesheet)
         ->update(['ts_status_id' => '404']);
 
+        $employees = User::where('id', $user_timesheet)->get();
+
+        foreach ($employees as $employee) {
+            $notification = new RejectedTimesheet($employee, $year, $month);
+            Mail::send('mailer.rejected_timesheet', $notification->data(), function ($message) use ($notification) {
+                $message->to($notification->emailTo())
+                        ->subject($notification->emailSubject());
+            });
+        }
         Session::flash('failed',"You rejected $user_timesheet timereport!");
         return redirect()->back();
     }
@@ -155,14 +166,14 @@ class ApprovalController extends Controller
         }
 
         $approvals = $approvals->get();
-		return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year','employees'));
+		return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
 	}
 
     public function ts_preview($id, $year, $month)
 	{
 		// $year = Crypt::decrypt($year);
         // $month = Crypt::decrypt($month);
-        // Set the default time zone to Jakarta
+        // Set the default time zone to Jakarta 
         date_default_timezone_set("Asia/Jakarta");
 
         // Get the start and end dates for the selected month
@@ -174,7 +185,7 @@ class ApprovalController extends Controller
         
         $user_info = User::find($id);
 
-        $workflow = Timesheet_detail::where('user_id', $id)->where('month_periode', $year.$month)->get();
+        $workflow = Timesheet_detail::where('user_timesheet', $id)->where('month_periode', $year.intval($month))->get();
 
         $info = [];
         $lastUpdate = DB::table('timesheet')
@@ -184,16 +195,9 @@ class ApprovalController extends Controller
                 ->where('ts_user_id', $id)
                 ->first();
         if ($lastUpdate) {
-            if($lastUpdate->ts_status_id == '10'){
-                $status = "Saved";
-            }elseif($lastUpdate->ts_status_id == '20'){
-                $status = "Submitted";
-            }elseif($lastUpdate->ts_status_id == '29'){
-                $status = "Approved";
-            }elseif($lastUpdate->ts_status_id == '404'){
-                $status = "Rejected";
-            }else{
-                $status = "404";
+            $status = Approval_status::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
+            if(!$status){
+                $status = "Unknown Status";
             }
             $lastUpdatedAt = $lastUpdate->updated_at;
         } else {
