@@ -1,20 +1,21 @@
 @extends('layouts.main')
 
-@section('title', 'Project Assignment - ESS')
+@section('title', 'Project Assignment (View Only) - ESS')
 
 @section('active-page-project')
 active
 @endsection
 
 @section('content')
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">@if($stat == 404)<span class="text-danger"> @else @endif Project Assignment #{{ $assignment_id }}</span></h1>
-    @if($stat == 1)
-    @else
-    <a href="#" onclick="deleteAssignment(event, {{$assignment_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-        <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Assignment</a>
-    @endif
+<!-- Page Heading -->
+<div class="row align-items-center">
+    <div class="col">
+        <h1 class="h3 mb-2 text-gray-800">Project Assignment #{{ $assignment_id }}</h1>
+        <p class="mb-4 text-danger"><i>{{ $stat }}</i></p>
+    </div>
+    {!! $btnApprove !!}
 </div>
+
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -65,7 +66,7 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 200px;">Notes Assignment</td>
-                                        <td>: {{ $row->notes }}</td>
+                                        <td>: <i>{{ $row->notes }}</i></td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -119,13 +120,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Project Member</h6>
-                @if($stat == 1 || $stat == 404)
-                @else
-                <div class="text-right">
-                    <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#addMem" id="addMemModal">+ Add Member</a>
-                </div>
-                @endif
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Project Member</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -139,10 +134,6 @@ active
                                 <th>Responsibility</th>
                                 <th>Periode Start</th>
                                 <th>Periode End</th>
-                                @if($stat == 1 || $stat == 404)
-                                @else
-                                <th width="170px">Action</th>
-                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -152,17 +143,11 @@ active
                             @foreach ($project_member as $usr)
                                 <tr>
                                     <td>{{ $row_number++ }}</td>
-                                    <td>{{ $usr->user->name }}</td>
-                                    <td>{{ $usr->project_role->role_name }}</td>
+                                    <td>{{ $usr->user_id }}</td>
+                                    <td>{{ $usr->role }}</td>
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
-                                    @if($stat == 1 || $stat == 404)
-                                    @else
-                                    <td class="text-center">
-                                        <a href="/assignment/member/delete/{{ $usr->id }}" onclick='isconfirm();' class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
-                                    </td>
-                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -173,76 +158,6 @@ active
     </div>
 </div>
 
-
-<div class="modal fade" id="addMem" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Add Member</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form action="/assignment/add_member_to_assignment/{{ $assignment_id }}" method="post">
-                @csrf
-				<div class="modal-body" style="">
-                    <div class="col-md-12 zoom90">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="email">Employee Name :</label>
-                                            <select class="form-control" id="update_location" name="emp_name" required>
-                                                @foreach($user as $employees)
-                                                <option value="{{$employees->id}}">{{ $employees->name}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="password">Role :</label>
-                                            <select class="form-control" id="update_location" name="emp_role" required>
-                                                @foreach($usr_roles as $roles)
-                                                <option value="{{$roles->role_code}}">{{ $roles->role_name}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="password">Responsibility :</label>
-                                            <input type="text" class="form-control" name="emp_resp" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">From :</label>
-                                    <input type="date" class="form-control" name="fromTime" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">To :</label>
-                                    <input type="date" class="form-control" name="toTime" required>
-                                </div>
-                            </div>
-                        </div>
-				    </div>
-                </div>
-				<div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                  </div>
-			</form>
-		</div>
-	</div>
-</div>
 <style>
 .action{
     width: 180px;

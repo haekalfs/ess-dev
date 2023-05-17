@@ -37,7 +37,7 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
                 <div class="text-right">
-                    <a class="btn btn-danger btn-sm" type="button" href="{{ url()->previous() }}" id="manButton">Back</a>
+                    <a class="btn btn-danger btn-sm" type="button" href="{{ url()->previous() }}" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -52,12 +52,12 @@ active
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Employee Information</th>
+                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Employee Information</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="table-sm">
-                                    <td>Nama</td>
+                                    <td>Name</td>
                                     <td>: {{$user_info->name}}</td>
                                 </tr>
                                 <tr class="table-sm">
@@ -82,7 +82,7 @@ active
                                 </tr>
                                 <tr class="table-sm">
                                     <td>Assignment</td>
-                                    <td>: {{$user_info->users_detail->hired_date}}</td>
+                                    <td class="clickable"><span class="long-text" title="{{ $assignmentNames }}">: {{ $assignmentNames }}</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -91,7 +91,7 @@ active
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th class="m-0 font-weight-bold text-primary" colspan="2">Timesheet Information</th>
+                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Timesheet Information</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -145,7 +145,7 @@ active
                     @foreach($timesheet as $timesheets)
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
-                            <td>{{ date('d-m-Y', strtotime($timesheets->ts_date)) }}</td>
+                            <td>{{ date('d-M-Y', strtotime($timesheets->ts_date)) }}</td>
                             <td>{{ $timesheets->ts_task }}</td>
                             <td>{{ $timesheets->ts_location }}</td>
                             <td>{{ $timesheets->ts_activity }}</td>
@@ -180,42 +180,55 @@ active
 </div>
 <div class="row">
     <!-- Area Chart -->
-    <div class="col-xl-6 col-lg-6">
+    <div class="col-xl-8 col-lg-8">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Timesheet Workflow</h6>
                 <div class="text-right">
-                    <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a>
+                    {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a> --}}
                 </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
-                <table class="table table-sm zoom90">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Username</th>
-                            <th>Activity</th>
-                            <th>Status</th>
-                            <th>Updated at</th>
-                            <th>Notes</th>
-                    </thead>
-                    <tbody>
-                        @foreach($workflow as $workflows)
-                        <tr>
-                            <td>{{ $workflows->user_id }}</td>
-                            <td><span class="shorter-text">{{ $workflows->ts_task }}</span></td>
-                            <td>{{ $workflows->activity }}</td>
-                            <td>{{ $workflows->created_at->format('d-m-Y') }}</td>
-                            <td>{{ $workflows->note }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm zoom90">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Approver</th>
+                                <th>Notes</th>
+                        </thead>
+                        <tbody>
+                            @foreach($workflow as $index => $wf)
+                            <tr>
+                                @if ($index > 0 && $wf->user->name === $workflow[$index-1]->user->name)
+                                <td style="border-bottom: none; border-top: none;"></td>
+                                <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->RequestTo }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
+                                @else
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->user_id }}</td>
+                                <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->RequestTo }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
+                                @endif
+                            </tr>
+                            @endforeach
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-xl-6 col-lg-6">
+    <div class="col-xl-4 col-lg-4">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">

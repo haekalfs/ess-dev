@@ -49,14 +49,15 @@ Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
 Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
+Route::get('/timesheet/summary/all', 'TimesheetController@summary')->name('summary')->middleware('auth');
+Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController@remind')->name('remind')->middleware('auth');
 
-
-// Testing
-Route::get('/development', 'HomeController@notification_indev');
-Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar');
-Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update');
-Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
-Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities');
+// // Testing
+// Route::get('/development', 'HomeController@notification_indev');
+// Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar');
+// Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update');
+// Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
+// Route::post('/timesheet/entry/save-activities', 'TimesheetController@save')->name('save_activities');
 
 //Approval
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth');
@@ -64,9 +65,12 @@ Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->na
 Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth');
 Route::get('/approval/timesheet/preview/{user_id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth');
 
+Route::match(['get', 'post'], '/approval/timesheet/approve/{user_id}/{year}/{month}', 'ApprovalController@approve')->middleware('auth');
+Route::match(['get', 'post'], '/approval/timesheet/reject/{user_id}/{year}/{month}', 'ApprovalController@reject')->middleware('auth');
+
+    //Sub Approval
 Route::get('/approval/fin_ga_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth');
 Route::get('/approval/service_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_service_dir')->middleware('auth');
-    //Sub Approval
 Route::get('/approval/pm/{user_id}/{year}/{month}', 'ApprovalController@approve_pm')->middleware('auth');
 Route::get('/approval/pa/{user_id}/{year}/{month}', 'ApprovalController@approve_pa')->middleware('auth');
 Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_hr')->middleware('auth');
@@ -77,6 +81,7 @@ Route::get('/approval/fm/{user_id}/{year}/{month}', 'ApprovalController@approve_
 Route::get('/approval/project/assignment/', 'ApprovalProjectController@index')->name('approval.project')->middleware('auth');
 Route::get('/approval/project/assignment/preview/{id}', 'ApprovalProjectController@preview_assignment')->name('preview.project.assignment')->middleware('auth');
 Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectController@approve_assignment')->name('approve.project.assignment')->middleware('auth');
+Route::get('/approval/project/assignment/reject/{id}', 'ApprovalProjectController@reject_assignment')->name('reject.project.assignment')->middleware('auth');
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
@@ -111,8 +116,11 @@ Route::get('/retrieveProjectRoles', 'ProjectController@listProjectRoles')->name(
 Route::post('/projectRole/create', 'ProjectController@create_new_project_roles')->middleware('auth')->name('insert.new.role');
 Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delete_project_role')->name('role-delete')->middleware('auth');
 
+Route::get('/retrieveProjectData/{id}', 'ProjectController@retrieveProjectData')->middleware('auth');
+Route::put('/project_list/edit/save/{project}', 'ProjectController@updateProjectData')->middleware('auth');
+
 Route::get('/assignment/requested/by/user', 'ProjectController@requested_assignment')->name('myproject')->middleware('auth');
-Route::post('/assignment/request/', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');
+Route::post('/assignment/request', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');
 Route::get('/assignment/requested/by/user/view/{id}', 'ProjectController@requested_assignment_view')->middleware('auth');
 Route::get('/assignment/requested/by/user/approve/{id}', 'ProjectController@requested_assignment_approve')->middleware('auth');
 Route::post('/assignment/add_entries/based_on/request/{id}', 'ProjectController@add_project_assignment_from_request')->middleware('auth');

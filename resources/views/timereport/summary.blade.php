@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Review by Finance Manager - ESS')
+@section('title', 'Summary - ESS')
 
 @section('active-page-timesheet')
 active
@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-2 text-gray-800">Timesheet Review <small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></h1>
+    <h1 class="h3 mb-2 text-gray-800">Timesheet Summary <small style="color: red;"><i> &nbsp;&nbsp;Administrator</i></small></h1>
     {{-- <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a> --}}
 </div>
 @if ($message = Session::get('success'))
@@ -35,11 +35,11 @@ active
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Timesheets</h6>
-        <div class="text-right">
+        {{-- <div class="text-right">
             <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
-        </div>
+        </div> --}}
     </div>
-    <form method="GET" action="/timesheet/review/fm">
+    <form method="GET" action="/timesheet/summary/e">
         @csrf
         <div class="card-body">
             <div class="col-md-12 zoom90">
@@ -88,9 +88,8 @@ active
                                         <th>Emp ID</th>
                                         <th>Name</th>
                                         <th>Project</th>
-                                        <th>Location</th>
-                                        <th>Role</th>
-                                        <th>Mandays</th>
+                                        <th>Timesheet Status</th>
+                                        <th>Approver</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -101,29 +100,26 @@ active
                                         <td style="border-bottom: none; border-top: none;"></td>
                                         <td style="border-bottom: none; border-top: none;"></td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
-                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_location }}</td>
-                                        <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
-                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
                                         <td style="border-bottom: none; border-top: none;"></td>
                                         @else
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->user->users_detail->employee_id }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->user->name }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
-                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_location }}</td>
-                                        <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
-                                        <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
                                         <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                            <a href="/approval/timesheet/preview/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
+                                            <a href="/timesheet/summary/remind/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
                                         </td>
                                         @endif
                                     </tr>
                                     @endforeach
                                     <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                        <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
                                     </tr>
                                 </tbody>
                             </table>
-                            
                         </div>
                     </div>
                 </div>
@@ -145,6 +141,10 @@ active
 <style>
 .action{
     width: 190px;
+}
+.invisible {
+    border-top: none;
+    border-bottom: none;
 }
 </style>
 @endsection

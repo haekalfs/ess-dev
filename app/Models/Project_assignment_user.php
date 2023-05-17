@@ -29,4 +29,8 @@ class Project_assignment_user extends Model
     public function project_role(){
     	return $this->belongsTo('App\Models\Project_role', 'role', 'role_code');
     }
+
+    public function company_project(){
+    	return $this->belongsTo('App\Models\Company_project');
+    }
 }

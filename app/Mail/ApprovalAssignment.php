@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ApprovalTimesheet extends Mailable
+class ApprovalAssignment extends Mailable
     {
         protected $employee;
     
@@ -22,19 +22,19 @@ class ApprovalTimesheet extends Mailable
             $data = [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
+                'link' => 'https://timereport.perdana.co.id/approval/project/assignment'
             ];
     
-            $subject = 'Timesheet Approval Reminder';
+            $subject = 'Assignment Approval Reminder';
     
-            return $this->markdown('mailer.timesheetapproval', $data)
+            return $this->markdown('mailer.approval_assignment', $data)
                         ->subject($subject)
                         ->to($this->employee->email);
         }
     
         public function emailSubject()
         {
-            return 'Timesheet Approval Reminder';
+            return 'Assignment Approval Reminder';
         }
     
         public function emailTo()
@@ -47,7 +47,7 @@ class ApprovalTimesheet extends Mailable
             return [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
+                'link' => 'https://timereport.perdana.co.id/approval/project/assignment'
             ];
         }
     }

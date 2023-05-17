@@ -8,13 +8,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ApprovalTimesheet extends Mailable
-    {
+    class RejectedTimesheet extends Mailable
+        {
         protected $employee;
+        protected $month;
+        protected $year;
     
-        public function __construct(User $employee)
+        public function __construct(User $employee, $year, $month)
         {
             $this->employee = $employee;
+            $this->month = $month;
+            $this->year = $year;
         }
     
         public function build()
@@ -22,19 +26,21 @@ class ApprovalTimesheet extends Mailable
             $data = [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
+                'link' => 'https://timereport.perdana.co.id/timesheet/entry/',
+                'month' => $this->month,
+                'year' => $this->year
             ];
     
-            $subject = 'Timesheet Approval Reminder';
+            $subject = 'Timesheet Rejected';
     
-            return $this->markdown('mailer.timesheetapproval', $data)
+            return $this->markdown('mailer.rejected_timesheet', $data)
                         ->subject($subject)
                         ->to($this->employee->email);
         }
     
         public function emailSubject()
         {
-            return 'Timesheet Approval Reminder';
+            return 'Timesheet Rejected';
         }
     
         public function emailTo()
@@ -47,7 +53,9 @@ class ApprovalTimesheet extends Mailable
             return [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
+                'link' => 'https://timereport.perdana.co.id/timesheet',
+                'month' => $this->month,
+                'year' => $this->year
             ];
         }
     }

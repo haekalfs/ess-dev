@@ -57,11 +57,8 @@ active
                         <td>{{ $approval->req_by }}</td>
                         <td>{{ $approval->company_project->project_name }}</td>
                         <td class="action text-center">
-                            <a href="/approval/project/assignment/approve/{{ $approval->id }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve
-                            </a>
-                            <a href="#" class="btn btn-danger btn-sm" style="margin-left: 3%;">Reject</a>
-                            <a href="/approval/project/assignment/preview/{{ $approval->id }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;">Preview</a>
+                            <a href="/approval/project/assignment/preview/{{ $approval->id }}" class="btn btn-secondary btn-sm" style="margin-right: 3%;">Preview</a>
+                            <a href="/approval/project/assignment/reject/{{ $approval->id }}" class="btn btn-danger btn-sm">Reject</a>
                         </td>
                     </tr>
                     @endforeach

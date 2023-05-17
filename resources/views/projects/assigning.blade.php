@@ -69,7 +69,7 @@ active
                             @elseif($assign->approval_status == 29) 
                             <span class="m-0 font-weight-bold text-primary">Approved by Service Director</span>
                             @else 
-                            <span class="text-danger">Rejected</span>
+                            <span class="m-0 font-weight-bold text-danger">Rejected</span>
                             @endif
                         </td>
                         <td class="text-center"><a class="btn btn-primary btn-sm" href="/assignment/member/{{ $assign->id }}"><i class='fas fa-fw fa-eye'></i> View</a></td>

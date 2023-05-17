@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApprovalAssignment;
 use App\Models\Approval_status;
 use App\Models\Client;
 use App\Models\Company_project;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;
 use App\Models\Project_role;
 use App\Models\Requested_assignment;
 use App\Models\User;
+use App\Models\Usr_role;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,6 +88,16 @@ class ProjectController extends Controller
             'approval_status' => '40'
     	]);
 
+        $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
+        $employees = User::whereIn('id', $roleToApprove)->get();
+
+        foreach ($employees as $employee) {
+            $notification = new ApprovalAssignment($employee);
+            Mail::send('mailer.approval_assignment', $notification->data(), function ($message) use ($notification) {
+                $message->to($notification->emailTo())
+                        ->subject($notification->emailSubject());
+            });
+        }
         return redirect("/assignment/member/$uniqueIdP")->with('success', "Assignment #$uniqueIdP Create successfully");
     }
 
@@ -102,12 +117,14 @@ class ProjectController extends Controller
                 $status = "Waiting for Approval";
             } elseif($as->approval_status == 29) {
                 $status = 1;
+            } elseif($as->approval_status == 404) {
+                $status = 404;
             } else {
                 $status = "Unknown Status";
             }
         }
         // $projects = $project->client->client_name;
-        // var_dump($project);
+        // var_dump($status);
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
@@ -128,6 +145,8 @@ class ProjectController extends Controller
                 $status = "Waiting for Approval";
             } elseif($as->approval_status == 29) {
                 $status = "Approved";
+            } elseif($as->approval_status == 404) {
+                $status = "Rejected";
             } else {
                 $status = "Unknown Status";
             }
@@ -191,18 +210,42 @@ class ProjectController extends Controller
         foreach ($company_code as $project) {
             $company_project_id = $project->company_project_id;
         }
-        $userAdded = $request->emp_name;
-        Project_assignment_user::create([
-            // 'id' => $uniqueId,
-    		'user_id' => $request->emp_name,
-    		'role' => $request->emp_role,
-            'responsibility' => $request->emp_resp,
-            'periode_start' => $request->fromTime,
-            'periode_end' => $request->toTime,
-            'project_assignment_id' => $assignment_id,
-            'company_project_id' => $company_project_id
-    	]);
-        return redirect()->back()->with('success', "$userAdded has been added to the assignment!");
+
+        $userFind = User::find($request->emp_name);
+        $userAdded = $userFind->name;
+        $from = Carbon::createFromFormat('Y-m-d', $request->fromTime);
+        $to = Carbon::createFromFormat('Y-m-d', $request->toTime);
+        $userId = $request->emp_name;
+        $companyProjectId = $company_project_id;
+
+        $existingAssignment = Project_assignment_user::where('user_id', $userId)
+            ->where('company_project_id', $companyProjectId)
+            ->where(function ($query) use ($from, $to) {
+                $query->where(function ($query) use ($from, $to) {
+                    $query->where('periode_start', '<=', $from->format('Y-m-d'))
+                        ->where('periode_end', '>=', $from->format('Y-m-d'));
+                })->orWhere(function ($query) use ($from, $to) {
+                    $query->where('periode_start', '<=', $to->format('Y-m-d'))
+                        ->where('periode_end', '>=', $to->format('Y-m-d'));
+                });
+            })
+            ->get();
+
+        if ($existingAssignment->isNotEmpty()) {
+            return redirect()->back()->with('failed', "$userAdded already have an assignment that intersect with current periode!");
+        } else {
+            Project_assignment_user::create([
+                // 'id' => $uniqueId,
+                'user_id' => $request->emp_name,
+                'role' => $request->emp_role,
+                'responsibility' => $request->emp_resp,
+                'periode_start' => $request->fromTime,
+                'periode_end' => $request->toTime,
+                'project_assignment_id' => $assignment_id,
+                'company_project_id' => $company_project_id
+            ]);
+            return redirect()->back()->with('success', "$userAdded has been added to the assignment!");
+        }
     }
 
     public function project_list()
@@ -366,7 +409,9 @@ class ProjectController extends Controller
         $project = Company_project::find($id);
         $project_member = Project_assignment_user::where('company_project_id', $id)->get();
         $project_id = Company_project::where('id', $id)->pluck('id')->first();
-        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member, 'project_id' => $project_id]);
+        $p_location = Project_location::all();
+        $client = Client::all();
+        return view('projects.company_project_view_only', ['project' => $project, 'project_member' => $project_member, 'project_id' => $project_id, 'clients' => $client, 'locations' => $p_location]);
     }
 
     public function project_delete(Request $request, $id)
@@ -398,7 +443,7 @@ class ProjectController extends Controller
     
     public function requested_assignment_entry(Request $request)
     {
-        $this->validate($request,[
+        $validator = Validator::make($request->all(), [
             'emp_name' => 'required',
             'emp_role' => 'required',
             'project' => 'required',
@@ -475,5 +520,39 @@ class ProjectController extends Controller
     	]);
 
         return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
+    }
+
+    public function retrieveProjectData($id)
+    {
+        // Get the Timesheet records between the start and end dates
+        $project = Company_project::find($id);
+        
+        return response()->json($project);
+    }
+
+    public function updateProjectData(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'p_code' => 'required',
+            'p_name' => 'required',
+            'from' => 'required',
+            'to' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $cp = Company_project::find($id);
+        $cp->project_code = $request->input('p_code');
+        $cp->alias = $request->input('p_location');
+        $cp->project_name = $request->input('p_name');
+        $cp->address = $request->input('address');
+        $cp->periode_start = $request->input('from');
+        $cp->periode_end = $request->input('to');
+        $cp->client_id = $request->input('p_client');
+        $cp->save();
+        
+        return response()->json(['success'=>'Project updated successfully.']);
     }
 }

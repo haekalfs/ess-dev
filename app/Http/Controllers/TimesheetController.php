@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EssMailer;
+use App\Mail\TimesheetReminderEmployee;
 use App\Models\Approval_status;
 use App\Models\Company_project;
 use App\Models\Cutoffdate;
@@ -10,9 +11,11 @@ use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;
 use App\Models\Timesheet;
+use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Users_detail;
+use App\Models\Usr_role;
 use Carbon\Carbon;
 use DateInterval;
 use DateTime;
@@ -180,20 +183,29 @@ class TimesheetController extends Controller
             }
         }
         $pLocations = Project_location::all();
+
+        $checkUserAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->get();
+
+        if ($checkUserAssignment->isEmpty()) {
+            $pLocations = $pLocations->reject(function ($pLocation) {
+                return $pLocation->location_code === 'WFH'; // Replace 'WFH' with the specific value you want to remove
+            });
+        }
         // Company_project::all();
         $userId = Auth::user()->id;
-        //Check Assignment Expiration
-        // Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '<', date('Y-m-d'))->whereNull('deleted_at')->delete();
-        // Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '>', date('Y-m-d'))->onlyTrashed()->restore();
 
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
-            // ->where('project_assignment_users.periode_end', '>', date('Y-m-d'))
+            ->whereMonth('project_assignment_users.periode_start', '<=', $month)
+            ->whereMonth('project_assignment_users.periode_end', '>=', $month)
+            ->whereYear('project_assignment_users.periode_start', $year)
+            ->whereYear('project_assignment_users.periode_end', $year)
             ->where('project_assignments.approval_status', 29)
             ->get();
+            
         $validStatusIDs = ['20', '29', '30', '40'];
         if($lastUpdate){
             if(in_array($lastUpdate->ts_status_id, $validStatusIDs)) {
@@ -294,7 +306,7 @@ class TimesheetController extends Controller
         $entry->ts_status_id = '10';
         $entry->save();
     
-        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
         return response()->json(['success' => 'Entry saved successfully.']);
     }
@@ -362,6 +374,25 @@ class TimesheetController extends Controller
 
         $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year.$month)->get();
 
+        $userId = Auth::user()->id;
+
+        $assignment = DB::table('project_assignment_users')
+            ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
+            ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
+            ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
+            ->where('project_assignment_users.user_id', '=', $userId)
+            ->whereMonth('project_assignment_users.periode_start', '<=', $month)
+            ->whereMonth('project_assignment_users.periode_end', '>=', $month)
+            ->whereYear('project_assignment_users.periode_start', $year)
+            ->whereYear('project_assignment_users.periode_end', $year)
+            ->where('project_assignments.approval_status', 29)
+            ->get();
+
+        $assignmentNames = $assignment->pluck('project_name')->implode(', ');
+        if($assignment->isEmpty()){
+            $assignmentNames = "None";
+        }
+
         $info = [];
         $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $month)
@@ -381,13 +412,32 @@ class TimesheetController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month','info'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month','info', 'assignmentNames'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
     {
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
+
+        $checkisSubmitted = DB::table('timesheet_details')
+        ->select('*')
+        ->whereYear('date_submitted', $year)
+        ->whereNotIn('ts_status_id', [10,404])
+        ->where('month_periode', $year.intval($month))
+        ->whereNotExists(function ($query) use ($year, $month) {
+            $query->select(DB::raw(1))
+                ->from('timesheet_details')
+                ->where('month_periode', $year.intval($month))
+                ->where('ts_status_id', [404]);
+        })
+        ->groupBy('user_timesheet', 'month_periode')
+        ->get();
+
+        if (!$checkisSubmitted->isEmpty()) {
+            Session::flash('failed', 'Your Timesheet has already been submitted!');
+            return redirect()->back();
+        }
 
         // Get the current date
         $currentDate = Carbon::now();
@@ -431,37 +481,359 @@ class TimesheetController extends Controller
         ->groupBy('ts_task', 'ts_location', 'ts_user_id')
         ->get();
     
+        $l10 = Timesheet_approver::where('id', 10)->pluck('approver')->first();
+        $l15 = Timesheet_approver::where('id', 15)->pluck('approver')->first();
+        $l20 = Timesheet_approver::where('id', 20)->pluck('approver')->first();
+        $l45 = Timesheet_approver::where('id', 45)->pluck('approver')->first();
+        $l40 = Timesheet_approver::where('id', 40)->pluck('approver')->first();
+        
+        
         // var_dump($countRows);
         foreach($countRows as $row) {
-            if (in_array($row->ts_task, ["HO", "Sick", "Standby", "Other"])) {
-                if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray())) {
-                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'RequestTo' => 'fm', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                    ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
-                } else {
-                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'RequestTo' => 'hr', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                    ['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
-                }
-            } else {
-                $test = Project_assignment_user::where('role', "PM")->where('project_assignment_id', $row->ts_task_id)->pluck('user_id')->first();
-                $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
-                if($test == NULL){
-                    $straighToPA = 'pa';
-                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $straighToPA, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                ['ts_mandays' => $row->total_rows, 'roleAs' => $checkRole, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '30', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
-                } else {
-                    Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'workhours' => intval($total_work_hours), 'activity' => 'Submitted', 'month_periode' => $year.$month, 'RequestTo' => $test, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],
-                    ['ts_mandays' => $row->total_rows, 'roleAs' => $checkRole, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'ts_task_id' => $row->ts_task_id, 'user_timesheet' => Auth::user()->id]);
-                }
-            }
+            Timesheet_detail::updateOrCreate([
+                'user_id' => Auth::user()->id,
+                'workhours' => intval($total_work_hours),
+                'activity' => 'Submitted',
+                'month_periode' => $year.$month,
+            ], [
+                'ts_status_id' => 20,
+                'date_submitted' => date('Y-m-d'),
+                'note' => '',
+                'ts_task' => '-',
+                'RequestTo' => '-',
+                'user_timesheet' => Auth::user()->id
+            ]);
+            $test = Project_assignment::where('id', $row->ts_task_id)->pluck('company_project_id')->first();
+            $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->pluck('user_id')->first();
+            $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
+            $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->pluck('user_id')->first();
             
-            // Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Submitted', 'month_periode' => $year.$month, 'ts_task' => $row->ts_task, 'ts_location' => $row->ts_location],['ts_mandays' => $row->total_rows, 'date_submitted' => date('Y-m-d'),'ts_status_id' => '20', 'note' => '', 'user_timesheet' => Auth::user()->id]);
-        }
+            $timesheetApproversHR = Timesheet_approver::where('id', 10)->pluck('approver');
+            $checkUserHR = $timesheetApproversHR->toArray();
+            switch ($row->ts_task) {
+                case(in_array(Auth::user()->id, $checkUserHR)):
+                    Timesheet_detail::updateOrCreate([
+                        'user_id' => Auth::user()->id,
+                        'workhours' => intval($total_work_hours),
+                        'month_periode' => $year.$month,
+                        'RequestTo' => $l45,
+                        'ts_task' => $row->ts_task,
+                        'ts_location' => $row->ts_location
+                    ], [
+                        'ts_mandays' => $row->total_rows,
+                        'activity' => 'Waiting for Approval',
+                        'roleAs' => $checkRole,
+                        'date_submitted' => date('Y-m-d'),
+                        'ts_status_id' => '20',
+                        'note' => '',
+                        'ts_task_id' => $row->ts_task_id,
+                        'user_timesheet' => Auth::user()->id
+                    ]);
+                break;
+                case "HO":
+                case "Sick":
+                case "Standby":
+                case "Other":
+                case "Training":
+                case "Trainer":
+                    $requestTo = in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) ? $l15 : $l10;
+                    Timesheet_detail::updateOrCreate([
+                        'user_id' => Auth::user()->id,
+                        'workhours' => intval($total_work_hours),
+                        'RequestTo' => $requestTo,
+                        'month_periode' => $year.$month,
+                        'ts_task' => $row->ts_task,
+                        'ts_location' => $row->ts_location
+                    ], [
+                        'ts_mandays' => $row->total_rows,
+                        'date_submitted' => date('Y-m-d'),
+                        'ts_status_id' => '20',
+                        'activity' => 'Waiting for Approval 1',
+                        'note' => '',
+                        'ts_task_id' => $row->ts_task_id,
+                        'user_timesheet' => Auth::user()->id
+                    ]);
         
+                    Timesheet_detail::updateOrCreate([
+                        'user_id' => Auth::user()->id,
+                        'workhours' => intval($total_work_hours),
+                        'RequestTo' => $l45,
+                        'month_periode' => $year.$month,
+                        'ts_task' => $row->ts_task,
+                        'ts_location' => $row->ts_location
+                    ], [
+                        'ts_mandays' => $row->total_rows,
+                        'date_submitted' => date('Y-m-d'),
+                        'ts_status_id' => '20',
+                        'activity' => 'Waiting for Approval 2',
+                        'note' => '',
+                        'ts_task_id' => $row->ts_task_id,
+                        'user_timesheet' => Auth::user()->id
+                    ]);
+                    break;
+        
+                default:
+                $timesheetApprovers = Timesheet_approver::where('id', 20)->pluck('approver');
+                $checkUser = $timesheetApprovers->toArray();
+                // if(in_array(Auth::user()->id, $checkUser)){
+                //     Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->delete();
+                // }
+                switch (true) {
+                    case(in_array(Auth::user()->id, $checkUser)):
+                        Timesheet_detail::updateOrCreate([
+                            'user_id' => Auth::user()->id,
+                            'workhours' => intval($total_work_hours),
+                            'month_periode' => $year.$month,
+                            'RequestTo' => $l40,
+                            'ts_task' => $row->ts_task,
+                            'ts_location' => $row->ts_location
+                        ], [
+                            'ts_mandays' => $row->total_rows,
+                            'activity' => 'Waiting for Approval 4',
+                            'roleAs' => $checkRole,
+                            'date_submitted' => date('Y-m-d'),
+                            'ts_status_id' => '20',
+                            'note' => '',
+                            'ts_task_id' => $row->ts_task_id,
+                            'user_timesheet' => Auth::user()->id
+                        ]);
+                        break;
+                    case ($test2 == NULL):
+                        if ($pa == NULL) {
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l20,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 3',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l40,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 4',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                        } else {
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $pa,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 2',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l20,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 3',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l40,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 4',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                        }
+                        break;
+
+                    default:
+                        if ($pa == NULL) {
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $test2,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 1',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l20,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 3',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l40,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 4',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                        } else {
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $test2,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 1',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $pa,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 2',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l20,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 3',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+
+                            Timesheet_detail::updateOrCreate([
+                                'user_id' => Auth::user()->id,
+                                'workhours' => intval($total_work_hours),
+                                'month_periode' => $year.$month,
+                                'RequestTo' => $l40,
+                                'ts_task' => $row->ts_task,
+                                'ts_location' => $row->ts_location
+                            ], [
+                                'ts_mandays' => $row->total_rows,
+                                'activity' => 'Waiting for Approval 4',
+                                'roleAs' => $checkRole,
+                                'date_submitted' => date('Y-m-d'),
+                                'ts_status_id' => '20',
+                                'note' => '',
+                                'ts_task_id' => $row->ts_task_id,
+                                'user_timesheet' => Auth::user()->id
+                            ]);
+                        }
+                    break;
+                }
+                break;
+            }
+            if(Auth::user()->id == $test2 || Auth::user()->id == $pa){
+                Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->delete();
+            }
+        }
         // Update Timesheet records between the start and end dates
         Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '20']);
       
+        $ts_date_desc = date("F", mktime(0, 0, 0, $month, 1)).' '.$year;
         // return response()->json($activities);
-        Session::flash('success',"Timereport $year - 0$month has been submitted!");
+        Session::flash('success',"Your Timereport $ts_date_desc has been submitted!");
         return redirect()->back();
     }
 
@@ -607,5 +979,53 @@ class TimesheetController extends Controller
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => $month_periode],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
         return response()->json(['success' => "Entry saved successfully. $request->daterange"]);
+    }
+
+    public function summary(Request $request)
+	{
+		$Month = date('m');
+        $Year = date('Y');
+
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $employees = User::all();
+        
+        $validator = Validator::make($request->all(), [
+            'showOpt' => 'required',
+            'yearOpt' => 'required',
+            'monthOpt' => 'required'
+        ]);
+
+        // var_dump($Year.intval($Month));
+        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_status_id', 'RequestTo');
+
+        if ($validator->passes()) {
+            $Year = $request->yearOpt;
+            $Month = $request->monthOpt;
+            $approvals->whereYear('date_submitted', $Year);
+            $approvals->where('month_periode', $Year.intval($Month));
+        } else {
+            $approvals->whereYear('date_submitted', $Year);
+            $approvals->where('month_periode', $Year.intval($Month));
+        }
+
+        $approvals = $approvals->get();
+        // dd($approvals);
+		return view('timereport.summary', compact('approvals', 'yearsBefore', 'Month', 'Year','employees'));
+	}
+
+    public function remind($id, $year, $month)
+    {
+        $employees = User::where('id', $id)->get();
+
+        foreach ($employees as $employee) {
+            $notification = new TimesheetReminderEmployee($employee, $year, $month);
+            Mail::send('mailer.timesheet_entry', $notification->data(), function ($message) use ($notification) {
+                $message->to($notification->emailTo())
+                        ->subject($notification->emailSubject());
+            });
+        }
+        return redirect()->back()->with('success', "An email has been sent!");
     }
 }

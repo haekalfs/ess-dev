@@ -96,7 +96,7 @@
                         @else
                         @endusr_acc
                         @usr_acc(103)
-                        <a class="collapse-item" href="/development">Summary</a>
+                        <a class="collapse-item" href="/timesheet/summary/all">Summary</a>
                         @else
                         @endusr_acc
                         @usr_acc(104)
@@ -387,7 +387,12 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bell fa-fw"></i>
                                 <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
+                                @if ($notifications->isEmpty())
+                                @else
+                                <span class="badge badge-danger badge-counter">
+                                    {{ $notificationsCount }}
+                                </span>
+                                @endif
                             </a>
                             <!-- Dropdown - Alerts -->
                             <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -395,50 +400,36 @@
                                 <h6 class="dropdown-header">
                                     Alerts Center
                                 </h6>
+                                @if ($notifications->isEmpty())
                                 <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                    </div>
+                                    <span class="text-gray-500">No Data Available</span>
                                 </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                                @else
+                                    @foreach ($notifications as $notification)
+                                        <a class="dropdown-item d-flex align-items-center" href="#">
+                                            <div class="mr-3">
+                                                <div class="icon-circle bg-primary">
+                                                    <i class="fas fa-file-alt text-white"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="small text-gray-500">{{ $notification->created_at }}</div>
+                                                <span class="font-weight-bold">{{ $notification->message}}</span>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                @endif
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Showing latest notification of 7 days</a>
                             </div>
                         </li>
 
+                        @guest
+
+                        @else
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            @guest
-
-                            @else
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span
@@ -462,8 +453,8 @@
                                     @csrf
                                 </form>
                             </div>
-                            @endguest
                         </li>
+                        @endguest
 
                     </ul>
 

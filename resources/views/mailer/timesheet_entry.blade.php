@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>This is timesheet approval reminder, and some user's timesheets require your approval. Kindly request your review for the documents.</p>
+<p>Kindly remind you to fill up the timesheet entry of {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{ $year }}. Complete and submit your timesheet before the end of 7th. Failure to submit your timesheet on time may result in late payment.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>
