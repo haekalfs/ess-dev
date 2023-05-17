@@ -423,6 +423,7 @@ class TimesheetController extends Controller
         $checkisSubmitted = DB::table('timesheet_details')
         ->select('*')
         ->whereYear('date_submitted', $year)
+        ->where('user_timesheet', Auth::user()->id)
         ->whereNotIn('ts_status_id', [10,404])
         ->where('month_periode', $year.intval($month))
         ->whereNotExists(function ($query) use ($year, $month) {
