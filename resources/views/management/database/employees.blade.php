@@ -45,18 +45,34 @@ active
         <div class="card-body">
             <div class="col-md-12 zoom90">
                 <div class="row d-flex justify-content-start">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="position_id">Filter by Position:</label>
-                            <select name="position_id" class="form-control" id="position_id">
-                                <option value="">All Positions</option>
-                                <option value="4,18,19" {{ request('position_id') == '4,18,19' ? 'selected' : '' }}>Consultant</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-center align-items-end">
-                        <div class="form-group">
-                            <input type="submit" class="btn btn-primary" value="Filter"/>
+                    <div class="col-md-12">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="position_id">Filter by Position:</label>
+                                    <select name="position_id" class="form-control" id="position_id">
+                                        <option value="">All Positions</option>
+                                        <option value="4,18,19" {{ request('position_id') == '4,18,19' ? 'selected' : '' }}>Consultant</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="col-md-4">  
+                                <div class="form-group">
+                                    <label for="status">Status:</label>
+                                    <select name="status" class="form-control" id="status">
+                                        <option value="">All</option>
+                                        <option value="Active" {{ request('status_active') == 'Active' ? 'selected' : '' }}>Active</option>
+                                        <option value="nonActive" {{ request('status_active') == 'nonActive' ? 'selected' : '' }}>Non Active</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-self-end justify-content-start">
+                                <div class="form-group">
+                                    <div class="align-self-center">
+                                        <input type="submit" class="btn btn-primary" value="Filter"/>
+                                    </div>
+                                </div>
+                            </div>   
                         </div>
                     </div>
                     <div class="col-md-12"><br>

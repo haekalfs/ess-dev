@@ -14,6 +14,7 @@ class EmployeesDatabase extends Controller
         // $listUser = User::join('users_details', 'users.id', '=', 'users_details.user_id')
         // ->whereIn('users_details.position_id', $positionIds)
         //     ->get();
+        $status = $request->query('status');
         $positionIds = explode(',', $request->position_id);
         $users = User::join('users_details', 'users.id', '=', 'users_details.user_id');
 
@@ -21,6 +22,13 @@ class EmployeesDatabase extends Controller
             $users->whereIn('users_details.position_id', $positionIds);
         }
 
+        if ($status) {
+            if ($status === 'Active') {
+                $users->where('status_active', 'Active');
+            } elseif ($status === 'nonActive') {
+                $users->where('status_active', 'nonActive');
+            }
+        }
         $listUser = $users->get();
 
         return view('management.database.employees', ['users' => $listUser]);

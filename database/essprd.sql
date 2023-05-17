@@ -269,3 +269,5 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2023-02-27 15:54:48
+
+ALTER TABLE `users_details` ADD `profile_pic` VARCHAR(255) NULL AFTER `current_address`, ADD `cv` VARCHAR(255) NULL AFTER `profile_pic`;

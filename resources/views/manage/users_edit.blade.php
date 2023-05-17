@@ -8,7 +8,7 @@ active
 <!-- Page Heading -->
 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between ">
 <h4 class="m-0 font-weight-bold text-grey">Edit Employee</h4>
-<form method="POST" action="/users/update/{{ $user->id }}">
+<form method="POST" action="/users/update/{{ $user->id }}" enctype="multipart/form-data">
 @csrf
 @method('PUT')
     <div class="text-right">
@@ -36,9 +36,70 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+.img-thumbnail.no-image {
+  position: relative;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px; 
+  height: 100px;
+}
 
+.no-image-text {
+  text-align: center;
+}
+</style>
     <div class="row">
         <!-- Area Chart -->
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Profile Picture & CV</h6>
+                </div>
+                    <!-- Card Body -->
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Profile Picture:</label>
+                                    <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="changeFileName('profile', 'profile-label')">
+                                    <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
+                                    </div>
+                                </div>
+                                @if($user->users_detail->profile_pic)
+                                    <img style="max-width: 110px; max-height: 110px;" class="img-thumbnail" src="{{ url('/storage/profile_pic/'.$user->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                @else
+                                <div class="img-thumbnail no-image"><i class="no-image-text">No Image Available</i></div>
+                                @endif
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>CV:</label>
+                                    <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="changeFileName('cv', 'cv-label')">
+                                    <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
+                                    </div>
+                                </div>
+                                @if($user->users_detail->cv)
+                                   <a href="{{ url('/storage/cv/'.$user->users_detail->cv) }}" target="_blank">
+                                        <img class="img-thumbnail" width="110px" src="https://img.icons8.com/cute-clipart/64/pdf.png" alt="CV Image">
+                                    </a>
+                                @else
+                                    <div class="img-thumbnail no-image"><i class="no-image-text">No CV Available</i></div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -499,4 +560,53 @@ active
         </div>
     </div>
 </form>
+<!-- Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img src="{{ url('/storage/profile_pic/'.$user->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+            </div>
+            {{-- <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div> --}}
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#usr_id').blur(function() {
+        var userId = $(this).val();
+        checkUserIdExists(userId);
+    });
+
+    function checkUserIdExists(userId) {
+        $.ajax({
+            url: '/check-user-id',
+            method: 'POST',
+            data: {
+                '_token': '{{ csrf_token() }}',
+                'usr_id': userId
+            },
+            success: function(response) {
+                if (response.exists) {
+                    $('#user-id-error').text('User ID sudah digunakan');
+                } else {
+                    $('#user-id-error').text('User ID Tersedia');
+                }
+            },
+            error: function() {
+                $('#user-id-error').text('Terjadi kesalahan saat memeriksa User ID');
+            }
+        });
+    }
+});
+
+function changeFileName(inputId, labelId) {
+  var input = document.getElementById(inputId);
+  var label = document.getElementById(labelId);
+  label.textContent = input.files[0].name;
+}
+</script>
 @endsection
