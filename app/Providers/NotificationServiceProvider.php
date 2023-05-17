@@ -31,7 +31,13 @@ class NotificationServiceProvider extends ServiceProvider
                 ->orderBy('created_at', 'desc')
                 ->limit(3)
                 ->get();
-            $view->with('notifications', $notifications);
+            $notificationsCount = Notification_alert::where('user_id', Auth::user()->id)
+                ->orderBy('created_at', 'desc')
+                ->count();
+            $view->with([
+                'notifications' => $notifications,
+                'notificationsCount' => $notificationsCount,
+            ]);
         });
     }
 }

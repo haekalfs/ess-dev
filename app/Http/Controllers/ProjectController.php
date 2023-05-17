@@ -6,6 +6,7 @@ use App\Mail\ApprovalAssignment;
 use App\Models\Approval_status;
 use App\Models\Client;
 use App\Models\Company_project;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;

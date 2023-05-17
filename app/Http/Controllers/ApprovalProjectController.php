@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Company_project;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_role;
@@ -66,6 +67,17 @@ class ApprovalProjectController extends Controller
         date_default_timezone_set("Asia/Jakarta");
         Project_assignment::where('id', $assignment_id)->update(['approval_status' => '29']);
 
+        $assignment = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
+        
+        foreach($assignment as $as){
+            $entry = new Notification_alert();
+            $entry->user_id = $as->user_id;
+            $cp = $as->company_project->project_name;
+            $entry->message = "You have assigned to an assignment of $cp!";
+            $entry->importance = 1;
+            $entry->save();
+        }
+        
         Session::flash('success',"You approved Assignment #$assignment_id!");
         return redirect()->back();
     }

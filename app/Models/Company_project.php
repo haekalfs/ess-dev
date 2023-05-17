@@ -27,4 +27,8 @@ class Company_project extends Model
     public function client(){
         return $this->belongsTo('App\Models\Client');
     }
+
+    public function project_assignment_user(){
+    	return $this->hasMany('App\Models\Project_assignment_user');
+    }
 }

@@ -387,7 +387,12 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bell fa-fw"></i>
                                 <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">1+</span>
+                                @if ($notifications->isEmpty())
+                                @else
+                                <span class="badge badge-danger badge-counter">
+                                    {{ $notificationsCount }}
+                                </span>
+                                @endif
                             </a>
                             <!-- Dropdown - Alerts -->
                             <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
