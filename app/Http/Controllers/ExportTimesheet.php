@@ -116,14 +116,9 @@ class ExportTimesheet extends Controller
         
             // Accumulate the allowances for each user
             $totalAllowances += $countAllowances;
-            // Print the total allowances only once for each user
-            // if ($firstRow) {
-            //     $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $totalAllowances);
-            //     $firstRow = false; // Set the firstRow flag to false after printing the total allowances
-            // }
 
             if($row->roleAs == NULL){
-                $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, 0);
+                
             } elseif ($row->roleAs == "MT") {
                 $mt_hiredDate = Users_detail::where('user_id', $lastUser)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
                 $hiredDate = new DateTime($mt_hiredDate);
@@ -156,6 +151,10 @@ class ExportTimesheet extends Controller
             
             $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
         
+            if (!$firstRow) {
+                $total = $totalIncentive + $totalAllowances;
+                $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $total);
+            }
             $startRow++;
             $firstRow = false; // Set the firstRow flag to false after the first row for each user
         }
