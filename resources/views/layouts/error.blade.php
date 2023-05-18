@@ -382,20 +382,6 @@
                             </div>
                         </li>
 
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                @if ($notifications->isEmpty())
-                                @else
-                                <span class="badge badge-danger badge-counter">
-                                    {{ $notificationsCount }}
-                                </span>
-                                @endif
-                            </a>
-                        </li>
-
                         @guest
 
                         @else
