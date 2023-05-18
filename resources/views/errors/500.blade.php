@@ -4,7 +4,7 @@
 @section('code', '500')
 @section('message', __('Server Error')) --}}
 
-@extends('layouts.main')
+@extends('layouts.error')
 
 @section('content')
 <div class="text-center">

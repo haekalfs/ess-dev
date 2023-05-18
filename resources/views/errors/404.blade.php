@@ -4,7 +4,7 @@
 @section('code', '404')
 @section('message', __('Not Found')) --}}
 
-@extends('layouts.main')
+@extends('layouts.error')
 
 @section('content')
 <div class="text-center">
