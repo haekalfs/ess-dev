@@ -39,7 +39,7 @@ active
             <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
         </div> --}}
     </div>
-    <form method="GET" action="/timesheet/summary/e">
+    <form method="GET" action="/timesheet/summary/all">
         @csrf
         <div class="card-body">
             <div class="col-md-12 zoom90">
