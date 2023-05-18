@@ -11,6 +11,8 @@ use App\Models\Users_detail;
 use App\Models\Position;
 use App\Models\Department;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class UserController extends Controller
 {
@@ -42,18 +44,30 @@ class UserController extends Controller
             'department' => 'required',
             'hired_date'=> 'required',
             'employee_id'=> 'required',
-            'usr_id_type'=> 'required',
-            'usr_id_no'=> 'required',
-            'usr_id_expiration'=> 'required',
-            'usr_dob'=> 'required',
-            'usr_birth_place'=> 'required',
-            'usr_gender'=> 'required',
-            'usr_religion'=> 'required',
+            // 'usr_id_type'=> 'required',
+            // 'usr_id_no'=> 'required',
+            // 'usr_id_expiration'=> 'required',
+            // 'usr_dob'=> 'required',
+            // 'usr_birth_place'=> 'required',
+            // 'usr_gender'=> 'required',
+            // 'usr_religion'=> 'required',
             ]);
         
         $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
         $nextId = intval(substr($lastId, 4)) + 1;
         $hash_pwd = Hash::make($request->password);
+
+        // menyimpan data file yang diupload ke variabel $file
+        $profile_file = $request->file('profile');
+        $nama_file_profile = $request->usr_id . "_" . $profile_file->getClientOriginalName();
+        // isi dengan nama folder tempat kemana file diupload
+        $tujuan_upload_profile = '/storage/profile_pic';
+        $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
+
+        $cv_file = $request->file('cv');
+        $nama_file_cv = $request->usr_id . "_" . $cv_file->getClientOriginalName();
+        $tujuan_upload_cv = '/storage/cv';
+        $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
 
         User::create([
             'id' => $request->usr_id,
@@ -90,7 +104,9 @@ class UserController extends Controller
             'usr_bank_name'=> $request->usr_bank_name,
             'usr_bank_branch'=> $request->usr_bank_branch,
             'usr_bank_account'=> $request->usr_bank_account,
-            'usr_bank_account_name' => $request->usr_bank_account_name
+            'usr_bank_account_name' => $request->usr_bank_account_name,
+            'profile_pic' => $nama_file_profile,
+            'cv' => $nama_file_cv,
         ]);
 
     	return redirect('/manage/users')->with('success', 'User Create successfully');
@@ -133,6 +149,38 @@ class UserController extends Controller
             'usr_religion'=> 'required',
             ]);
             
+            // menyimpan data file yang diupload ke variabel $file
+            $profile_file = $request->file('profile');
+            $nama_file_profile = $request->usr_id . "_" . $profile_file->getClientOriginalName();
+            
+            // isi dengan nama folder tempat kemana file diupload
+            $tujuan_upload_profile = 'public/profile_pic';
+            $profile_file->storeAs($tujuan_upload_profile, $nama_file_profile);
+            
+            
+            // Menghapus gambar profil yang lama jika ada
+                if ($request->hasFile('profile')) {
+                    $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
+    
+                    if (Storage::exists($oldProfileImage)) {
+                        Storage::delete($oldProfileImage);
+                    }
+                }
+
+            $cv_file = $request->file('cv');
+            $nama_file_cv = $request->usr_id . "_" . $cv_file->getClientOriginalName();
+            $tujuan_upload_cv = 'public/cv';
+            $cv_file->storeAs($tujuan_upload_cv, $nama_file_cv);
+            
+            if ($request->hasFile('cv')) {
+                $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
+
+                if (Storage::exists($oldCV)) {
+                    Storage::delete($oldCV);
+                }
+            }
+
+
             $user = User::find($id);
             $user->id = $request->usr_id;
             $user->name = $request->name;
@@ -168,6 +216,8 @@ class UserController extends Controller
             $user_detail->usr_bank_account = $request->usr_bank_account;
             $user_detail->usr_bank_account_name = $request->usr_bank_account_name;
             $user_detail->current_address = $request->current_address;
+            $user_detail->profile_pic = $nama_file_profile;
+            $user_detail->cv = $nama_file_cv;
             $user_detail->save();
 
 

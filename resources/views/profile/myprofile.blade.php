@@ -29,6 +29,23 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+    .img-thumbnail.no-image {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-image-text {
+  text-align: center;
+}
+</style>
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
@@ -46,11 +63,13 @@ active
                     <div class="col-md-3 align-items-center text-center">
                         <table class="table table-borderless">
                             <tbody>
-                                <tr>
-                                    <td><img src="{{ asset('img/profile.jpg') }}" style="height: 100px; width: 100px;" /></td>
-                                </tr>
-                                <tr>
-                                    <td><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" href="#" id="manButton">Upload CV</a></td>
+                                <tr class="table-sm text-center">
+                                    <td style="d-flex align-items-center text-center"> @if($user_info->users_detail->profile_pic)
+                                            <img class="img-thumbnail" width="100px" height="100px" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                        @else
+                                            <div class="img-thumbnail no-image"><i class="no-image-text">No Image Available</i></div>
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -293,4 +312,30 @@ active
 		</div>
 	</div>
 </div>
+
+<!-- Modal Profile -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="text-right" width="100px">
+    </div>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close-icon">
+                    <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
+                </div>
+                <img src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+    cursor: pointer;
+}
+
+</style>
 @endsection

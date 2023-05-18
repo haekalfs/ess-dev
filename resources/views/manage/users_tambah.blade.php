@@ -6,7 +6,7 @@ active
 @endsection
 
 @section('content')
-<form method="POST" action="/users/store">
+<form method="POST" action="/users/store" enctype="multipart/form-data">
     @csrf
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -36,6 +36,39 @@ active
 @endif
     <div class="row">
         <!-- Area Chart -->
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Profile Picture & CV</h6>
+                </div>
+                    <!-- Card Body -->
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Profile Picture:</label>
+                                    <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="changeFileName('profile', 'profile-label')">
+                                    <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>CV:</label>
+                                    <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="changeFileName('cv', 'cv-label')">
+                                    <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -527,6 +560,12 @@ $(document).ready(function() {
         });
     }
 });
+
+function changeFileName(inputId, labelId) {
+  var input = document.getElementById(inputId);
+  var label = document.getElementById(labelId);
+  label.textContent = input.files[0].name;
+}
 </script>
 
 @endsection
