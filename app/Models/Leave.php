@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Approval_status extends Model
+class Leave extends Model
 {
     use HasFactory;
-    protected $table = "approval_status";
-
+    protected $table = 'leave';
+    
     public function leave_request(){
     	return $this->hasMany('App\Models\Leave_request');
     }

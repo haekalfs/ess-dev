@@ -1,8 +1,8 @@
 @extends('layouts.main')
 
-@section('title', 'Timesheet - ESS')
+@section('title', 'Timesheet Approval - ESS')
 
-@section('active-page-timesheet')
+@section('active-page-approval')
 active
 @endsection
 
@@ -57,7 +57,7 @@ active
                             </thead>
                             <tbody>
                                 <tr class="table-sm">
-                                    <td>Name</td>
+                                    <td>Nama</td>
                                     <td>: {{$user_info->name}}</td>
                                 </tr>
                                 <tr class="table-sm">
@@ -122,12 +122,11 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Timesheet Preview</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/review/fm/preview/print/{{$year}}/{{$month}}/{{$user_id}}" id="manButton">Download</a>
         </div>
     </div>
-    <!-- Card Body -->
     <div class="card-body">
-        <div class="table-responsive table-sm">
+        <div class="table-responsive zoom90 table-sm">
             <table class="table table-bordered zoom80" id="tsPreview" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
@@ -250,11 +249,7 @@ active
                 <tbody>
                     <tr class="table-sm">
                         <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
-                        @if($total_work_hours < 160)
-                        <td class="text-center text-danger font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
-                        @else
-                        <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
-                        @endif
+                        <td class="text-center font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
                     </tr>
                 </tbody>
             </table>
@@ -291,13 +286,13 @@ active
                                 <td style="border-bottom: none; border-top: none;"></td>
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->RequestTo }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @else
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->user->name }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->user_id }}</td>
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->RequestTo }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @endif
                             </tr>

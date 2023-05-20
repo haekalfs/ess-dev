@@ -86,8 +86,24 @@ $(document).ready(function() {
 
 $(document).ready(function() {
   $('#listAssignments').DataTable({
-    "order": [[ 1, "asc" ]],
+    "order": [[ 0, "desc" ]],
     "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
     "pageLength": 20
+  } );
+} );
+
+$(document).ready(function() {
+  $('#myLeave').DataTable({
+    "order": [[ 0, "desc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 5
+  } );
+} );
+
+$(document).ready(function() {
+  $('#requestedAssignment').DataTable({
+    "order": [[ 0, "desc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 5
   } );
 } );

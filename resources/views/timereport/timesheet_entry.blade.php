@@ -71,9 +71,13 @@ active
                                                 $status = $day['status'];
                                             @endphp
                                             @if ($status === "red")
-                                                <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}<br></td>
+                                                <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
+                                            @elseif ($status === 2907)
+                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <a><i class="fas fa-plane-departure fa-sm"></i></a>
+                                                </td>
                                             @else
-                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}<br></td>
+                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
                                             @endif
                                         @else
                                             @php
@@ -113,18 +117,48 @@ active
                 <div class="card shadow mb-4">
                     <!-- Card Header - Dropdown -->
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Allowances Calculation</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Information Details</h6>
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
-                        <table class="zoom80">
-                            {{-- <thead>
-                                <tr class="calculations">
-                                </tr>
-                            </thead> --}}
-                            <tbody class="calculations">
-                            </tbody>
-                        </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
+                        <div class="row">
+                            <div class="col-xl-8 col-lg-8">
+                                <table class="zoom80">
+                                    <thead>
+                                        <tr>
+                                            <th>Allowances Calculations :</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="calculations">
+                                    </tbody>
+                                </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
+                            </div>
+                            <div class="col-xl-4 col-lg-4">
+                                <table class="zoom80">
+                                    <thead>
+                                        <tr>
+                                            <th>My Leave Days :</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <td>
+                                        @forelse($leaveRequests as $leaves)
+                                            <li class="zoom90" style="font-size: 12px;">
+                                                @foreach ($leaves->dateGroups as $key => $group)
+                                                    @if ($key > 0)
+                                                        -
+                                                    @endif
+                                                    {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
+                                                @endforeach
+                                            </li>
+                                        @empty
+                                            <a><small><i>No Leaves</i></small></a>
+                                        @endforelse
+                                        </td>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,11 +170,36 @@ active
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
-                        @forelse($assignment as $assign)
-                            <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name }}</li>
-                        @empty
-                            <a><small><i>No Project Assigned</i></small></a>
-                        @endforelse
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="font-size: small;">My Assignments :</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="col-xl-4 col-lg-4">
+                                @forelse($assignment as $assign)
+                                <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name }}</li>
+                                @empty
+                                    <a><small><i>No Project Assigned</i></small></a>
+                                @endforelse
+                            </div>
+                            <div class="col-xl-4 col-lg-4">
+                                @forelse($assignment as $assign)
+                                <li class="zoom90" style="font-size: 12px;">{{ $assign->responsibility }}</li>
+                                @empty
+                                @endforelse
+                            </div>
+                            <div class="col-xl-4 col-lg-4">
+                                @forelse($assignment as $assign)
+                                <li class="zoom90" style="font-size: 12px;">{{ $assign->address }}</li>
+                                @empty
+                                @endforelse
+                            </div>
+                        </div>
                         {{-- <small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small> --}}
                     </div>
                 </div>

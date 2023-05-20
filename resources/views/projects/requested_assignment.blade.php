@@ -42,7 +42,7 @@ active
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered zoom90" id="myProjects" cellspacing="0">
+            <table class="table table-bordered zoom90" id="requestedAssignment" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
                         <th>Request Date</th>
@@ -65,6 +65,8 @@ active
                         <td>
                             @if($record->status == 0)
                             <a style='font-size: small;'><i class='fas fa-fw fa-spinner'></i></a>
+                            @elseif ($record->status == 404)
+                            <a style='font-size: small;'><i class='fas fa-fw fa-ban'></i></a>
                             @else
                             <a style='font-size: small;'><i class='fas fa-fw fa-check'></i></a>
                             @endif
@@ -72,9 +74,11 @@ active
                         <td class="action text-center">
                             @if($record->status == 1)
                             <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/view/{{$record->id}}"><i class='fas fa-fw fa-eye'></i> View</a>
-                            @else
+                            @elseif ($record->status == 404)
                             <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/view/{{$record->id}}"><i class='fas fa-fw fa-eye'></i> View</a>
+                            @else
                             <a class="btn btn-primary btn-sm" href="/assignment/requested/by/user/approve/{{$record->id}}"><i class='fas fa-fw fa-check'></i> Process</a>
+                            <a class="btn btn-danger btn-sm" href="/assignment/requested/by/user/reject/{{$record->id}}"><i class='fas fa-fw fa-ban'></i> Reject</a>
                             @endif
                         </td>
                     </tr>

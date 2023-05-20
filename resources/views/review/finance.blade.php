@@ -113,7 +113,7 @@ active
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
                                         <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                            <a href="/approval/timesheet/preview/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
+                                            <a href="/timesheet/review/fm/review/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
                                         </td>
                                         @endif
                                     </tr>

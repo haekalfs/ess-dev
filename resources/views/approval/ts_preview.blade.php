@@ -127,7 +127,7 @@ active
                     <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Approve
                 </button>
                 <div class="dropdown-menu" aria-labelledby="approveDropdown">
-                    <form action="/approval/timesheet/approve/{{ $id }}/{{ $year }}/{{ $month }}" method="post">
+                    <form action="/approval/timesheet/approve/{{ $user_id }}/{{ $year }}/{{ $month }}" method="post">
                         @csrf
                         <div class="col-md-12 zoom90">
                             <div class="row">
@@ -155,7 +155,7 @@ active
                     <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject
                 </button>
                 <div class="dropdown-menu" aria-labelledby="rejectDropdown">
-                    <form action="/approval/timesheet/reject/{{ $id }}/{{ $year }}/{{ $month }}" method="post">
+                    <form action="/approval/timesheet/reject/{{ $user_id }}/{{ $year }}/{{ $month }}" method="post">
                         @csrf
                         <div class="col-md-12 zoom90">
                             <div class="row">
@@ -176,13 +176,13 @@ active
                         </div>
                     </form>
                 </div>
-            </div>            
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/approval/preview/print/{{$year}}/{{$month}}/{{$id}}" id="manButton">Download</a>
+            </div>
+            <a class="btn btn-secondary btn-sm" type="button" href="/approval/timesheet/preview/print/{{$year}}/{{$month}}/{{$user_id}}" id="manButton">Download</a>
         </div>
     </div>
     <div class="card-body">
         <div class="table-responsive zoom90 table-sm">
-            <table class="table table-bordered" id="tsPreview" width="100%" cellspacing="0">
+            <table class="table table-bordered zoom80" id="tsPreview" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
                         <th>Day</th>
@@ -196,27 +196,106 @@ active
                 </thead>
                 <tbody>
                     <?php $total_work_hours = 0; ?>
-                    @foreach($timesheet as $timesheets)
+                    @for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay())
                         <tr>
-                            <td>{{ \Carbon\Carbon::parse($timesheets->ts_date)->format('D') }}</td>
-                            <td>{{ date('d-M-Y', strtotime($timesheets->ts_date)) }}</td>
-                            <td>{{ $timesheets->ts_task }}</td>
-                            <td>{{ $timesheets->ts_location }}</td>
-                            <td>{{ $timesheets->ts_activity }}</td>
-                            <td>{{ $timesheets->ts_from_time }}</td>
-                            <td>{{ $timesheets->ts_to_time }}</td>
                             <td>
-                            <?php 
-                            $start_time = strtotime($timesheets->ts_from_time);
-                            $end_time = strtotime($timesheets->ts_to_time);
-                            $time_diff_seconds = $end_time - $start_time;
-                            $time_diff_hours = gmdate('H', $time_diff_seconds);
-                            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes;
-                            ?>
+                                @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
+                                    <span class="text-danger">{{ $date->format('D') }}</span>
+                                @else
+                                    {{ $date->format('D') }}
+                                @endif
+                            </td>
+                            <td>
+                                @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
+                                    <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
+                                @else
+                                    {{ $date->format('d-M-Y') }}
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                    <span><i>Leave Day</i></span>
+                                @else
+                                    @foreach ($activities as $timesheet)
+                                        @if ($timesheet->ts_date == $date->format('Y-m-d'))
+                                            {{ $timesheet->ts_task }}<br>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                    -
+                                @else
+                                    @foreach ($activities as $timesheet)
+                                        @if ($timesheet->ts_date == $date->format('Y-m-d'))
+                                            {{ $timesheet->ts_location }}<br>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                    -
+                                @else
+                                    @foreach ($activities as $timesheet)
+                                        @if ($timesheet->ts_date == $date->format('Y-m-d'))
+                                            {{ $timesheet->ts_activity }}<br>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                    -
+                                @else
+                                    @foreach ($activities as $timesheet)
+                                        @if ($timesheet->ts_date == $date->format('Y-m-d'))
+                                            {{ $timesheet->ts_from_time }}<br>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td>
+                                @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                    -
+                                @else
+                                    @foreach ($activities as $timesheet)
+                                        @if ($timesheet->ts_date == $date->format('Y-m-d'))
+                                            {{ $timesheet->ts_to_time }}<br>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                    -
+                                @else
+                                <?php 
+                                    $work_hours = 0;
+                                    $time_diff_minutes = 0;
+                                    $time_diff_hours = 0; // Set initial value to 0
+                                    
+                                    foreach ($activities as $timesheet) {
+                                        if ($timesheet->ts_date == $date->format('Y-m-d')) {
+                                            $start_time = strtotime($timesheet->ts_from_time);
+                                            $end_time = strtotime($timesheet->ts_to_time);
+                                            $time_diff_seconds = $end_time - $start_time;
+                                            $time_diff_hours = gmdate('H', $time_diff_seconds);
+                                            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+                                            $work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+                                        }
+                                    }
+                                    
+                                    $total_work_hours += $work_hours;
+                                    if(!empty($work_hours)){
+                                        echo intval($work_hours)." Hours";
+                                    }
+                                ?>
+                                @endif
                             </td>
                         </tr>
-                    @endforeach
+                    @endfor
                 </tbody>
             </table>
         </div><br>

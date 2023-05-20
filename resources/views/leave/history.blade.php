@@ -6,6 +6,11 @@
 active
 @endsection
 
+@section('css-js-if-exist')
+<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" rel="stylesheet"/>
+@endsection
+
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -85,11 +90,11 @@ active
                     <tr>
                       <tr>
                           <th width="300px">Leaves Balance</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaAnnual }}</td>
                       </tr>
                       <tr>
                           <th>5 Year Term</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
                       </tr>
                       <tr>
                           <th>Weekend Replacement</th>
@@ -97,7 +102,7 @@ active
                       </tr>
                       <tr>
                           <th>Total Leave Available</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $totalQuota }}</td>
                       </tr>
                     </tr>
                 </table>
@@ -116,11 +121,12 @@ active
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
+            <table class="table table-bordered zoom90" id="myLeave" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
                         <th>Request Date</th>
                         <th>Qouta Used</th>
+                        <th>Leave Dates</th>
                         <th>Total Days</th>
                         <th>Reason</th>
                         <th>Status</th>
@@ -128,7 +134,46 @@ active
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    @foreach ($leaveRequests as $lr)
+                        <tr>
+                            <td>{{ $lr->req_date }}</td>
+                            <td>{{ $lr->leave->description }}</td>
+                            <td>
+                                @foreach ($lr->dateGroups as $key => $group)
+                                    @if ($key > 0)
+                                        -
+                                    @endif
+                                    {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
+                                @endforeach
+                            </td>
+                            <td>{{ $lr->total_days }}</td>
+                            <td>{{ $lr->reason }}</td>
+                            <td>{!! $lr->approvalStatus !!}</td>
+                            <td class="action text-center">
+                                @php
+                                    $approved = false;
+                                @endphp
+                                
+                                @foreach ($lr->leave_request_approval as $stat)
+                                    @if ($stat->status == 29 || $stat->status == 20 || $stat->status == 404)
+                                        <a class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View Details
+                                        </a>
+                                        @php
+                                            $approved = true;
+                                            break;
+                                        @endphp
+                                    @endif
+                                @endforeach
+                                
+                                @unless ($approved)
+                                    <a href="/leave/history/cancel/{{ $lr->id }}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel Request
+                                    </a>
+                                @endunless
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -144,35 +189,30 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form method="post" id="multiple-entry-form">
+			<form method="post" id="leave-request" action="{{ route('leave.entry') }}">
                 @csrf
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
                         <div class="row">
+                            {{-- <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="email">Date :</label>
+                                    <input type="text" class="form-control" name="daterangeLeave" id="daterangeLeave"/>
+                                </div>
+                            </div> --}}
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Date :</label>
-                                    <input type="text" class="form-control validateMult" name="daterangeLeave" id="daterangeLeave"/>
+                                    <input type="text" class="form-control date" name="datepickLeave" id="datepickLeave" autocomplete="off" placeholder="mm/dd/YYYY" onblur="calculateTotalDays()"/>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Quota Used :</label>
-                                    <select class="form-control" id="task" name="task" required>
-                                        <option value="HO">HO</option>
-                                        <option value="Sick">Sick</option>
-                                        <option value="Other">Other</option>
-                                        <option>Standby</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Project Manager :</label>
-                                    <select class="form-control" id="location" name="location" required>
-                                        <option hidden value="N/a">N/a</option>
+                                    <select class="form-control" name="quota_used" required>
+                                        @foreach($leaveType as $l)
+                                        <option value="{{$l->id}}">{{ $l->description}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -180,14 +220,14 @@ active
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="email">Contact Number During Leave :</label>
-                                    <input type="text" class="form-control validateMult time-input" placeholder="HH:mm" required autocomplete="off" name="from" id="from">
+                                    <label for="email">CP During Leave :</label>
+                                    <input type="text" class="form-control" required autocomplete="off" name="cp_number" id="cp_number" placeholder="083818XXXX">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Total Leave Days :</label>
-                                    <input type="text" class="form-control validateMult time-input" placeholder="HH:mm" required autocomplete="off" name="to" id="to">
+                                    <input type="number" class="form-control" required autocomplete="off" name="total_days" id="total_days" readonly>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +235,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Reason :</label>
-                                    <textarea type="text" class="form-control validateMult" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control" name="reason" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -203,10 +243,27 @@ active
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" id="multiple-entries" class="btn btn-primary" data-dismiss="modal">Submit Request</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
                   </div>
 			</form>
 		</div>
 	</div>
 </div>
+<script>
+    $('.date').datepicker({
+    multidate: true
+});
+function calculateTotalDays() {
+        var dateInput = document.getElementById('datepickLeave');
+        var selectedDates = dateInput.value.split(',');
+
+        var totalDays = 0;
+        for (var i = 0; i < selectedDates.length; i++) {
+            var currentDate = new Date(selectedDates[i]);
+            totalDays++;
+        }
+
+        document.getElementById('total_days').value = totalDays;
+    }
+</script>
 @endsection

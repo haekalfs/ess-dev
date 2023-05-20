@@ -481,6 +481,22 @@ class ProjectController extends Controller
         return redirect()->back();
     }
 
+    public function requested_assignment_reject($id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        Requested_assignment::where('id', $id)->update(['status' => '404']);
+        $name = Requested_assignment::where('id', $id)->pluck('req_by')->first();
+
+        $entry = new Notification_alert;
+        $entry->user_id = $name;
+        $entry->message = "Your Assignment Request is Rejected!";
+        $entry->importance = 1;
+        $entry->save();
+
+        Session::flash('failed',"You rejected the assignment request!");
+        return redirect()->back();
+    }
+
     public function add_project_assignment_from_request(Request $request, $id)
     {
         $this->validate($request,[

@@ -284,7 +284,26 @@ active
 			@endif
 			<form method="POST" action="{{ route('password.email') }}">
                 @csrf
-				<div class="modal-body" style="">
+                <div class="modal-body">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="email">{{ __('Your E-Mail Address :') }}</label>
+                                    <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
+                                    value="{{ old('email') }}" required autocomplete="email" autofocus>
+        
+                                @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				{{-- <div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
                         <div class="row mb-3">
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
@@ -301,7 +320,7 @@ active
                             </div>
                         </div>
 				    </div>
-                </div>
+                </div> --}}
 			    <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			        <button type="submit" class="btn btn-primary">

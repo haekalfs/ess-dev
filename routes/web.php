@@ -43,12 +43,14 @@ Route::delete('/activities/all/{year}/{month}', 'TimesheetController@destroy_all
     //Preview
 Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview.timesheet')->middleware('auth');
 Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print')->middleware('auth');
-Route::get('/timesheet/approval/preview/print/{year}/{month}/{user_timesheet}', 'TimesheetController@print_selected')->middleware('auth');
     //submit
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
 Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
+Route::get('/timesheet/review/fm/review/{user_id}/{year}/{month}', 'ReviewController@ts_preview')->name('preview.fm.timesheet')->middleware('auth');
+Route::get('/timesheet/review/fm/preview/print/{year}/{month}/{user_timesheet}', 'ReviewController@print_selected')->middleware('auth');
+
 Route::get('/timesheet/summary/all', 'TimesheetController@summary')->name('summary')->middleware('auth');
 Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController@remind')->name('remind')->middleware('auth');
 
@@ -62,20 +64,25 @@ Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController
 //Approval
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth');
 Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary')->middleware('auth');
-Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth');
+Route::get('/approval/leave', 'LeaveApprovalController@leave_approval')->name('approval.leave')->middleware('auth');
+
+Route::match(['get', 'post'], '/approval/leave/approve/{id}', 'LeaveApprovalController@approve')->name('leave.approve')->middleware('auth');
+Route::match(['get', 'post'], '/approval/leave/reject/{id}', 'LeaveApprovalController@reject')->name('leave.reject')->middleware('auth');
+
 Route::get('/approval/timesheet/preview/{user_id}/{year}/{month}', 'ApprovalController@ts_preview')->name('preview.timesheet')->middleware('auth');
+Route::get('/approval/timesheet/preview/print/{year}/{month}/{user_timesheet}', 'TimesheetController@print_selected')->middleware('auth');
+// Route::get('/reject/director/{user_id}/{year}/{month}', 'ApprovalController@reject_director')->name('reject-director')->middleware('auth');
 
 Route::match(['get', 'post'], '/approval/timesheet/approve/{user_id}/{year}/{month}', 'ApprovalController@approve')->middleware('auth');
 Route::match(['get', 'post'], '/approval/timesheet/reject/{user_id}/{year}/{month}', 'ApprovalController@reject')->middleware('auth');
 
     //Sub Approval
-Route::get('/approval/fin_ga_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth');
-Route::get('/approval/service_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_service_dir')->middleware('auth');
-Route::get('/approval/pm/{user_id}/{year}/{month}', 'ApprovalController@approve_pm')->middleware('auth');
-Route::get('/approval/pa/{user_id}/{year}/{month}', 'ApprovalController@approve_pa')->middleware('auth');
-Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_hr')->middleware('auth');
-    //Sub Approval for Finances Dept
-Route::get('/approval/fm/{user_id}/{year}/{month}', 'ApprovalController@approve_fm')->middleware('auth');
+// Route::get('/approval/fin_ga_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_fin_ga_dir')->name('approve-director')->middleware('auth');
+// Route::get('/approval/service_dir/{user_id}/{year}/{month}', 'ApprovalController@approve_service_dir')->middleware('auth');
+// Route::get('/approval/pm/{user_id}/{year}/{month}', 'ApprovalController@approve_pm')->middleware('auth');
+// Route::get('/approval/pa/{user_id}/{year}/{month}', 'ApprovalController@approve_pa')->middleware('auth');
+// Route::get('/approval/hr/{user_id}/{year}/{month}', 'ApprovalController@approve_hr')->middleware('auth');
+// Route::get('/approval/fm/{user_id}/{year}/{month}', 'ApprovalController@approve_fm')->middleware('auth');
 
     //Approval Project
 Route::get('/approval/project/assignment/', 'ApprovalProjectController@index')->name('approval.project')->middleware('auth');
@@ -86,8 +93,10 @@ Route::get('/approval/project/assignment/reject/{id}', 'ApprovalProjectControlle
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
 
-//
+//leave
 Route::get('/leave/history/{yearSelected?}', 'LeaveController@history')->name('leave')->middleware('auth');
+Route::post('/leave/request/entry', 'LeaveController@leave_request_entry')->name('leave.entry');
+Route::get('/leave/history/cancel/{id}', 'LeaveController@cancel_request')->name('cancel_leave')->middleware('auth');
 
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth');
@@ -123,6 +132,7 @@ Route::get('/assignment/requested/by/user', 'ProjectController@requested_assignm
 Route::post('/assignment/request', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');
 Route::get('/assignment/requested/by/user/view/{id}', 'ProjectController@requested_assignment_view')->middleware('auth');
 Route::get('/assignment/requested/by/user/approve/{id}', 'ProjectController@requested_assignment_approve')->middleware('auth');
+Route::get('/assignment/requested/by/user/reject/{id}', 'ProjectController@requested_assignment_reject')->middleware('auth');
 Route::post('/assignment/add_entries/based_on/request/{id}', 'ProjectController@add_project_assignment_from_request')->middleware('auth');
 
 //manage users

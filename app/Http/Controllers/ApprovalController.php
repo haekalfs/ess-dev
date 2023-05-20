@@ -6,6 +6,8 @@ use App\Exports\TimesheetExport;
 use App\Mail\ApprovalTimesheet;
 use App\Mail\RejectedTimesheet;
 use App\Models\Approval_status;
+use App\Models\Leave_request;
+use App\Models\Leave_request_approval;
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
@@ -53,15 +55,47 @@ class ApprovalController extends Controller
         // Get the current day of the month
         $currentDay = date('j');
 
+        $checkUserPost = Auth::user()->users_detail->position->id;
+
+        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
+        // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 5 && $currentDay <= 30) {
-            $approvals = DB::table('timesheet_details')
-                ->select('*')
-                ->whereYear('date_submitted', $currentYear)
-                ->where('RequestTo', Auth::user()->id)
-                ->whereNotIn('ts_status_id', [29, 404, 30])
-                ->groupBy('user_timesheet', 'month_periode')
-                ->get();
+                if (in_array($checkUserPost, [7, 8, 12])) {
+                    $Check = DB::table('timesheet_details')
+                        ->select('*')
+                        ->whereYear('date_submitted', $currentYear)
+                        ->whereNotIn('ts_status_id', [10, 15])
+                        ->whereNotIn('RequestTo', $ts_approver)
+                        ->groupBy('user_timesheet', 'month_periode')
+                        ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 ELSE 0 END)')
+                        ->pluck('user_timesheet')
+                        ->toArray();
+                        if (!empty($Check)) {
+                            $approvals = DB::table('timesheet_details')
+                                ->select('*')
+                                ->whereYear('date_submitted', $currentYear)
+                                ->where('RequestTo', Auth::user()->id)
+                                ->whereIn('user_timesheet', $Check)
+                                ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->get();
+                        } else {
+                            $approvals = DB::table('timesheet_details')
+                                ->select('*')
+                                ->where('RequestTo', 'xxhaekalsxx')
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->get();
+                        }
+                } else {
+                    $approvals = DB::table('timesheet_details')
+                        ->select('*')
+                        ->whereYear('date_submitted', $currentYear)
+                        ->where('RequestTo', Auth::user()->id)
+                        ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                        ->groupBy('user_timesheet', 'month_periode')
+                        ->get();
+                }
             return view('approval.timesheet_approval', ['approvals' => $approvals]);
         } else {
             // Handle the case when the date is not within the range
@@ -79,7 +113,7 @@ class ApprovalController extends Controller
 
         $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
 
-        $timesheetApproversDir = Timesheet_approver::whereIn('id', [45, 40])->pluck('approver');
+        $timesheetApproversDir = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver');
         $checkUserDir = $timesheetApproversDir->toArray();
         foreach ($countRows as $row) {
             $tsStatusId = '30';
@@ -113,6 +147,15 @@ class ApprovalController extends Controller
                 ->where('ts_user_id', $user_timesheet)
                 ->update(['ts_status_id' => $tsStatusId]);
         }
+
+        $approverName = Auth::user()->name;
+        $entry = new Notification_alert;
+        $entry->user_id = $user_timesheet;
+        $ts_name = date("F", mktime(0, 0, 0, $month, 1)).' - '.$year;
+        $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
+        $entry->importance = 1;
+        $entry->save();
+
         return redirect('/approval/timesheet/p')->with('success',"You approved $user_timesheet timereport!");
     }
 
@@ -201,7 +244,7 @@ class ApprovalController extends Controller
 		return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
 	}
 
-    public function ts_preview($id, $year, $month)
+    public function ts_preview($user_id, $year, $month)
 	{
 		// $year = Crypt::decrypt($year);
         // $month = Crypt::decrypt($month);
@@ -213,23 +256,42 @@ class ApprovalController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', $id)->get();
-        
-        $user_info = User::find($id);
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', $user_id)->get();
 
-        $workflow = Timesheet_detail::where('user_timesheet', $id)->where('month_periode', $year.intval($month))->get();
+        $user_info = User::find($user_id);
+
+        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year.$month)->get(); 
 
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
-            ->where('project_assignment_users.user_id', '=', $id)
+            ->where('project_assignment_users.user_id', '=', $user_id)
             ->whereMonth('project_assignment_users.periode_start', '<=', $month)
             ->whereMonth('project_assignment_users.periode_end', '>=', $month)
             ->whereYear('project_assignment_users.periode_start', $year)
             ->whereYear('project_assignment_users.periode_end', $year)
             ->where('project_assignments.approval_status', 29)
-            ->get();
+            ->get(); 
+
+        $leaveApproved = [];
+        $checkLeaveApproval = Leave_request::where('req_by', $user_id)->pluck('id');
+        foreach ($checkLeaveApproval as $chk){
+            $checkApp = Leave_request_approval::where('leave_request_id', $chk)->where('status', 29)->pluck('leave_request_id')->first();
+            if(!empty($checkApp)){
+                $leaveApproved[] = $checkApp;
+            }
+        }
+
+        $leave_day = Leave_request::where('req_by', $user_id)->whereIn('id', $leaveApproved)->pluck('leave_dates')->toArray();
+
+        $formattedDates = [];
+        foreach ($leave_day as $dateString) {
+            $dateArray = explode(',', $dateString);
+            foreach ($dateArray as $dateA) {
+                $formattedDates[] = date('Y-m-d', strtotime($dateA));
+            }
+        }
 
         $assignmentNames = $assignment->pluck('project_name')->implode(', ');
         if($assignment->isEmpty()){
@@ -241,7 +303,7 @@ class ApprovalController extends Controller
                 ->whereMonth('ts_date', $month)
                 ->whereYear('ts_date', $year)
                 ->orderBy('updated_at', 'desc')
-                ->where('ts_user_id', $id)
+                ->where('ts_user_id', $user_id)
                 ->first();
         if ($lastUpdate) {
             $status = Approval_status::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
@@ -255,6 +317,6 @@ class ApprovalController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month','info', 'id', 'assignmentNames'), ['timesheet' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
-	}
+        return view('approval.ts_preview', compact('year', 'month','info', 'assignmentNames', 'user_id', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+    }
 }
