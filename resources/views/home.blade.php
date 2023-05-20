@@ -72,11 +72,11 @@ active
                     <tr>
                       <tr>
                           <th width="300px">Leaves Balance</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaAnnual }}</td>
                       </tr>
                       <tr>
                           <th>5 Year Term</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
                       </tr>
                       <tr>
                           <th>Weekend Replacement</th>
@@ -84,12 +84,12 @@ active
                       </tr>
                       <tr>
                           <th>Total Leave Available</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $totalQuota }}</td>
                       </tr>
                       <tr>
-                          <th>Sick</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
-                      </tr>
+                        <th>Sick</th>
+                        <td style="text-align: start; font-weight:500">: N/A</td>
+                    </tr>
                     </tr>
                 </table>
             </div>
