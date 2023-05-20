@@ -266,4 +266,9 @@ function calculateTotalDays() {
         document.getElementById('total_days').value = totalDays;
     }
 </script>
+<style>
+.action{
+    width: 195px;
+}
+</style>
 @endsection
