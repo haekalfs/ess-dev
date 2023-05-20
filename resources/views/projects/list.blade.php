@@ -388,7 +388,7 @@ active
 </div>
 <style>
 .action{
-    width: 180px;
+    width: 200px;
 }
 </style>
 <script>
