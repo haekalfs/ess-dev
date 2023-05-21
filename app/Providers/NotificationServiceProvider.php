@@ -28,11 +28,14 @@ class NotificationServiceProvider extends ServiceProvider
     {
         View::composer('layouts.main', function ($view) {
             $notifications = Notification_alert::where('user_id', Auth::user()->id)
+                ->orderByRaw('read_stat = 1')
                 ->orderBy('created_at', 'desc')
                 ->limit(3)
                 ->get();
+
             $notificationsCount = Notification_alert::where('user_id', Auth::user()->id)
                 ->orderBy('created_at', 'desc')
+                ->where('read_stat', NULL)
                 ->count();
             $view->with([
                 'notifications' => $notifications,

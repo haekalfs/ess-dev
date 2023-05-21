@@ -7,8 +7,18 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-
+@if (session('status'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ session('status') }}</strong>
+</div>
+@endif
+@error('email')
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@enderror
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -277,11 +287,6 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-            @if (session('status'))
-			<div class="alert alert-success" role="alert">
-			    {{ session('status') }}
-			</div>
-			@endif
 			<form method="POST" action="{{ route('password.email') }}">
                 @csrf
                 <div class="modal-body">

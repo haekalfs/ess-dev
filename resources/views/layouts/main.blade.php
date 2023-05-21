@@ -388,7 +388,7 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bell fa-fw"></i>
                                 <!-- Counter - Alerts -->
-                                @if ($notifications->isEmpty())
+                                @if ($notifications->isEmpty() || $notificationsCount == 0)
                                 @else
                                 <span class="badge badge-danger badge-counter">
                                     {{ $notificationsCount }}
@@ -407,7 +407,7 @@
                                 </a>
                                 @else
                                     @foreach ($notifications as $notification)
-                                        <a class="dropdown-item d-flex align-items-center" href="#">
+                                        <a class="dropdown-item notification-item d-flex align-items-center" data-notification-id="{{ $notification->id }}">
                                             @if($notification->importance == 1)
                                             <div class="mr-3">
                                                 <div class="icon-circle bg-success">
@@ -423,7 +423,11 @@
                                             @endif
                                             <div>
                                                 <div class="small text-gray-500">{{ $notification->created_at }}</div>
+                                                @if($notification->read_stat == 1)
+                                                <span>{{ $notification->message}}</span>
+                                                @else
                                                 <span class="font-weight-bold">{{ $notification->message}}</span>
+                                                @endif
                                             </div>
                                         </a>
                                     @endforeach
@@ -524,16 +528,8 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset('js/demo/datatables-demo.js') }}"></script>
 
-</body>
+    <script src="{{ asset('js/home.js') }}"></script>
 
-<script>
-function isconfirm(){
-	if(!confirm('Are you sure want to do this ?')){
-	    event.preventDefault();
-	    return;
-	}
-    return true;
-}
-</script>
+</body>
 
 </html>

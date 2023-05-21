@@ -21,6 +21,8 @@ Route::get('/',[App\Http\Controllers\HomeController::class, 'index'])->middlewar
 
 Auth::routes();
 
+Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->middleware('auth')->name('status.read');
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/logout', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //testing

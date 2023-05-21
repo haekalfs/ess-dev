@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Emp_leave_quota;
+use App\Models\Notification_alert;
 use Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,5 +52,17 @@ class HomeController extends Controller
     {
         Session::flash('warning',"That page is still under development! Thankyou for your patience :)");
         return redirect('home');
+    }
+
+    public function changeStatus($id)
+    {
+        // Retrieve the notification
+        $notification = Notification_alert::findOrFail($id);
+
+        // Update the status
+        $notification->read_stat = true;
+        $notification->save();
+        
+        return response()->json(['success'=>'Client created successfully.']);
     }
 }
