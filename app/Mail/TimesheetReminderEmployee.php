@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Crypt;
     
         public function build()
         {
-            $encryptYear = Crypt::encrypt(intval($this->month));
-            $encryptMonth = Crypt::encrypt($this->year);
+            $encryptYear = Crypt::encrypt(intval($this->year));
+            $encryptMonth = Crypt::encrypt($this->month);
             $data = [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
@@ -53,8 +53,8 @@ use Illuminate\Support\Facades\Crypt;
         
         public function data()
         {
-            $encryptYear = Crypt::encrypt(intval($this->month));
-            $encryptMonth = Crypt::encrypt($this->year);
+            $encryptYear = Crypt::encrypt(intval($this->year));
+            $encryptMonth = Crypt::encrypt($this->month);
             return [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
