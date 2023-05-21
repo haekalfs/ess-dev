@@ -204,7 +204,7 @@ class ApprovalController extends Controller
         $entry->user_id = $user_timesheet;
         $ts_name = date("F", mktime(0, 0, 0, $month, 1)).' - '.$year;
         $entry->message = "Your Timesheet of $ts_name has been rejected!";
-        $entry->importance = 1;
+        $entry->importance = 404;
         $entry->save();
 
         return redirect('/approval/timesheet/p')->with('failed',"You rejected $user_timesheet timereport!");

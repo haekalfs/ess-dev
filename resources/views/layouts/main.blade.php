@@ -408,11 +408,19 @@
                                 @else
                                     @foreach ($notifications as $notification)
                                         <a class="dropdown-item d-flex align-items-center" href="#">
+                                            @if($notification->importance == 1)
                                             <div class="mr-3">
-                                                <div class="icon-circle bg-primary">
-                                                    <i class="fas fa-file-alt text-white"></i>
+                                                <div class="icon-circle bg-success">
+                                                    <i class="fas fa-check-square text-white"></i>
                                                 </div>
                                             </div>
+                                            @else
+                                            <div class="mr-3">
+                                                <div class="icon-circle bg-warning">
+                                                    <i class="fas fa-exclamation-triangle text-white"></i>
+                                                </div>
+                                            </div>
+                                            @endif
                                             <div>
                                                 <div class="small text-gray-500">{{ $notification->created_at }}</div>
                                                 <span class="font-weight-bold">{{ $notification->message}}</span>

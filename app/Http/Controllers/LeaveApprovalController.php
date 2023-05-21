@@ -115,9 +115,14 @@ class LeaveApprovalController extends Controller
             $approve->update(['status' => $tsStatusId]);
         }
 
-        // $getIdLeaveReq = Leave_request_approval::where('id', $id)->pluck('leave_request_id')->groupBy('leave_request_id')->first();
-        // $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->get();
+        $getIdLeaveReq = Leave_request_approval::where('id', $id)->pluck('leave_request_id')->groupBy('leave_request_id')->first();
+        $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
 
+        $entry = new Notification_alert();
+        $entry->user_id = $getLeaveReq->req_by;
+        $entry->message = "Your Leave Request has been Approved!";
+        $entry->importance = 1;
+        $entry->save();
         // // dd($getIdLeaveReq, $getLeaveReq);
         // foreach($getLeaveReq as $gl){
         //     $req_by = $gl->req_by;
@@ -207,7 +212,7 @@ class LeaveApprovalController extends Controller
         $entry = new Notification_alert();
         $entry->user_id = $getLeaveReq->req_by;
         $entry->message = "Your Leave Request has been rejected!";
-        $entry->importance = 1;
+        $entry->importance = 404;
         $entry->save();
 
         return redirect('/approval/leave')->with('failed',"You rejected the leave request!");

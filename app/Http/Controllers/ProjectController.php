@@ -490,7 +490,7 @@ class ProjectController extends Controller
         $entry = new Notification_alert;
         $entry->user_id = $name;
         $entry->message = "Your Assignment Request is Rejected!";
-        $entry->importance = 1;
+        $entry->importance = 404;
         $entry->save();
 
         Session::flash('failed',"You rejected the assignment request!");

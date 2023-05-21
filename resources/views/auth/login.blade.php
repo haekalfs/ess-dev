@@ -48,7 +48,7 @@
         </div>
     </div>
 </div>
-
+{{-- 
 <div class="lc-block position-relative">
     <div id="carouselExampleControls2" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
@@ -177,7 +177,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection
 
 

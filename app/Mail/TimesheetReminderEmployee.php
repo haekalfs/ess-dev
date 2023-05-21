@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Crypt;
 
     class TimesheetReminderEmployee extends Mailable
         {
@@ -23,10 +24,12 @@ use Illuminate\Queue\SerializesModels;
     
         public function build()
         {
+            $encryptYear = Crypt::encrypt(intval($this->month));
+            $encryptMonth = Crypt::encrypt($this->year);
             $data = [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/timesheet/entry/',
+                'link' => "https://timereport.perdana.co.id/timesheet/entry/$encryptYear/$encryptMonth",
                 'month' => $this->month,
                 'year' => $this->year
             ];
@@ -50,10 +53,12 @@ use Illuminate\Queue\SerializesModels;
         
         public function data()
         {
+            $encryptYear = Crypt::encrypt(intval($this->month));
+            $encryptMonth = Crypt::encrypt($this->year);
             return [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/timesheet',
+                'link' => "https://timereport.perdana.co.id/timesheet/entry/$encryptYear/$encryptMonth",
                 'month' => $this->month,
                 'year' => $this->year
             ];
