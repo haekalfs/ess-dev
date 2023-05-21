@@ -26,6 +26,15 @@ class HomeController extends Controller
      */
     public function index()
     {
+        try {
+            $roles = Auth::user()->role_id()->pluck('role_name')->toArray();
+            if (!session()->has('allowed_roles')) {
+                session()->put('allowed_roles', $roles);
+            }
+        } catch (\Exception $e) {
+            // Do nothing
+        }        
+
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
             ->where('active_periode', '>=', date('Y-m-d'))
