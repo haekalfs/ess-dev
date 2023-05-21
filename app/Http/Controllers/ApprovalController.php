@@ -37,15 +37,20 @@ class ApprovalController extends Controller
         $accessController = new AccessController();
         $result = $accessController->usr_acc(202);
 
-        $tsCount = Timesheet_detail::whereIn('ts_status_id', ['20', '30', '40', '25', '404'])
+        $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29'])
              ->where(function($query) {
                  $query->where('RequestTo', Auth::user()->id);
              })
              ->count();
 
         $pCount = Project_assignment::where('approval_status', 40)->count();
+        $leaveCount = Leave_request_approval::whereNotIn('status', ['20', '30', '29'])
+        ->where(function($query) {
+            $query->where('RequestTo', Auth::user()->id);
+        })
+        ->count();
 
-		return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount]);
+		return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount]);
 	}
 
     public function timesheet_approval()

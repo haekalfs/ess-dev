@@ -77,16 +77,18 @@ class ProjectController extends Controller
         }
 
         Project_assignment::create([
-            'id' => $uniqueIdP,
+            'id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
     		'assignment_no' => $request->no_doc,
     		'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
             'req_by' => Auth::user()->id,
-            'task_id' => $uniqueIdP,
+            'task_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
             'company_project_id' => $request->project,
             'notes' => $request->notes,
             'approval_status' => '40'
     	]);
+
+        $url = $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc);
 
         $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
         $employees = User::whereIn('id', $roleToApprove)->get();
@@ -98,7 +100,7 @@ class ProjectController extends Controller
                         ->subject($notification->emailSubject());
             });
         }
-        return redirect("/assignment/member/$uniqueIdP")->with('success', "Assignment #$uniqueIdP Create successfully");
+        return redirect("/assignment/member/$url")->with('success', "Assignment #$uniqueIdP Create successfully");
     }
 
     public function project_assignment_member($assignment_id)
@@ -275,12 +277,6 @@ class ProjectController extends Controller
             'from' => 'required',
             'to' => 'required'
     	]);
-
-        $uniqueId = hexdec(substr(uniqid(), 0, 4));
-
-        while (Company_project::where('id', $uniqueId)->exists()) {
-            $uniqueId = hexdec(substr(uniqid(), 0, 4));
-        }
 
         $location = Project_location::find($request->p_location);
         Company_project::create([
@@ -514,12 +510,12 @@ class ProjectController extends Controller
         }
 
         Project_assignment::create([
-            'id' => $uniqueIdP,
+            'id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
     		'assignment_no' => $request->no_doc,
     		'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
             'req_by' => Auth::user()->id,
-            'task_id' => $uniqueIdP,
+            'task_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
             'company_project_id' => $requestAss->company_project_id,
             'notes' => $request->notes,
             'approval_status' => '40'

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AssignmentNotifyToUser;
 use App\Models\Client;
 use App\Models\Company_project;
 use App\Models\Notification_alert;
@@ -12,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
 class ApprovalProjectController extends Controller
@@ -69,6 +71,7 @@ class ApprovalProjectController extends Controller
 
         $assignment = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
         
+        $userNotify = [];
         foreach($assignment as $as){
             $entry = new Notification_alert();
             $entry->user_id = $as->user_id;
@@ -76,6 +79,18 @@ class ApprovalProjectController extends Controller
             $entry->message = "You have assigned to an assignment of $cp!";
             $entry->importance = 1;
             $entry->save();
+            $userNotify[] = $as->user_id;
+            $assignmentName = $as->company_project->project_name;
+        }
+
+        $employees = User::whereIn('id', $userNotify)->get();
+
+        foreach ($employees as $employee) {
+            $notification = new AssignmentNotifyToUser($employee, $assignmentName);
+            Mail::send('mailer.notify_user_assignment', $notification->data(), function ($message) use ($notification) {
+                $message->to($notification->emailTo())
+                        ->subject($notification->emailSubject());
+            });
         }
         
         Session::flash('success',"You approved Assignment #$assignment_id!");

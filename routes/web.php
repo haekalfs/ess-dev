@@ -158,19 +158,19 @@ function () {
 
 
 //Management
-Route::get('/management/security_&_roles/', 'ManagementController@roles')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/management/security_&_roles/manage/access', 'ManagementController@manage_access')->middleware('auth')->middleware(['checkRole:admin']);
-Route::get('/management/security_&_roles/manage/roles', 'ManagementController@manage_roles')->middleware('auth')->middleware(['checkRole:admin']);
+Route::get('/management/security_&_roles/', 'ManagementController@roles')->middleware('auth');
+Route::get('/management/security_&_roles/manage/access', 'ManagementController@manage_access');
+Route::get('/management/security_&_roles/manage/roles', 'ManagementController@manage_roles');
     //link non-page
-    Route::get('/management/security_&_roles/remove/roles/{id}', 'ManagementController@remove_roles_from_user')->middleware('auth')->middleware(['checkRole:admin']);
-    Route::get('/management/security_&_roles/remove/access/{id}', 'ManagementController@remove_access')->middleware('auth')->middleware(['checkRole:admin']);
+    Route::get('/management/security_&_roles/remove/roles/{id}', 'ManagementController@remove_roles_from_user');
+    Route::get('/management/security_&_roles/remove/access/{id}', 'ManagementController@remove_access');
 
-    Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth')->middleware(['checkRole:admin']);
-    Route::match(['get', 'post'], '/management/security_&_roles/add/access/', 'ManagementController@grant_access_to_roles')->middleware('auth')->middleware(['checkRole:admin']);
+    Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles');
+    Route::match(['get', 'post'], '/management/security_&_roles/add/access/', 'ManagementController@grant_access_to_roles');
 
-    Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth')->middleware(['checkRole:admin']);
-    Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles')->middleware('auth')->middleware(['checkRole:admin']);
-    Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth')->middleware(['checkRole:admin']);
+    Route::post('/manage/roles/add_roles', 'ManagementController@add_roles');
+    Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles');
+    Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete');
 
 //Employees Database
 Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');

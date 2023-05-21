@@ -9,6 +9,7 @@ class Project_assignment extends Model
 {
     use HasFactory;
     protected $table = "project_assignments";
+    public $incrementing = false;
 
 
     protected $fillable = ['id','assignment_no', 'req_date', 'req_by', 'reference_doc', 'notes', 'company_project_id', 'task_id', 'approval_status'];
