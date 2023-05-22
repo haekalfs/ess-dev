@@ -26,10 +26,9 @@ class LeaveApprovalController extends Controller
 
         //code above is to check if those with id 40,45,55,60 are able to approve or not
         $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
-        $ts_approver[] = Auth::user()->id;
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 5 && $currentDay <= 30) {
+        if ($currentDay >= 1 && $currentDay <= 31) {
                 if (in_array($checkUserPost, [7, 8, 12])) {
                     $Check = DB::table('leave_request_approval')
                         ->select('leave_request_id')
@@ -55,7 +54,6 @@ class LeaveApprovalController extends Controller
                 } else {
                     $Check = DB::table('leave_request_approval')
                         ->select('leave_request_id')
-                        ->whereNotIn('RequestTo', $ts_approver)
                         ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
                         ->groupBy('leave_request_id', 'RequestTo')
                         ->pluck('leave_request_id')
@@ -117,6 +115,21 @@ class LeaveApprovalController extends Controller
 
         $getIdLeaveReq = Leave_request_approval::where('id', $id)->pluck('leave_request_id')->groupBy('leave_request_id')->first();
         $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
+
+        switch($getLeaveReq->leave_id){
+            case 10:
+            case 20:
+                
+                break;
+            default:
+                Emp_leave_quota::updateOrCreate([
+                    'user_id' => $getLeaveReq->req_by,
+                    'leave_id' => $getLeaveReq->leave_id
+                ], [
+                    'once_in_service_years' => TRUE
+                ]);
+            break;
+        }
 
         $entry = new Notification_alert();
         $entry->user_id = $getLeaveReq->req_by;

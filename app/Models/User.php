@@ -69,4 +69,12 @@ class User extends Authenticatable
     public function requested_assignment(){
     	return $this->hasMany('App\Models\Requested_assignment');
     }
+
+    public function emp_leave_quota(){
+    	return $this->hasMany('App\Models\Emp_leave_quota');
+    }
+
+    public function leave_request_approval(){
+    	return $this->hasMany('App\Models\Leave_request_approval');
+    }
 }

@@ -116,7 +116,7 @@ active
         <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">Leave History</h6>
         <div class="text-right">
             <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#leaveRequest" id="leaveRequestBtn" style="margin-right: 5px;">Create Request</a>
-            <button class="btn @role('freelancer') btn-success @else btn-secondary @endrole btn-sm" type="button" id="manButton">Leave Quota</button>
+            <button class="btn @role('freelancer') btn-success @else btn-secondary @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveQuota" id="manButton">Leave Quota</button>
         </div>
     </div>
     <div class="card-body">
@@ -156,7 +156,7 @@ active
                                 
                                 @foreach ($lr->leave_request_approval as $stat)
                                     @if ($stat->status == 29 || $stat->status == 20 || $stat->status == 404)
-                                        <a class="btn btn-secondary btn-sm">
+                                        <a class="btn btn-secondary btn-sm" data-toggle="modal" and data-target="#leaveRequestDetailModal" data-id="{{ $lr->id }}">
                                             <i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View Details
                                         </a>
                                         @php
@@ -248,6 +248,146 @@ active
 			</form>
 		</div>
 	</div>
+</div>
+<div class="modal fade leaveQuota" tabindex="-1" role="dialog" aria-labelledby="leaveQuota" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Leave Quota Details</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+            <div class="modal-body" style="height: 500px; overflow-y: auto;">
+                <div class="col-md-12 zoom90">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="h5 mb-2 text-gray-800">Leave Detail Information <small style="color: red;"> : &nbsp;&nbsp; {{ Auth::user()->name }}</i></small></h6><br>
+                            <div class="table-responsive">
+                                <table class="table table-bordered zoom90" id="dataTableProject" width="100%" cellspacing="0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Leave ID</th>
+                                            <th>Active Periode</th>
+                                            <th>Expired On</th>
+                                            <th>Quota</th>
+                                            <th>Quota Used</th>
+                                            <th>Quota Left</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($leaveRequests as $lr)
+                                            <tr>
+                                                <td>{{ $lr->leave->description }}</td>
+                                                <td>{{ $lr->leave->description }}</td>
+                                                <td>
+                                                    @foreach ($lr->dateGroups as $key => $group)
+                                                        @if ($key > 0)
+                                                            -
+                                                        @endif
+                                                        {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ $lr->total_days }}</td>
+                                                <td>{{ $lr->reason }}</td>
+                                                <td>{!! $lr->approvalStatus !!}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div><br>
+                        </div>
+                        <div class="col-md-12">
+                            <h6 class="h6 text-danger mb-2"><i>Weekend Replacement</i></h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Leave ID</th>
+                                            <th>Active Periode</th>
+                                            <th>Expired On</th>
+                                            <th>Quota</th>
+                                            <th>Quota Used</th>
+                                            <th>Quota Left</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($leaveRequests as $lr)
+                                            <tr>
+                                                <td>{{ $lr->leave->description }}</td>
+                                                <td>{{ $lr->leave->description }}</td>
+                                                <td>
+                                                    @foreach ($lr->dateGroups as $key => $group)
+                                                        @if ($key > 0)
+                                                            -
+                                                        @endif
+                                                        {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ $lr->total_days }}</td>
+                                                <td>{{ $lr->reason }}</td>
+                                                <td>{!! $lr->approvalStatus !!}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="leaveRequestDetailModal" tabindex="-1" role="dialog" aria-labelledby="leaveRequestDetailModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-1">
+          <h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Leave Request Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+            <div class="modal-body" style="height: 270px; overflow-y: auto;">
+                <div class="col-md-12 zoom90">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="h5 mb-2 text-gray-800">Waiting For Approval : <span class="text-danger" id="approver"></span></i></h6>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                            </div><br>
+                            <div class="table-responsive">
+                                <table class="table table-bordered zoom90" id="myLeave" width="100%" cellspacing="0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Request Date</th>
+                                            <th>Qouta Used</th>
+                                            <th>Leave Dates</th>
+                                            <th>Total Days</th>
+                                            <th>Reason</th>
+                                            <th>Status</th>
+                                            <th>Request To</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="leaveRequestDetails">
+                                        <!-- Ajax Data -->
+                                    </tbody>
+                                </table>
+                            </div><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     $('.date').datepicker({

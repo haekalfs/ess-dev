@@ -14,4 +14,8 @@ class Leave_request_approval extends Model
     public function leave_request(){
     	return $this->belongsTo('App\Models\Leave_request', 'leave_request_id', 'id');
     }
+
+    public function user(){
+    	return $this->belongsTo('App\Models\User', 'RequestTo', 'id');
+    }
 }

@@ -57,7 +57,7 @@ Route::get('/timesheet/summary/all', 'TimesheetController@summary')->name('summa
 Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController@remind')->name('remind')->middleware('auth');
 
 // // Testing
-// Route::get('/development', 'HomeController@notification_indev');
+Route::get('/development', 'HomeController@notification_indev');
 // Route::get('/calendar/{year}/{month}', 'TimesheetController@showCalendar');
 // Route::put('/calendar/{year}/{month}/{day}', 'CalendarController@update')->name('calendar.update');
 // Route::get('/timesheet/entry/{id}', 'TimesheetController@timesheet_entry')->middleware('auth');
@@ -98,7 +98,11 @@ Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middle
 //leave
 Route::get('/leave/history/{yearSelected?}', 'LeaveController@history')->name('leave')->middleware('auth');
 Route::post('/leave/request/entry', 'LeaveController@leave_request_entry')->name('leave.entry');
+Route::get('/leave/request/details/{id}', 'LeaveController@leave_request_details')->name('leave_req_details')->middleware('auth')->where('id', '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}');
 Route::get('/leave/history/cancel/{id}', 'LeaveController@cancel_request')->name('cancel_leave')->middleware('auth');
+
+Route::get('/leave/manage/all', 'LeaveController@manage')->name('manage_leave')->middleware('auth');
+Route::get('/leave/manage/{id}', 'LeaveController@manage_leave_emp')->name('manage_leave_user')->middleware('auth');
 
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth');
