@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyLeaveApproval;
 use App\Mail\ApprovalLeave;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave;
@@ -291,11 +292,7 @@ class LeaveController extends Controller
         $userName = Auth::user()->name;
 
         foreach ($employees as $employee) {
-            $notification = new ApprovalLeave($employee, $userName);
-            Mail::send('mailer.approval_leave', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            dispatch(new NotifyLeaveApproval($employee, $userName));
         }
 
         // Leave_request::where('RequestTo', Auth::user()->id)->delete();

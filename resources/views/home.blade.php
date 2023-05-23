@@ -159,22 +159,4 @@ active
         </div>
     </div>
 </div>
-<div class="modal fade" id="homeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" >
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title m-0 font-weight-bold text-danger" id="exampleModalLabel">User Guide</h5>
-          </button>
-        </div>
-        <div class="modal-body">
-            <p>[<a class="text-warning"> Warning </a>] ESS is in the development stage. Some page is still not accessible & you may find faults on input.</p>
-            <p>Sincerely,</p>
-            <p>IT Administrator</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">I Understand</button>
-        </div>
-      </div>
-    </div>
-</div>
 @endsection

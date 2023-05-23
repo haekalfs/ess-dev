@@ -194,12 +194,6 @@ active
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
                         <div class="row">
-                            {{-- <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="email">Date :</label>
-                                    <input type="text" class="form-control" name="daterangeLeave" id="daterangeLeave"/>
-                                </div>
-                            </div> --}}
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="email">Date :</label>
@@ -390,8 +384,10 @@ active
     </div>
 </div>
 <script>
-    $('.date').datepicker({
-    multidate: true
+var now = new Date();
+$('.date').datepicker({
+    multidate: true,
+    startDate: now
 });
 function calculateTotalDays() {
         var dateInput = document.getElementById('datepickLeave');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyAssignmentCreation;
 use App\Mail\ApprovalAssignment;
 use App\Models\Approval_status;
 use App\Models\Client;
@@ -94,11 +95,7 @@ class ProjectController extends Controller
         $employees = User::whereIn('id', $roleToApprove)->get();
 
         foreach ($employees as $employee) {
-            $notification = new ApprovalAssignment($employee);
-            Mail::send('mailer.approval_assignment', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            dispatch(new NotifyAssignmentCreation($employee));
         }
         return redirect("/assignment/member/$url")->with('success', "Assignment #$uniqueIdP Create successfully");
     }
