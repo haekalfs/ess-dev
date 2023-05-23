@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendTimesheetReminderSummary;
 use App\Mail\EssMailer;
 use App\Mail\TimesheetReminderEmployee;
 use App\Models\Additional_fare;
@@ -14,6 +15,7 @@ use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;
 use App\Models\Project_role;
+use App\Models\Surat_penugasan;
 use App\Models\Timesheet;
 use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
@@ -32,6 +34,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 use function PHPUnit\Framework\isEmpty;
@@ -296,47 +299,22 @@ class TimesheetController extends Controller
     }
     
 
-    public function save(Request $request)
-    {
-        foreach ($request->activities as $date => $activities) {
-            Timesheet::updateOrCreate(
-                ['ts_user_id' => 'haekals', 'ts_date' => $date],
-                [
-                    'ts_from_time' => $activities['from'],
-                    'ts_to_time' => $activities['to'],
-                    'ts_activity' => $activities['activity'],
-                    // Add more activity columns as needed
-                ]
-            );
-        }
-        Session::flash('success',"Timesheet has been saved!");
-        return redirect()->back();
-    }
-
-    public function showCalendar($year, $month)
-    {
-        // Set the default time zone to Jakarta
-        date_default_timezone_set("Asia/Jakarta");
-
-        // Get the number of days in the specified month and year
-        $numDays = Carbon::create($year, $month)->daysInMonth;
-
-        // Create an empty array to store the calendar data
-        $calendar = [];
-
-        // Loop through each day of the month and check if it is a holiday
-        for ($i = 1; $i <= $numDays; $i++) {
-            $date = Carbon::create($year, $month, $i)->format('Ymd');
-            $holiday = $this->tanggalMerah($date);
-            $calendar[$i] = [
-                'date' => $i,
-                'holiday' => $holiday,
-            ];
-        }
-
-        // Return the calendar view with the calendar data
-        return view('timereport.testing', compact('calendar'));
-    }
+    // public function save(Request $request)
+    // {
+    //     foreach ($request->activities as $date => $activities) {
+    //         Timesheet::updateOrCreate(
+    //             ['ts_user_id' => 'haekals', 'ts_date' => $date],
+    //             [
+    //                 'ts_from_time' => $activities['from'],
+    //                 'ts_to_time' => $activities['to'],
+    //                 'ts_activity' => $activities['activity'],
+    //                 // Add more activity columns as needed
+    //             ]
+    //         );
+    //     }
+    //     Session::flash('success',"Timesheet has been saved!");
+    //     return redirect()->back();
+    // }
 
     public function save_entries(Request $request)
     {
@@ -348,6 +326,7 @@ class TimesheetController extends Controller
             'from' => 'required',
             'to' => 'required',
             'activity' => 'required',
+            'surat_penugasan' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -368,16 +347,39 @@ class TimesheetController extends Controller
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->task;
         $entry->ts_location = $request->location;
-        $entry->ts_from_time = date('H:i', strtotime($request->from));;
+        $entry->ts_from_time = date('H:i', strtotime($request->from));
         $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
         $entry->save();
-    
+
+        // Store the file if it is provided
+        if ($request->hasFile('surat_penugasan')) {
+            $file = $request->file('surat_penugasan');
+            $surat_penugasan = $request->file('surat_penugasan');
+            $fileExtension = $surat_penugasan->getClientOriginalExtension();
+            $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+            $filePath = 'surat_penugasan/' . $fileName;
+            $upload_folder = public_path('surat_penugasan/');
+
+            // Move the uploaded file to the storage folder
+            $file->move($upload_folder, $fileName);
+
+            // Save the file details in the database
+            $fileEntry = new Surat_penugasan;
+            $fileEntry->user_id = Auth::user()->id;
+            $fileEntry->ts_date = $request->clickedDate;
+            $fileEntry->file_name = $fileName;
+            $fileEntry->file_path = $filePath;
+            $fileEntry->timesheet_id = str_replace('-','',$request->clickedDate);
+            $fileEntry->save();
+        }
+
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
         return response()->json(['success' => 'Entry saved successfully.']);
     }
+
 
     public function getActivities($year, $month)
     {
@@ -399,7 +401,25 @@ class TimesheetController extends Controller
         $activity = Timesheet::find($id);
 
         if ($activity) {
+            $surat_penugasan = Surat_penugasan::where("timesheet_id", $activity->ts_id_date);
+            
+            // Delete the file from the public folder if it exists
+            if ($surat_penugasan->exists()) {
+                $fileEntry = $surat_penugasan->first();
+                $filePath = public_path($fileEntry->file_path);
+                
+                // Delete the file
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+                
+                // Delete the Surat_penugasan entry
+                $surat_penugasan->delete();
+            }
+            
+            // Delete the activity entry
             $activity->delete();
+
             return response()->json(['success' => true]);
         } else {
             return response()->json(['success' => false, 'message' => 'Activity not found']);
@@ -414,14 +434,32 @@ class TimesheetController extends Controller
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
-        $activity = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
 
-        if ($activity) {
+        // Retrieve the activities within the date range
+        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
+
+        foreach ($activities as $activity) {
+            $surat_penugasan = Surat_penugasan::where("timesheet_id", $activity->ts_id_date);
+
+            // Delete the file from the public folder if it exists
+            if ($surat_penugasan->exists()) {
+                $fileEntry = $surat_penugasan->first();
+                $filePath = public_path($fileEntry->file_path);
+
+                // Delete the file
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+
+                // Delete the Surat_penugasan entry
+                $surat_penugasan->delete();
+            }
+
+            // Delete the activity entry
             $activity->delete();
-            return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Activity not found']);
         }
+
+        return response()->json(['success' => true]);
     }
 
     public function preview($year, $month)
@@ -475,6 +513,15 @@ class TimesheetController extends Controller
             }
         }
 
+        $surat_penugasan = Surat_penugasan::where('user_id', Auth::user()->id)->pluck('ts_date')->toArray();
+        $srtDate = [];
+        foreach ($surat_penugasan as $ts_date_srt) {
+            $dateArraySrt = explode(',', $ts_date_srt);
+            foreach ($dateArraySrt as $dateSrt) {
+                $srtDate[] = date('Y-m-d', strtotime($dateSrt));
+            }
+        }
+
         $assignmentNames = $assignment->pluck('project_name')->implode(', ');
         if($assignment->isEmpty()){
             $assignmentNames = "None";
@@ -499,7 +546,7 @@ class TimesheetController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month','info', 'assignmentNames', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month','info', 'assignmentNames', 'srtDate','startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
@@ -1034,12 +1081,22 @@ class TimesheetController extends Controller
         $employees = User::where('id', $id)->get();
 
         foreach ($employees as $employee) {
-            $notification = new TimesheetReminderEmployee($employee, $year, $month);
-            Mail::send('mailer.timesheet_entry', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            dispatch(new SendTimesheetReminderSummary($employee, $year, $month));
         }
         return redirect()->back()->with('success', "An email has been sent!");
+    }
+
+    public function download_surat($timesheet_id)
+    {
+        $getFile = Surat_penugasan::where('timesheet_id', $timesheet_id)->first();
+    	$filePath = public_path($getFile->file_path);
+
+        // Check if the file exists
+        if (File::exists($filePath)) {
+            return response()->download($filePath);
+        }
+
+        // File not found
+        abort(404);
     }
 }

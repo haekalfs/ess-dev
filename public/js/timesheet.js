@@ -12,8 +12,20 @@ $(function() {
         var year = formattedDate[2];
         var formattedDateStr = day + '-' + month + '-' + year;
         $('#selected-date-display').text(formattedDateStr);
+        
+        // Check if the selected date is a Saturday or Sunday
+        var selectedDate = new Date(date);
+        var dayOfWeek = selectedDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+        
+        // Show or hide the file input form based on the day of the week
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            $('#fileInputIfexist').show(); // Show the file input form
+        } else {
+            $('#fileInputIfexist').hide(); // Hide the file input form
+        }
     });
 });
+
 
 $(document).ready(function () {
     $('.clickable').click(function () {
@@ -31,16 +43,6 @@ $(document).ready(function() {
     if (!lastModalShownDate || lastModalShownDate !== currentDate) {
         $('#infoModal').modal('show');
         localStorage.setItem('modalShownDate', currentDate);
-    }
-});
-
-$(document).ready(function() {
-    var currentDate = new Date().toLocaleDateString();
-    var lastModalHomeDate = localStorage.getItem('modalHomeDate');
-    
-    if (!lastModalHomeDate || lastModalHomeDate !== currentDate) {
-        $('#homeModal').modal('show');
-        localStorage.setItem('modalHomeDate', currentDate);
     }
 });
 
@@ -127,6 +129,7 @@ $(document).ready(function() {
                     var taskEntry = $('#task_entry' + i);
                     taskEntry.removeClass('border-bottom-primary');
                   }
+                $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
             error: function(response,jqXHR, textStatus, errorThrown) {
@@ -156,6 +159,7 @@ $(document).ready(function() {
                     var taskEntry = $('#task_entry' + i);
                     taskEntry.removeClass('border-bottom-primary');
                   }
+                $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
             error: function(response,jqXHR, textStatus, errorThrown) {
@@ -324,47 +328,53 @@ $(document).ready(function() {
     
         // Check if any field with the class "validate" is empty
         $('.validate').each(function() {
-        if ($(this).val() === '') {
-            isValid = false;
-            $(this).addClass('is-invalid'); // Add "is-invalid" class to highlight the field
-        } else {
-            $(this).removeClass('is-invalid'); // Remove "is-invalid" class if the field is filled
-        }
+            if ($(this).val() === '') {
+                isValid = false;
+                $(this).addClass('is-invalid'); // Add "is-invalid" class to highlight the field
+            } else {
+                $(this).removeClass('is-invalid'); // Remove "is-invalid" class if the field is filled
+            }
         });
     
         if (isValid) {
-        // Serialize the form data
-        var formData = $('#entry-form').serialize();
-        // Send an AJAX request to the entries.store route
-        $.ajax({
-            type: 'POST',
-            url: '/entries',
-            data: formData,
-            success: function(response) {
-            $('.alert-success-saving').show();
-            document.getElementById("activity").removeAttribute("readonly");
-            document.getElementById("location").removeAttribute("readonly");
-            document.getElementById("start-time").removeAttribute("readonly");
-            document.getElementById("end-time").removeAttribute("readonly");
-            $('#entry-form')[0].reset();
-            setTimeout(function() {
-                $('.alert-success-saving').fadeOut('slow');
-            }, 3000);
-            // Fetch the updated list of activities
-            fetchActivities(yearput, monthput);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-            $('.alert-danger').show();
-            setTimeout(function() {
-                $('.alert-danger').fadeOut('slow');
-            }, 3000);
-            }
-        });
+            // Create a FormData object to send the form data including the file
+            var formData = new FormData($('#entry-form')[0]);
+    
+            // Send an AJAX request to the entries.store route
+            $.ajax({
+                type: 'POST',
+                url: '/entries',
+                data: formData,
+                dataType: 'json',
+                contentType: false, // Set contentType to false, as we are sending FormData
+                processData: false, // Set processData to false, as we are sending FormData
+                success: function(response) {
+                    $('.alert-success-saving').show();
+                    document.getElementById("activity").removeAttribute("readonly");
+                    document.getElementById("location").removeAttribute("readonly");
+                    document.getElementById("start-time").removeAttribute("readonly");
+                    document.getElementById("end-time").removeAttribute("readonly");
+                    $('#entry-form')[0].reset();
+                    $('#sp-label').text('Choose File');
+                    setTimeout(function() {
+                        $('.alert-success-saving').fadeOut('slow');
+                    }, 3000);
+                    // Fetch the updated list of activities
+                    fetchActivities(yearput, monthput);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $('#entry-form')[0].reset();
+                    $('.alert-danger').show();
+                    setTimeout(function() {
+                        $('.alert-danger').fadeOut('slow');
+                    }, 3000);
+                }
+            });
         } else {
-        // Show a popup or perform any other action to indicate that there are empty fields
-        alert('Please fill in all the required fields.');
+            // Show a popup or perform any other action to indicate that there are empty fields
+            alert('Please fill in all the required fields.');
         }
-    });
+    });    
   
 
     $('#multiple-entries').click(function(e) {

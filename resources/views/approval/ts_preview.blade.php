@@ -207,7 +207,11 @@ active
                             </td>
                             <td>
                                 @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
-                                    <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
+                                    @if (in_array($date->format('Y-m-d'), $srtDate))
+                                        <a href="/timesheet/user/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span class="text-danger">{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-danger"></i></a>
+                                    @else
+                                        <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
+                                    @endif
                                 @else
                                     {{ $date->format('d-M-Y') }}
                                 @endif
@@ -341,13 +345,13 @@ active
                                 <td style="border-bottom: none; border-top: none;"></td>
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->RequestTo }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @else
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->user_id }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ strtok($wf->user->name, " ") }}</td>
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->RequestTo }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @endif
                             </tr>

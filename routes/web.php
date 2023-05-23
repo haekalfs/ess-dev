@@ -45,6 +45,7 @@ Route::delete('/activities/all/{year}/{month}', 'TimesheetController@destroy_all
     //Preview
 Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview.timesheet')->middleware('auth');
 Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print')->middleware('auth');
+Route::get('/timesheet/entry/preview/surat_penugasan/download/{timesheet_id}', 'TimesheetController@download_surat')->middleware('auth');
     //submit
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
@@ -55,6 +56,8 @@ Route::get('/timesheet/review/fm/preview/print/{year}/{month}/{user_timesheet}',
 
 Route::get('/timesheet/summary/all', 'TimesheetController@summary')->name('summary')->middleware('auth');
 Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController@remind')->name('remind')->middleware('auth');
+
+Route::get('/timesheet/user/preview/surat_penugasan/download/{timesheet_id}', 'TimesheetController@download_surat')->middleware('auth');
 
 // // Testing
 Route::get('/development', 'HomeController@notification_indev');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendAssignmentNotification;
 use App\Mail\AssignmentNotifyToUser;
 use App\Models\Client;
 use App\Models\Company_project;
@@ -86,11 +87,7 @@ class ApprovalProjectController extends Controller
         $employees = User::whereIn('id', $userNotify)->get();
 
         foreach ($employees as $employee) {
-            $notification = new AssignmentNotifyToUser($employee, $assignmentName);
-            Mail::send('mailer.notify_user_assignment', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            dispatch(new SendAssignmentNotification($employee, $assignmentName));
         }
         
         Session::flash('success',"You approved Assignment #$assignment_id!");

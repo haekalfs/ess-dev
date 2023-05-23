@@ -272,25 +272,46 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form method="post" id="entry-form">
+			<form method="post" id="entry-form" enctype="multipart/form-data">
                 @csrf
 				<div class="modal-body" style="">
                     <input type="hidden" id="clickedDate" name="clickedDate">
                     <div class="col-md-12 zoom90">
                         <div class="row">
+                            <div class="col-md-12" id="fileInputIfexist">
+                                <div class="form-group">
+                                    <label for="email"><span class="text-danger"><i>Surat Penugasan : (If Any)</i></span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="surat_penugasan" name="surat_penugasan" onchange="changeFileName('surat_penugasan', 'sp-label')">
+                                        <label class="custom-file-label" id="sp-label">Choose file</label>
+                                    </div>
+                                    <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 500kb</i></small>
+                                </div>
+                            </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
                                     <select class="form-control" id="task" name="task" required>
-                                        <option value="HO">HO</option>
-                                        <optgroup label="Projects">
-                                            @foreach($assignment as $assign)
-                                            <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
-                                            @endforeach
+                                        <option value="HO">Head Office</option>
+                                        <option value="Training">Training</option>
+                                        <optgroup label="Presales">
+                                        <option value="Presales">Presales</option>
+                                        <option value="Trainer">Trainer</option>
+                                        <optgroup label="Others">
+                                            <option value="Standby">Standby</option>
+                                            <option value="Lembur">Lembur</option>
+                                            <option value="Sick">Sick</option>
+                                            <option value="Other">Other</option>
                                         </optgroup>
-                                        <option value="Standby">Standby</option>
-                                        <option value="Sick">Sick</option>
-                                        <option value="Other">Other</option>
+                                        <optgroup label="Projects">
+                                            @if ($assignment->isEmpty())
+                                                <option disabled><i>No Project Assigned</i></option>
+                                            @else
+                                                @foreach($assignment as $assign)
+                                                    <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
+                                                @endforeach
+                                            @endif
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
@@ -613,6 +634,12 @@ function setupTimeInputs() {
     // After form submission or page refresh, call the setupTimeInputs function again
     setupTimeInputs();
   }
+
+function changeFileName(inputId, labelId) {
+  var input = document.getElementById(inputId);
+  var label = document.getElementById(labelId);
+  label.textContent = input.files[0].name;
+}
 </script>
 <style>
     .row-toolbar {

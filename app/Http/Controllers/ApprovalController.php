@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\TimesheetExport;
+use App\Jobs\NotifRejectedTimesheet;
 use App\Mail\ApprovalTimesheet;
 use App\Mail\RejectedTimesheet;
 use App\Models\Approval_status;
@@ -11,6 +12,7 @@ use App\Models\Leave_request_approval;
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
+use App\Models\Surat_penugasan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
 use App\Models\Timesheet_approver;
@@ -197,13 +199,8 @@ class ApprovalController extends Controller
 
         $employees = User::where('id', $user_timesheet)->get();
 
-        //add notes to reject notification email
         foreach ($employees as $employee) {
-            $notification = new RejectedTimesheet($employee, $year, $month);
-            Mail::send('mailer.rejected_timesheet', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            dispatch(new NotifRejectedTimesheet($employee, $year, $month));
         }
         $entry = new Notification_alert;
         $entry->user_id = $user_timesheet;
@@ -265,7 +262,7 @@ class ApprovalController extends Controller
 
         $user_info = User::find($user_id);
 
-        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year.$month)->get(); 
+        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year.intval($month))->get(); 
 
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
@@ -298,6 +295,15 @@ class ApprovalController extends Controller
             }
         }
 
+        $surat_penugasan = Surat_penugasan::where('user_id', $user_id)->pluck('ts_date')->toArray();
+        $srtDate = [];
+        foreach ($surat_penugasan as $ts_date_srt) {
+            $dateArraySrt = explode(',', $ts_date_srt);
+            foreach ($dateArraySrt as $dateSrt) {
+                $srtDate[] = date('Y-m-d', strtotime($dateSrt));
+            }
+        }
+
         $assignmentNames = $assignment->pluck('project_name')->implode(', ');
         if($assignment->isEmpty()){
             $assignmentNames = "None";
@@ -322,6 +328,6 @@ class ApprovalController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month','info', 'assignmentNames', 'user_id', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month','info', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 }
