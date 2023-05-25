@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class UserController extends Controller
 {
     public function index()
@@ -57,17 +58,28 @@ class UserController extends Controller
         $nextId = intval(substr($lastId, 4)) + 1;
         $hash_pwd = Hash::make($request->password);
 
-        // menyimpan data file yang diupload ke variabel $file
-        $profile_file = $request->file('profile');
-        $nama_file_profile = $request->usr_id . "_" . $profile_file->getClientOriginalName();
-        // isi dengan nama folder tempat kemana file diupload
-        $tujuan_upload_profile = '/storage/profile_pic';
-        $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
+        // Memeriksa apakah file foto profil diunggah
+        if ($request->hasFile('profile')) {
+            $profile_file = $request->file('profile');
+            $nama_file_profile = $request->email . "." . $profile_file->getClientOriginalExtension();
+            $tujuan_upload_profile = '/storage/profile_pic';
+            $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
+        }
+        else {
+            // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
+            $nama_file_profile = null;
+        }
 
-        $cv_file = $request->file('cv');
-        $nama_file_cv = $request->usr_id . "_" . $cv_file->getClientOriginalName();
-        $tujuan_upload_cv = '/storage/cv';
-        $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
+        // Memeriksa apakah file CV diunggah
+        if ($request->hasFile('cv')) {
+            $cv_file = $request->file('cv');
+             $nama_file_cv = $request->usr_id . "." . $cv_file->getClientOriginalExtension();
+            $tujuan_upload_cv = '/storage/cv';
+            $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
+        } else {
+            // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
+            $nama_file_cv = null;
+        }
 
         User::create([
             'id' => $request->usr_id,
@@ -130,7 +142,9 @@ class UserController extends Controller
     
     public function update(Request $request, $id)
     {
-        
+        $dep_data = Department::all();
+        $pos_data = Position::all();
+        $user = User::find($id);
         $this->validate($request,[
             'name' => 'required',
             'email' => 'required',
@@ -148,39 +162,51 @@ class UserController extends Controller
             'usr_gender'=> 'required',
             'usr_religion'=> 'required',
             ]);
-            
-            // menyimpan data file yang diupload ke variabel $file
+
+        // Memeriksa apakah file foto profil diunggah
+        if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $request->usr_id . "_" . $profile_file->getClientOriginalName();
-            
-            // isi dengan nama folder tempat kemana file diupload
-            $tujuan_upload_profile = 'public/profile_pic';
-            $profile_file->storeAs($tujuan_upload_profile, $nama_file_profile);
-            
-            
-            // Menghapus gambar profil yang lama jika ada
-                if ($request->hasFile('profile')) {
-                    $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
-    
-                    if (Storage::exists($oldProfileImage)) {
-                        Storage::delete($oldProfileImage);
-                    }
-                }
+            $nama_file_profile = $request->email.".".$profile_file->getClientOriginalExtension();
+            $tujuan_upload_profile = 'profile_pic';
 
-            $cv_file = $request->file('cv');
-            $nama_file_cv = $request->usr_id . "_" . $cv_file->getClientOriginalName();
-            $tujuan_upload_cv = 'public/cv';
-            $cv_file->storeAs($tujuan_upload_cv, $nama_file_cv);
-            
-            if ($request->hasFile('cv')) {
-                $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
-
-                if (Storage::exists($oldCV)) {
-                    Storage::delete($oldCV);
-                }
+            // Menghapus file profil lama jika ada
+            $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
+            if (file_exists($oldProfileImage)) {
+                unlink($oldProfileImage);
             }
 
+            // Memindahkan file profil yang baru diunggah
+            $profile_file->storeAs('public/' . $tujuan_upload_profile, $nama_file_profile);
+        
+        } elseif ($user->users_detail->profile_pic) {
+            // Menggunakan foto profil yang sudah ada dalam database jika ada
+            $nama_file_profile = $user->users_detail->profile_pic;
+        } else {
+            // Tidak ada foto profil di database dan tidak ada unggahan baru, set nilai menjadi null
+            $nama_file_profile = null;
+        }
 
+        // Memeriksa apakah file CV diunggah
+        if ($request->hasFile('cv')) {
+            $cv_file = $request->file('cv');
+            
+            $nama_file_cv = $request->usr_id . "." . $cv_file->getClientOriginalExtension();
+            $tujuan_upload_cv = 'cv';
+
+            // Menghapus file profil lama jika ada
+            $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
+            if (file_exists($oldCV)) {
+                unlink($oldCV);
+            }
+
+            $cv_file->storeAs('public/' . $tujuan_upload_cv, $nama_file_cv);
+        } elseif ($user->users_detail->cv) {
+            // Menggunakan foto profil yang sudah ada dalam database jika ada
+            $nama_file_cv = $user->users_detail->cv;
+        } else {
+            // Tidak ada foto profil di database dan tidak ada unggahan baru, set nilai menjadi null
+            $nama_file_cv = null;
+        }
             $user = User::find($id);
             $user->id = $request->usr_id;
             $user->name = $request->name;
@@ -221,19 +247,7 @@ class UserController extends Controller
             $user_detail->save();
 
 
-        return redirect('/manage/users')->with('success', 'User updated successfully');
+        return view('manage.users_edit', ['user' => $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data]);
     }
 
-
-    // List consul and employee
-    public function consultant()
-    {
-        $consultants = User::all();
-        return view('manage.consultant', ['consultants' => $consultants]);
-    }
-    public function employee()
-    {
-        $employee = User::all();
-        return view('manage.employee', ['employee' => $employee]);
-    }
 }
