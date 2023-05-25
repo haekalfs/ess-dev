@@ -602,9 +602,9 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.exists) {
-                    $('#user-id-error').text('User ID sudah digunakan');
+                    $('#user-id-error').text('User ID Sudah Digunakan');
                 } else {
-                    $('#user-id-error').text('User ID Tersedia');
+                    $('#user-id-error').text('User ID Dapat Digunakan');
                 }
             },
             error: function() {

@@ -181,7 +181,7 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
 
 //Employees Database
 Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');
-Route::get('/export-users', 'EmployeesDatabase@exportUsers')->name('export.users');
+Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users');
 
 //HR TOOLS
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth');

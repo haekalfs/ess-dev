@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Exports\MasterDataExport;
+use App\Models\Users_detail;
 
 class EmployeesDatabase extends Controller
 {
@@ -32,5 +34,17 @@ class EmployeesDatabase extends Controller
         $listUser = $users->get();
 
         return view('management.database.employees', ['users' => $listUser]);
+    }
+
+
+    public function exportData()
+    {
+        // Ambil data dari tabel user
+        $users = User::with('users_detail.department','users_detail.position')->get();
+
+        // Ambil data dari tabel users_detail
+        $usersDetail = Users_detail::all();
+
+        return (new MasterDataExport($users, $usersDetail))->toResponse(request());
     }
 }
