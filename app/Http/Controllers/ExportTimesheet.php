@@ -8,6 +8,7 @@ use App\Models\Project_location;
 use App\Models\Project_role;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
+use App\Models\Timesheet_detail;
 use App\Models\Timesheet_workflow;
 use App\Models\User;
 use App\Models\Users_detail;
@@ -56,21 +57,23 @@ class ExportTimesheet extends Controller
         ->groupBy('user_timesheet')
         ->get(); 
 
-
        // Set up the starting row and column for the data
         $startRow = 8;
         $startCol = 2;
 
         // Initialize the last printed user name
         $lastUser = '';
+        $lastAllowance = 0;
         $lastWorkhours = '';
         $totalAllowances = 0;
         $totalIncentive = 0;
         $countIncentive = [];
         $lastTotalMandays = 0;
         $firstRow = true; // Flag to check if it's the first row for each user
-
+        $incentiveArray = [];
+        $allowanceArray = [];
         $totalSum = 0;
+        $total = 0;
 
         foreach ($result as $row) {
             $mandays = $row->ts_mandays;
@@ -91,18 +94,56 @@ class ExportTimesheet extends Controller
                 $firstRow = true; // Reset the firstRow flag for a new user
             }
             
+
             // Print the user name if it is different from the last printed user name
             if ($row->user_timesheet !== $lastUser) {
                 $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->name);
                 $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $totalMandays);
                 $sheet->setCellValueByColumnAndRow(1, $startRow, $row->employee_id);
+                
+                $ts_id_date = DB::table('timesheet')
+                ->select('ts_id_date', DB::raw('MAX(CAST(allowance AS DECIMAL(10, 2))) AS max_allowance'), DB::raw('MAX(CAST(incentive AS DECIMAL(10, 2))) AS max_incentive'))
+                ->where('ts_user_id', $row->user_timesheet)
+                ->groupBy('ts_id_date')
+                ->get();
+                foreach ($ts_id_date as $ts_count) {
+                    $incentiveArray[] = $ts_count->max_incentive; // Use [] to add elements to the array
+                    $allowanceArray[] = $ts_count->max_allowance; // Use [] to add elements to the array
+                }
+                $totalAllowances = array_sum($allowanceArray);
+                $totalIncentive = array_sum($incentiveArray);
+
+                $checkUser = User::find($row->user_timesheet);
+                $checkDepartment = $checkUser->users_detail->department->id;
+                
+                $countTotalRowsEachUser = Timesheet_detail::where('month_periode', $Year.intval($Month))
+                ->where('ts_status_id', 29);
+                $countUserRows = $countTotalRowsEachUser->where('user_timesheet', $row->user_timesheet)->count();
+
+                if ($checkDepartment == 2) {
+                    $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $totalAllowances);
+                    $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $totalIncentive);
+                } else {
+                    $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $totalAllowances);
+                    $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $totalIncentive);
+                }
+                $total = $totalIncentive + $totalAllowances;
+                if ($countUserRows === 1) {
+                    $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, $total);
+                } else {
+                    $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, $total);
+                }
                 // Reset the total allowances for the new user
+                $allowanceArray = [];
+                $incentiveArray = [];
                 $totalAllowances = 0;
                 $totalIncentive = 0;
+                $total = 0;
                 $countIncentive = [];
                 $lastUser = $row->user_timesheet;
             }
             
+
             $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
             $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
             $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays);
@@ -112,29 +153,27 @@ class ExportTimesheet extends Controller
                 $lastWorkhours = $row->workhours;
             }
 
-            $fare = Project_location::where('location_code', $row->ts_location)->pluck('fare')->first();
-            $countAllowances = $row->ts_mandays * $fare;
+            ///////////////////////////////////
+            // $fare = Project_location::where('location_code', $row->ts_location)->pluck('fare')->first();
+            // $countAllowances = $row->ts_mandays * $fare;
 
-            $checkUser = User::find($row->user_timesheet);
-            $checkDepartment = $checkUser->users_detail->department->id;
-            if ($checkDepartment == 2) {
-                $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $countAllowances);
-            } else {
-                $sheet->setCellValueByColumnAndRow($startCol + 7, $startRow, $countAllowances);
-            }
+            // $checkUser = User::find($row->user_timesheet);
+            // $checkDepartment = $checkUser->users_detail->department->id;
+            // if ($checkDepartment == 2) {
+            //     $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $countAllowances);
+            // } else {
+            //     $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $countAllowances);
+            // }
             
-            $countIncentive[] = $row->incentive;
-            $totalAllowances += $countAllowances;
-            $totalIncentive = array_sum($countIncentive);
+            // $countIncentive[] = $row->incentive;
+            // $totalAllowances += $countAllowances;
+            // $totalIncentive = array_sum($countIncentive);
 
-            $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->incentive);
+            // if ($row->user_timesheet !== $lastUser) {
+            //     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->incentive);
+            // }///////////////////////////
             
             $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
-
-            if (!$firstRow && ($index === count($result) - 1 || $row->user_timesheet !== $result[$index + 1]->user_timesheet)) {
-                $total = $totalIncentive + $totalAllowances;
-                $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, $total);
-            }
 
             $startRow++;
             $firstRow = false; // Set the firstRow flag to false after the first row for each user

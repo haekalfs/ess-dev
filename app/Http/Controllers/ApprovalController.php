@@ -7,6 +7,7 @@ use App\Jobs\NotifRejectedTimesheet;
 use App\Mail\ApprovalTimesheet;
 use App\Mail\RejectedTimesheet;
 use App\Models\Approval_status;
+use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Notification_alert;
@@ -162,6 +163,32 @@ class ApprovalController extends Controller
         $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
         $entry->importance = 1;
         $entry->save();
+
+        $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
+        $countWeekendReplacement = Emp_leave_quota::where('user_id', $user_timesheet)
+                                    ->where('leave_id', 100)
+                                    ->where('active_periode', '>=', date('Y-m-d'))
+                                    ->sum('quota_left');
+        if(!$weekendReplacementInCurrentMonth){
+            Emp_leave_quota::updateOrCreate([
+                'user_id' => Auth::user()->id,
+                'leave_id' => 100,
+                'active_periode' => date('Y-m-d'),
+            ], [
+                'quota_left' => 1,
+                'once_in_service_years' => false
+            ]);
+        } else {
+            $totalWeekendReplacement = $weekendReplacementInCurrentMonth + $countWeekendReplacement;
+            Emp_leave_quota::updateOrCreate([
+                'user_id' => Auth::user()->id,
+                'leave_id' => 100,
+                'active_periode' => date('Y-m-d'),
+            ], [
+                'quota_left' => $totalWeekendReplacement,
+                'once_in_service_years' => false
+            ]);
+        }
 
         return redirect('/approval/timesheet/p')->with('success',"You approved $user_timesheet timereport!");
     }

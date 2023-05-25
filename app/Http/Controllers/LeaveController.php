@@ -33,12 +33,16 @@ class LeaveController extends Controller
             $currentYear = $yearSelected;
         }
         $leaveType = Leave::all();
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
+        ->where('leave_id', 100)
+        ->where('active_periode', '>=', date('Y-m-d'))
+        ->sum('quota_left');
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
             ->where('active_periode', '>=', date('Y-m-d'))
             ->sum('quota_left');
         $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('active_periode', '>=', date('Y-m-d'))->where('user_id', Auth::user()->id)->where('leave_id', 20)->pluck('quota_left')->first();
-        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm;
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";
         }
@@ -76,24 +80,24 @@ class LeaveController extends Controller
             
             foreach ($lr->leave_request_approval as $stat) {
                 if ($stat->status == 29) {
-                    $lr->approvalStatus = "<span class='m-0 font-weight-bold text-primary'>Approved</span>";
+                    $lr->approvalStatus = "<span class='m-0 text-primary'>Approved</span>";
                     $approved = true;
                     break;
                 } elseif($stat->status == 404) {
-                    $lr->approvalStatus = "<span class='m-0 font-weight-bold text-danger'>Rejected</span>";
+                    $lr->approvalStatus = "<span class='m-0 text-danger'>Rejected</span>";
                     $approved = true;
                     break;
                 }
             }
             
             if (!$approved) {
-                $lr->approvalStatus = "<span class='m-0 font-weight-bold text-secondary'>Waiting for Approval</span>";
+                $lr->approvalStatus = "<span class='m-0 text-secondary'>Waiting for Approval</span>";
             }
         }
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::whereIn('project_assignment_id', $findAssignment)->where('role', 'PM')->get();
 
-        return view('leave.history', compact('yearsBefore', 'leaveType', 'usersWithPMRole', 'leaveRequests', 'empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
+        return view('leave.history', compact('yearsBefore', 'leaveType', 'usersWithPMRole', 'empLeaveQuotaWeekendReplacement', 'leaveRequests', 'empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
 	}
 
     public function leave_request_entry(Request $request){
@@ -149,6 +153,7 @@ class LeaveController extends Controller
         switch($quotaUsed){
             case 10:
             case 20:
+            case 100:
                 if (intval($totalDays) > $checkQuotaLeft) {
                     return redirect()->back()->with('failed', "Your Leave Request Exceeds Your Leave Quota or Your Leave Quota is Expired, Ask the HR Dept for solutions");
                 }
@@ -262,15 +267,19 @@ class LeaveController extends Controller
             break;
         }
 
+        // $getUsedQuota = Emp_leave_quota::where
+        //set quota for leaves
         switch($quotaUsed) {
             case 10:
             case 20:
+            case 100:
                 foreach ($checkQuota as $quota) {
                     if ($countQuota > 0) {
                         $remainingQuota = $quota->quota_left;
                         $deductedQuota = min($countQuota, $remainingQuota);
                         $countQuota -= $deductedQuota;
 
+                        $quota->quota_used += $deductedQuota;
                         $quota->quota_left -= $deductedQuota;
                         $quota->save();
                     } else {
@@ -334,7 +343,7 @@ class LeaveController extends Controller
         if ($leaveApproverCount > 0) {
             $approvalPercentage = ($leaveApproverApprovedCount / $leaveApproverCount) * 100;
         } else {
-            $approvalPercentage = 0;
+            $approvalPercentage = 100;
         }
 
         $data[0]['approvalPercentage'] = $approvalPercentage;
@@ -383,6 +392,7 @@ class LeaveController extends Controller
                 $addedQuota = min($countQuota, 12 - $remainingQuota); // Ensure quota_left doesn't exceed 12
                 $countQuota -= $addedQuota;
 
+                $quota->quota_used -= $addedQuota;
                 $quota->quota_left += $addedQuota;
                 $quota->save();
             } else {

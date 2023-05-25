@@ -9,6 +9,7 @@ use App\Models\Additional_fare;
 use App\Models\Approval_status;
 use App\Models\Company_project;
 use App\Models\Cutoffdate;
+use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Project_assignment;
@@ -332,7 +333,8 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
-
+        $totalIncentive = 0;
+        $totalIncentive = 0;
         $entry = new Timesheet;
         $ts_task_id = $request->task;
         $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
@@ -351,6 +353,39 @@ class TimesheetController extends Controller
         $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
+
+        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $request->task)->pluck('role')->first();
+        if($checkRole == NULL){
+                
+        } elseif ($checkRole == "MT") {
+            $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+            $hiredDate = new DateTime($mt_hiredDate);
+            $currentDate = new DateTime(date('Y-m-d'));
+            $interval = $hiredDate->diff($currentDate);
+            $yearsDifference = $interval->format('%y'); // Get the year difference between the two dates
+            $monthsDifference = $interval->format('%m'); // Get the month difference between the two dates
+            $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
+            
+            if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
+                $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
+                $totalIncentive = $roleFare * 0.7;
+            } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
+                $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
+                $totalIncentive = $roleFare * 0.7;
+            } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
+                $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
+                $totalIncentive = $roleFare * 0.7;
+            } else {
+            }
+        } else {
+            $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
+            $totalIncentive = $roleFare * 0.7;
+        }
+        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        $countAllowances = $fare;
+
+        $entry->allowance = $countAllowances;
+        $entry->incentive = $totalIncentive;
         $entry->save();
 
         // Store the file if it is provided
@@ -593,7 +628,7 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Get the Timesheet records between the start and end dates
-        $tsOfTheMonth = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
+        $tsOfTheMonth = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_id_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
 
         if ($tsOfTheMonth->isEmpty()) {
             Session::flash('failed', "You have to fill your timesheet first!");
@@ -610,9 +645,16 @@ class TimesheetController extends Controller
         }
 
         $countRows = DB::table('timesheet')
-        ->selectRaw('ts_task, ts_location, ts_user_id, MAX(ts_task_id) AS ts_task_id, COUNT(*) AS total_rows')
+        ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('MAX(CAST(allowance AS DECIMAL(10, 2))) AS max_allowance'), DB::raw('MAX(ts_task_id) AS ts_task_id'), DB::raw('COUNT(*) AS total_rows'))
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
         ->where('ts_user_id', Auth::user()->id)
+        ->whereIn(DB::raw('(ts_id_date, CAST(allowance AS DECIMAL(10, 2)))'), function ($query) use ($startDate, $endDate) {
+            $query->select(DB::raw('ts_id_date, MAX(CAST(allowance AS DECIMAL(10, 2)))'))
+                ->from('timesheet')
+                ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->where('ts_user_id', Auth::user()->id)
+                ->groupBy('ts_id_date');
+        })
         ->groupBy('ts_task', 'ts_location', 'ts_user_id')
         ->get();
 
@@ -1059,7 +1101,7 @@ class TimesheetController extends Controller
         ]);
 
         // var_dump($Year.intval($Month));
-        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_task', 'RequestTo')->orderBy('user_timesheet', 'asc');
+        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_task', 'RequestTo')->orderBy('user_timesheet', 'asc')->orderBy('created_at', 'asc');
 
         if ($validator->passes()) {
             $Year = $request->yearOpt;

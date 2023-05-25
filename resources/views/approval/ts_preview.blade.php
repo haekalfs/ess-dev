@@ -308,7 +308,11 @@ active
                 <tbody>
                     <tr class="table-sm">
                         <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
-                        <td class="text-center font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
+                        @if($total_work_hours < 160)
+                        <td class="text-center text-danger font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
+                        @else
+                        <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
+                        @endif
                     </tr>
                 </tbody>
             </table>
