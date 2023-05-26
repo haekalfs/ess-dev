@@ -75,9 +75,9 @@ active
                             <tbody>
                                 <tr class="table-sm text-center">
                                     <td style="d-flex align-items-center text-center"> @if($user_info->users_detail->profile_pic)
-                                            <img class="img-thumbnail" width="100px" height="100px" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                            <img class="img-profile rounded-circle" width="140px" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                         @else
-                                            <div class="img-thumbnail no-image"><i class="no-image-text">No Image Available</i></div>
+                                            <div class="img-profile rounded-circle"><i class="no-image-text">No Image Available</i></div>
                                         @endif
                                     </td>
                                 </tr>
