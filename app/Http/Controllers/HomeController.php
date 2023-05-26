@@ -40,12 +40,16 @@ class HomeController extends Controller
             ->where('leave_id', 10)
             ->where('active_periode', '>=', date('Y-m-d'))
             ->sum('quota_left');
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
+            ->where('leave_id', 100)
+            ->where('active_periode', '>=', date('Y-m-d'))
+            ->sum('quota_left');
         $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('active_periode', '>=', date('Y-m-d'))->where('user_id', Auth::user()->id)->where('leave_id', 20)->pluck('quota_left')->first();
-        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm;
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";
         }
-       return view('home', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
+       return view('home', compact('empLeaveQuotaAnnual', 'empLeaveQuotaWeekendReplacement', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
     }
 
     public function notification_indev()

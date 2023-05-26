@@ -98,7 +98,7 @@ active
                       </tr>
                       <tr>
                           <th>Weekend Replacement</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaWeekendReplacement }}</td>
                       </tr>
                       <tr>
                           <th>Total Leave Available</th>
@@ -167,8 +167,11 @@ active
                                 @endforeach
                                 
                                 @unless ($approved)
+                                    <a class="btn btn-secondary btn-sm" data-toggle="modal" and data-target="#leaveRequestDetailModal" data-id="{{ $lr->id }}">
+                                        <i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Details
+                                    </a>
                                     <a href="/leave/history/cancel/{{ $lr->id }}" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel Request
+                                        <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel
                                     </a>
                                 @endunless
                             </td>
@@ -346,16 +349,16 @@ active
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-            <div class="modal-body" style="height: 270px; overflow-y: auto;">
+            <div class="modal-body" style="height: 370px; overflow-y: auto;">
                 <div class="col-md-12 zoom90">
                     <div class="row">
                         <div class="col-md-12">
-                            <h6 class="h5 mb-2 text-gray-800">Waiting For Approval : <span class="text-danger" id="approver"></span></i></h6>
+                            <h6 class="h5 mb-2 text-gray-800">Waiting For Approval : <span class="text-primary" id="approver"></span></i></h6>
                             <div class="progress">
-                                <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
                             </div><br>
                             <div class="table-responsive">
-                                <table class="table table-bordered zoom90" id="myLeave" width="100%" cellspacing="0">
+                                <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
                                     <thead class="thead-light">
                                         <tr>
                                             <th>Request Date</th>
@@ -404,7 +407,7 @@ function calculateTotalDays() {
 </script>
 <style>
 .action{
-    width: 195px;
+    width: 205px;
 }
 </style>
 @endsection

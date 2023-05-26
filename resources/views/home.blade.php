@@ -80,7 +80,7 @@ active
                       </tr>
                       <tr>
                           <th>Weekend Replacement</th>
-                          <td style="text-align: start; font-weight:500">: N/A</td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaWeekendReplacement }}</td>
                       </tr>
                       <tr>
                           <th>Total Leave Available</th>

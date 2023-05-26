@@ -89,6 +89,7 @@ active
                                         <th>Name</th>
                                         <th>Project</th>
                                         <th>Timesheet Status</th>
+                                        <th>Date Created</th>
                                         <th>Approver</th>
                                         <th>Action</th>
                                     </tr>
@@ -101,6 +102,7 @@ active
                                         <td style="border-bottom: none; border-top: none;"></td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->created_at->format('d-M-Y H:m') }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
                                         <td style="border-bottom: none; border-top: none;"></td>
                                         @else
@@ -108,6 +110,7 @@ active
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->user->name }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
+                                        <td style="border-bottom: none; border-top: none;">{{ $approval->created_at->format('d-M-Y H:m') }}</td>
                                         <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
                                         <td style="border-bottom: none; border-top: none;" class="action text-center">
                                             <a href="/timesheet/summary/remind/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
