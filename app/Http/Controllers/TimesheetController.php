@@ -367,9 +367,9 @@ class TimesheetController extends Controller
             $checkRole = Project_assignment_user::where('user_id', $user->id)
             ->where('project_assignment_id', $id_project)
             ->value('role');
-            if ($checkRole === null) {
+            if ($checkRole == NULL) {
                 $totalIncentive = 0;
-            } elseif ($checkRole === "MT") {
+            } elseif ($checkRole == "MT") {
                 $mt_hiredDate = Users_detail::where('user_id', $user->id)
                     ->value('hired_date');
                 
