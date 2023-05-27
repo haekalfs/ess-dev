@@ -362,11 +362,11 @@ class TimesheetController extends Controller
         $entry->ts_status_id = '10';
 
         $user = Auth::user();
-        $checkRole = Project_assignment_user::where('user_id', $user->id)
-            ->where('project_assignment_id', $id_project)
-            ->value('role');
 
         if(Project_assignment_user::where('user_id', $user->id)->where('project_assignment_id', $id_project)->exists()){
+            $checkRole = Project_assignment_user::where('user_id', $user->id)
+            ->where('project_assignment_id', $id_project)
+            ->value('role');
             if ($checkRole === null) {
                 $totalIncentive = 0;
             } elseif ($checkRole === "MT") {
