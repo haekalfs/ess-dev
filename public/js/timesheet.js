@@ -466,7 +466,8 @@ $(document).ready(function() {
                 // Fetch the updated list of activities
                 fetchActivities(yearput, monthput);
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function(response,jqXHR, textStatus, errorThrown) {
+                console.log(response);
                 $('.alert-danger').show();
                 setTimeout(function() {
                 $('.alert-danger').fadeOut('slow');
