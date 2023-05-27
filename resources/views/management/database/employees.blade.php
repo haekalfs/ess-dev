@@ -82,7 +82,7 @@ active
                                     <tr>
                                         <th class="text-center">
                                             <div class="form-check form-check-inline larger-checkbox">
-                                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                                                <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleCheckboxes()">
                                             </div>
                                         </th>
                                         <th>User ID</th>
@@ -95,7 +95,7 @@ active
                                     <tr>
                                         <td class="text-center">
                                             <div class="form-check form-check-inline larger-checkbox">
-                                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                                                <input class="form-check-input data-checkbox" type="checkbox" value="option1">
                                             </div>
                                         </td>
                                         <td>{{ $user->user_id }}</td>
@@ -133,4 +133,14 @@ active
     </form>
     </div>
 </div> --}}
+<script>
+function toggleCheckboxes() {
+    var checkboxes = document.getElementsByClassName('data-checkbox');
+    var checkAllCheckbox = document.getElementById('checkAll');
+
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = checkAllCheckbox.checked;
+    }
+}
+</script>
 @endsection

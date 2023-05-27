@@ -45,13 +45,7 @@ class UserController extends Controller
             'department' => 'required',
             'hired_date'=> 'required',
             'employee_id'=> 'required',
-            // 'usr_id_type'=> 'required',
-            // 'usr_id_no'=> 'required',
-            // 'usr_id_expiration'=> 'required',
-            // 'usr_dob'=> 'required',
-            // 'usr_birth_place'=> 'required',
-            // 'usr_gender'=> 'required',
-            // 'usr_religion'=> 'required',
+            'profile_pic' => 'sometimes|file|image|mimes:jpeg,png,jpg|max:2048'
             ]);
         
         $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();

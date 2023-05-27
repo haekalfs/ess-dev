@@ -108,7 +108,6 @@ class MasterDataExport implements Responsable
             $row++;
         }
 
-        
         // Simpan file Excel
         $writer = new Xlsx($spreadsheet);
         $filename = 'Master Data Employee.xlsx';

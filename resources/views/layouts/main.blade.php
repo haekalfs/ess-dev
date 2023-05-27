@@ -447,7 +447,11 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span
                                     class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
+                                @if(Auth::user()->users_detail->profile_pic)
+                                <img class="img-profile rounded-circle"  src="{{ url('/storage/profile_pic/'.Auth::user()->users_detail->profile_pic) }}">
+                                @else
                                 <img class="img-profile rounded-circle" src="{{ asset('img/PC-01A.png') }}">
+                                @endif
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"

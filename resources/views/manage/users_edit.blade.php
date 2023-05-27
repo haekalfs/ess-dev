@@ -6,13 +6,13 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between ">
-<h4 class="m-0 font-weight-bold text-grey">Edit Employee</h4>
 <form method="POST" action="/users/update/{{ $user->id }}" enctype="multipart/form-data">
 @csrf
 @method('PUT')
-    <div class="text-right">
-        <a href="/manage/users" class="btn btn-primary btn-sm" id="manButton">Kembali</a>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h4 class="m-0 font-weight-bold text-grey">Edit Employee</h4>
+    <div class="d-sm-flex justify-content-end ">
+        <a href="/manage/users" class="btn btn-danger btn-sm mr-2" id="manButton">Kembali</a>
         <input type="submit" class="btn btn-success btn-sm" value="Simpan">
     </div>
 </div>
