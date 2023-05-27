@@ -72,7 +72,7 @@ class TimesheetController extends Controller
                 }
                 $encryptYear = Crypt::encrypt($currentYear);
                 $encryptMonth = Crypt::encrypt($entry);
-                $validStatusIDs = ['20', '29', '30', '40', '15'];
+                $validStatusIDs = Approval_status::whereIn('id', [2,3,6,8])->pluck('approval_status_id')->toArray();
                 $isSubmitted = in_array($lastUpdate->ts_status_id, $validStatusIDs);
                 $lastUpdatedAt = $lastUpdate->updated_at;
                 $editUrl = "/timesheet/entry/".$encryptYear."/".$encryptMonth;
@@ -267,18 +267,24 @@ class TimesheetController extends Controller
             
             $approved = false;
         }
+        // Get the current day
+        $currentDay = date('d');
+
+        // Create the date string in the format Y-m-d
+        $date = $year . '-' . $month . '-' . $currentDay;
+
         $assignment = Project_assignment_user::join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
-            ->whereMonth('project_assignment_users.periode_start', '<=', $month)
-            ->whereMonth('project_assignment_users.periode_end', '>=', $month)
-            ->whereYear('project_assignment_users.periode_start', $year)
-            ->whereYear('project_assignment_users.periode_end', $year)
             ->where('project_assignments.approval_status', 29)
+            ->where(function ($query) use ($date) {
+                $query->whereDate('project_assignment_users.periode_start', '<=', $date)
+                    ->whereDate('project_assignment_users.periode_end', '>=', $date);
+            })
             ->get();
 
-        $validStatusIDs = ['20', '29', '30', '40', '15'];
+        $validStatusIDs = Approval_status::whereIn('id', [2,3,6,8])->pluck('approval_status_id')->toArray();
         if($lastUpdate){
             if(in_array($lastUpdate->ts_status_id, $validStatusIDs)) {
                 Session::flash('failed',"You've already submitted your timereport!");
@@ -327,7 +333,7 @@ class TimesheetController extends Controller
             'from' => 'required',
             'to' => 'required',
             'activity' => 'required',
-            'surat_penugasan' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:500',
+            'surat_penugasan_wfh' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -355,31 +361,137 @@ class TimesheetController extends Controller
         $entry->ts_status_id = '10';
 
         $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $request->task)->pluck('role')->first();
-        if($checkRole == NULL){
+        switch($checkRole){
+            case NULL:
+                $totalIncentive = 0;
+                break;
+            case "MT":
+                $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+                $hiredDate = new DateTime($mt_hiredDate);
+                $currentDate = new DateTime(date('Y-m-d'));
+                $intervalDate = $hiredDate->diff($currentDate);
+                $yearsDifference = $intervalDate->format('%y'); // Get the year difference between the two dates
+                $monthsDifference = $intervalDate->format('%m'); // Get the month difference between the two dates
+                $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
                 
-        } elseif ($checkRole == "MT") {
-            $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
-            $hiredDate = new DateTime($mt_hiredDate);
-            $currentDate = new DateTime(date('Y-m-d'));
-            $interval = $hiredDate->diff($currentDate);
-            $yearsDifference = $interval->format('%y'); // Get the year difference between the two dates
-            $monthsDifference = $interval->format('%m'); // Get the month difference between the two dates
-            $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
-            
-            if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
-                $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
+                if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
+                    $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
+                    $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
+                    $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } else {
+                }
+                break;
+            default:
+                $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
                 $totalIncentive = $roleFare * 0.7;
-            } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
-                $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
-                $totalIncentive = $roleFare * 0.7;
-            } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
-                $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
-                $totalIncentive = $roleFare * 0.7;
-            } else {
+                break;
+        }
+        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        $countAllowances = $fare;
+
+        $entry->allowance = $countAllowances;
+        $entry->incentive = $totalIncentive;
+        $entry->save();
+
+        // Store the file if it is provided
+        if ($request->hasFile('surat_penugasan_wfh')) {
+            $file = $request->file('surat_penugasan_wfh');
+            $surat_penugasan_wfh = $request->file('surat_penugasan_wfh');
+            $fileExtension = $surat_penugasan_wfh->getClientOriginalExtension();
+            $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+            $filePath = 'surat_penugasan/' . $fileName;
+            $upload_folder = public_path('surat_penugasan/');
+
+            // Move the uploaded file to the storage folder
+            $file->move($upload_folder, $fileName);
+
+            // Save the file details in the database
+            $fileEntry = new Surat_penugasan;
+            $fileEntry->user_id = Auth::user()->id;
+            $fileEntry->ts_date = $request->clickedDate;
+            $fileEntry->file_name = $fileName;
+            $fileEntry->file_path = $filePath;
+            $fileEntry->timesheet_id = str_replace('-','',$request->clickedDateRed);
+            $fileEntry->save();
+        }
+
+        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+
+        return response()->json(['success' => 'Entry saved successfully.']);
+    }
+
+    public function save_entries_on_holiday(Request $request)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'task' => 'required',
+            'clickedDateRed' => 'required',
+            'location' => 'required',
+            'from' => 'required',
+            'to' => 'required',
+            'activity' => 'required',
+            'surat_penugasan' => 'required|mimes:pdf,png,jpeg,jpg|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+        $totalIncentive = 0;
+        $totalIncentive = 0;
+        $entry = new Timesheet;
+        $ts_task_id = $request->task;
+        $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
+        while (Project_assignment::where('id', $ts_task_id)->exists()){
+            foreach($task_project as $tp){
+                $ts_task_id = $tp->company_project->project_name;
             }
-        } else {
-            $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
-            $totalIncentive = $roleFare * 0.7;
+        }
+        $entry->ts_user_id = Auth::user()->id;
+        $entry->ts_id_date = str_replace('-','',$request->clickedDateRed);
+        $entry->ts_date = $request->clickedDateRed;
+        $entry->ts_task = $ts_task_id;
+        $entry->ts_task_id = $request->task;
+        $entry->ts_location = $request->location;
+        $entry->ts_from_time = date('H:i', strtotime($request->from));
+        $entry->ts_to_time = date('H:i', strtotime($request->to));
+        $entry->ts_activity = $request->activity;
+        $entry->ts_status_id = '10';
+
+        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $request->task)->pluck('role')->first();
+        switch($checkRole){
+            case NULL:
+                $totalIncentive = 0;
+                break;
+            case "MT":
+                $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+                $hiredDate = new DateTime($mt_hiredDate);
+                $currentDate = new DateTime(date('Y-m-d'));
+                $intervalDate = $hiredDate->diff($currentDate);
+                $yearsDifference = $intervalDate->format('%y'); // Get the year difference between the two dates
+                $monthsDifference = $intervalDate->format('%m'); // Get the month difference between the two dates
+                $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
+                
+                if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
+                    $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
+                    $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
+                    $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } else {
+                }
+                break;
+            default:
+                $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
+                $totalIncentive = $roleFare * 0.7;
+                break;
         }
         $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
         $countAllowances = $fare;
@@ -403,16 +515,137 @@ class TimesheetController extends Controller
             // Save the file details in the database
             $fileEntry = new Surat_penugasan;
             $fileEntry->user_id = Auth::user()->id;
-            $fileEntry->ts_date = $request->clickedDate;
+            $fileEntry->ts_date = $request->clickedDateRed;
             $fileEntry->file_name = $fileName;
             $fileEntry->file_path = $filePath;
-            $fileEntry->timesheet_id = str_replace('-','',$request->clickedDate);
+            $fileEntry->timesheet_id = str_replace('-','',$request->clickedDateRed);
             $fileEntry->save();
         }
 
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
         return response()->json(['success' => 'Entry saved successfully.']);
+    }
+
+    public function save_multiple_entries(Request $request)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'task' => 'required',
+            'daterange' => 'required',
+            'location' => 'required',
+            'from' => 'required',
+            'to' => 'required',
+            'activity' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $dateString = $request->daterange;
+        list($startDateString, $endDateString) = explode(' - ', $dateString);
+        $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
+        $endDate = DateTime::createFromFormat('m/d/Y', $endDateString);
+        $interval = new DateInterval('P1D'); // Interval of 1 day
+
+        $month_periode = $startDate->format('Yn');
+
+        $leaveApproved = [];
+        $checkLeaveApproval = Leave_request::where('req_by', Auth::user()->id)->get();
+        foreach ($checkLeaveApproval as $chk){
+            $checkApp = Leave_request_approval::where('leave_request_id', $chk->id)->where('status', 29)->pluck('leave_request_id');
+            if(!$checkApp->isEmpty()){
+                $leaveApproved[] = $checkApp;
+            } else {
+                
+            }
+        }
+        $leave_day = Leave_request::where('req_by', Auth::user()->id)->whereIn('id', $leaveApproved)->pluck('leave_dates')->toArray();
+
+        $formattedDates = [];
+        foreach ($leave_day as $dateString) {
+            $dateArray = explode(',', $dateString);
+            foreach ($dateArray as $dateA) {
+                $formattedDates[] = date('Ymd', strtotime($dateA));
+            }
+        }
+        
+        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $request->task)->pluck('role')->first();
+        switch($checkRole){
+            case NULL:
+                $totalIncentive = 0;
+                break;
+            case "MT":
+                $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+                $hiredDate = new DateTime($mt_hiredDate);
+                $currentDate = new DateTime(date('Y-m-d'));
+                $intervalDate = $hiredDate->diff($currentDate);
+                $yearsDifference = $intervalDate->format('%y'); // Get the year difference between the two dates
+                $monthsDifference = $intervalDate->format('%m'); // Get the month difference between the two dates
+                $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
+                
+                if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
+                    $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
+                    $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
+                    $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
+                    $totalIncentive = $roleFare * 0.7;
+                } else {
+                }
+                break;
+            default:
+                $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
+                $totalIncentive = $roleFare * 0.7;
+                break;
+        }
+
+        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        $countAllowances = $fare;
+        // Loop through each day between start and end dates
+        while ($startDate <= $endDate) {
+            $dayOfWeek = $startDate->format('N');
+            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
+                $startDate->add($interval);
+                continue;
+            }
+            $dateToCheck = $startDate->format('Ymd');
+            if (in_array($dateToCheck, $formattedDates)) {
+                $startDate->add($interval);
+            } else {
+                // Insert the entry to the database for this day
+                $entry = new Timesheet;
+                $ts_task_id = $request->task;
+                $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
+                while (Project_assignment::where('id', $ts_task_id)->exists()){
+                    foreach($task_project as $tp){
+                        $ts_task_id = $tp->company_project->project_name;
+                    }
+                }
+                $entry->ts_user_id = Auth::user()->id;
+                $entry->ts_id_date = $startDate->format('Ymd');
+                $entry->ts_date = $startDate->format('Y-m-d');
+                $entry->ts_task = $ts_task_id;
+                $entry->ts_task_id = $request->task;
+                $entry->ts_location = $request->location;
+                $entry->ts_from_time = date('H:i', strtotime($request->from));;
+                $entry->ts_to_time = date('H:i', strtotime($request->to));
+                $entry->ts_activity = $request->activity;
+                $entry->ts_status_id = '10';
+                $entry->allowance = $countAllowances;
+                $entry->incentive = $totalIncentive;
+                $entry->save();
+            
+                // Move to the next day
+                $startDate->add($interval);
+            }
+        }
+        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => $month_periode],['date_submitted' => date('Y-m-d'), 'ts_task' => '-', 'RequestTo' => '-', 'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
+
+        return response()->json(['success' => "Entry saved successfully. $request->daterange"]);
     }
 
 
@@ -504,6 +737,27 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
+        // Create a DateTime object for the first day of the selected month
+        $dateToCount = new DateTime("$year-$month-01");
+
+        // Get the last day of the selected month
+        $lastDay = $dateToCount->format('t');
+
+        // Initialize a counter for weekdays
+        $totalWeekdays = 0;
+
+        // Loop through each day of the month and count weekdays
+        for ($day = 1; $day <= $lastDay; $day++) {
+            // Set the day of the month
+            $dateToCount->setDate($year, $month, $day);
+            
+            // Check if the day is a weekday (Monday to Friday)
+            if ($dateToCount->format('N') <= 5) {
+                $totalWeekdays++;
+            }
+        }
+
+        $totalHours = $totalWeekdays * 8; 
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
@@ -517,16 +771,53 @@ class TimesheetController extends Controller
 
         $userId = Auth::user()->id;
 
-        $assignment = DB::table('project_assignment_users')
-            ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
+        $checkisSubmitted = DB::table('timesheet_details')
+        ->select('*')
+        ->whereYear('date_submitted', $year)
+        ->where('user_timesheet', Auth::user()->id)
+        ->whereNotIn('ts_status_id', [10,404])
+        ->where('month_periode', $year.intval($month))
+        ->whereNotExists(function ($query) use ($year, $month) {
+            $query->select(DB::raw(1))
+                ->from('timesheet_details')
+                ->where('month_periode', $year.intval($month))
+                ->where('ts_status_id', [404]);
+        })
+        ->groupBy('user_timesheet', 'month_periode')
+        ->get();
+
+        $Check = DB::table('timesheet_details')
+            ->select('ts_status_id')
+            ->where('user_timesheet', Auth::user()->id)
+            ->where('month_periode', $year.intval($month))
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 0 WHEN ts_status_id = 29 THEN 0 ELSE 1 END)')
+            ->groupBy('user_timesheet', 'month_periode')
+            ->pluck('ts_status_id')
+            ->toArray();
+        if (!$checkisSubmitted->isEmpty()) {
+            $removeBtnSubmit = 1;
+            if (empty($Check)) {
+                $removeBtnSubmit = 29;
+            }
+        } else {
+            $removeBtnSubmit = 0;
+        }
+
+        // Get the current day
+        $currentDay = date('d');
+
+        // Create the date string in the format Y-m-d
+        $date = $year . '-' . $month . '-' . $currentDay;
+
+        $assignment = Project_assignment_user::join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
-            ->whereMonth('project_assignment_users.periode_start', '<=', $month)
-            ->whereMonth('project_assignment_users.periode_end', '>=', $month)
-            ->whereYear('project_assignment_users.periode_start', $year)
-            ->whereYear('project_assignment_users.periode_end', $year)
             ->where('project_assignments.approval_status', 29)
+            ->where(function ($query) use ($date) {
+                $query->whereDate('project_assignment_users.periode_start', '<=', $date)
+                    ->whereDate('project_assignment_users.periode_end', '>=', $date);
+            })
             ->get();
 
         $leaveApproved = [];
@@ -581,7 +872,7 @@ class TimesheetController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month','info', 'assignmentNames', 'srtDate','startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month', 'removeBtnSubmit', 'totalHours','info', 'assignmentNames', 'srtDate','startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
@@ -756,6 +1047,34 @@ class TimesheetController extends Controller
                                 $empApproval[] = $newArrayService;
                             }
                         break;
+                        case 3:
+                            foreach($approvalGA as $approverGa){
+                                $newArrayHO = [
+                                    'name' => $approverGa->approver,
+                                    'task' => $row->ts_task,
+                                    'location' => $row->ts_location,
+                                    'mandays' => $row->total_rows,
+                                    'role' => $checkRole,
+                                    'task_id' => $row->ts_task_id,
+                                    'incentive' => $totalIncentive,
+                                ];
+                                $empApproval[] = $newArrayHO;
+                            }
+                        break;
+                        case 1:
+                            foreach($approvalSales as $approverSales){
+                                $newArrayHO = [
+                                    'name' => $approverSales->approver,
+                                    'task' => $row->ts_task,
+                                    'location' => $row->ts_location,
+                                    'mandays' => $row->total_rows,
+                                    'role' => $checkRole,
+                                    'task_id' => $row->ts_task_id,
+                                    'incentive' => $totalIncentive,
+                                ];
+                                $empApproval[] = $newArrayHO;
+                            }
+                        break;
                     }
                     break;
                 case "Training":
@@ -916,6 +1235,17 @@ class TimesheetController extends Controller
         return redirect()->back();
     }
 
+    public function cancel_submit_timesheet($year, $month)
+    {
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        Timesheet_detail::whereNotIn('ts_status_id', [10])->where('month_periode', $year.intval($month))->where('user_timesheet', Auth::user()->id)->delete();
+        Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '10']);
+        return redirect()->back()->with('success', 'Timesheet submission has been canceled!');
+    }
+
     public function print($year, $month)
     {
     	// Set the default time zone to Jakarta
@@ -997,91 +1327,6 @@ class TimesheetController extends Controller
         $entry->save();
 
         return response()->json(['success' => 'Entry updated successfully.']);
-    }
-
-    public function save_multiple_entries(Request $request)
-    {
-        date_default_timezone_set("Asia/Jakarta");
-        $validator = Validator::make($request->all(), [
-            'task' => 'required',
-            'daterange' => 'required',
-            'location' => 'required',
-            'from' => 'required',
-            'to' => 'required',
-            'activity' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()]);
-        }
-
-        $dateString = $request->daterange;
-        list($startDateString, $endDateString) = explode(' - ', $dateString);
-        $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
-        $endDate = DateTime::createFromFormat('m/d/Y', $endDateString);
-        $interval = new DateInterval('P1D'); // Interval of 1 day
-
-        $month_periode = $startDate->format('Yn');
-
-        $leaveApproved = [];
-        $checkLeaveApproval = Leave_request::where('req_by', Auth::user()->id)->get();
-        foreach ($checkLeaveApproval as $chk){
-            $checkApp = Leave_request_approval::where('leave_request_id', $chk->id)->where('status', 29)->pluck('leave_request_id');
-            if(!$checkApp->isEmpty()){
-                $leaveApproved[] = $checkApp;
-            } else {
-                
-            }
-        }
-        $leave_day = Leave_request::where('req_by', Auth::user()->id)->whereIn('id', $leaveApproved)->pluck('leave_dates')->toArray();
-
-        $formattedDates = [];
-        foreach ($leave_day as $dateString) {
-            $dateArray = explode(',', $dateString);
-            foreach ($dateArray as $dateA) {
-                $formattedDates[] = date('Ymd', strtotime($dateA));
-            }
-        }
-        
-        // Loop through each day between start and end dates
-        while ($startDate <= $endDate) {
-            $dayOfWeek = $startDate->format('N');
-            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
-                $startDate->add($interval);
-                continue;
-            }
-            $dateToCheck = $startDate->format('Ymd');
-            if (in_array($dateToCheck, $formattedDates)) {
-                $startDate->add($interval);
-            } else {
-                // Insert the entry to the database for this day
-                $entry = new Timesheet;
-                $ts_task_id = $request->task;
-                $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
-                while (Project_assignment::where('id', $ts_task_id)->exists()){
-                    foreach($task_project as $tp){
-                        $ts_task_id = $tp->company_project->project_name;
-                    }
-                }
-                $entry->ts_user_id = Auth::user()->id;
-                $entry->ts_id_date = $startDate->format('Ymd');
-                $entry->ts_date = $startDate->format('Y-m-d');
-                $entry->ts_task = $ts_task_id;
-                $entry->ts_task_id = $request->task;
-                $entry->ts_location = $request->location;
-                $entry->ts_from_time = date('H:i', strtotime($request->from));;
-                $entry->ts_to_time = date('H:i', strtotime($request->to));
-                $entry->ts_activity = $request->activity;
-                $entry->ts_status_id = '10';
-                $entry->save();
-            
-                // Move to the next day
-                $startDate->add($interval);
-            }
-        }
-        Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => $month_periode],['date_submitted' => date('Y-m-d'), 'ts_task' => '-', 'RequestTo' => '-', 'ts_status_id' => '10', 'note' => '', 'user_timesheet' => Auth::user()->id]);
-
-        return response()->json(['success' => "Entry saved successfully. $request->daterange"]);
     }
 
     public function summary(Request $request)

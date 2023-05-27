@@ -122,7 +122,15 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Timesheet Preview</h6>
         <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a><a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
+            @if($removeBtnSubmit == 0)
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a>
+            <a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
+            @elseif($removeBtnSubmit == 29)
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton">Download</a>
+            @else
+            <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a>
+            <a class="btn btn-warning btn-sm" type="button" href="/timesheet/entry/cancel_submit/{{$year}}/{{$month}}" id="copyButton">Cancel Submit</a>
+            @endif
         </div>
     </div>
     <!-- Card Body -->
@@ -159,7 +167,11 @@ active
                                         <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @endif
                                 @else
-                                    {{ $date->format('d-M-Y') }}
+                                    @if (in_array($date->format('Y-m-d'), $srtDate))
+                                        <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span>{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-primary"></i></a>
+                                    @else
+                                        {{ $date->format('d-M-Y') }}
+                                    @endif
                                 @endif
                             </td>
                             <td>
@@ -254,8 +266,8 @@ active
                 <tbody>
                     <tr class="table-sm">
                         <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
-                        @if($total_work_hours < 160)
-                        <td class="text-center text-danger font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
+                        @if($total_work_hours < $totalHours)
+                        <td class="text-center text-danger font-weight-bold" title="Should be above {{ $totalHours }} Hours"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
                         @else
                         <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
                         @endif

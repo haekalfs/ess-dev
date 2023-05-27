@@ -77,4 +77,8 @@ class User extends Authenticatable
     public function leave_request_approval(){
     	return $this->hasMany('App\Models\Leave_request_approval');
     }
+
+    public function leave_request(){
+    	return $this->hasMany('App\Models\Leave_request');
+    }
 }

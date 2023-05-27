@@ -153,25 +153,6 @@ class ExportTimesheet extends Controller
                 $lastWorkhours = $row->workhours;
             }
 
-            ///////////////////////////////////
-            // $fare = Project_location::where('location_code', $row->ts_location)->pluck('fare')->first();
-            // $countAllowances = $row->ts_mandays * $fare;
-
-            // $checkUser = User::find($row->user_timesheet);
-            // $checkDepartment = $checkUser->users_detail->department->id;
-            // if ($checkDepartment == 2) {
-            //     $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $countAllowances);
-            // } else {
-            //     $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $countAllowances);
-            // }
-            
-            // $countIncentive[] = $row->incentive;
-            // $totalAllowances += $countAllowances;
-            // $totalIncentive = array_sum($countIncentive);
-
-            // if ($row->user_timesheet !== $lastUser) {
-            //     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->incentive);
-            // }///////////////////////////
             
             $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
 
@@ -190,5 +171,25 @@ class ExportTimesheet extends Controller
         ];
 
         return response()->download($filePath, 'output.xlsx', $headers);
+        
+        ///////////////////////////////////
+        // $fare = Project_location::where('location_code', $row->ts_location)->pluck('fare')->first();
+        // $countAllowances = $row->ts_mandays * $fare;
+
+        // $checkUser = User::find($row->user_timesheet);
+        // $checkDepartment = $checkUser->users_detail->department->id;
+        // if ($checkDepartment == 2) {
+        //     $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $countAllowances);
+        // } else {
+        //     $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $countAllowances);
+        // }
+        
+        // $countIncentive[] = $row->incentive;
+        // $totalAllowances += $countAllowances;
+        // $totalIncentive = array_sum($countIncentive);
+
+        // if ($row->user_timesheet !== $lastUser) {
+        //     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->incentive);
+        // }///////////////////////////
     }
 }

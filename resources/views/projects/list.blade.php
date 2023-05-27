@@ -397,3 +397,7 @@ fetchLocations();
 fetchProjectRoles();
 </script>
 @endsection
+
+@section('javascript')
+<script src="{{ asset('js/project.js') }}"></script>
+@endsection

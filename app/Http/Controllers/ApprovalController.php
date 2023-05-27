@@ -69,7 +69,7 @@ class ApprovalController extends Controller
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 5 && $currentDay <= 30) {
-                if (in_array($checkUserPost, [7, 8, 12])) {
+                if (in_array($checkUserPost, [7, 8, 10, 12])) {
                     $Check = DB::table('timesheet_details')
                         ->select('*')
                         ->whereYear('date_submitted', $currentYear)
@@ -96,13 +96,33 @@ class ApprovalController extends Controller
                                 ->get();
                         }
                 } else {
-                    $approvals = DB::table('timesheet_details')
+                    $Check = DB::table('timesheet_details')
+                        ->select('*')
+                        ->whereYear('date_submitted', $currentYear)
+                        ->whereNotIn('ts_status_id', [10, 15])
+                        ->whereNotIn('RequestTo', [Auth::user()->id])
+                        ->groupBy('user_timesheet', 'month_periode')
+                        ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 404 THEN 0 ELSE 1 END)')
+                        ->pluck('user_timesheet')
+                        ->toArray();
+                    if (!empty($Check)) {
+                        $approvals = DB::table('timesheet_details')
                         ->select('*')
                         ->whereYear('date_submitted', $currentYear)
                         ->where('RequestTo', Auth::user()->id)
                         ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                        ->whereIn('user_timesheet', $Check)
                         ->groupBy('user_timesheet', 'month_periode')
                         ->get();
+                    } else {
+                        $approvals = DB::table('timesheet_details')
+                        ->select('*')
+                        ->whereYear('date_submitted', $currentYear)
+                        ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+                        ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                        ->groupBy('user_timesheet', 'month_periode')
+                        ->get();
+                    }
                 }
             return view('approval.timesheet_approval', ['approvals' => $approvals]);
         } else {
@@ -130,7 +150,7 @@ class ApprovalController extends Controller
             switch (true) {
                 case in_array(Auth::user()->id, $checkUserDir):
                     $tsStatusId = '29';
-                    $activity = 'All Approved';
+                    $activity = 'Approved';
                     break;
                 default:
                     $tsStatusId = '30';
@@ -150,10 +170,28 @@ class ApprovalController extends Controller
             } else {
                 $approve->update(['ts_status_id' => $tsStatusId, 'activity' => $activity]);
             }
+            $currentYear = date('Y');
 
-            Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+            $Check = DB::table('timesheet_details')
+                    ->select('*')
+                    ->whereYear('date_submitted', $currentYear)
+                    ->whereNotIn('ts_status_id', [10, 15])
+                    ->whereNotIn('RequestTo', [Auth::user()->id])
+                    ->groupBy('user_timesheet', 'month_periode')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 20 THEN 0 ELSE 1 END)')
+                    ->pluck('user_timesheet')
+                    ->toArray();
+
+            if (!empty($Check)) {
+                $tsStatusId = '30';
+                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
                 ->where('ts_user_id', $user_timesheet)
                 ->update(['ts_status_id' => $tsStatusId]);
+            } else {
+                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+                ->where('ts_user_id', $user_timesheet)
+                ->update(['ts_status_id' => 30]);
+            }
         }
 
         $approverName = Auth::user()->name;
@@ -173,9 +211,10 @@ class ApprovalController extends Controller
             Emp_leave_quota::updateOrCreate([
                 'user_id' => Auth::user()->id,
                 'leave_id' => 100,
-                'active_periode' => date('Y-m-d'),
             ], [
                 'quota_left' => 1,
+                'active_periode' => date('Y-m-d'),
+                'expiration' => "9999-01-01",
                 'once_in_service_years' => false
             ]);
         } else {
@@ -183,9 +222,10 @@ class ApprovalController extends Controller
             Emp_leave_quota::updateOrCreate([
                 'user_id' => Auth::user()->id,
                 'leave_id' => 100,
-                'active_periode' => date('Y-m-d'),
             ], [
                 'quota_left' => $totalWeekendReplacement,
+                'active_periode' => date('Y-m-d'),
+                'expiration' => "9999-01-01",
                 'once_in_service_years' => false
             ]);
         }

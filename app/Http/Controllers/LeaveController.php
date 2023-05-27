@@ -8,12 +8,14 @@ use App\Models\Emp_leave_quota;
 use App\Models\Leave;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
+use App\Models\Leave_request_history;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Usr_role;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -33,16 +35,26 @@ class LeaveController extends Controller
             $currentYear = $yearSelected;
         }
         $leaveType = Leave::all();
+
+        $leaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
+        ->whereIn('leave_id', [10, 20])->orderBy('expiration', 'asc')->get();
+
+        $leaveQuotaUsage = Leave_request_history::where('req_by', Auth::user()->id)->get();
+
+        $weekendReplacementQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
+        ->where('leave_id', 100)
+        ->where('expiration', '>=', date('Y-m-d'))
+        ->get();
         $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->where('leave_id', 100)
-        ->where('active_periode', '>=', date('Y-m-d'))
+        ->where('expiration', '>=', date('Y-m-d'))
         ->sum('quota_left');
-        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
+        $empLeaveQuotaAnnualSum = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
-            ->where('active_periode', '>=', date('Y-m-d'))
+            ->where('expiration', '>=', date('Y-m-d'))
             ->sum('quota_left');
-        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('active_periode', '>=', date('Y-m-d'))->where('user_id', Auth::user()->id)->where('leave_id', 20)->pluck('quota_left')->first();
-        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))->where('user_id', Auth::user()->id)->where('leave_id', 20)->pluck('quota_left')->first();
+        $totalQuota = $empLeaveQuotaAnnualSum + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";
         }
@@ -97,7 +109,7 @@ class LeaveController extends Controller
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::whereIn('project_assignment_id', $findAssignment)->where('role', 'PM')->get();
 
-        return view('leave.history', compact('yearsBefore', 'leaveType', 'usersWithPMRole', 'empLeaveQuotaWeekendReplacement', 'leaveRequests', 'empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
+        return view('leave.history', compact('yearsBefore', 'leaveType', 'usersWithPMRole', 'weekendReplacementQuota', 'empLeaveQuotaWeekendReplacement', 'leaveQuotaUsage', 'leaveQuotaAnnual','leaveRequests', 'empLeaveQuotaAnnualSum', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
 	}
 
     public function leave_request_entry(Request $request){
@@ -113,15 +125,9 @@ class LeaveController extends Controller
 
         $checkQuotaLeft = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->where('leave_id', $quotaUsed)
-        ->where('active_periode', '>=', date('Y-m-d'))
+        ->where('expiration', '>=', date('Y-m-d'))
         ->sum('quota_left');
 
-        // $dateString = $request->daterangeLeave;
-        // list($startDateString, $endDateString) = explode(' - ', $dateString);
-        // $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
-        // $endDate = DateTime::createFromFormat('m/d/Y', $endDateString);
-
-        // echo "Total days: " . $totalDays;
         $checkUserDept = Auth::user()->users_detail->department->id;
 
         $approvalFinance_GA = Timesheet_approver::whereIn('id', [10, 45])
@@ -139,8 +145,8 @@ class LeaveController extends Controller
         // Retrieve the relevant Emp_leave_quota rows ordered by active_periode in ascending order
         $checkQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->where('leave_id', $request->quota_used)
-        ->where('active_periode', '>=', date('Y-m-d'))
-        ->orderBy('active_periode', 'asc')
+        ->where('expiration', '>=', date('Y-m-d'))
+        ->orderBy('expiration', 'asc')
         ->get();
 
         $countQuota = $request->total_days;
@@ -183,7 +189,8 @@ class LeaveController extends Controller
                                 'RequestTo' => $approverGa->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverGa->approver; 
+                            $userToApprove[] = $approverGa->approver;
+
                         }
                         break;
                         // No break statement here, so it will continue to the next case
@@ -278,10 +285,21 @@ class LeaveController extends Controller
                         $remainingQuota = $quota->quota_left;
                         $deductedQuota = min($countQuota, $remainingQuota);
                         $countQuota -= $deductedQuota;
-
                         $quota->quota_used += $deductedQuota;
                         $quota->quota_left -= $deductedQuota;
                         $quota->save();
+
+                        $history = New Leave_request_history;
+                        $history->req_date = date('Y-m-d');
+                        $history->req_by = Auth::user()->id;
+                        $history->requested_days = $request->total_days;
+                        $history->quota_used = $deductedQuota;
+                        $history->quota_left = $quota->quota_left;
+                        $history->description = "Leave Request";
+                        $history->leave_id = $request->quota_used;
+                        $history->emp_leave_quota_id = $quota->id;
+                        $history->leave_request_id = $uniqueId;
+                        $history->save();
                     } else {
                         break; // Stop deducting if countQuota reaches zero
                     }
@@ -297,12 +315,12 @@ class LeaveController extends Controller
             break;
         }
 
-        $employees = User::whereIn('id', $userToApprove)->get();
-        $userName = Auth::user()->name;
+        // $employees = User::whereIn('id', $userToApprove)->get();
+        // $userName = Auth::user()->name;
 
-        foreach ($employees as $employee) {
-            dispatch(new NotifyLeaveApproval($employee, $userName));
-        }
+        // foreach ($employees as $employee) {
+        //     dispatch(new NotifyLeaveApproval($employee, $userName));
+        // }
 
         // Leave_request::where('RequestTo', Auth::user()->id)->delete();
 
@@ -311,12 +329,16 @@ class LeaveController extends Controller
 
     public function leave_request_details($id)
     {
-        $leaveRequest = Leave_request_approval::where('leave_request_id', $id)->get();
+        $leaveRequest = Leave_request_approval::where('leave_request_id', $id)->orderBy('updated_at', 'desc')->get();
         
         // Initialize an empty array to store the data
         $data = [];
 
         $status = '';
+
+        // foreach($leave_request_history as $lrh){
+        //     $quota
+        // }
         foreach ($leaveRequest as $lr) {
             if($lr->status == 29 || $lr->status == 20){
                 $status = "Approved";
@@ -325,8 +347,11 @@ class LeaveController extends Controller
             } else {
                 $status = "Waiting for Approval";
             }
+            $reqDateFormatted = Carbon::parse($lr->leave_request->req_date)->format('d-M-Y');
+            $lastUpdated = Carbon::parse($lr->updated_at)->format('d-M-Y H:i');
             $data[] = [
-                'requestDate' => $lr->leave_request->req_date,
+                'requestBy' => $lr->leave_request->user->name,
+                'requestDate' => $reqDateFormatted,
                 'quotaUsed' => $lr->leave_request->leave->description,
                 'leaveDates' => $lr->leave_request->leave_dates,
                 'totalDays' => $lr->leave_request->total_days,
@@ -334,6 +359,7 @@ class LeaveController extends Controller
                 'status' => $status,
                 'RequestTo' => $lr->RequestTo,
                 'notes' => $lr->notes,
+                'last_updated' => $lastUpdated,
             ];
         }
 
@@ -352,13 +378,11 @@ class LeaveController extends Controller
         $leaveRunningApprover = $leaveRequest->where('status', 15)->first();
         if($leaveRunningApprover){
             $leaveRunningApproverName = $leaveRunningApprover->user->name;
-        } else {
             if(!empty($checkIfRejected)){
                 $leaveRunningApproverName = "Rejected";
-            } else {
-                $leaveRunningApproverName = "Approved";
             }
-            
+        } else {
+            $leaveRunningApproverName = "Approved";
         }
 
         $data[0]['leaveRunningApprover'] = $leaveRunningApproverName;
@@ -370,35 +394,18 @@ class LeaveController extends Controller
 	{
         $leaveRequest = Leave_request::where('id', $id)->first();
 
-        $sumQuotaLeft = Emp_leave_quota::where('user_id', Auth::user()->id)
-            ->where('leave_id', $leaveRequest->leave_id)
-            ->where('active_periode', '>=', date('Y-m-d'))
-            ->sum('quota_left');
+        $addQuota = Leave_request_history::where('leave_request_id', $id)->where('req_by', Auth::user()->id)->get();
+        foreach ($addQuota as $aq) {
+            $returnQuota = Emp_leave_quota::find($aq->emp_leave_quota_id);
+            $totalQuotaUsed = $aq->quota_used;
 
-        $totalDays = intval($leaveRequest->total_days);
-        
-        // Retrieve the relevant Emp_leave_quota rows ordered by active_periode in ascending order
-        $checkQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
-        ->where('leave_id', $leaveRequest->leave_id)
-        ->where('active_periode', '>=', date('Y-m-d'))
-        ->orderBy('active_periode', 'desc')
-        ->get();
-
-        $countQuota = $totalDays; // Initialize the count
-
-        foreach ($checkQuota as $quota) {
-            if ($countQuota > 0) {
-                $remainingQuota = $quota->quota_left;
-                $addedQuota = min($countQuota, 12 - $remainingQuota); // Ensure quota_left doesn't exceed 12
-                $countQuota -= $addedQuota;
-
-                $quota->quota_used -= $addedQuota;
-                $quota->quota_left += $addedQuota;
-                $quota->save();
-            } else {
-                break; // Stop adding if countQuota reaches zero
-            }
+            $returnQuota->quota_used -= $totalQuotaUsed;
+            $returnQuota->quota_left += $totalQuotaUsed;
+            $returnQuota->save();
         }
+
+        //delete
+        Leave_request_history::where('leave_request_id', $id)->where('req_by', Auth::user()->id)->delete();
 
         //delete Leave Request
         Leave_request::where('id', $id)->where('req_by', Auth::user()->id)->where('req_date', $leaveRequest->req_date)->where('leave_id', $leaveRequest->leave_id)->delete();
@@ -448,9 +455,9 @@ class LeaveController extends Controller
         $user_info = User::find($id);
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', $user_info->id)
             ->where('leave_id', 10)
-            ->where('active_periode', '>=', date('Y-m-d'))
+            ->where('expiration', '>=', date('Y-m-d'))
             ->sum('quota_left');
-        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('active_periode', '>=', date('Y-m-d'))->where('user_id', $user_info->id)->where('leave_id', 20)->pluck('quota_left')->first();
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))->where('user_id', $user_info->id)->where('leave_id', 20)->pluck('quota_left')->first();
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm;
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";

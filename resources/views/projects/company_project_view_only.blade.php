@@ -126,7 +126,10 @@ active
                                     <td>{{ $usr->responsibility }}</td>
                                     <td>{{ $usr->periode_start }}</td>
                                     <td>{{ $usr->periode_end }}</td>
-                                    <td class="text-center"><a href="/project_list/delete/assignment/member/{{ $usr->id }}/{{ $usr->project_assignment_id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a></td>
+                                    <td class="text-center">
+                                        <a data-toggle="modal" data-target="#editPeriodModal" data-usr-id="{{ $usr->id }}" class="btn btn-primary btn-sm btn-usr-edit"><i class="fas fa-fw fa-edit"></i> Edit</a>
+                                        <a href="/project_list/delete/assignment/member/{{ $usr->id }}/{{ $usr->project_assignment_id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -228,59 +231,55 @@ active
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="editPeriodModal" tabindex="-1" role="dialog" aria-labelledby="modalPeriod" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="editPeriodModalLabel">Edit User Periode</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form method="post" id="editUserPeriodeForm">
+                @csrf
+                <input type="hidden" name="usr_id" id="usr_id" value="">
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="from">From :</label>
+                                            <input type="date" class="form-control" name="fromPeriode" id="fromPeriode" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="to">To :</label>
+                                            <input type="date" class="form-control" name="toPeriode" id="toPeriode" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="editUserPeriodeSubmit">Submit Request</button>
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
 <style>
 .action{
     width: 180px;
 }
 </style>
-<script>
-    $(document).on('click', '.btn-edit', function() {
-        var projectId = $(this).data('project-id');
-        $('#project_id').val(projectId);
-        
-        // Make an AJAX request to fetch the project data and populate the form fields
-        $.ajax({
-            url: '/retrieveProjectData/' + projectId,
-            method: 'GET',
-            success: function(response) {
-                // Populate the form fields with the received data
-                $('#p_code').val(response.project_code);
-                $('#p_name').val(response.project_name);
-                $('#address').val(response.address);
-            },
-            error: function(xhr) {
-                // Handle error
-                console.log(xhr.responseText);
-            }
-        });
-    });
-</script>
-<script>
-    $(document).on('click', '#submitEdit', function() {
-        var formData = $('#editForm').serialize();
-        var projectId = $('#project_id').val();
-        
-        // Make an AJAX request to update the project data
-        $.ajax({
-            url: '/project_list/edit/save/' + projectId,
-            method: 'PUT',
-            data: formData,
-            success: function(response) {
-                // Handle success
-                console.log(response);
-                
-                // Close the modal
-                $('#editModal').modal('hide');
-                window.location.href = '/project_list/view/details/' + projectId;
-                
-                // Reload or update the project list on the page
-                // Implement the appropriate logic based on your requirements
-            },
-            error: function(xhr) {
-                // Handle error
-                console.log(xhr.responseText);
-            }
-        });
-    });
-</script>
+@endsection
+
+@section('javascript')
+<script src="{{ asset('js/project.js') }}"></script>
 @endsection

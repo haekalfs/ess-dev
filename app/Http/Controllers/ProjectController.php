@@ -29,6 +29,8 @@ class ProjectController extends Controller
     {
         $userId = Auth::user()->id;
 
+        date_default_timezone_set("Asia/Jakarta");
+
         $records = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
@@ -469,7 +471,14 @@ class ProjectController extends Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         Requested_assignment::where('id', $id)->update(['status' => '1']);
+        $name = Requested_assignment::where('id', $id)->pluck('req_by')->first();
 
+        $entry = new Notification_alert;
+        $entry->user_id = $name;
+        $entry->message = "Your Assignment Request is Approved!";
+        $entry->importance = 1;
+        $entry->save();
+        
         Session::flash('success',"You approved the assignment request!");
         return redirect()->back();
     }
@@ -563,5 +572,34 @@ class ProjectController extends Controller
         $cp->save();
         
         return response()->json(['success'=>'Project updated successfully.']);
+    }
+
+    public function retrieveUsrPeriodData($id)
+    {
+        // Get the Timesheet records between the start and end dates
+        $usrData = Project_assignment_user::find($id);
+        
+        return response()->json($usrData);
+    }
+
+    public function updateUserPeriod(Request $request, $usr_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'fromPeriode' => 'sometimes',
+            'toPeriode' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $usr = Project_assignment_user::find($usr_id);
+        if(!empty($request->fromPeriode)){
+            $usr->periode_start = $request->fromPeriode;
+        }
+        $usr->periode_end = $request->toPeriode;
+        $usr->save();
+        
+        return response()->json(['success'=>'User Periode updated successfully.']);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
+use App\Models\Leave_request_history;
 use App\Models\Notification_alert;
 use App\Models\Timesheet_approver;
 use App\Models\User;
@@ -58,20 +59,20 @@ class LeaveApprovalController extends Controller
                         ->groupBy('leave_request_id', 'RequestTo')
                         ->pluck('leave_request_id')
                         ->toArray();
-                        if (!empty($Check)) {
-                            $approvals = Leave_request_approval::select('*')
-                            // ->whereYear('date_submitted', $currentYear)
-                            ->where('RequestTo', Auth::user()->id)
-                            ->whereNotIn('status', [29, 404, 20])
-                            ->whereIn('leave_request_id', $Check)
-                            ->groupBy('leave_request_id')
+                    if (!empty($Check)) {
+                        $approvals = Leave_request_approval::select('*')
+                        // ->whereYear('date_submitted', $currentYear)
+                        ->where('RequestTo', Auth::user()->id)
+                        ->whereNotIn('status', [29, 404, 20])
+                        ->whereIn('leave_request_id', $Check)
+                        ->groupBy('leave_request_id')
+                        ->get();
+                    } else {
+                        $approvals = DB::table('leave_request_approval')
+                            ->select('*')
+                            ->where('RequestTo', 'xxhaekalsastraxx')
                             ->get();
-                        } else {
-                            $approvals = DB::table('leave_request_approval')
-                                ->select('*')
-                                ->where('RequestTo', 'xxhaekalsastraxx')
-                                ->get();
-                        }
+                    }
                 }
             return view('approval.leave_approval', ['approvals' => $approvals]);
         } else {
@@ -136,34 +137,7 @@ class LeaveApprovalController extends Controller
         $entry->message = "Your Leave Request has been Approved!";
         $entry->importance = 1;
         $entry->save();
-        // // dd($getIdLeaveReq, $getLeaveReq);
-        // foreach($getLeaveReq as $gl){
-        //     $req_by = $gl->req_by;
-        //     $leave_id = $gl->leave_id;
-        //     $totalDays = $gl->total_days;
-        // }
         
-        // // Retrieve the relevant Emp_leave_quota rows ordered by active_periode in ascending order
-        // $checkQuota = Emp_leave_quota::where('user_id', $req_by)
-        // ->where('leave_id', $leave_id)
-        // ->where('active_periode', '>=', date('Y-m-d'))
-        // ->orderBy('active_periode', 'desc')
-        // ->get();
-
-        // $countQuota = $totalDays; // Initialize the count
-
-        // foreach ($checkQuota as $quota) {
-        //     if ($countQuota > 0) {
-        //         $remainingQuota = $quota->quota_left;
-        //         $deductedQuota = min($countQuota, $remainingQuota);
-        //         $countQuota -= $deductedQuota;
-        
-        //         $quota->quota_left -= $deductedQuota;
-        //         $quota->save();
-        //     } else {
-        //         break; // Stop deducting if countQuota reaches zero
-        //     }
-        // }
         return redirect('/approval/leave')->with('success',"You approved the leave request!");
     }
 
@@ -188,30 +162,20 @@ class LeaveApprovalController extends Controller
 
         $getIdLeaveReq = Leave_request_approval::where('id', $id)->pluck('leave_request_id')->groupBy('leave_request_id')->first();
         $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
-        
-        $totalDays = intval($getLeaveReq->total_days);
-        
-        // Retrieve the relevant Emp_leave_quota rows ordered by active_periode in ascending order
-        $checkQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
-        ->where('leave_id', $getLeaveReq->leave_id)
-        ->where('active_periode', '>=', date('Y-m-d'))
-        ->orderBy('active_periode', 'desc')
-        ->get();
 
-        $countQuota = $totalDays; // Initialize the count
+        $addQuota = Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->get();
+        foreach ($addQuota as $aq) {
+            $returnQuota = Emp_leave_quota::find($aq->emp_leave_quota_id);
+            $totalQuotaUsed = $aq->quota_used;
 
-        foreach ($checkQuota as $quota) {
-            if ($countQuota > 0) {
-                $remainingQuota = $quota->quota_left;
-                $addedQuota = min($countQuota, 12 - $remainingQuota); // Ensure quota_left doesn't exceed 12
-                $countQuota -= $addedQuota;
-
-                $quota->quota_left += $addedQuota;
-                $quota->save();
-            } else {
-                break; // Stop adding if countQuota reaches zero
-            }
+            $returnQuota->quota_used -= $totalQuotaUsed;
+            $returnQuota->quota_left += $totalQuotaUsed;
+            $returnQuota->save();
         }
+
+        //delete
+        Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->delete();
+        
         // $employees = User::where('id', $user_timesheet)->get();
 
         // //add notes to reject notification email

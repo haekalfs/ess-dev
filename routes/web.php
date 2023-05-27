@@ -37,6 +37,7 @@ Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')
 Route::get('/timesheet/{yearSelected?}', 'TimesheetController@index')->middleware('auth')->name('timesheet');
 Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry')->middleware('auth');
 Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
+Route::post('//save_entries/holiday', 'TimesheetController@save_entries_on_holiday')->name('entries.store.holiday');
 Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store');
 Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
     //DELETE
@@ -48,6 +49,7 @@ Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController
 Route::get('/timesheet/entry/preview/surat_penugasan/download/{timesheet_id}', 'TimesheetController@download_surat')->middleware('auth');
     //submit
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
+Route::get('/timesheet/entry/cancel_submit/{year}/{month}', 'TimesheetController@cancel_submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
 Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
 Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
@@ -136,6 +138,8 @@ Route::delete('/project_list/delete/project_role/{id}', 'ProjectController@delet
 
 Route::get('/retrieveProjectData/{id}', 'ProjectController@retrieveProjectData')->middleware('auth');
 Route::put('/project_list/edit/save/{project}', 'ProjectController@updateProjectData')->middleware('auth');
+Route::get('/retrieveUsrPeriodData/{id}', 'ProjectController@retrieveUsrPeriodData')->middleware('auth');
+Route::put('/project_list/edit/usr/save/{usr_id}', 'ProjectController@updateUserPeriod')->middleware('auth');
 
 Route::get('/assignment/requested/by/user', 'ProjectController@requested_assignment')->name('myproject')->middleware('auth');
 Route::post('/assignment/request', 'ProjectController@requested_assignment_entry')->middleware('auth')->name('req.ass');

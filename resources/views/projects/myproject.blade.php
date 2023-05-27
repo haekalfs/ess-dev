@@ -35,7 +35,7 @@ active
 @endif
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center bg-primary justify-content-between">
-        <h6 class="m-0 font-weight-bold text-light" id="judul">Active Projects</h6>
+        <h6 class="m-0 font-weight-bold text-light" id="judul">MyProjects List</h6>
         {{-- <div class="text-right">
             <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
         </div> --}}
@@ -50,6 +50,7 @@ active
                         <th>Project Name</th>
                         <th>Project Start</th>
                         <th>Project End</th>
+                        <th>Status</th>
                         <th width='120px'>Action</th>
                     </tr>
                 </thead>
@@ -61,10 +62,16 @@ active
                         <td>{{ $record->project_name }}</td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
-                        <td class="action text-center"><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" href="/assignment/view/details/{{$record->project_assignment_id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
+                        <td>
+                            @if($record->periode_end <= date('Y-m-d'))
+                            <span class="text-danger">Expired</span>
+                            @else
+                            <span class="text-success">Active</span>
+                            @endif
+                        </td>
+                        <td class="text-center"><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" href="/assignment/view/details/{{$record->project_assignment_id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
                     </tr>
                     @endforeach
-                    
                 </tbody>
             </table>
         </div>
@@ -188,4 +195,8 @@ active
 		</div>
 	</div>
 </div>
+@endsection
+
+@section('javascript')
+<script src="{{ asset('js/project.js') }}"></script>
 @endsection

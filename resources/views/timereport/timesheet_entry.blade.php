@@ -28,8 +28,12 @@ active
     Your entry has been saved successfully.
 </div>
 
-<div class="alert alert-danger" role="alert" style="display: none;">
-    An error occurred while saving your entry. Please try again.
+<div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+    Your entry has been deleted.
+</div>
+
+<div class="alert alert-danger-delete" role="alert" style="display: none;">
+    An error occurred while deleting your entry. Please try again.
 </div>
 <div class="row">
     <!-- Area Chart -->
@@ -71,7 +75,7 @@ active
                                                 $status = $day['status'];
                                             @endphp
                                             @if ($status === "red")
-                                                <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
+                                                <td data-toggle="modal" class="clickable text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
                                             @elseif ($status === 2907)
                                                 <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                     <a><i class="fas fa-plane-departure fa-sm"></i></a>
@@ -225,6 +229,10 @@ active
             <div class="alert alert-danger-delete" role="alert" style="display: none;">
                 An error occurred while deleting your entry. Please try again.
             </div>
+
+            <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
+                Your entry has been saved successfully.
+            </div>
             <div class="row-toolbar">
                 <div class="col">
                     <select style="max-width: 13%;" class="form-control" id="rowsPerPage">
@@ -272,18 +280,18 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form method="post" id="entry-form" enctype="multipart/form-data">
+			<form method="post" id="entry-form">
                 @csrf
 				<div class="modal-body" style="">
                     <input type="hidden" id="clickedDate" name="clickedDate">
                     <div class="col-md-12 zoom90">
                         <div class="row">
-                            <div class="col-md-12" id="fileInputIfexist">
+                            <div class="col-md-12" id="fileInputIfexistWfh" style="display: none;">
                                 <div class="form-group">
-                                    <label for="email"><span class="text-danger"><i>Surat Penugasan : (If Any)</i></span></label>
+                                    <label for="email"><span class="text-danger"><i>Surat Penugasan :</i></span></label>
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="surat_penugasan" name="surat_penugasan" onchange="changeFileName('surat_penugasan', 'sp-label')">
-                                        <label class="custom-file-label" id="sp-label">Choose file</label>
+                                        <input type="file" class="custom-file-input" id="surat_penugasan_wfh" name="surat_penugasan_wfh" onchange="changeFileName('surat_penugasan_wfh', 'sp-label-wfh')">
+                                        <label class="custom-file-label" id="sp-label-wfh">Choose file</label>
                                     </div>
                                     <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 500kb</i></small>
                                 </div>
@@ -361,6 +369,105 @@ active
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="redModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Entry <a id="selected-date-display-red"></a></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form method="post" id="entry-form-red" enctype="multipart/form-data">
+                @csrf
+				<div class="modal-body" style="">
+                    <input type="hidden" id="clickedDateRed" name="clickedDateRed">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12" id="fileInputIfexist">
+                                <div class="form-group">
+                                    <label for="email"><span class="text-danger"><i>Surat Penugasan :</i></span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input validate-red" id="surat_penugasan" name="surat_penugasan" onchange="changeFileName('surat_penugasan', 'sp-label')">
+                                        <label class="custom-file-label" id="sp-label">Choose file</label>
+                                    </div>
+                                    <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 500kb</i></small>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Task :</label>
+                                    <select class="form-control" id="task" name="task" required>
+                                        <option value="HO">Head Office</option>
+                                        <option value="Training">Training</option>
+                                        <optgroup label="Presales">
+                                        <option value="Presales">Presales</option>
+                                        <option value="Trainer">Trainer</option>
+                                        <optgroup label="Others">
+                                            <option value="Standby">Standby</option>
+                                            <option value="Lembur">Lembur</option>
+                                            <option value="Sick">Sick</option>
+                                            <option value="Other">Other</option>
+                                        </optgroup>
+                                        <optgroup label="Projects">
+                                            @if ($assignment->isEmpty())
+                                                <option disabled><i>No Project Assigned</i></option>
+                                            @else
+                                                @foreach($assignment as $assign)
+                                                    <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
+                                                @endforeach
+                                            @endif
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Location :</label>
+                                    <select class="form-control" id="location" name="location" required>
+                                        @foreach($pLocations as $loc)
+                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                        @endforeach
+                                        <option hidden value="N/a">N/a</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">From :</label>
+                                    <input type="text" class="form-control validate-red time-input" required autocomplete="off" placeholder="HH:mm" name="from" id="start-time" timeFormat="HH:mm">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">To :</label>
+                                    <input type="text" class="form-control validate-red time-input" required autocomplete="off" placeholder="HH:mm" name="to" id="end-time" timeFormat="HH:mm">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Activity :</label>
+                                    <textarea type="text" class="form-control validate-red" id="activity" name="activity" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" id="save-entry-red" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
+
 
 <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
@@ -667,4 +774,8 @@ function changeFileName(inputId, labelId) {
         width: 100%;
     }
 </style>
+@endsection
+
+@section('javascript')
+<script src="{{ asset('js/timesheet.js') }}"></script>
 @endsection
