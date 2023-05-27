@@ -361,20 +361,8 @@ class TimesheetController extends Controller
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
 
-        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)
-        ->where('project_assignment_id', $id_project)
-        ->pluck('role')
-        ->first();
-        if ($checkRole === null) {
-            $totalIncentive = 0;
-        } elseif ($checkRole === "MT") {
-            $totalIncentive = 7;
-        } else {
-            $roleFare = Project_role::where('role_code', $checkRole)
-                ->pluck('fare')
-                ->first();
-                $totalIncentive = 7;
-        }
+        // 
+        $totalIncentive = 7;
         $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
         $countAllowances = $fare;
 
