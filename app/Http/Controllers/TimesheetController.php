@@ -361,42 +361,42 @@ class TimesheetController extends Controller
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
 
-        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $id_project)->pluck('role')->first();
-        switch($checkRole){
-            case NULL:
-                $totalIncentive = 0;
-                break;
-            case "MT":
-                $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
-                $hiredDate = new DateTime($mt_hiredDate);
-                $currentDate = new DateTime(date('Y-m-d'));
-                $intervalDate = $hiredDate->diff($currentDate);
-                $yearsDifference = $intervalDate->format('%y'); // Get the year difference between the two dates
-                $monthsDifference = $intervalDate->format('%m'); // Get the month difference between the two dates
-                $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
+        // $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $id_project)->pluck('role')->first();
+        // switch($checkRole){
+        //     case NULL:
+        //         $totalIncentive = 0;
+        //         break;
+        //     case "MT":
+        //         $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+        //         $hiredDate = new DateTime($mt_hiredDate);
+        //         $currentDate = new DateTime(date('Y-m-d'));
+        //         $intervalDate = $hiredDate->diff($currentDate);
+        //         $yearsDifference = $intervalDate->format('%y'); // Get the year difference between the two dates
+        //         $monthsDifference = $intervalDate->format('%m'); // Get the month difference between the two dates
+        //         $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
                 
-                if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
-                    $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
-                    $totalIncentive = $roleFare * 0.7;
-                } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
-                    $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
-                    $totalIncentive = $roleFare * 0.7;
-                } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
-                    $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
-                    $totalIncentive = $roleFare * 0.7;
-                } else {
-                }
-                break;
-            default:
-                $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
-                $totalIncentive = $roleFare * 0.7;
-                break;
-        }
-        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
-        $countAllowances = $fare;
+        //         if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
+        //             $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
+        //             $totalIncentive = $roleFare * 0.7;
+        //         } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
+        //             $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
+        //             $totalIncentive = $roleFare * 0.7;
+        //         } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
+        //             $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
+        //             $totalIncentive = $roleFare * 0.7;
+        //         } else {
+        //         }
+        //         break;
+        //     default:
+        //         $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
+        //         $totalIncentive = $roleFare * 0.7;
+        //         break;
+        // }
+        // $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        // $countAllowances = $fare;
 
-        $entry->allowance = $countAllowances;
-        $entry->incentive = $totalIncentive;
+        // $entry->allowance = $countAllowances;
+        // $entry->incentive = $totalIncentive;
         $entry->save();
 
         // Store the file if it is provided
