@@ -403,26 +403,30 @@ class TimesheetController extends Controller
         $entry->incentive = $totalIncentive;
         $entry->save();
 
-        // Store the file if it is provided
-        if ($request->hasFile('surat_penugasan_wfh')) {
-            $file = $request->file('surat_penugasan_wfh');
-            $surat_penugasan_wfh = $request->file('surat_penugasan_wfh');
-            $fileExtension = $surat_penugasan_wfh->getClientOriginalExtension();
-            $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            $filePath = 'surat_penugasan/' . $fileName;
-            $upload_folder = public_path('surat_penugasan/');
+        try {
+           // Store the file if it is provided
+            if ($request->hasFile('surat_penugasan_wfh')) {
+                $file = $request->file('surat_penugasan_wfh');
+                $surat_penugasan_wfh = $request->file('surat_penugasan_wfh');
+                $fileExtension = $surat_penugasan_wfh->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $filePath = 'surat_penugasan/' . $fileName;
+                $upload_folder = public_path('surat_penugasan/');
 
-            // Move the uploaded file to the storage folder
-            $file->move($upload_folder, $fileName);
+                // Move the uploaded file to the storage folder
+                $file->move($upload_folder, $fileName);
 
-            // Save the file details in the database
-            $fileEntry = new Surat_penugasan;
-            $fileEntry->user_id = Auth::user()->id;
-            $fileEntry->ts_date = $request->clickedDate;
-            $fileEntry->file_name = $fileName;
-            $fileEntry->file_path = $filePath;
-            $fileEntry->timesheet_id = str_replace('-','',$request->clickedDateRed);
-            $fileEntry->save();
+                // Save the file details in the database
+                $fileEntry = new Surat_penugasan;
+                $fileEntry->user_id = Auth::user()->id;
+                $fileEntry->ts_date = $request->clickedDate;
+                $fileEntry->file_name = $fileName;
+                $fileEntry->file_path = $filePath;
+                $fileEntry->timesheet_id = str_replace('-','',$request->clickedDate);
+                $fileEntry->save();
+            }
+        } catch (Exception $e) {
+            //do nothing
         }
 
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
@@ -510,27 +514,31 @@ class TimesheetController extends Controller
         $entry->incentive = $totalIncentive;
         $entry->save();
 
-        // Store the file if it is provided
-        if ($request->hasFile('surat_penugasan')) {
-            $file = $request->file('surat_penugasan');
-            $surat_penugasan = $request->file('surat_penugasan');
-            $fileExtension = $surat_penugasan->getClientOriginalExtension();
-            $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            $filePath = 'surat_penugasan/' . $fileName;
-            $upload_folder = public_path('surat_penugasan/');
+        try {
+           // Store the file if it is provided
+            if ($request->hasFile('surat_penugasan')) {
+                $file = $request->file('surat_penugasan');
+                $surat_penugasan = $request->file('surat_penugasan');
+                $fileExtension = $surat_penugasan->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $filePath = 'surat_penugasan/' . $fileName;
+                $upload_folder = public_path('surat_penugasan/');
 
-            // Move the uploaded file to the storage folder
-            $file->move($upload_folder, $fileName);
+                // Move the uploaded file to the storage folder
+                $file->move($upload_folder, $fileName);
 
-            // Save the file details in the database
-            $fileEntry = new Surat_penugasan;
-            $fileEntry->user_id = Auth::user()->id;
-            $fileEntry->ts_date = $request->clickedDateRed;
-            $fileEntry->file_name = $fileName;
-            $fileEntry->file_path = $filePath;
-            $fileEntry->timesheet_id = str_replace('-','',$request->clickedDateRed);
-            $fileEntry->save();
-        }
+                // Save the file details in the database
+                $fileEntry = new Surat_penugasan;
+                $fileEntry->user_id = Auth::user()->id;
+                $fileEntry->ts_date = $request->clickedDateRed;
+                $fileEntry->file_name = $fileName;
+                $fileEntry->file_path = $filePath;
+                $fileEntry->timesheet_id = str_replace('-','',$request->clickedDateRed);
+                $fileEntry->save();
+            }
+         } catch (Exception $e) {
+             //do nothing
+         }
 
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDate))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
