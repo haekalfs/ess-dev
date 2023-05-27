@@ -564,6 +564,9 @@ class TimesheetController extends Controller
         $totalIncentive = 0;
         $totalIncentive = 0;
 
+        $totalIncentive = 0;
+        $totalIncentive = 0;
+        
         $dateString = $request->daterange;
         list($startDateString, $endDateString) = explode(' - ', $dateString);
         $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
