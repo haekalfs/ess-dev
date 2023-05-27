@@ -382,13 +382,13 @@ class TimesheetController extends Controller
                 $roleFare = Additional_fare::where('id', $totalMonthsDifference > 24 ? 3 : ($totalMonthsDifference > 12 ? 2 : 1))
                     ->pluck('fare')
                     ->first();
-                $totalIncentive = $roleFare * 0.7;
+                $totalIncentive = intval($roleFare) * 0.7;
             }
         } else {
             $roleFare = Project_role::where('role_code', $checkRole)
                 ->pluck('fare')
                 ->first();
-            $totalIncentive = $roleFare * 0.7;
+            $totalIncentive = intval($roleFare) * 0.7;
         }
         $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
         $countAllowances = $fare;
