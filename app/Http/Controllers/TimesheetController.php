@@ -361,13 +361,14 @@ class TimesheetController extends Controller
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
 
-        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)
+        $user = Auth::user()->id;
+        $checkRole = Project_assignment_user::where('user_id', $user)
         ->where('project_assignment_id', $id_project)
+        ->pluck('role')
         ->first();
-        if ($checkRole->role === null) {
+        if ($checkRole === null) {
             $totalIncentive = 0;
-            $entry->incentive = $totalIncentive;
-        } elseif ($checkRole->role === "MT") {
+        } elseif ($checkRole === "MT") {
             $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)
                 ->pluck('hired_date')
                 ->first();
@@ -384,18 +385,17 @@ class TimesheetController extends Controller
                     ->first();
                 $totalIncentive = $roleFare * 0.7;
             }
-            $entry->incentive = $totalIncentive;
         } else {
             $roleFare = Project_role::where('role_code', $checkRole)
                 ->pluck('fare')
                 ->first();
             $totalIncentive = $roleFare * 0.7;
-            $entry->incentive = $totalIncentive;
         }
         $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
         $countAllowances = $fare;
 
         $entry->allowance = $countAllowances;
+        $entry->incentive = $totalIncentive;
         $entry->save();
 
         // Store the file if it is provided
