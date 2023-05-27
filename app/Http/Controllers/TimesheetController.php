@@ -626,8 +626,13 @@ class TimesheetController extends Controller
             }
         }
 
-        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
-        $countAllowances = $fare;
+        try {
+            $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+            $countAllowances = $fare;
+        } catch (Exception $e) {
+            //do nothing
+        }
+        
         // Loop through each day between start and end dates
         while ($startDate <= $endDate) {
             $dayOfWeek = $startDate->format('N');
@@ -642,11 +647,17 @@ class TimesheetController extends Controller
                 // Insert the entry to the database for this day
                 $entry = new Timesheet;
                 $ts_task_id = $request->task;
-                $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
-                while (Project_assignment::where('id', $ts_task_id)->exists()){
-                    foreach($task_project as $tp){
-                        $ts_task_id = $tp->company_project->project_name;
+                try{
+                    $task_project = Project_assignment::where('id', $ts_task_id)->get();
+                    if(Project_assignment::where('id', $ts_task_id)->exists()){
+                        foreach($task_project as $tp){
+                            $ts_task_id = $tp->company_project->project_name;
+                        }
+                    } else   {
+                        $ts_task_id = "HO";
                     }
+                } catch (Exception $e) {
+                    //do nothing
                 }
                 $entry->ts_user_id = Auth::user()->id;
                 $entry->ts_id_date = $startDate->format('Ymd');
