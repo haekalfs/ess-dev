@@ -280,7 +280,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form method="post" id="entry-form">
+			<form method="post" id="entry-form" enctype="multipart/form-data">
                 @csrf
 				<div class="modal-body" style="">
                     <input type="hidden" id="clickedDate" name="clickedDate">
