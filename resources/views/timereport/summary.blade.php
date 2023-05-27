@@ -119,7 +119,7 @@ active
                                     </tr>
                                     @endforeach
                                     <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                        <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
                                     </tr>
                                 </tbody>
                             </table>
