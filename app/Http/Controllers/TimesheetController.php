@@ -366,14 +366,29 @@ class TimesheetController extends Controller
             ->where('project_assignment_id', $id_project)
             ->value('role');
 
-        if ($checkRole === null) {
-            $totalIncentive = 0;
-        } elseif ($checkRole === "MT") {
-            $totalIncentive = 10 * 0.7;
-        } else {
-            $roleFare = Project_role::where('role_code', $checkRole)
-                ->value('fare');
-            $totalIncentive = $roleFare * 0.7;
+        if(Project_assignment_user::where('user_id', $user->id)->where('project_assignment_id', $id_project)->exists()){
+            if ($checkRole === null) {
+                $totalIncentive = 0;
+            } elseif ($checkRole === "MT") {
+                $mt_hiredDate = Users_detail::where('user_id', $user->id)
+                    ->value('hired_date');
+                
+                // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+                $hiredDate = new DateTime($mt_hiredDate);
+                $currentDate = new DateTime(date('Y-m-d'));
+                $intervalDate = $hiredDate->diff($currentDate);
+                $totalMonthsDifference = ($intervalDate->format('%y') * 12) + $intervalDate->format('%m');
+                
+                if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 37) {
+                    $roleFare = Additional_fare::where('id', $totalMonthsDifference > 24 ? 3 : ($totalMonthsDifference > 12 ? 2 : 1))
+                        ->value('fare');
+                    $totalIncentive = $roleFare * 0.7;
+                }
+            } else {
+                $roleFare = Project_role::where('role_code', $checkRole)
+                    ->value('fare');
+                $totalIncentive = $roleFare * 0.7;
+            }
         }
 
         $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
