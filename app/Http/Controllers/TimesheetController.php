@@ -343,8 +343,8 @@ class TimesheetController extends Controller
         $totalIncentive = 0;
         $entry = new Timesheet;
         $ts_task_id = $request->task;
-        $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
-        while (Project_assignment::where('id', $ts_task_id)->exists()){
+        $task_project = Project_assignment::where('id', $ts_task_id)->get();
+        if(Project_assignment::where('id', $ts_task_id)->exists()){
             foreach($task_project as $tp){
                 $ts_task_id = $tp->company_project->project_name;
             }
