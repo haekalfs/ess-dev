@@ -571,15 +571,26 @@ active
                                 <div class="form-group">
                                     <label for="password">Task :</label>
                                     <select class="form-control" id="task" name="task" required>
-                                        <option value="HO">HO</option>
-                                        <optgroup label="Projects">
-                                            @foreach($assignment as $assign)
-                                            <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
-                                            @endforeach
+                                        <option value="HO">Head Office</option>
+                                        <option value="Training">Training</option>
+                                        <optgroup label="Presales">
+                                        <option value="Presales">Presales</option>
+                                        <option value="Trainer">Trainer</option>
+                                        <optgroup label="Others">
+                                            <option value="Standby">Standby</option>
+                                            <option value="Lembur">Lembur</option>
+                                            <option value="Sick">Sick</option>
+                                            <option value="Other">Other</option>
                                         </optgroup>
-                                        <option value="Sick">Sick</option>
-                                        <option value="Other">Other</option>
-                                        <option value="Standby">Standby</option>
+                                        <optgroup label="Projects">
+                                            @if ($assignment->isEmpty())
+                                                <option disabled><i>No Project Assigned</i></option>
+                                            @else
+                                                @foreach($assignment as $assign)
+                                                    <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
+                                                @endforeach
+                                            @endif
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>

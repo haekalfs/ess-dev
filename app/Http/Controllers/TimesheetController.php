@@ -563,7 +563,7 @@ class TimesheetController extends Controller
 
         $totalIncentive = 0;
         $totalIncentive = 0;
-        
+
         $dateString = $request->daterange;
         list($startDateString, $endDateString) = explode(' - ', $dateString);
         $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
@@ -1115,6 +1115,7 @@ class TimesheetController extends Controller
                     }
                     break;
                 case "Training":
+                case "Absent":
                     foreach($approvalHCM as $approverHCM){
                         $newArrayHO = [
                             'name' => $approverHCM->approver,
