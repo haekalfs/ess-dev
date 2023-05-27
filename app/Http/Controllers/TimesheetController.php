@@ -343,6 +343,7 @@ class TimesheetController extends Controller
         $totalIncentive = 0;
         $entry = new Timesheet;
         $ts_task_id = $request->task;
+        $id_project = $request->task;
         $task_project = Project_assignment::where('id', $ts_task_id)->get();
         if(Project_assignment::where('id', $ts_task_id)->exists()){
             foreach($task_project as $tp){
@@ -360,7 +361,7 @@ class TimesheetController extends Controller
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
 
-        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $request->task)->pluck('role')->first();
+        $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $id_project)->pluck('role')->first();
         switch($checkRole){
             case NULL:
                 $totalIncentive = 0;
