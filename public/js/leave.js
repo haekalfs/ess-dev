@@ -28,7 +28,7 @@ $(document).ready(function() {
                         $('#reason_detail').val(row.reason);
                         $('#last_updated_detail').val(row.last_updated);
                         $('#request_date_detail').val(row.requestDate);
-                        $('#total_days_detail').val(row.totalDays);
+                        $('#total_days_detail').val(row.totalDays + " Day(s)");
                         $('#approver_detail').val(row.RequestTo);
 
                         // Update the progress bar
