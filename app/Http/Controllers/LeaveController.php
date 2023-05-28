@@ -112,7 +112,8 @@ class LeaveController extends Controller
         return view('leave.history', compact('yearsBefore', 'leaveType', 'usersWithPMRole', 'weekendReplacementQuota', 'empLeaveQuotaWeekendReplacement', 'leaveQuotaUsage', 'leaveQuotaAnnual','leaveRequests', 'empLeaveQuotaAnnualSum', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
 	}
 
-    public function leave_request_entry(Request $request){
+    public function leave_request_entry(Request $request)
+    {
         $this->validate($request,[
             'datepickLeave' => 'required',
     		'quota_used' => 'required',
@@ -357,7 +358,7 @@ class LeaveController extends Controller
                 'totalDays' => $lr->leave_request->total_days,
                 'reason' => $lr->leave_request->reason,
                 'status' => $status,
-                'RequestTo' => $lr->RequestTo,
+                'RequestTo' => $lr->user->name,
                 'notes' => $lr->notes,
                 'last_updated' => $lastUpdated,
             ];

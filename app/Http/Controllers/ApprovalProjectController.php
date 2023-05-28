@@ -21,14 +21,11 @@ class ApprovalProjectController extends Controller
 {
     public function index()
 	{
-        $userRoles = Auth::user()->role_id()->pluck('role_name')->toArray();
-        if (in_array('service_dir', $userRoles)) {
-            $listAssignment = Project_assignment::where('approval_status', 40)->get();
-            return view('approval.project_approval', ['queue' => $listAssignment]);
-        } else {
-            // Redirect to a URL with a session
-            return redirect()->route('approval.main')->with('failed', 'You do not have permission to access this page.');
-        }
+        $accessController = new AccessController();
+        $result = $accessController->usr_acc(204);
+        
+        $listAssignment = Project_assignment::where('approval_status', 40)->get();
+        return view('approval.project_approval', ['queue' => $listAssignment]);
 	}
 
     public function preview_assignment($assignment_id)
