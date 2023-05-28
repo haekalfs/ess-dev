@@ -40,14 +40,14 @@ class ApprovalController extends Controller
         $accessController = new AccessController();
         $result = $accessController->usr_acc(202);
 
-        $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29'])
-             ->where(function($query) {
-                 $query->where('RequestTo', Auth::user()->id);
-             })
-             ->count();
+        $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
+        ->where(function($query) {
+            $query->where('RequestTo', Auth::user()->id);
+        })
+        ->count();
 
         $pCount = Project_assignment::where('approval_status', 40)->count();
-        $leaveCount = Leave_request_approval::whereNotIn('status', ['20', '30', '29'])
+        $leaveCount = Leave_request_approval::whereNotIn('status', ['20', '30', '29', '404'])
         ->where(function($query) {
             $query->where('RequestTo', Auth::user()->id);
         })
@@ -68,8 +68,8 @@ class ApprovalController extends Controller
         $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 5 && $currentDay <= 30) {
-                if (in_array($checkUserPost, [7, 8, 10, 12])) {
+        if ($currentDay >= 5 && $currentDay <= 8) {
+                if (in_array($checkUserPost, [7, 8, 12])) {
                     $Check = DB::table('timesheet_details')
                         ->select('*')
                         ->whereYear('date_submitted', $currentYear)
@@ -204,9 +204,9 @@ class ApprovalController extends Controller
 
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
         $countWeekendReplacement = Emp_leave_quota::where('user_id', $user_timesheet)
-                                    ->where('leave_id', 100)
-                                    ->where('active_periode', '>=', date('Y-m-d'))
-                                    ->sum('quota_left');
+        ->where('leave_id', 100)
+        ->where('active_periode', '>=', date('Y-m-d'))
+        ->sum('quota_left');
         if(!$weekendReplacementInCurrentMonth){
             Emp_leave_quota::updateOrCreate([
                 'user_id' => Auth::user()->id,
