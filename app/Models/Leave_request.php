@@ -13,11 +13,13 @@ class Leave_request extends Model
     protected $fillable = ['id','req_date', 'req_by', 'leave_dates', 'total_days', 'reason', 'leave_id', 'contact_number', 'status', 'RequestTo'];
 
     public function leave(){
-    	return $this->belongsTo('App\Models\Leave');
+    	return $this->belongsTo('App\Models\Leave')
+        ->withDefault();
     }
 
     public function approval_status(){
-    	return $this->belongsTo('App\Models\Approval_status', 'status', 'approval_status_id');
+    	return $this->belongsTo('App\Models\Approval_status', 'status', 'approval_status_id')
+        ->withDefault();
     }
 
     public function leave_request_approval(){
@@ -25,6 +27,7 @@ class Leave_request extends Model
     }
 
     public function user(){
-    	return $this->belongsTo('App\Models\User', 'req_by', 'id');
+    	return $this->belongsTo('App\Models\User', 'req_by', 'id')
+        ->withDefault();
     }
 }
