@@ -36,7 +36,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Timesheets</h6>
         <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
+            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" onclick="confirmPassword()"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
         </div>
     </div>
     <form method="GET" action="/timesheet/review/fm">
@@ -131,17 +131,17 @@ active
         </div>
     </form>
 </div>
-{{-- <div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Approved Timesheets</h6>
-        <div class="text-right">
-            <a class="btn btn-secondary btn-sm" type="button" href="#" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export Selected</a>
-        </div>
-    </div>
-    <div class="card-body">
-        
-    </div>
-</div> --}}
+<script>
+function confirmPassword() {
+    var password = prompt('Please enter your password:');
+    if (password !== null) {
+        // Send the plain password to the server
+        var url = "/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}?password=" + encodeURIComponent(password);
+        window.location.href = url;
+    }
+}
+</script>
+    
 <style>
 .action{
     width: 190px;
