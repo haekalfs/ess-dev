@@ -108,6 +108,8 @@ Route::get('/leave/history/cancel/{id}', 'LeaveController@cancel_request')->name
 
 Route::get('/leave/manage/all', 'LeaveController@manage')->name('manage_leave')->middleware('auth');
 Route::get('/leave/manage/{id}', 'LeaveController@manage_leave_emp')->name('manage_leave_user')->middleware('auth');
+Route::get('/leave/manage/edit/{id}', 'LeaveController@get_leave_emp');
+Route::post('/leave/manage/update/{id}', 'LeaveController@update_leave_emp');
 
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth');

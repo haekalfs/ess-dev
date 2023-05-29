@@ -322,6 +322,21 @@
                     <span>Contact Administrator</span></a>
             </li>
 
+            <li class="nav-item @yield('active-page-system_management')">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseApps"
+                    aria-expanded="true" aria-controls="collapseApps">
+                    <i class="fas fa-fw fa-user-cog"></i>
+                    <span>Browse Apps</span>
+                </a>
+                <div id="collapseApps" class="collapse" aria-labelledby="headingApps" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" target="_blank" href="https://po-controller.perdana.co.id/">eForm - Forms Controller</a>
+                        <a class="collapse-item" target="_blank" href="https://myspace.perdana.co.id/">MySpace - Cloud Storage</a>
+                        <a class="collapse-item" href="#">AMS - Assets Controller</a>
+                    </div>
+                </div>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 

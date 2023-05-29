@@ -536,9 +536,9 @@ class TimesheetController extends Controller
                 $fileEntry->timesheet_id = str_replace('-','',$request->clickedDateRed);
                 $fileEntry->save();
             }
-         } catch (Exception $e) {
-             //do nothing
-         }
+        } catch (Exception $e) {
+            //do nothing
+        }
 
         Timesheet_detail::updateOrCreate(['user_id' => Auth::user()->id, 'activity' => 'Saved', 'month_periode' => date("Yn", strtotime($request->clickedDateRed))],['date_submitted' => date('Y-m-d'),'ts_status_id' => '10', 'ts_task' => '-', 'RequestTo' => '-', 'note' => '', 'user_timesheet' => Auth::user()->id]);
 
@@ -688,6 +688,84 @@ class TimesheetController extends Controller
         return response()->json(['success' => "Entry saved successfully. $request->daterange"]);
     }
 
+    public function updateActivitiesEntry($id, Request $request)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'update_task' => 'required',
+            'update_clickedDate' => 'required',
+            'update_location' => 'required',
+            'update_from' => 'required',
+            'update_to' => 'required',
+            'update_activity' => 'required',
+        ]);
+
+        $inputFromTimeUpdate = $request->update_from;
+        $inputToTimeUpdate = $request->update_to;
+        $totalIncentive = 0;
+        $totalIncentive = 0;
+        $id_project = $request->update_task;
+
+        $entry = Timesheet::find($id);
+
+        $ts_task_id = $request->update_task;
+        $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
+        while (Project_assignment::where('id', $ts_task_id)->exists()){
+            foreach($task_project as $tp){
+                $ts_task_id = $tp->company_project->project_name;
+            }
+        }
+        $entry->ts_task = $ts_task_id;
+        $entry->ts_task_id = $request->update_task;
+        $entry->ts_location = $request->update_location;
+        $entry->ts_from_time = date('H:i', strtotime($inputFromTimeUpdate));
+        $entry->ts_to_time = date('H:i', strtotime($inputToTimeUpdate));
+        $entry->ts_activity = $request->update_activity;
+
+        $user = Auth::user();
+
+        if(Project_assignment_user::where('user_id', $user->id)->where('project_assignment_id', $id_project)->exists()){
+            try {
+                $checkRole = Project_assignment_user::where('user_id', $user->id)
+                ->where('project_assignment_id', $id_project)
+                ->value('role');
+
+                if ($checkRole === NULL) {
+                    //do nothing
+                } elseif ($checkRole === "MT") {
+                    $mt_hiredDate = Users_detail::where('user_id', $user->id)
+                        ->value('hired_date');
+                    
+                    // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
+                    $hiredDate = new DateTime($mt_hiredDate);
+                    $currentDate = new DateTime(date('Y-m-d'));
+                    $intervalDate = $hiredDate->diff($currentDate);
+                    $totalMonthsDifference = ($intervalDate->format('%y') * 12) + $intervalDate->format('%m');
+                    
+                    if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 37) {
+                        $roleFare = Additional_fare::where('id', $totalMonthsDifference > 24 ? 3 : ($totalMonthsDifference > 12 ? 2 : 1))
+                            ->value('fare');
+                        $totalIncentive = $roleFare * 0.7;
+                    }
+                } else {
+                    $roleFare = Project_role::where('role_code', $checkRole)
+                        ->value('fare');
+                    $totalIncentive = $roleFare * 0.7;
+                }
+            } catch (Exception $e) {
+                //do nothing
+            }
+        }
+
+        $fare = Project_location::where('location_code', $request->update_location)->pluck('fare')->first();
+        $countAllowances = $fare;
+
+        $entry->allowance = $countAllowances;
+        $entry->incentive = $totalIncentive;
+        $entry->save();
+
+        return response()->json(['success' => 'Entry updated successfully.']);
+    }
 
     public function getActivities($year, $month)
     {
@@ -1335,40 +1413,6 @@ class TimesheetController extends Controller
 
         // Return the data as a JSON response
         return response()->json($data);
-    }
-
-    public function updateActivitiesEntry($id, Request $request)
-    {
-        date_default_timezone_set("Asia/Jakarta");
-        $validator = Validator::make($request->all(), [
-            'update_task' => 'required',
-            'update_clickedDate' => 'required',
-            'update_location' => 'required',
-            'update_from' => 'required',
-            'update_to' => 'required',
-            'update_activity' => 'required',
-        ]);
-
-        $inputFromTimeUpdate = $request->update_from;
-        $inputToTimeUpdate = $request->update_to;
-
-        $entry = Timesheet::find($id);
-        $ts_task_id = $request->update_task;
-        $task_project = Project_assignment::where('id', $ts_task_id)->get(); 
-        while (Project_assignment::where('id', $ts_task_id)->exists()){
-            foreach($task_project as $tp){
-                $ts_task_id = $tp->company_project->project_name;
-            }
-        }
-        $entry->ts_task = $ts_task_id;
-        $entry->ts_task_id = $request->update_task;
-        $entry->ts_location = $request->update_location;
-        $entry->ts_from_time = date('H:i', strtotime($inputFromTimeUpdate));
-        $entry->ts_to_time = date('H:i', strtotime($inputToTimeUpdate));
-        $entry->ts_activity = $request->update_activity;
-        $entry->save();
-
-        return response()->json(['success' => 'Entry updated successfully.']);
     }
 
     public function summary(Request $request)

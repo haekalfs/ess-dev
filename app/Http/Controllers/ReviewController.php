@@ -21,8 +21,30 @@ class ReviewController extends Controller
 	{
 		// $year = Crypt::decrypt($year);
         // $month = Crypt::decrypt($month);
-        // Set the default time zone to Jakarta 
+        // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
+
+        // Create a DateTime object for the first day of the selected month
+        $dateToCount = new DateTime("$year-$month-01");
+
+        // Get the last day of the selected month
+        $lastDay = $dateToCount->format('t');
+
+        // Initialize a counter for weekdays
+        $totalWeekdays = 0;
+
+        // Loop through each day of the month and count weekdays
+        for ($day = 1; $day <= $lastDay; $day++) {
+            // Set the day of the month
+            $dateToCount->setDate($year, $month, $day);
+            
+            // Check if the day is a weekday (Monday to Friday)
+            if ($dateToCount->format('N') <= 5) {
+                $totalWeekdays++;
+            }
+        }
+
+        $totalHours = $totalWeekdays * 8; 
 
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
@@ -99,7 +121,7 @@ class ReviewController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
         // return response()->json($activities);
-        return view('review.ts_preview', compact('year', 'month','info', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('review.ts_preview', compact('year', 'month','info', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function print_selected($year, $month, $user_timesheet)

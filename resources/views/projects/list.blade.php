@@ -329,21 +329,31 @@ active
 				<div class="modal-body" style="height: 500px; overflow-y: auto;">
                     <div class="col-md-12 zoom90">
                         <div class="row">
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <label for="email">Role Code :</label>
-                                    <input type="text" class="form-control" name="role_code">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">Description :</label>
-                                    <input type="text" class="form-control" name="role_desc">
-                                </div>
-                            </div>
-                            <div class="col-md-1 d-flex justify-content-center align-items-end">
-                                <div class="form-group">
-                                    <button type="button" id="save-project-roles-entry" class="btn btn-primary">Insert</button>
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="email">Role Code :</label>
+                                            <input type="text" class="form-control" name="role_code">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="password">Description :</label>
+                                            <input type="text" class="form-control" name="role_desc">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="password">Fare :</label>
+                                            <input type="text" class="form-control" name="loc_fare">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex justify-content-center align-items-end">
+                                        <div class="form-group">
+                                            <button type="button" id="save-project-roles-entry" class="btn btn-primary">Insert</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12"><br>
@@ -360,13 +370,14 @@ active
                                     An error occurred while saving your entry. Please try again.
                                 </div>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered zoom90" width="100%"
+                                    <table class="table table-bordered" width="100%"
                                         cellspacing="0">
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>No</th>
                                                 <th>Role Code</th>
                                                 <th>Description</th>
+                                                <th>Fare</th>
                                                 <th width="150px">Action</th>
                                             </tr>
                                         </thead>

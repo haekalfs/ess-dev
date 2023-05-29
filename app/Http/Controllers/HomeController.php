@@ -38,13 +38,16 @@ class HomeController extends Controller
 
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
-            ->where('active_periode', '>=', date('Y-m-d'))
+            ->where('expiration', '>=', date('Y-m-d'))
             ->sum('quota_left');
         $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 100)
-            ->where('active_periode', '>=', date('Y-m-d'))
+            ->where('expiration', '>=', date('Y-m-d'))
             ->sum('quota_left');
-        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('active_periode', '>=', date('Y-m-d'))->where('user_id', Auth::user()->id)->where('leave_id', 20)->pluck('quota_left')->first();
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+            ->where('user_id', Auth::user()->id)
+            ->where('leave_id', 20)
+            ->sum('quota_left');
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";

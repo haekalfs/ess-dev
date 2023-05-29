@@ -458,13 +458,69 @@ class LeaveController extends Controller
             ->where('leave_id', 10)
             ->where('expiration', '>=', date('Y-m-d'))
             ->sum('quota_left');
-        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))->where('user_id', $user_info->id)->where('leave_id', 20)->pluck('quota_left')->first();
-        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm;
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 100)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+            ->where('user_id', $user_info->id)
+            ->where('leave_id', 20)
+            ->sum('quota_left');
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";
         }
 
         $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
-		return view('leave.manage_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'totalQuota', 'user_info', 'empLeaves'));
+		return view('leave.manage_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
+	}
+
+    public function get_leave_emp($id)
+	{
+        $data = Emp_leave_quota::find($id);
+        // Return the data as a JSON response
+        return response()->json($data);    
+    }
+
+    public function update_leave_emp(Request $request, $id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'active_periode' => 'required',
+            'expiration' => 'required',
+            'quota_left' => 'required',
+        ]);
+
+        $row = Emp_leave_quota::find($id);
+        $row->active_periode = $request->active_periode;
+        $row->expiration = $request->expiration;
+        $row->quota_left = $request->quota_left;
+        $row->save();
+
+        return response()->json(['success' => 'Employee Leave updated successfully.']);
+    }
+
+    public function edit_leave_emp($usrId, $id)
+	{
+        $user_info = User::find($usrId);
+        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 10)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 100)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+            ->where('user_id', $user_info->id)
+            ->where('leave_id', 20)
+            ->sum('quota_left');
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
+        if($empLeaveQuotaFiveYearTerm == NULL){
+            $empLeaveQuotaFiveYearTerm = "-";
+        }
+
+        $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
+		return view('leave.edit_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
 	}
 }

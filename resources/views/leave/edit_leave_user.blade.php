@@ -73,9 +73,9 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Leaves Information</h6>
-        <div class="text-right">
-            <a class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-plus"></i> Add New</a>
-        </div>
+        {{-- <div class="text-right">
+            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
+        </div> --}}
     </div>
     <div class="card-body">
     <table class="table table-bordered zoom80" id="dataTableProject" width="100%" cellspacing="0">
@@ -102,7 +102,7 @@
                 <td>{{ $empLeave->quota_left }}</td>
                 <td>{{ $empLeave->quota_used }}</td>
                 <td class="text-center">
-                    <a data-toggle="modal" data-target="#updateLeave" data-id="{{ $empLeave->id }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-mouse-pointer fa-sm text-white-50"></i> Select</a>
+                    <a href="/leave/manage/{{ $user_info->id }}/{{ $empLeave->id }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-mouse-pointer fa-sm text-white-50"></i> Select</a>
                 </td>
             </tr>
             @endforeach
@@ -110,64 +110,4 @@
     </table>
     </div>
 </div>
-
-<div class="modal fade" id="updateLeave" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="updateLeaveLabel">Edit Leave Quota</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<form method="post" id="update-leave">
-                @csrf
-				<div class="modal-body">
-                    <div class="col-md-12 zoom90">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="email">Active Periode :</label>
-                                    <input type="date" class="form-control" required autocomplete="off" name="active_periode" id="active_periode">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">Expiration :</label>
-                                    <input type="date" class="form-control" required autocomplete="off" name="expiration" id="expiration">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Qouta Left :</label>
-                                    <input type="number" class="form-control" required autocomplete="off" name="quota_left" id="quota_left">
-                                </div>
-                            </div>
-                        </div>
-				    </div>
-                </div>
-				<div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" id="update-leave-btn" class="btn btn-primary" data-dismiss="modal">Save changes</button>
-                  </div>
-			</form>
-		</div>
-	</div>
-</div>
-<!-- The success popup modal -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <span class="m-0 font-weight-bold text-success">Employee Leave updated successfully.</span>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-
-@section('javascript')
-<script src="{{ asset('js/leave.js') }}"></script>
 @endsection

@@ -44,55 +44,63 @@ $(document).ready(function () {
 //this is my save function 
 $(document).ready(function() {
     $(function() {
-        $('#updateModal').on('show.bs.modal', function (event) {
-            var activityId = $(event.relatedTarget).data('id');
-            var date = $(event.relatedTarget).data('date');
-            var formattedDate = new Date(date).toLocaleDateString('en-US', { 
-                day: 'numeric', 
-                month: 'short', 
-                year: 'numeric' 
-            }).replace(',', '').split(' ');
-            var month = formattedDate[0];
-            var day = formattedDate[1];
-            var year = formattedDate[2];
-            var formattedDateStr = day + '-' + month + '-' + year;
-            $.ajax({
-                url: '/get-data/' + year + '/' + month + '/' + activityId,
-                type: 'GET',
-                success: function(response) {
-                    // Set the values of the form fields with the data received from the server
-                    $('#updateModal').find('#update_task').val(response.ts_task);
-                    $('#updateModal').find('#update_location').val(response.ts_location);
-                    $('#updateModal').find('#update_activity').val(response.ts_activity);
-                    $('#updateModal').find('#update_from').val(response.ts_from_time);
-                    $('#updateModal').find('#update_to').val(response.ts_to_time);
-        
-                },
-                error: function(response, jqXHR, textStatus, errorThrown) {
-                    console.log(response);
-                }
+        $(function() {
+            $('#updateModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var activityId = button.data('id');
+                var date = button.data('date');
+                var formattedDate = new Date(date).toLocaleDateString('en-US', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric' 
+                }).replace(',', '').split(' ');
+                var month = formattedDate[0];
+                var day = formattedDate[1];
+                var year = formattedDate[2];
+                var formattedDateStr = day + '-' + month + '-' + year;
+                $.ajax({
+                    url: '/get-data/' + year + '/' + month + '/' + activityId,
+                    type: 'GET',
+                    success: function(response) {
+                        // Set the values of the form fields with the data received from the server
+                        $('#updateModal').find('#update_task').val(response.ts_task_id);
+                        $('#updateModal').find('#update_location').val(response.ts_location);
+                        $('#updateModal').find('#update_activity').val(response.ts_activity);
+                        $('#updateModal').find('#update_from').val(response.ts_from_time);
+                        $('#updateModal').find('#update_to').val(response.ts_to_time);
+            
+                    },
+                    error: function(response, jqXHR, textStatus, errorThrown) {
+                        console.log(response);
+                    }
+                });
+                
+                $('#update-entry').data('id', activityId); // Store the activityId as data attribute
+                $('#entry-date-update').text(formattedDateStr); 
             });
-            $('#entry-date-update').text(formattedDateStr);
-    
+            
             $('#update-entry').click(function(e) {
                 e.preventDefault();
+                var activityId = $(this).data('id'); // Retrieve the activityId from the data attribute
+                
                 // Serialize the form data
                 var updateData = $('#update-form').serialize();
-                // Send an AJAX request to the entries.store route
+                
                 $.ajax({
-                type: 'POST',
-                url: '/update-entries/' + activityId,
-                data: updateData,
-                success: function(response) {
-                    $('.alert-success-saving').show();
-                    $('#update-form')[0].reset();
-                        setTimeout(function() {
-                            $('.alert-success-saving').fadeOut('slow');
-                        }, 3000);
-                    // Fetch the updated list of activities
-                    fetchActivities(yearput, monthput);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
+                    type: 'POST',
+                    url: '/update-entries/' + activityId,
+                    data: updateData,
+                    success: function(response) {
+                        $('.alert-success-saving').show();
+                        $('#update-form')[0].reset();
+                            setTimeout(function() {
+                                $('.alert-success-saving').fadeOut('slow');
+                            }, 3000);
+                        // Fetch the updated list of activities
+                        fetchActivities(yearput, monthput);
+                    },
+                    error: function(response, jqXHR, textStatus, errorThrown) {
+                        console.log(response);
                         $('.alert-danger').show();
                         setTimeout(function() {
                             $('.alert-danger').fadeOut('slow');
@@ -198,12 +206,12 @@ $(document).ready(function() {
                         var options = { weekday: 'short' };
                         row.append($('<td></td>').text(date.toLocaleDateString('en-US', options)));
                         var formattedDate = moment(activity.ts_date).format('D-MMM-YYYY');
-                        row.append($('<td width="150px" data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(formattedDate));
-                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
-                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
-                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
-                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
-                        row.append($('<td data-toggle="modal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
+                        row.append($('<td width="150px" data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(formattedDate));
+                        row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_task));
+                        row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_location));
+                        row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_activity));
+                        row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
+                        row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                         var actions = $('<td></td>');
                         actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
                         row.append(actions);
@@ -510,6 +518,7 @@ $(document).ready(function() {
     $('#location').change(function() {
         var selectedLocation = $(this).val();
         var fileInput = $('#surat_penugasan_wfh');
+        var checkbox = $('#flexCheckWfh');
         if (selectedLocation === "WFH") {
             fileInput.addClass('validate');
             $('#fileInputIfexistWfh').show();
@@ -517,5 +526,28 @@ $(document).ready(function() {
             fileInput.removeClass('validate');
             $('#fileInputIfexistWfh').hide();
         }
+        if (checkbox.is(':checked')) {
+            $('#surat_penugasan_wfh').removeClass('validate');
+        } else {
+            $('#surat_penugasan_wfh').addClass('validate');
+        }
     });
+
+    $('#flexCheckWfh').change(function() {
+        if ($(this).is(':checked')) {
+            $('#surat_penugasan_wfh').removeClass('validate');
+        } else {
+            $('#surat_penugasan_wfh').addClass('validate');
+        }
+    });
+});
+
+$(function() {
+  $('#flexCheckDefault').change(function() {
+    if ($(this).is(':checked')) {
+      $('#surat_penugasan').removeClass('validate-red');
+    } else {
+      $('#surat_penugasan').addClass('validate-red');
+    }
+  });
 });

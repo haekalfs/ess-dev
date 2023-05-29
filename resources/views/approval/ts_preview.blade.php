@@ -275,24 +275,35 @@ active
                                 @if (in_array($date->format('Y-m-d'), $formattedDates))
                                     -
                                 @else
-                                <?php 
+                                <?php
                                     $work_hours = 0;
-                                    $time_diff_minutes = 0;
-                                    $time_diff_hours = 0; // Set initial value to 0
-                                    
+                                    $start_time = PHP_INT_MAX;
+                                    $end_time = 0;
+
                                     foreach ($activities as $timesheet) {
                                         if ($timesheet->ts_date == $date->format('Y-m-d')) {
-                                            $start_time = strtotime($timesheet->ts_from_time);
-                                            $end_time = strtotime($timesheet->ts_to_time);
-                                            $time_diff_seconds = $end_time - $start_time;
-                                            $time_diff_hours = gmdate('H', $time_diff_seconds);
-                                            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-                                            $work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+                                            $current_start_time = strtotime($timesheet->ts_from_time);
+                                            $current_end_time = strtotime($timesheet->ts_to_time);
+
+                                            if ($current_start_time < $start_time) {
+                                                $start_time = $current_start_time;
+                                            }
+
+                                            if ($current_end_time > $end_time) {
+                                                $end_time = $current_end_time;
+                                            }
                                         }
                                     }
-                                    
+
+                                    if ($end_time > $start_time) {
+                                        $time_diff_seconds = $end_time - $start_time;
+                                        $time_diff_hours = gmdate('H', $time_diff_seconds);
+                                        $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+                                        $work_hours = $time_diff_hours + ($time_diff_minutes / 60);
+                                    }
+
                                     $total_work_hours += $work_hours;
-                                    if(!empty($work_hours)){
+                                    if ($work_hours > 0) {
                                         echo intval($work_hours)." Hours";
                                     }
                                 ?>
@@ -308,8 +319,8 @@ active
                 <tbody>
                     <tr class="table-sm">
                         <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
-                        @if($total_work_hours < 160)
-                        <td class="text-center text-danger font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
+                        @if($total_work_hours < $totalHours)
+                        <td class="text-center text-danger font-weight-bold" title="Should be above {{ $totalHours }} Hours"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
                         @else
                         <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours</i></td>
                         @endif

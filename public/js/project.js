@@ -84,6 +84,7 @@ function fetchProjectRoles() {
                     row.append($('<td></td>').text(activity.id));
                     row.append($('<td></td>').text(activity.role_code));
                     row.append($('<td></td>').text(activity.role_name));
+                    row.append($('<td></td>').text(activity.fare));
                     var actions = $('<td class="text-center"></td>');
                     actions.append($('<a></a>').addClass('btn-sm btn btn-danger deleteRole').text('Delete').attr('data-id', activity.id)).attr('onclick', 'return isconfirm()');;
                     row.append(actions);

@@ -50,3 +50,49 @@ $(document).ready(function() {
         });
     });
 });
+
+$(document).ready(function() {
+    $(function() {
+        $(function() {
+            $('#updateLeave').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var leaveId = button.data('id');
+                $.ajax({
+                    url: '/leave/manage/edit/' + leaveId,
+                    type: 'GET',
+                    success: function(response) {
+                        $('#updateLeave').find('#active_periode').val(response.active_periode);
+                        $('#updateLeave').find('#expiration').val(response.expiration);
+                        $('#updateLeave').find('#quota_left').val(response.quota_left);
+                    },
+                    error: function(response, jqXHR, textStatus, errorThrown) {
+                        console.log(response);
+                    }
+                });
+                
+                $('#update-leave-btn').data('id', leaveId); // Store the activityId as data attribute
+            });
+            
+            $('#update-leave-btn').click(function(e) {
+                e.preventDefault();
+                var leaveId = $(this).data('id'); // Retrieve the activityId from the data attribute
+                // Serialize the form data
+                var updateData = $('#update-leave').serialize();
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/leave/manage/update/' + leaveId,
+                    data: updateData,
+                    success: function(response) {
+                        $('#successModal').modal('show');
+                        $('#update-leave')[0].reset();
+                        window.location.reload();
+                    },
+                    error: function(response, jqXHR, textStatus, errorThrown) {
+                        console.log(response);
+                    }
+                });
+            });
+        });
+    });
+});

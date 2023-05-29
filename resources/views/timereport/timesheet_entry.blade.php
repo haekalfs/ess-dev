@@ -287,8 +287,18 @@ active
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-12" id="fileInputIfexistWfh" style="display: none;">
+                                <div class="form-group d-flex align-items-center" style="margin-bottom: 8px;">
+                                    <label for="email" style="margin-bottom: 0;">
+                                        <span class="text-danger"><i>Surat Penugasan :</i></span>
+                                    </label>
+                                    <div class="ml-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckWfh">
+                                            <label class="form-check-label" for="flexCheckWfh">Already uploaded</label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
-                                    <label for="email"><span class="text-danger"><i>Surat Penugasan :</i></span></label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="surat_penugasan_wfh" name="surat_penugasan_wfh" onchange="changeFileName('surat_penugasan_wfh', 'sp-label-wfh')">
                                         <label class="custom-file-label" id="sp-label-wfh">Choose file</label>
@@ -385,8 +395,18 @@ active
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-12" id="fileInputIfexist">
+                                <div class="form-group d-flex align-items-center" style="margin-bottom: 8px;">
+                                    <label for="email" style="margin-bottom: 0;">
+                                        <span class="text-danger"><i>Surat Penugasan :</i></span>
+                                    </label>
+                                    <div class="ml-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                            <label class="form-check-label" for="flexCheckDefault">Already uploaded</label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
-                                    <label for="email"><span class="text-danger"><i>Surat Penugasan :</i></span></label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input validate-red" id="surat_penugasan" name="surat_penugasan" onchange="changeFileName('surat_penugasan', 'sp-label')">
                                         <label class="custom-file-label" id="sp-label">Choose file</label>
@@ -484,19 +504,40 @@ active
                     <input type="hidden" id="update_clickedDate" name="update_clickedDate">
                     <div class="col-md-12 zoom90">
                         <div class="row">
+                            <div class="col-md-12" id="fileInputIfexistWfh" style="display: none;">
+                                <div class="form-group">
+                                    <label for="email"><span class="text-danger"><i>Surat Penugasan :</i></span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="surat_penugasan_wfh" name="surat_penugasan_wfh" onchange="changeFileName('surat_penugasan_wfh', 'sp-label-wfh')">
+                                        <label class="custom-file-label" id="sp-label-wfh">Choose file</label>
+                                    </div>
+                                    <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 500kb</i></small>
+                                </div>
+                            </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
                                     <select class="form-control" id="update_task" name="update_task" required>
-                                        <option value="HO">HO</option>
-                                        <optgroup label="Projects">
-                                            @foreach($assignment as $assign)
-                                            <option value="{{$assign->project_name}}">{{ $assign->project_name}}</option>
-                                            @endforeach
+                                        <option value="HO">Head Office</option>
+                                        <option value="Training">Training</option>
+                                        <optgroup label="Presales">
+                                        <option value="Presales">Presales</option>
+                                        <option value="Trainer">Trainer</option>
+                                        <optgroup label="Others">
+                                            <option value="Standby">Standby</option>
+                                            <option value="Lembur">Lembur</option>
+                                            <option value="Sick">Sick</option>
+                                            <option value="Other">Other</option>
                                         </optgroup>
-                                        <option value="Sick">Sick</option>
-                                        <option value="Other">Other</option>
-                                        <option value="Standby">Standby</option>
+                                        <optgroup label="Projects">
+                                            @if ($assignment->isEmpty())
+                                                <option disabled><i>No Project Assigned</i></option>
+                                            @else
+                                                @foreach($assignment as $assign)
+                                                    <option value="{{$assign->project_assignment_id}}">{{ $assign->project_name}}</option>
+                                                @endforeach
+                                            @endif
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
@@ -663,7 +704,7 @@ active
 </div>
 
 <script>
-    document.getElementById("task").addEventListener("change", function() {
+document.getElementById("task").addEventListener("change", function() {
     if (this.value === "Sick") {
         document.getElementById("activity").value = "-";
         document.getElementById("location").value = "N/a";
