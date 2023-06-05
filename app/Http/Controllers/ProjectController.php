@@ -96,9 +96,9 @@ class ProjectController extends Controller
         $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
         $employees = User::whereIn('id', $roleToApprove)->get();
 
-        // foreach ($employees as $employee) {
-        //     dispatch(new NotifyAssignmentCreation($employee));
-        // }
+        foreach ($employees as $employee) {
+            dispatch(new NotifyAssignmentCreation($employee));
+        }
         return redirect("/assignment/member/$url")->with('success', "Assignment #$uniqueIdP Create successfully");
     }
 

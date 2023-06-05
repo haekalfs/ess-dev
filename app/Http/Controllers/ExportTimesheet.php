@@ -65,6 +65,31 @@ class ExportTimesheet extends Controller
            // Set up the starting row and column for the data
             $startRow = 8;
             $startCol = 2;
+
+            // Set the default time zone to Jakarta
+            date_default_timezone_set("Asia/Jakarta");
+
+            // Create a DateTime object for the first day of the selected month
+            $dateToCount = new DateTime("$Year-$Month-01");
+
+            // Get the last day of the selected month
+            $lastDay = $dateToCount->format('t');
+
+            // Initialize a counter for weekdays
+            $totalWeekdays = 0;
+
+            // Loop through each day of the month and count weekdays
+            for ($day = 1; $day <= $lastDay; $day++) {
+                // Set the day of the month
+                $dateToCount->setDate($Year, $Month, $day);
+                
+                // Check if the day is a weekday (Monday to Friday)
+                if ($dateToCount->format('N') <= 5) {
+                    $totalWeekdays++;
+                }
+            }
+
+            $totalHours = $totalWeekdays * 8; 
     
             // Initialize the last printed user name
             $lastUser = '';
@@ -124,17 +149,18 @@ class ExportTimesheet extends Controller
                 }
                 
     
-                if ($checkDepartment == 2) {
+                if($row->ts_task_id == "HO"){
+                    $sheet->setCellValueByColumnAndRow($startCol + 7, $startRow, $row->total_allowance);
+                } else {
                     $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $row->total_allowance);
+                }
+                if ($checkDepartment == 2) {
                     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
                 } elseif($checkDepartment == 4) {
-                    $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $row->total_allowance);
                     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
                 } elseif($checkDepartment == 3) {
-                    $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $row->total_allowance);
                     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
                 } elseif($checkDepartment == 1) {
-                    $sheet->setCellValueByColumnAndRow($startCol + 10,   $startRow, $row->total_allowance);
                     $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
                 }
 
@@ -145,15 +171,15 @@ class ExportTimesheet extends Controller
                         $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, array_sum($total));
                     }
                 }
-            
-                
-                
+
                 $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
                 $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
                 $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays);
                 
                 if ($row->workhours !== $lastWorkhours) {
-                    $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours');
+                    $percentage = (intval($row->workhours) / $totalHours) * 100;
+                    $percentage = intval($percentage);
+                    $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours '."($percentage%)");
                     $lastWorkhours = $row->workhours;
                 }
     
