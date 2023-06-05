@@ -528,16 +528,12 @@ $(document).ready(function() {
         }
         if (checkbox.is(':checked')) {
             $('#surat_penugasan_wfh').removeClass('validate');
-        } else {
-            $('#surat_penugasan_wfh').addClass('validate');
         }
     });
 
     $('#flexCheckWfh').change(function() {
         if ($(this).is(':checked')) {
             $('#surat_penugasan_wfh').removeClass('validate');
-        } else {
-            $('#surat_penugasan_wfh').addClass('validate');
         }
     });
 });
