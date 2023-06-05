@@ -820,7 +820,7 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Retrieve the activities within the date range
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
+        $activities = Timesheet::where('ts_user_id', Auth::user()->id)->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
 
         foreach ($activities as $activity) {
             $surat_penugasan = Surat_penugasan::where("timesheet_id", $activity->ts_id_date);
