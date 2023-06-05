@@ -339,7 +339,7 @@ $(document).ready(function() {
         if (isValid) {
             // Create a FormData object to send the form data including the file
             var formData = new FormData($('#entry-form')[0]);
-     
+            var fileInput = $('#surat_penugasan_wfh');
             // Send an AJAX request to the entries.store route
             $.ajax({
                 type: 'POST',
@@ -354,6 +354,9 @@ $(document).ready(function() {
                     document.getElementById("location").removeAttribute("readonly");
                     document.getElementById("start-time").removeAttribute("readonly");
                     document.getElementById("end-time").removeAttribute("readonly");
+                    fileInput.removeClass('validate');
+                    $('#fileInputIfexistWfh').hide();
+                    
                     $('#entry-form')[0].reset();
                     $('#sp-label').text('Choose File');
                     setTimeout(function() {

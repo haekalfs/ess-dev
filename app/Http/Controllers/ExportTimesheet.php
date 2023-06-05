@@ -32,10 +32,13 @@ class ExportTimesheet extends Controller
 	{
         // Retrieve the hashed password from the query parameters
         $password = $request->query('password');
-        // dd($password);
 
         $getPassword = Financial_password::find(1);
         $storedHashedPassword = $getPassword->password;
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($Year, $Month, 1)->startOfMonth();
+        $endDate = Carbon::create($Year, $Month)->endOfMonth();
 
         // Compare the hashed passwords
         if (Hash::check($password, $storedHashedPassword)) {
@@ -49,7 +52,7 @@ class ExportTimesheet extends Controller
             ->join('users_details', 'timesheet_details.user_timesheet', '=', 'users_details.user_id')
             ->where('timesheet_details.ts_status_id', 29)
             ->where('timesheet_details.month_periode', $Year.intval($Month))
-            ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task')
+            ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task', 'timesheet_details.ts_location')
             ->get();
                 
             $getTotalMandays = DB::table('timesheet_details')
@@ -75,7 +78,7 @@ class ExportTimesheet extends Controller
             $incentiveArray = [];
             $allowanceArray = [];
             $totalSum = 0;
-            $total = 0;
+            $total = [];
     
             foreach ($result as $row) {
                 $mandays = $row->ts_mandays;
@@ -102,18 +105,6 @@ class ExportTimesheet extends Controller
                     $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->name);
                     $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $totalMandays);
                     $sheet->setCellValueByColumnAndRow(1, $startRow, $row->employee_id);
-                    
-                    $ts_id_date = DB::table('timesheet')
-                    ->select('ts_id_date', DB::raw('MAX(CAST(allowance AS DECIMAL(10, 2))) AS max_allowance'), DB::raw('MAX(CAST(incentive AS DECIMAL(10, 2))) AS max_incentive'))
-                    ->where('ts_user_id', $row->user_timesheet)
-                    ->groupBy('ts_id_date')
-                    ->get();
-                    foreach ($ts_id_date as $ts_count) {
-                        $incentiveArray[] = $ts_count->max_incentive; // Use [] to add elements to the array
-                        $allowanceArray[] = $ts_count->max_allowance; // Use [] to add elements to the array
-                    }
-                    $totalAllowances = array_sum($allowanceArray);
-                    $totalIncentive = array_sum($incentiveArray);
     
                     $checkUser = User::find($row->user_timesheet);
                     $checkDepartment = $checkUser->users_detail->department->id;
@@ -121,31 +112,42 @@ class ExportTimesheet extends Controller
                     $countTotalRowsEachUser = Timesheet_detail::where('month_periode', $Year.intval($Month))
                     ->where('ts_status_id', 29);
                     $countUserRows = $countTotalRowsEachUser->where('user_timesheet', $row->user_timesheet)->count();
-    
-                    if ($checkDepartment == 2) {
-                        $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $totalAllowances);
-                        $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $totalIncentive);
-                    } else {
-                        $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $totalAllowances);
-                        $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $totalIncentive);
-                    }
-                    $total = $totalIncentive + $totalAllowances;
-                    if ($countUserRows === 1) {
-                        $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, $total);
-                    } else {
-                        $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, $total);
-                    }
+
                     // Reset the total allowances for the new user
                     $allowanceArray = [];
                     $incentiveArray = [];
                     $totalAllowances = 0;
                     $totalIncentive = 0;
-                    $total = 0;
+                    $total = [];
                     $countIncentive = [];
                     $lastUser = $row->user_timesheet;
                 }
                 
     
+                if ($checkDepartment == 2) {
+                    $sheet->setCellValueByColumnAndRow($startCol + 8, $startRow, $row->total_allowance);
+                    $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
+                } elseif($checkDepartment == 4) {
+                    $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $row->total_allowance);
+                    $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
+                } elseif($checkDepartment == 3) {
+                    $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $row->total_allowance);
+                    $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
+                } elseif($checkDepartment == 1) {
+                    $sheet->setCellValueByColumnAndRow($startCol + 10,   $startRow, $row->total_allowance);
+                    $sheet->setCellValueByColumnAndRow($startCol + 9, $startRow, $row->total_incentive);
+                }
+
+                $total[] = $row->total_incentive;
+                $total[] = $row->total_allowance;
+                if (!$firstRow) {
+                    if ($countUserRows === 1) {
+                        $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow, array_sum($total));
+                    }
+                }
+            
+                
+                
                 $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
                 $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
                 $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays);
@@ -157,9 +159,14 @@ class ExportTimesheet extends Controller
     
                 
                 $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
-    
+
                 $startRow++;
                 $firstRow = false; // Set the firstRow flag to false after the first row for each user
+            
+                if ($index === count($result) - 1 || $row->user_timesheet !== $result[$index + 1]->user_timesheet) {
+                    // Print the totalBanget value in the last row for each user
+                    $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow - 1, array_sum($total));
+                } // Set the firstRow flag to false after the first row for each user
             }
     
     

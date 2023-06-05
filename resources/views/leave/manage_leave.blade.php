@@ -63,6 +63,7 @@
                                     <th>Leave ID</th>
                                     <th>Quota Left</th>
                                     <th>Active Periode</th>
+                                    <th>Expiration</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -75,6 +76,7 @@
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->leave->description }}</td>
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->quota_left }}</td>
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->active_periode }}</td>
+                                    <td style="border-bottom: none; border-top: none;">{{ $leave_quota->expiration }}</td>
                                     <td style="border-bottom: none; border-top: none;"></td>
                                     @else
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->user->users_detail->employee_id }}</td>
@@ -82,6 +84,7 @@
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->leave->description }}</td>
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->quota_left }}</td>
                                     <td style="border-bottom: none; border-top: none;">{{ $leave_quota->active_periode }}</td>
+                                    <td style="border-bottom: none; border-top: none;">{{ $leave_quota->expiration }}</td>
                                     <td style="border-bottom: none; border-top: none;" class="action text-center">
                                         <a href="/leave/manage/{{ $leave_quota->user_id }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-mouse-pointer fa-sm text-white-50"></i> Select</a>
                                     </td>
@@ -89,7 +92,7 @@
                                 </tr>
                                 @endforeach
                                 <tr style="border-bottom: 1px solid #dee2e6;">
-                                    <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                    <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
                                 </tr>
                             </tbody>
                         </table>

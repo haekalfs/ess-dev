@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Crypt;
 
-    class TimesheetReminderAllEmployee extends Mailable
+    class TimesheetReminderAllEmp extends Mailable
         {
         protected $employee;
         protected $month;

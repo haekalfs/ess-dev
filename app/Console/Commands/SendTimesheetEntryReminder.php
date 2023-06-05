@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Mail\ApprovalTimesheet;
-use App\Mail\TimesheetReminderAllEmployee;
+use App\Mail\TimesheetReminderAllEmp;
 use App\Mail\TimesheetReminderEmployee;
 use App\Models\Timesheet_detail;
 use App\Models\User;
@@ -52,12 +52,24 @@ class SendTimesheetEntryReminder extends Command
 
         $year = date('Y');
         $month = date('m');
+        $previousMonth = date('m', strtotime('-1 month'));
+        
         foreach ($usersToRemind as $employee) {
-            $notification = new TimesheetReminderAllEmployee($employee, $year, $month);
-            Mail::send('mailer.timesheet_entry', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            try {
+                $year = date('Y');
+                $month = date('m');
+                $previousMonth = date('m', strtotime('-1 month'));
+        
+                $notification = new TimesheetReminderAllEmp($employee, $year, $previousMonth);
+        
+                Mail::send('mailer.timesheet_entry', $notification->data(), function ($message) use ($notification) {
+                    $message->to($notification->emailTo())
+                            ->subject($notification->emailSubject());
+                });
+            } catch (\Exception $e) {
+                // Handle the error, e.g., log the error message
+                \Log::error('Error sending email: ' . $e->getMessage());
+            }
         }
     }
 
