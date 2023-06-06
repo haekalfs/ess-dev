@@ -44,7 +44,7 @@ active
     <div class="card-body zoom90">
         <table class="table table-bordered table-hover " id="dataTable">
                 <thead>
-                    <tr style="font-size: 13px" class="text-center">
+                    <tr class="text-center">
                         <th>Request Number</th>
                         <th>Request Date</th>
                         <th>Payment</th>
@@ -54,9 +54,9 @@ active
                 </thead>
                 <tbody>
                     @foreach($med as $q)
-                    <tr style="font-size: 12px">
-                        <td>{{$q->med_number}}</td>
-                        <td>{{$q->med_date}}</td>
+                    <tr >
+                        <td>MED_0000{{$q->id}}</td>
+                        <td>{{$q->med_req_date}}</td>
                         <td>{{$q->med_payment}}</td>
                         <td>{{$q->med_status}}</td>
                         <td class="row-cols-2 justify-content-betwen text-center">

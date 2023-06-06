@@ -404,6 +404,7 @@ class TimesheetController extends Controller
         $entry->save();
 
         try {
+            
            // Store the file if it is provided
             if ($request->hasFile('surat_penugasan_wfh')) {
                 $file = $request->file('surat_penugasan_wfh');

@@ -59,7 +59,7 @@ class User extends Authenticatable
     }
 
     public function medical(){
-    	return $this->belongsTo('App\Models\Medical');
+    	return $this->hasOne('App\Models\Medical');
     }
     
     public function timesheet_detail(){

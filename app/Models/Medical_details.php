@@ -18,7 +18,7 @@ class Medical_details extends Authenticatable
     protected $table = 'medicals_detail';
     protected $fillable = [
         'id',
-        'mdet_number',
+        'medical_number',
         'mdet_attachment',
         'mdet_amount',
         'mdet_desc',
