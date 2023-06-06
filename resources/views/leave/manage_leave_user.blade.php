@@ -102,7 +102,7 @@
                 <td>{{ $empLeave->quota_left }}</td>
                 <td>{{ $empLeave->quota_used }}</td>
                 <td class="text-center">
-                    <a data-toggle="modal" data-target="#updateLeave" data-id="{{ $empLeave->id }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-mouse-pointer fa-sm text-white-50"></i> Select</a>
+                    <a data-toggle="modal" data-target="#updateLeave" data-id="{{ $empLeave->id }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit</a>
                 </td>
             </tr>
             @endforeach

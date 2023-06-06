@@ -445,7 +445,7 @@ class TimesheetController extends Controller
             'from' => 'required',
             'to' => 'required',
             'activity' => 'required',
-            'surat_penugasan' => 'required|mimes:pdf,png,jpeg,jpg|max:500',
+            'surat_penugasan' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -660,8 +660,6 @@ class TimesheetController extends Controller
                         foreach($task_project as $tp){
                             $ts_task_id = $tp->company_project->project_name;
                         }
-                    } else   {
-                        $ts_task_id = "HO";
                     }
                 } catch (Exception $e) {
                     //do nothing
@@ -823,7 +821,7 @@ class TimesheetController extends Controller
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
         // Retrieve the activities within the date range
-        $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
+        $activities = Timesheet::where('ts_user_id', Auth::user()->id)->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->get();
 
         foreach ($activities as $activity) {
             $surat_penugasan = Surat_penugasan::where("timesheet_id", $activity->ts_id_date);
@@ -1053,20 +1051,23 @@ class TimesheetController extends Controller
             $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
             $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes;
         }
+        $userId = Auth::user()->id;
+        
+        $subquery = DB::table('timesheet')
+            ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(allowance AS DECIMAL(10, 2)) AS allowance'), 'ts_task_id', 'ts_id_date', 'incentive')
+            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(allowance AS DECIMAL(10, 2)) DESC) AS rn')
+            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->where('ts_user_id', $userId)
+            ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'allowance', 'ts_task_id');
 
-        $countRows = DB::table('timesheet')
-        ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('MAX(CAST(allowance AS DECIMAL(10, 2))) AS max_allowance'), DB::raw('MAX(ts_task_id) AS ts_task_id'), DB::raw('COUNT(*) AS total_rows'))
-        ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->where('ts_user_id', Auth::user()->id)
-        ->whereIn(DB::raw('(ts_id_date, CAST(allowance AS DECIMAL(10, 2)))'), function ($query) use ($startDate, $endDate) {
-            $query->select(DB::raw('ts_id_date, MAX(CAST(allowance AS DECIMAL(10, 2)))'))
-                ->from('timesheet')
-                ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-                ->where('ts_user_id', Auth::user()->id)
-                ->groupBy('ts_id_date');
-        })
-        ->groupBy('ts_task', 'ts_location', 'ts_user_id')
-        ->get();
+        $sql = '(' . $subquery->toSql() . ') as subquery';
+
+        $results = DB::table(DB::raw($sql))
+            ->mergeBindings($subquery)
+            ->select('ts_task', 'ts_location', 'ts_user_id', 'allowance as max_allowance', 'ts_task_id', 'incentive', DB::raw('COUNT(*) as total_rows'))
+            ->where('rn', 1)
+            ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'allowance', 'ts_task_id')
+            ->get();
 
         // echo "Total days: " . $totalDays;
         $checkUserDept = Auth::user()->users_detail->department->id;
@@ -1095,14 +1096,20 @@ class TimesheetController extends Controller
             'user_timesheet' => Auth::user()->id
         ]);
         $empApproval = [];
+        $totalIncentive = 0;
         // var_dump($countRows);
-        foreach($countRows as $row) {
+        foreach($results as $row) {
             $test = Project_assignment::where('id', $row->ts_task_id)->pluck('company_project_id')->first();
             $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->pluck('user_id')->first();
             $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->pluck('user_id')->first();
             $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
 
-            $totalIncentive = 0;
+            $countIncentive = $row->total_rows * $row->incentive;
+
+            $countAllowance = $row->total_rows * $row->max_allowance;
+
+            $totalIncentive = $countIncentive;
+            $totalAllowances = $countAllowance;
             switch ($row->ts_task) {
                 case "HO":
                 case "Sick":
@@ -1120,7 +1127,8 @@ class TimesheetController extends Controller
                                         'mandays' => $row->total_rows,
                                         'role' => $checkRole,
                                         'task_id' => $row->ts_task_id,
-                                        'incentive' => $totalIncentive,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
                                     ];
                                     $empApproval[] = $newArrayFm;
                                 }
@@ -1133,7 +1141,8 @@ class TimesheetController extends Controller
                                         'mandays' => $row->total_rows,
                                         'role' => $checkRole,
                                         'task_id' => $row->ts_task_id,
-                                        'incentive' => $totalIncentive,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
                                     ];
                                     $empApproval[] = $newArrayS;
                                 } else {
@@ -1145,7 +1154,8 @@ class TimesheetController extends Controller
                                             'mandays' => $row->total_rows,
                                             'role' => $checkRole,
                                             'task_id' => $row->ts_task_id,
-                                            'incentive' => $totalIncentive,
+                                            'total_incentive' => $totalIncentive,
+                                            'total_allowance' => $totalAllowances,
                                         ];
                                         $empApproval[] = $newArrayHO;
                                     }
@@ -1161,7 +1171,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayService;
                             }
@@ -1175,7 +1186,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayHO;
                             }
@@ -1189,7 +1201,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayHO;
                             }
@@ -1207,7 +1220,8 @@ class TimesheetController extends Controller
                             'mandays' => $row->total_rows,
                             'role' => $checkRole,
                             'task_id' => $row->ts_task_id,
-                            'incentive' => $totalIncentive,
+                            'total_incentive' => $totalIncentive,
+                            'total_allowance' => $totalAllowances,
                         ];
                         $empApproval[] = $newArrayHO;
                     }
@@ -1222,7 +1236,8 @@ class TimesheetController extends Controller
                             'mandays' => $row->total_rows,
                             'role' => $checkRole,
                             'task_id' => $row->ts_task_id,
-                            'incentive' => $totalIncentive,
+                            'total_incentive' => $totalIncentive,
+                            'total_allowance' => $totalAllowances,
                         ];
                         $empApproval[] = $newArrayPresales;
                     }
@@ -1238,37 +1253,12 @@ class TimesheetController extends Controller
                                 'mandays' => $row->total_rows,
                                 'role' => $checkRole,
                                 'task_id' => $row->ts_task_id,
-                                'incentive' => $totalIncentive,
+                                'total_incentive' => $totalIncentive,
+                                'total_allowance' => $totalAllowances,
                             ];
                             $empApproval[] = $newArrayHO;
                         }
                     } else {
-                        if($checkRole == NULL){
-                
-                        } elseif ($checkRole == "MT") {
-                            $mt_hiredDate = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first(); // Assuming the hired_date is in the format 'Y-m-d' (e.g., 2022-02-04)
-                            $hiredDate = new DateTime($mt_hiredDate);
-                            $currentDate = new DateTime(date('Y-m-d'));
-                            $interval = $hiredDate->diff($currentDate);
-                            $yearsDifference = $interval->format('%y'); // Get the year difference between the two dates
-                            $monthsDifference = $interval->format('%m'); // Get the month difference between the two dates
-                            $totalMonthsDifference = ($yearsDifference * 12) + $monthsDifference; // Calculate the total month difference
-                            
-                            if ($totalMonthsDifference > 6 && $totalMonthsDifference <= 12) {
-                                $roleFare = Additional_fare::where('id', 1)->pluck('fare')->first();
-                                $totalIncentive = ($roleFare * 0.7) * $row->total_rows;
-                            } elseif ($totalMonthsDifference > 12 && $totalMonthsDifference <= 24) {
-                                $roleFare = Additional_fare::where('id', 2)->pluck('fare')->first();
-                                $totalIncentive = ($roleFare * 0.7) * $row->total_rows;
-                            } elseif ($totalMonthsDifference > 24 && $totalMonthsDifference <= 37) {
-                                $roleFare = Additional_fare::where('id', 3)->pluck('fare')->first();
-                                $totalIncentive = ($roleFare * 0.7) * $row->total_rows;
-                            } else {
-                            }
-                        } else {
-                            $roleFare = Project_role::where('role_code', $checkRole)->pluck('fare')->first();
-                            $totalIncentive = ($roleFare * 0.7) * $row->total_rows;
-                        }
                         switch (true) {
                             case(array_intersect($serviceDirOnly , $checkUserRole)):
                                 $newArrayS = [
@@ -1278,7 +1268,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayS;
                             break;
@@ -1291,7 +1282,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayPM;
                             }
@@ -1303,7 +1295,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayPA;
                             }
@@ -1315,7 +1308,8 @@ class TimesheetController extends Controller
                                     'mandays' => $row->total_rows,
                                     'role' => $checkRole,
                                     'task_id' => $row->ts_task_id,
-                                    'incentive' => $totalIncentive,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayS;
                             }
@@ -1340,7 +1334,8 @@ class TimesheetController extends Controller
                 'roleAs' => $test['role'],
                 'date_submitted' => date('Y-m-d'),
                 'ts_status_id' => 20,
-                'incentive' => $test['incentive'],
+                'total_incentive' => $test['total_incentive'],
+                'total_allowance' => $test['total_allowance'],
                 'note' => '',
                 'ts_task_id' => $test['task_id'],
                 'user_timesheet' => Auth::user()->id

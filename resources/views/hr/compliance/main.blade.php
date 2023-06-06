@@ -13,7 +13,7 @@ active
         <h1 class="h3 mb-2 text-gray-800">Compliance Settings</h1>
         <p class="mb-4 text-danger"><i>Restricted Access</i></p>
     </div>
-    <a class="btn btn-primary shadow-sm"> Save</a>
+    <a class="btn btn-primary shadow-sm"><i class="fas fa-fw fa-save fa-sm text-white-50"></i> Save</a>
 </div>
 
 @if ($message = Session::get('success'))
@@ -42,7 +42,7 @@ active
             <!-- Card Header - Accordion -->
             <a href="#collapseCardProject1" class="d-block card-header py-3" data-toggle="collapse" role="button"
                 aria-expanded="true" aria-controls="collapseCardProject1">
-                <h6 class="m-0 font-weight-bold text-primary">Compliance Configuration</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Approver</h6>
             </a>
             <!-- Card Content - Collapse -->
             <div class="collapse show" id="collapseCardProject1">
@@ -50,18 +50,15 @@ active
                     <div class="col-md-12">
                         <div class="col-md-12">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="email">Employee ID :</label>
-                                        <input class="form-control"  name="employee_id" placeholder="Employee ID..." value=""readonly/>
-                                        @if($errors->has('employee_id'))
-                                            <div class="text-danger">
-                                                {{ $errors->first('employee_id')}}
-                                            </div>
-                                        @endif
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label for="email" class="col-sm-3 col-form-label">Cuttoff Date :</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="employee_id" placeholder="Employee ID..." value="" readonly>
+                                        </div>
                                     </div>
-                                </div>
-                            <div class="col-md-6">
+                                </div>                                
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">User ID :</label>
                                     <input class="form-control flex" id="usr_id" name="usr_id" placeholder="User ID..."/>

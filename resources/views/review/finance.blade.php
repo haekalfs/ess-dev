@@ -36,7 +36,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Timesheets</h6>
         <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" onclick="confirmPassword()"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
+            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" onclick="confirmPassword()"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All (XLS)</a>
         </div>
     </div>
     <form method="GET" action="/timesheet/review/fm">
