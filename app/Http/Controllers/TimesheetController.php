@@ -271,16 +271,18 @@ class TimesheetController extends Controller
         $currentDay = date('d');
 
         // Create the date string in the format Y-m-d
-        $date = $year . '-' . $month . '-' . $currentDay;
+        $date = $year . '-' . $month . '-' . '01';
 
         $assignment = Project_assignment_user::join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
             ->where('project_assignments.approval_status', 29)
-            ->where(function ($query) use ($date) {
-                $query->whereDate('project_assignment_users.periode_start', '<=', $date)
-                    ->whereDate('project_assignment_users.periode_end', '>=', $date);
+            ->where(function ($query) use ($month, $year) {
+                $query->whereMonth('project_assignment_users.periode_start', '<=', $month)
+                ->whereMonth('project_assignment_users.periode_end', '>=', $month)
+                ->whereYear('project_assignment_users.periode_start', '=', $year)
+                ->whereYear('project_assignment_users.periode_start', '=', $year);
             })
             ->get();
 

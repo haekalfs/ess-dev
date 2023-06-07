@@ -358,6 +358,8 @@ $(document).on('click', '.btn-edit', function() {
             $('#p_code').val(response.project_code);
             $('#p_name').val(response.project_name);
             $('#address').val(response.address);
+            $('#from').val(moment(response.periode_start).format('YYYY-MM-DD'));
+            $('#to').val(moment(response.periode_end).format('YYYY-MM-DD'));
         },
         error: function(xhr) {
             // Handle error
