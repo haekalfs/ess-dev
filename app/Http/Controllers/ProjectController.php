@@ -561,14 +561,30 @@ class ProjectController extends Controller
             return response()->json(['error' => $validator->errors()]);
         }
 
+        $from = $request->input('from');
+        $fromDate = Carbon::createFromFormat('Y-m-d', $from);
+        $formattedFrom = $fromDate->format('d-M-Y');
+
+        $to = $request->input('to');
+        $toDate = Carbon::createFromFormat('Y-m-d', $to);
+        $formattedTo = $toDate->format('d-M-Y');
+
         $cp = Company_project::find($id);
+        $clientId = $request->input('p_client');
+        if($clientId == NULL || $clientId == ''){
+            $clientId = $cp->client_id;
+        }
+        $p_loc = $request->input('p_location');
+        if($p_loc == NULL || $p_loc == ''){
+            $p_loc = $cp->alias;
+        }
         $cp->project_code = $request->input('p_code');
-        $cp->alias = $request->input('p_location');
+        $cp->alias = $p_loc;
         $cp->project_name = $request->input('p_name');
         $cp->address = $request->input('address');
-        $cp->periode_start = $request->input('from');
-        $cp->periode_end = $request->input('to');
-        $cp->client_id = $request->input('p_client');
+        $cp->periode_start = $formattedFrom;
+        $cp->periode_end = $formattedTo;
+        $cp->client_id = $clientId;
         $cp->save();
         
         return response()->json(['success'=>'Project updated successfully.']);
