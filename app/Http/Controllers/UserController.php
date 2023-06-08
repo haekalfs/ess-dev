@@ -242,7 +242,12 @@ class UserController extends Controller
             $user_detail->save();
 
 
-        return view('manage.users_edit', ['user' => $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data]);
+        return view('manage.users_edit', [
+            'user' => $user,
+            'dep_data' => $dep_data,
+            'pos_data' => $pos_data,
+            'success' => 'User Edit successfully'
+        ]);
     }
 
 }
