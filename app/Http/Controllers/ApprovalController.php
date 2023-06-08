@@ -297,20 +297,36 @@ class ApprovalController extends Controller
         ]);
 
         // var_dump($Year.intval($Month));
-        $approvals = Timesheet_detail::where('ts_status_id', 29)
-            ->groupBy('user_timesheet', 'ts_task', 'ts_location');
+        $month_periode = $Year.intval($Month);
+        $approvals = Timesheet_detail::join('users as u', 'timesheet_details.user_timesheet', '=', 'u.id')
+                ->join('users_details as ud', 'timesheet_details.user_timesheet', '=', 'ud.user_id');
 
         if ($validator->passes()) {
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
-            $approvals->whereYear('date_submitted', $Year);
-            $approvals->where('month_periode', $Year.intval($Month));
+            $month_periode = $Year.intval($Month);
+            $approvals->join(DB::raw("(SELECT user_timesheet, MAX(created_at) AS latest_created_at
+                        FROM timesheet_details
+                        WHERE ts_status_id = 29 AND month_periode = '{$month_periode}'
+                        GROUP BY user_timesheet) t"), function ($join) {
+            $join->on('timesheet_details.user_timesheet', '=', 't.user_timesheet')
+                ->on('timesheet_details.created_at', '=', 't.latest_created_at');
+            });
         } else {
-            $approvals->whereYear('date_submitted', $Year);
-            $approvals->where('month_periode', $Year.intval($Month));
+            $approvals->join(DB::raw("(SELECT user_timesheet, MAX(created_at) AS latest_created_at
+                        FROM timesheet_details
+                        WHERE ts_status_id = 29 AND month_periode = '{$month_periode}'
+                        GROUP BY user_timesheet) t"), function ($join) {
+            $join->on('timesheet_details.user_timesheet', '=', 't.user_timesheet')
+                ->on('timesheet_details.created_at', '=', 't.latest_created_at');
+            });
         }
 
-        $approvals = $approvals->get();
+        $approvals = $approvals->where('timesheet_details.ts_status_id', 29)
+        ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task', 'timesheet_details.ts_location')
+        ->select('timesheet_details.*', 'u.name', 'ud.employee_id')
+        ->get();
+        // $approvals = $approvals->get();
 		return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
 	}
 
