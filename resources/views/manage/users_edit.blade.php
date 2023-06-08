@@ -10,31 +10,17 @@ active
 @csrf
 @method('PUT')
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h4 class="m-0 font-weight-bold text-grey">Edit Employee</h4>
+    <h4 class="m-0 font-weight-bold text-grey">Edit Employee #{{ $user->users_detail->employee_id }}</h4>
     <div class="d-sm-flex justify-content-end ">
         <a href="/manage/users" class="btn btn-danger btn-sm mr-2" id="manButton">Kembali</a>
         <input type="submit" class="btn btn-success btn-sm" value="Simpan">
     </div>
 </div>
-@if ($message = Session::get('success'))
-<div class="alert alert-success alert-block">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>{{ $message }}</strong>
-</div>
-@endif
-
-@if ($message = Session::get('failed'))
-<div class="alert alert-danger alert-block">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>{{ $message }}</strong>
-</div>
-@endif
-
-@if ($message = Session::get('warning'))
-<div class="alert alert-warning alert-block">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>{{ $message }}</strong>
-</div>
+@if(isset($success))
+    <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>{{ $success }}</strong>
+    </div>
 @endif
 <style>
 .img-thumbnail.no-image {

@@ -19,7 +19,7 @@ class Medical extends Authenticatable
     protected $fillable = [
         'id',
         'med_number',
-        'med_user',
+        'user_id',
         'med_req_date',
         'med_payment',
         'med_status',
@@ -27,7 +27,7 @@ class Medical extends Authenticatable
     ];
 
     public function user(){
-        return $this->hasOne('App\Models\User');
+        return $this->belongsTo('App\Models\User');
     }
     public function medical_details(){
     	return $this->ManyTo('App\Models\Medical_details');

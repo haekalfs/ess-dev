@@ -75,10 +75,15 @@ active
                             <tbody>
                                 <tr class="table-sm text-center">
                                     <td style="d-flex align-items-center text-center"> @if($user_info->users_detail->profile_pic)
-                                            <img class="img-profile rounded-circle" width="140px" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                            <img class="img-profile rounded-circle" height="150px"width="140px" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                         @else
                                             <div class="img-profile rounded-circle"><i class="no-image-text">No Image Available</i></div>
                                         @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="table-sm text-center">
+                                        <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#cvModal" id="cvButton">Upload Your CV </a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -352,6 +357,42 @@ active
         </div>
     </div>
 </div>
+<!-- Modal CV -->
+<div class="modal fade" id="cvModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+    <form>
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Input Your CV</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+            <div class="modal-body">
+                <div class="col-md-12 zoom90">
+                    <div class="row">
+                        <div class="form-group">
+                            <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="changeFileName('cv', 'cv-label')">
+                            <label class="custom-file-label" for="cv" id="cv-label">Choose file</label> 
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        @if($user_info->users_detail->cv)
+                        <a href="{{ url('/storage/cv/'.$user_info->users_detail->cv) }}" target="_blank">
+                            <img class="img-thumbnail" width="110px" src="https://img.icons8.com/cute-clipart/64/pdf.png" alt="CV Image">
+                        </a>
+                        @endif
+                    </div>
+                </div>              
+            </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
 <style>
     .close-icon {
     position: absolute;
@@ -362,4 +403,11 @@ active
 }
 
 </style>
+<script>
+function changeFileName(inputId, labelId) {
+  var input = document.getElementById(inputId);
+  var label = document.getElementById(labelId);
+  label.textContent = input.files[0].name;
+}
+</script>
 @endsection

@@ -26,7 +26,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<form method="post" action="/medical/entry/store" id="medForm">
+<form method="POST" action="/medical/entry/store" enctype="multipart/form-data" id="medForm">
 @csrf
 <!-- Page Heading -->
     <!-- Area Chart -->
@@ -34,7 +34,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h5 class="m-0 font-weight-bold text-primary">Medical Form Request Number #{{ $nextMedNumber }}</h5>
+                <h5 class="m-0 font-weight-bold text-primary">Medical Form Request Number # MED_{{ $nextMedNumber }}</h5>
                 <div class="text-right">
                     <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Add Entry">
                     <input type="submit" class="btn btn-success btn-sm" value="Submit" id="btn-submit">
@@ -92,7 +92,7 @@ active
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="amount">Amount (Rp) :</label>
-                                                    <input type="text" class="form-control" name="amount[]" id="amount" value="" required>
+                                                    <input type="text" class="form-control" name="amount[]" id="amount" value="" required required oninput="formatAmount(this)" >
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="description">Description :</label>
@@ -119,6 +119,7 @@ active
                     <small style="color: grey;"><i>*NOTE : Besides uploading files, the original receipt must be given to finance for verification</i></small>
                 </div>
                 <div class="text-right">
+                    <input hidden id="totalAmountInput" name="totalAmountInput" value="">
                     <a>Total Amount :</a><a class="text-danger" id="totalAmount" name="totalAmount"></a>
                 </div>
             </div>
@@ -241,6 +242,20 @@ undoButton.addEventListener("click", function (event) {
     document.getElementById("totalAmount").innerHTML= document.getElementById("amount").value.replace(formatRupiah);
 });
 
+function formatAmount(input) {
+  // Mengambil nilai input
+  let amount = input.value;
+
+  // Menghapus karakter selain angka
+  amount = amount.replace(/\D/g, '');
+
+  // Menambahkan pemisah ribuan setiap 3 angka
+  amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  // Memperbarui nilai input dengan format terbaru
+  input.value = amount;
+}
+
 function formatRupiah(angka, prefix) {
     var number_string = angka.toString().replace(/[^,\d]/g, ''),
         split = number_string.split(','),
@@ -271,6 +286,7 @@ document.getElementById("originalForm").addEventListener("input", function() {
     let total = +amount
     let formattedAmount = formatRupiah(total, amount);
     document.getElementById("totalAmount").innerHTML = formattedAmount;
+    document.getElementById("totalAmountInput").value = formattedAmount;
 });
 
 document.getElementById("targetContainer").addEventListener("input", function() {
@@ -280,6 +296,7 @@ document.getElementById("targetContainer").addEventListener("input", function() 
     let total = +amount + +amount1;
     let formattedAmount = formatRupiah(total, amount1);
     document.getElementById("totalAmount").innerHTML = formattedAmount;
+    document.getElementById("totalAmountInput").value = formattedAmount;
 });
 
 document.getElementById("targetContainer").addEventListener("input", function() {
@@ -290,6 +307,7 @@ document.getElementById("targetContainer").addEventListener("input", function() 
     let total = +amount + +amount1 + +amount2;
     let formattedAmount = formatRupiah(total, amount2);
     document.getElementById("totalAmount").innerHTML= formattedAmount;
+    document.getElementById("totalAmountInput").value = formattedAmount;
 });
 
 

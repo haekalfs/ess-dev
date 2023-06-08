@@ -64,10 +64,11 @@ class UserController extends Controller
             $nama_file_profile = null;
         }
 
+        
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
-             $nama_file_cv = $request->usr_id . "." . $cv_file->getClientOriginalExtension();
+             $nama_file_cv = $request->email . "." . $cv_file->getClientOriginalExtension();
             $tujuan_upload_cv = '/storage/cv';
             $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
         } else {
@@ -241,7 +242,12 @@ class UserController extends Controller
             $user_detail->save();
 
 
-        return view('manage.users_edit', ['user' => $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data]);
+        return view('manage.users_edit', [
+            'user' => $user,
+            'dep_data' => $dep_data,
+            'pos_data' => $pos_data,
+            'success' => 'User Edit successfully'
+        ]);
     }
 
 }
