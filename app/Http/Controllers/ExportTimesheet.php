@@ -46,21 +46,37 @@ class ExportTimesheet extends Controller
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
     
-            $result = DB::table('timesheet_details')
-            ->select('timesheet_details.*', 'users.name', 'users_details.employee_id')
-            ->join('users', 'timesheet_details.user_timesheet', '=', 'users.id')
-            ->join('users_details', 'timesheet_details.user_timesheet', '=', 'users_details.user_id')
-            ->where('timesheet_details.ts_status_id', 29)
-            ->where('timesheet_details.month_periode', $Year.intval($Month))
-            ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task', 'timesheet_details.ts_location')
+            $month_periode = $Year.intval($Month);
+            $result = DB::table('timesheet_details as td')
+            ->join('users as u', 'td.user_timesheet', '=', 'u.id')
+            ->join('users_details as ud', 'td.user_timesheet', '=', 'ud.user_id')
+            ->join(DB::raw("(SELECT user_timesheet, MAX(created_at) AS latest_created_at
+                            FROM timesheet_details
+                            WHERE ts_status_id = 29 AND month_periode = '{$month_periode}'
+                            GROUP BY user_timesheet) t"), function ($join) {
+                $join->on('td.user_timesheet', '=', 't.user_timesheet')
+                    ->on('td.created_at', '=', 't.latest_created_at');
+            })
+            ->where('td.ts_status_id', 29)
+            ->groupBy('td.user_timesheet', 'td.ts_task', 'td.ts_location')
+            ->select('td.*', 'u.name', 'ud.employee_id')
             ->get();
-                
+            
             $getTotalMandays = DB::table('timesheet_details')
-            ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
-            ->where('ts_status_id', 29)
-            ->where('timesheet_details.month_periode', $Year.intval($Month))
-            ->groupBy('user_timesheet')
-            ->get(); 
+                ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
+                ->whereIn('created_at', function ($query) use ($Year, $Month) {
+                    $query->select(DB::raw('MAX(created_at)'))
+                        ->from('timesheet_details')
+                        ->whereColumn('timesheet_details.user_timesheet', '=', 'user_timesheet')
+                        ->where('ts_status_id', 29)
+                        ->where('timesheet_details.month_periode', $Year.intval($Month))
+                        ->groupBy('user_timesheet');
+                })
+                ->where('ts_status_id', 29)
+                ->where('timesheet_details.month_periode', $Year.intval($Month))
+                ->groupBy('user_timesheet')
+                ->get();
+
     
            // Set up the starting row and column for the data
             $startRow = 8;
