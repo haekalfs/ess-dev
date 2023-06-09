@@ -364,3 +364,7 @@ active
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 @endsection
+
+@section('javascript')
+<script src="{{ asset('js/timesheet.js') }}"></script>
+@endsection

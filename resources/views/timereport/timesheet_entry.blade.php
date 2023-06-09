@@ -316,7 +316,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -340,7 +341,7 @@ active
                                     <label for="password">Location :</label>
                                     <select class="form-control" id="location" name="location" required>
                                         @foreach($pLocations as $loc)
-                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                            <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
                                     </select>
@@ -424,7 +425,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -524,7 +526,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -618,7 +621,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -799,6 +803,21 @@ function changeFileName(inputId, labelId) {
   var label = document.getElementById(labelId);
   label.textContent = input.files[0].name;
 }
+
+var taskSelect = document.getElementById("task");
+        var locationSelect = document.getElementById("location");
+
+        taskSelect.addEventListener("change", function() {
+            var selectedTask = taskSelect.value;
+
+            if (selectedTask === "StandbyLK") {
+                locationSelect.value = "LK";
+            } else if (selectedTask === "StandbyLN") {
+                locationSelect.value = "LN";
+            } else {
+                locationSelect.value = "HO";
+            }
+        });
 </script>
 <style>
     .row-toolbar {

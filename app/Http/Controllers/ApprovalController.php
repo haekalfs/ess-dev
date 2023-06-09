@@ -69,7 +69,7 @@ class ApprovalController extends Controller
         $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 1 && $currentDay <= 8) {
+        if ($currentDay >= 1 && $currentDay <= 10) {
                 if (in_array($checkUserPost, [7, 8, 12])) {
                     $Check = DB::table('timesheet_details')
                         ->select('*')
