@@ -911,6 +911,7 @@ class TimesheetController extends Controller
         ->whereNotExists(function ($query) use ($year, $month) {
             $query->select(DB::raw(1))
                 ->from('timesheet_details')
+                ->where('user_timesheet', Auth::user()->id)
                 ->where('month_periode', $year.intval($month))
                 ->where('ts_status_id', [404]);
         })
