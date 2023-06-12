@@ -216,7 +216,8 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Bulk Entries</a> <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
+            {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Bulk Entries</a>  --}}
+            <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
         </div>
     </div>
     <!-- Card Body -->
@@ -791,15 +792,18 @@ var locationSelectRed = document.getElementById("location-red");
 
 taskSelect.addEventListener("change", function() {
     var selectedTask = taskSelect.value;
-
+    
     if (selectedTask === "StandbyLK") {
         locationSelect.value = "LK";
-        locationSelect.setAttribute("disabled", true);
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
     } else if (selectedTask === "StandbyLN") {
         locationSelect.value = "LN";
-        locationSelect.setAttribute("disabled", true);
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
     } else {
-        locationSelect.removeAttribute("disabled");
+        locationSelect.readOnly = false;
+        locationSelect.style.pointerEvents = "auto";
         locationSelect.value = "HO";
     }
 });

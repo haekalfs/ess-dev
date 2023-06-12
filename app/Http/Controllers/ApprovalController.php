@@ -296,8 +296,10 @@ class ApprovalController extends Controller
             'monthOpt' => 'required'
         ]);
 
-        // var_dump($Year.intval($Month));
         $month_periode = $Year.intval($Month);
+
+        $priorApproval = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
+
         $approvals = Timesheet_detail::join('users as u', 'timesheet_details.user_timesheet', '=', 'u.id')
                 ->join('users_details as ud', 'timesheet_details.user_timesheet', '=', 'ud.user_id');
 
@@ -305,6 +307,15 @@ class ApprovalController extends Controller
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
             $month_periode = $Year.intval($Month);
+
+            $checkIfAllApproved = Timesheet_detail::whereIn('RequestTo', $priorApproval)
+            ->whereNotIn('ts_status_id', ['10', '15'])
+            ->where('month_periode', $month_periode)
+            ->groupBy('ts_task_id', 'ts_location', 'user_timesheet')
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
+            ->pluck('user_timesheet')
+            ->toArray();
+
             $approvals->join(DB::raw("(SELECT user_timesheet, MAX(created_at) AS latest_created_at
                         FROM timesheet_details
                         WHERE ts_status_id = 29 AND month_periode = '{$month_periode}'
@@ -313,6 +324,14 @@ class ApprovalController extends Controller
                 ->on('timesheet_details.created_at', '=', 't.latest_created_at');
             });
         } else {
+            $checkIfAllApproved = Timesheet_detail::whereIn('RequestTo', $priorApproval)
+            ->whereNotIn('ts_status_id', ['10', '15'])
+            ->where('month_periode', $month_periode)
+            ->groupBy('ts_task_id', 'ts_location', 'user_timesheet')
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
+            ->pluck('user_timesheet')
+            ->toArray();
+
             $approvals->join(DB::raw("(SELECT user_timesheet, MAX(created_at) AS latest_created_at
                         FROM timesheet_details
                         WHERE ts_status_id = 29 AND month_periode = '{$month_periode}'
@@ -323,10 +342,11 @@ class ApprovalController extends Controller
         }
 
         $approvals = $approvals->where('timesheet_details.ts_status_id', 29)
+        ->whereIn('timesheet_details.user_timesheet', $checkIfAllApproved)
         ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task', 'timesheet_details.ts_location')
         ->select('timesheet_details.*', 'u.name', 'ud.employee_id')
         ->get();
-        // $approvals = $approvals->get();
+
 		return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
 	}
 

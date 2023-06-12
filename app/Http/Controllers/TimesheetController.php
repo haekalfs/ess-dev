@@ -398,7 +398,13 @@ class TimesheetController extends Controller
             }
         }
 
-        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        if($ts_task_id == "StandbyLK"){
+            $fare = 110000;
+        } elseif ($ts_task_id == "StandbyLK") {
+            $fare = 200000;
+        } else {
+            $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        }
         $countAllowances = $fare;
 
         $entry->allowance = $countAllowances;
@@ -510,7 +516,13 @@ class TimesheetController extends Controller
             }
         }
 
-        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        if($ts_task_id == "StandbyLK"){
+            $fare = 110000;
+        } elseif ($ts_task_id == "StandbyLK") {
+            $fare = 200000;
+        } else {
+            $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        }
         $countAllowances = $fare;
 
         $entry->allowance = $countAllowances;
