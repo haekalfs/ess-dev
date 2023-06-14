@@ -7,17 +7,94 @@ use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Surat_penugasan;
 use App\Models\Timesheet;
+use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Users_detail;
 use Carbon\Carbon;
 use DateTime;
 use PDF;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
+    public function review(Request $request)
+    {
+        $Month = date('m');
+        $Year = date('Y');
+
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $employees = User::all();
+
+        $validator = Validator::make($request->all(), [
+            'showOpt' => 'required',
+            'yearOpt' => 'required',
+            'monthOpt' => 'required'
+        ]);
+
+        $month_periode = $Year . intval($Month);
+
+        $priorApproval = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver')->toArray();
+
+        $userArray = [];
+
+        $approvals = Timesheet_detail::join('users as u', 'timesheet_details.user_timesheet', '=', 'u.id')
+            ->join('users_details as ud', 'timesheet_details.user_timesheet', '=', 'ud.user_id');
+
+        if ($validator->passes()) {
+            $Year = $request->yearOpt;
+            $Month = $request->monthOpt;
+            $month_periode = $Year . intval($Month);
+            $getData = Timesheet_detail::where('month_periode', $month_periode)->whereNotIn('ts_status_id', ['10', '15'])->groupBy('ts_task_id', 'ts_location', 'user_timesheet')->get();
+
+            $approvals->joinSub(function ($query) use ($month_periode) {
+                $query->select('user_timesheet', DB::raw('MAX(created_at) AS latest_created_at'))
+                    ->from('timesheet_details')
+                    ->where('ts_status_id', 29)
+                    ->where('month_periode', $month_periode)
+                    ->groupBy('user_timesheet');
+            }, 't', function ($join) {
+                $join->on('timesheet_details.user_timesheet', '=', 't.user_timesheet')
+                    ->on('timesheet_details.created_at', '=', 't.latest_created_at');
+            });
+        } else {
+            $getData = Timesheet_detail::where('month_periode', $month_periode)->whereNotIn('ts_status_id', ['10', '15'])->groupBy('ts_task_id', 'ts_location', 'user_timesheet')->get();
+            $approvals->joinSub(function ($query) use ($month_periode) {
+                $query->select('user_timesheet', DB::raw('MAX(created_at) AS latest_created_at'))
+                    ->from('timesheet_details')
+                    ->where('ts_status_id', 29)
+                    ->where('month_periode', $month_periode)
+                    ->groupBy('user_timesheet');
+            }, 't', function ($join) {
+                $join->on('timesheet_details.user_timesheet', '=', 't.user_timesheet')
+                    ->on('timesheet_details.created_at', '=', 't.latest_created_at');
+            });
+        }
+
+        foreach ($getData as $data){
+            $checkIfAllApproved = Timesheet_detail::select('user_timesheet')->whereIn('RequestTo', $priorApproval)
+                ->whereNotIn('ts_status_id', ['10', '15'])
+                ->where('month_periode', $month_periode)
+                ->where('user_timesheet', $data->user_timesheet)
+                ->groupBy('ts_task_id', 'ts_location')
+                ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
+                ->pluck('user_timesheet')->first();
+            $userArray[] = $checkIfAllApproved;
+        }
+
+        $approvals->where('timesheet_details.ts_status_id', 29)
+            ->whereIn('timesheet_details.user_timesheet', $userArray)
+            ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task', 'timesheet_details.ts_location')
+            ->select('timesheet_details.*', 'u.name', 'ud.employee_id')
+            ->get();
+
+        return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
+    }
+
     public function ts_preview($user_id, $year, $month)
 	{
 		// $year = Crypt::decrypt($year);
