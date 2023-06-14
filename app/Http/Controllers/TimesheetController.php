@@ -1289,32 +1289,38 @@ class TimesheetController extends Controller
                                 $empApproval[] = $newArrayS;
                             break;
                             default:
-                            if(!$test2 == NULL){
-                                $newArrayPM = [
-                                    'name' => $test2,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                ];
-                                $empApproval[] = $newArrayPM;
-                            }
-                            if(!$pa == NULL){
-                                $newArrayPA = [
-                                    'name' => $pa,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                ];
-                                $empApproval[] = $newArrayPA;
-                            }
+                                switch (true){
+                                    case(Auth::user()->id == $test2):
+                                        break;
+                                    default:
+                                        if(!$test2 == NULL){
+                                            $newArrayPM = [
+                                                'name' => $test2,
+                                                'task' => $row->ts_task,
+                                                'location' => $row->ts_location,
+                                                'mandays' => $row->total_rows,
+                                                'role' => $checkRole,
+                                                'task_id' => $row->ts_task_id,
+                                                'total_incentive' => $totalIncentive,
+                                                'total_allowance' => $totalAllowances,
+                                            ];
+                                            $empApproval[] = $newArrayPM;
+                                        }
+                                        if(!$pa == NULL){
+                                            $newArrayPA = [
+                                                'name' => $pa,
+                                                'task' => $row->ts_task,
+                                                'location' => $row->ts_location,
+                                                'mandays' => $row->total_rows,
+                                                'role' => $checkRole,
+                                                'task_id' => $row->ts_task_id,
+                                                'total_incentive' => $totalIncentive,
+                                                'total_allowance' => $totalAllowances,
+                                            ];
+                                            $empApproval[] = $newArrayPA;
+                                        }
+                                    break;
+                                }
                             foreach($approvalService as $approverService){
                                 $newArrayS = [
                                     'name' => $approverService->approver,
@@ -1339,7 +1345,7 @@ class TimesheetController extends Controller
             Timesheet_detail::updateOrCreate([
                 'user_id' => Auth::user()->id,
                 'workhours' => intval($total_work_hours),
-                'month_periode' => $year.$month,
+                'month_periode' => $year.intval($month),
                 'RequestTo' => $test['name'],
                 'ts_task' => $test['task'],
                 'ts_location' => $test['location']

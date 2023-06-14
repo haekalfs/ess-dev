@@ -277,7 +277,7 @@ active
 </div>
 <div class="row">
     <!-- Area Chart -->
-    <div class="col-xl-8 col-lg-8">
+    <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -294,6 +294,8 @@ active
                             <tr>
                                 <th>Username</th>
                                 <th>Project</th>
+                                <th>Location</th>
+                                <th>Mandays</th>
                                 <th>Status</th>
                                 <th>Approver</th>
                                 <th>Notes</th>
@@ -304,12 +306,16 @@ active
                                 @if ($index > 0 && $wf->user->name === $workflow[$index-1]->user->name)
                                 <td style="border-bottom: none; border-top: none;"></td>
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->ts_location }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->ts_mandays }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @else
                                 <td style="border-bottom: none; border-top: none;">{{ strtok($wf->user->name, " ") }}</td>
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->ts_location }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->ts_mandays }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
@@ -317,33 +323,11 @@ active
                             </tr>
                             @endforeach
                             <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-4 col-lg-4">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Mandays</h6>
-                {{-- <div class="text-right">
-                    <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Reset">
-                </div> --}}
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <table class="zoom80">
-                    {{-- <thead>
-                        <tr class="calculations">
-                        </tr>
-                    </thead> --}}
-                    <tbody class="calculations">
-                    </tbody>
-                </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
             </div>
         </div>
     </div>
