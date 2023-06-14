@@ -49,7 +49,12 @@ class ReviewController extends Controller
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
             $month_periode = $Year . intval($Month);
-            $getData = Timesheet_detail::where('month_periode', $month_periode)->whereNotIn('ts_status_id', ['10', '15'])->groupBy('ts_task_id', 'ts_location', 'user_timesheet')->get();
+
+            $getData = Timesheet_detail::where('month_periode', $month_periode)
+            ->whereNotIn('ts_status_id', ['10', '15'])
+            ->whereIn('RequestTo', $priorApproval)
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
+            ->groupBy('user_timesheet')->get();
 
             $approvals->joinSub(function ($query) use ($month_periode) {
                 $query->select('user_timesheet', DB::raw('MAX(created_at) AS latest_created_at'))
@@ -62,7 +67,12 @@ class ReviewController extends Controller
                     ->on('timesheet_details.created_at', '=', 't.latest_created_at');
             });
         } else {
-            $getData = Timesheet_detail::where('month_periode', $month_periode)->whereNotIn('ts_status_id', ['10', '15'])->groupBy('ts_task_id', 'ts_location', 'user_timesheet')->get();
+            $getData = Timesheet_detail::where('month_periode', $month_periode)
+            ->whereNotIn('ts_status_id', ['10', '15'])
+            ->whereIn('RequestTo', $priorApproval)
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
+            ->groupBy('user_timesheet')->get();
+            
             $approvals->joinSub(function ($query) use ($month_periode) {
                 $query->select('user_timesheet', DB::raw('MAX(created_at) AS latest_created_at'))
                     ->from('timesheet_details')
@@ -76,17 +86,10 @@ class ReviewController extends Controller
         }
 
         foreach ($getData as $data){
-            $checkIfAllApproved = Timesheet_detail::select('user_timesheet')->whereIn('RequestTo', $priorApproval)
-                ->whereNotIn('ts_status_id', ['10', '15'])
-                ->where('month_periode', $month_periode)
-                ->where('user_timesheet', $data->user_timesheet)
-                ->groupBy('ts_task_id', 'ts_location')
-                ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
-                ->pluck('user_timesheet')->first();
-            $userArray[] = $checkIfAllApproved;
+            $userArray[] = $data->user_timesheet;
         }
 
-        $approvals->where('timesheet_details.ts_status_id', 29)
+        $approvals = $approvals->where('timesheet_details.ts_status_id', 29)
             ->whereIn('timesheet_details.user_timesheet', $userArray)
             ->groupBy('timesheet_details.user_timesheet', 'timesheet_details.ts_task', 'timesheet_details.ts_location')
             ->select('timesheet_details.*', 'u.name', 'ud.employee_id')
