@@ -51,7 +51,7 @@ Route::get('/timesheet/entry/preview/surat_penugasan/download/{timesheet_id}', '
 Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet')->middleware('auth');
 Route::get('/timesheet/entry/cancel_submit/{year}/{month}', 'TimesheetController@cancel_submit_timesheet')->name('submit-timesheet')->middleware('auth');
     //Review
-Route::get('/timesheet/review/fm', 'ApprovalController@review')->name('review.finance')->middleware('auth');
+Route::get('/timesheet/review/fm', 'ReviewController@review')->name('review.finance')->middleware('auth');
 Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel')->middleware('auth');
 Route::get('/timesheet/review/fm/review/{user_id}/{year}/{month}', 'ReviewController@ts_preview')->name('preview.fm.timesheet')->middleware('auth');
 Route::get('/timesheet/review/fm/preview/print/{year}/{month}/{user_timesheet}', 'ReviewController@print_selected')->middleware('auth');

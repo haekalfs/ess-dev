@@ -396,7 +396,13 @@ class TimesheetController extends Controller
             }
         }
 
-        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        if($ts_task_id == "StandbyLK"){
+            $fare = 110000;
+        } elseif ($ts_task_id == "StandbyLK") {
+            $fare = 200000;
+        } else {
+            $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        }
         $countAllowances = $fare;
 
         $entry->allowance = $countAllowances;
@@ -508,7 +514,13 @@ class TimesheetController extends Controller
             }
         }
 
-        $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        if($ts_task_id == "StandbyLK"){
+            $fare = 110000;
+        } elseif ($ts_task_id == "StandbyLK") {
+            $fare = 200000;
+        } else {
+            $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
+        }
         $countAllowances = $fare;
 
         $entry->allowance = $countAllowances;
@@ -888,19 +900,19 @@ class TimesheetController extends Controller
         $userId = Auth::user()->id;
 
         $checkisSubmitted = DB::table('timesheet_details')
-            ->select('*')
-            ->whereYear('date_submitted', $year)
-            ->where('user_timesheet', Auth::user()->id)
-            ->whereNotIn('ts_status_id', [10, 404])
-            ->where('month_periode', $year . intval($month))
-            ->whereNotExists(function ($query) use ($year, $month) {
-                $query->select(DB::raw(1))
-                    ->from('timesheet_details')
-                    ->where('month_periode', $year . intval($month))
-                    ->where('ts_status_id', [404]);
-            })
-            ->groupBy('user_timesheet', 'month_periode')
-            ->get();
+        ->select('*')
+        ->whereYear('date_submitted', $year)
+        ->where('user_timesheet', Auth::user()->id)
+        ->whereNotIn('ts_status_id', [10,404])
+        ->where('month_periode', $year.intval($month))
+        ->whereNotExists(function ($query) use ($year, $month) {
+            $query->select(DB::raw(1))
+                ->from('timesheet_details')
+                ->where('month_periode', $year.intval($month))
+                ->where('ts_status_id', [404]);
+        })
+        ->groupBy('user_timesheet', 'month_periode')
+        ->get();
 
         $Check = DB::table('timesheet_details')
             ->select('ts_status_id')
@@ -1274,48 +1286,48 @@ class TimesheetController extends Controller
                                     'total_allowance' => $totalAllowances,
                                 ];
                                 $empApproval[] = $newArrayS;
-                                break;
+                            break;
                             default:
-                                if (!$test2 == NULL) {
-                                    $newArrayPM = [
-                                        'name' => $test2,
-                                        'task' => $row->ts_task,
-                                        'location' => $row->ts_location,
-                                        'mandays' => $row->total_rows,
-                                        'role' => $checkRole,
-                                        'task_id' => $row->ts_task_id,
-                                        'total_incentive' => $totalIncentive,
-                                        'total_allowance' => $totalAllowances,
-                                    ];
-                                    $empApproval[] = $newArrayPM;
-                                }
-                                if (!$pa == NULL) {
-                                    $newArrayPA = [
-                                        'name' => $pa,
-                                        'task' => $row->ts_task,
-                                        'location' => $row->ts_location,
-                                        'mandays' => $row->total_rows,
-                                        'role' => $checkRole,
-                                        'task_id' => $row->ts_task_id,
-                                        'total_incentive' => $totalIncentive,
-                                        'total_allowance' => $totalAllowances,
-                                    ];
-                                    $empApproval[] = $newArrayPA;
-                                }
-                                foreach ($approvalService as $approverService) {
-                                    $newArrayS = [
-                                        'name' => $approverService->approver,
-                                        'task' => $row->ts_task,
-                                        'location' => $row->ts_location,
-                                        'mandays' => $row->total_rows,
-                                        'role' => $checkRole,
-                                        'task_id' => $row->ts_task_id,
-                                        'total_incentive' => $totalIncentive,
-                                        'total_allowance' => $totalAllowances,
-                                    ];
-                                    $empApproval[] = $newArrayS;
-                                }
-                                break;
+                            if(!$test2 == NULL){
+                                $newArrayPM = [
+                                    'name' => $test2,
+                                    'task' => $row->ts_task,
+                                    'location' => $row->ts_location,
+                                    'mandays' => $row->total_rows,
+                                    'role' => $checkRole,
+                                    'task_id' => $row->ts_task_id,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
+                                ];
+                                $empApproval[] = $newArrayPM;
+                            }
+                            if(!$pa == NULL){
+                                $newArrayPA = [
+                                    'name' => $pa,
+                                    'task' => $row->ts_task,
+                                    'location' => $row->ts_location,
+                                    'mandays' => $row->total_rows,
+                                    'role' => $checkRole,
+                                    'task_id' => $row->ts_task_id,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
+                                ];
+                                $empApproval[] = $newArrayPA;
+                            }
+                            foreach($approvalService as $approverService){
+                                $newArrayS = [
+                                    'name' => $approverService->approver,
+                                    'task' => $row->ts_task,
+                                    'location' => $row->ts_location,
+                                    'mandays' => $row->total_rows,
+                                    'role' => $checkRole,
+                                    'task_id' => $row->ts_task_id,
+                                    'total_incentive' => $totalIncentive,
+                                    'total_allowance' => $totalAllowances,
+                                ];
+                                $empApproval[] = $newArrayS;
+                            }
+                            break;
                         }
                     }
                     break;
@@ -1326,7 +1338,7 @@ class TimesheetController extends Controller
             Timesheet_detail::updateOrCreate([
                 'user_id' => Auth::user()->id,
                 'workhours' => intval($total_work_hours),
-                'month_periode' => $year . $month,
+                'month_periode' => $year.$month,
                 'RequestTo' => $test['name'],
                 'ts_task' => $test['task'],
                 'ts_location' => $test['location']

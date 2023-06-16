@@ -317,7 +317,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -341,7 +342,7 @@ active
                                     <label for="password">Location :</label>
                                     <select class="form-control" id="location" name="location" required>
                                         @foreach($pLocations as $loc)
-                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                            <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
                                     </select>
@@ -418,14 +419,15 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
-                                    <select class="form-control" id="task" name="task" required>
+                                    <select class="form-control" id="task-red" name="task" required>
                                         <option value="HO">Head Office</option>
                                         <option value="Training">Training</option>
                                         <optgroup label="Presales">
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -447,9 +449,9 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="location" name="location" required>
+                                    <select class="form-control" id="location-red" name="location" required>
                                         @foreach($pLocations as $loc)
-                                            <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
+                                            <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
                                     </select>
@@ -525,7 +527,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -619,7 +622,8 @@ active
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
                                         <optgroup label="Others">
-                                            <option value="Standby">Standby</option>
+                                            <option value="StandbyLK">Standby (LK)</option>
+                                            <option value="StandbyLN">Standby (LN)</option>
                                             <option value="Lembur">Lembur</option>
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
@@ -681,27 +685,6 @@ active
 			</form>
 		</div>
 	</div>
-</div>
-<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" >
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title m-0 font-weight-bold text-danger" id="exampleModalLabel">User Guide</h5>
-          </button>
-        </div>
-        <div class="modal-body">
-            <p><a class="text-warning">Warning!!</a>. For now ESS is in the development stage. To submit your timesheet, follow these steps:</p>
-            <p>1. Add entries for each of your mandays, by clicking on the date on the calendar.</p>
-            <p>2. Fill in each column correctly! If your time format is AM/PM, the from and to time columns must have AM and PM. example : 02:00 PM</p>
-            <p>3. If everything has been filled in correctly, preview your timesheet then download it.</p>
-            <p>4. Send your timesheet to each leadership for the approval process.</p>
-            <p>Thank You.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">I Understand</button>
-        </div>
-      </div>
-    </div>
 </div>
 
 <script>
@@ -800,6 +783,45 @@ function changeFileName(inputId, labelId) {
   var label = document.getElementById(labelId);
   label.textContent = input.files[0].name;
 }
+
+var taskSelect = document.getElementById("task");
+var locationSelect = document.getElementById("location");
+
+var taskSelectRed = document.getElementById("task-red");
+var locationSelectRed = document.getElementById("location-red");
+
+taskSelect.addEventListener("change", function() {
+    var selectedTask = taskSelect.value;
+    
+    if (selectedTask === "StandbyLK") {
+        locationSelect.value = "LK";
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
+    } else if (selectedTask === "StandbyLN") {
+        locationSelect.value = "LN";
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
+    } else {
+        locationSelect.readOnly = false;
+        locationSelect.style.pointerEvents = "auto";
+        locationSelect.value = "HO";
+    }
+});
+
+taskSelectRed.addEventListener("change", function() {
+    var selectedTaskRed = taskSelectRed.value;
+
+    if (selectedTaskRed === "StandbyLK") {
+        locationSelectRed.value = "LK";
+        locationSelectRed.setAttribute("disabled", true);
+    } else if (selectedTaskRed === "StandbyLN") {
+        locationSelectRed.value = "LN";
+        locationSelectRed.setAttribute("disabled", true);
+    } else {
+        locationSelectRed.removeAttribute("disabled");
+        locationSelectRed.value = "HO";
+    }
+});
 </script>
 <style>
     .row-toolbar {
