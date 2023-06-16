@@ -17,7 +17,7 @@ class Medical_details extends Authenticatable
     // protected $dates = ['deleted_at'];
     protected $table = 'medicals_detail';
     protected $fillable = [
-        'id',
+        'mdet_id',
         'medical_number',
         'mdet_attachment',
         'mdet_amount',
@@ -32,6 +32,6 @@ class Medical_details extends Authenticatable
     // }
 
     public function medical(){
-    	return $this->belongsTo('App\Models\Medical');
+    	return $this->hasMany('App\Models\Medical');
     }
 }

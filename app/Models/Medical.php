@@ -30,6 +30,6 @@ class Medical extends Authenticatable
         return $this->belongsTo('App\Models\User');
     }
     public function medical_details(){
-    	return $this->ManyTo('App\Models\Medical_details');
+    	return $this->hasMany('App\Models\Medical_details');
     }
 }

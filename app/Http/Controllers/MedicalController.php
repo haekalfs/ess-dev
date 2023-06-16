@@ -34,14 +34,7 @@ class MedicalController extends Controller
         // $nextMedNumber = str_pad($nextForm, 5, '0', STR_PAD_LEFT);
         $lastId = Medical::orderBy('id', 'desc')->first();
         $nextId = ($lastId) ? $lastId->id + 1 : 1;
-        $nextMedNumber = str_pad($nextId, 5, '0', STR_PAD_LEFT);
-        return view('medical.medical_tambah', compact('nextMedNumber'));
-    }
-
-    public function edit($id)
-    {
-        $med = Medical::with('Medical_details')->findOrFail($id);
-        return view('medical.medical_edit', ['med' => $med]);
+        return view('medical.medical_tambah', compact('nextId'));
     }
 
     public function store(Request $request)
@@ -59,15 +52,14 @@ class MedicalController extends Controller
         // ID Medical
         $lastId = Medical::orderBy('id', 'desc')->first();
         $nextId = ($lastId) ? $lastId->id + 1 : 1;
-        $nextMedNumber = str_pad($nextId, 5, '0', STR_PAD_LEFT);
+        // $nextMedNumber = str_pad($nextId, 5, '0', STR_PAD_LEFT);
         //Med Number
         // $latestForm = Medical::whereNull('deleted_at')->orderBy('med_number')->pluck('med_number')->first();
         // $nextForm = intval(substr($latestForm, 4)) + 1;
 
         $medical = new Medical();
-        $medical->id = $nextMedNumber;
+        $medical->id = $nextId;
         $medical->user_id = Auth::user()->id;
-        // $medical->med_number = $nextMedNumber;
         $medical->med_req_date = date('Y-m-d');
         $medical->med_payment = $request->payment_method;
         $medical->med_status = 'New Request';
@@ -80,7 +72,8 @@ class MedicalController extends Controller
             $lastmdet = Medical_details::orderBy('mdet_id', 'desc')->first();
             $nextmdet = ($lastmdet) ? $lastmdet->mdet_id + 1 : 1;
 
-            $filename = $nextMedNumber. "." .$attachment->getClientOriginalExtension();
+            $extension = $attachment->getClientOriginalExtension();
+            $filename = 'MED_0000' . $nextId . '_' . $key .  '_' .  Auth::user()->id . '.' . $extension;
 
             // Menyimpan file attach ke dalam folder yang diinginkan
             $attach_tujuan = '/storage/med_pic';
@@ -90,82 +83,67 @@ class MedicalController extends Controller
             
             $meddet = new Medical_details();
             $meddet->mdet_id = $nextmdet;
-            $meddet->medical_number = $nextMedNumber;
+            $meddet->medical_number = $nextId;
             $meddet->mdet_attachment = $filename;
             $meddet->mdet_amount = $amounts[$key];
             $meddet->mdet_desc = $descriptions[$key];
             $meddet->save();
         }
 
-        return redirect('/medical/history')->with('Success', 'Data medis berhasil disimpan.');
+        return redirect('/medical/history')->with('Success', 'Medical Reimburse Add successfully');
     }
 
-
-
-    public function sto1re(Request $request)
+    public function edit($id)
     {
-        $this->validate($request, [
-            // 'payment_method' => 'required',
-            // 'attach' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            // 'amount' => 'required',
-            // 'desc' => 'required',
-            // 'totalAmount' => 'required',
-
-        ]);
-
-        $lastId = Medical::orderBy('id', 'desc')->first();
-        $nextId = ($lastId) ? $lastId->id + 1 : 1;
-        $latestForm = Medical::whereNull('deleted_at')->orderBy('med_number')->pluck('med_number')->first();
-        $nextForm = intval(substr($latestForm, 4)) + 1;
-        $nextMedNumber = str_pad($nextForm, 5, '0', STR_PAD_LEFT);
-
-        Medical::create([
-            'id' => $nextId,
-            'med_number' => $nextMedNumber,
-            'user_id' => Auth::user()->id,
-            'med_req_date'=> date('Y-m-d'),
-            'med_payment' => $request->payment_method,
-            'med_status' => 'New Request',
-            'med_total_amount' => $request->totalAmount,
-        ]);
-
-        $attachArr = $request->input('attach');
-        $amountArr = $request->input('amount');
-        $descArr = $request->input('desc');
-
-        // menyimpan data file yang diupload ke variabel $file
-        $attach = $request->file('attach');
-
-        $nama_file = Auth::user()->id . "_" . $nextMedNumber . "_" . $attach->getClientOriginalName();
-
-        // isi dengan nama folder tempat kemana file diupload
-        $tujuan_upload = 'storage/med_pic';
-        $attach->move($tujuan_upload, $nama_file);
-
-        // Count the number of items in the arrays
-        $num_attach = count(['attach']);
-        $num_amount = count(['amount']);
-        $num_desc = count(['desc']);
-
-        if ($num_attach == $num_amount) {
-            for ($i = 0; $i < count($attachArr); $i++) {
-                $data = new Medical_details();
-                $data->mdet_id = $i + 1;
-                $data->mdet_attachment = $attachArr[$i];
-                $data->mdet_amount = $amountArr[$i];
-                $data->mdet_desc = $descArr[$i];
-                $data->mdet_med_number = $nextMedNumber;
-                $data->save();
-            }
-            //     $Med_number = Medical::whereNull('deleted_at')->orderBy('f_requisition_num', 'desc')->pluck('f_id')->first();
-            //     Session::flash('success',"Purchase Order #$Med_number Has Been Created!");
-            //     return redirect('/myform');
-            // } else {
-            //     Session::flash('failed',"Error Database has Occured! Failed to create purchase order!");
-            //     return redirect('/myform');
-        }
-
-        return redirect('medical.history')->with('success', 'Medical Reimburse Add successfully');
+        $user_info = User::find(Auth::user()->id);
+        $med = Medical::findOrFail($id);
+        $medDet = Medical_details::where('medical_number', $med->id)->get();
+        return view('medical.medical_edit', ['med' => $med, 'user_info' => $user_info, 'medDet' => $medDet ]);
     }
 
+    public function delete_med_all($id)
+    {
+        DB::table('medicals')->where('id', $id)->delete();
+        DB::table('medicals_detail')->where('medical_number', $id)->delete();
+        $user = Auth::user();
+        $med = Medical::where('user_id', $user->id)->get();
+        return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
+    }
+
+    public function update_medDetail(Request $request, $mdet_id)
+    {
+        $user_info = User::find(Auth::user()->id);
+        $medDet = Medical_details::find($mdet_id);
+        $request->validate([
+            'attach.*' => 'required|file',
+            'amount.*' => 'required',
+            'desc.*' => 'required',
+        ]);
+
+        if ($request->hasFile('inputAttach')){
+            $inputAttach = $request->file('inputAttach');
+
+            $filename = $medDet->mdet_attachment;
+            $attach_tujuan = '/storage/med_pic';
+            $inputAttach->move(public_path($attach_tujuan), $filename);
+
+            // Menghapus file profil lama jika ada
+            // $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
+            // if (file_exists($oldCV)) {
+            //     unlink($oldCV);
+            // }
+
+        } elseif ($medDet->mdet_attachment) {
+            // Menggunakan foto profil yang sudah ada dalam database jika ada
+            $filename = $medDet->mdet_attachment;
+        }
+        $med_detail = Medical_details::find($mdet_id);
+        $med_detail->mdet_attachment = $filename;
+        $med_detail->mdet_amount = $request->input_mdet_amount;
+        $med_detail->mdet_desc = $request->input_mdet_desc;
+        $med_detail->save();
+        
+        return view('medical.medical_edit', ['user_info' => $user_info, 'medDet' => $medDet, 'success' => 'User Edit successfully']);
+
+    }
 }

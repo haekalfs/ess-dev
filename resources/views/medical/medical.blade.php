@@ -5,6 +5,7 @@ active
 @endsection
 
 @section('content')
+
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Medical Reimburse</h1>
@@ -31,6 +32,73 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<div class="row zoom90">
+    <!-- Area Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Employee Information</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <th>User ID</th>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
+                    </tr>
+                    <tr>
+                        <th>Employee ID</th>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->employee_id}}</td>
+                    </tr>
+                    <tr>
+                        <th>Full Name</th>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->name}}</td>
+                    </tr>
+                    <tr>
+                        <th>Hired Date</th>
+                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->hired_date}}</td>
+                    </tr>
+                  </tr>
+              </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Medical Balance</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <table class="table table-borderless table-sm" width="100%" cellspacing="0">
+                    <tr>
+                      <tr>
+                          <th width="300px">Medical Balance</th>
+                          <td style="text-align: start; font-weight:500">: </td>
+                      </tr>
+                      <tr>
+                          <th>5 Year Term</th>
+                          <td style="text-align: start; font-weight:500">: </td>
+                      </tr>
+                      <tr>
+                          <th>Weekend Replacement</th>
+                          <td style="text-align: start; font-weight:500">: </td>
+                      </tr>
+                      <tr>
+                          <th>Total Leave Available</th>
+                          <td style="text-align: start; font-weight:500">: </td>
+                      </tr>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow mb-4">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -60,10 +128,10 @@ active
                         <td>{{$q->med_payment}}</td>
                         <td>{{$q->med_status}}</td>
                         <td class="row-cols-2 justify-content-betwen text-center">
-                            <a href="#" title="Edit" class="btn btn-warning btn-sm" >
+                            <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>
                             </a>
-                            <a href="#" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-bars justify-content"></i></a>
+                            <a href="/medical/delete/{{ $q->id }}" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
                         </td>
                     </tr>
                     @endforeach

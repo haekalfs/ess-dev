@@ -29,6 +29,30 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<style>
+.img-profile.rounded-circle.no-image {
+    margin-top: 15px;
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    height: 20vh;
+    width: 20vh;
+}
+
+.no-image-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20vh;
+}
+
+</style>
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
@@ -44,8 +68,12 @@ active
             <div class="card-body zoom90">
                 <div class="row">
                     <div class="col-md-3 align-items-center text-center">
-                        <div class="col-md-3 text-center">
-                            <img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 220px;" />
+                        <div class="col-md text-center">
+                            @if($user_info->users_detail->profile_pic)
+                                <img class="img-profile rounded-circle" height="150px"width="150px" style="object-fit:fill;" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                            @else
+                                <div class="img-profile rounded-circle no-image"><i class="no-image-text">No Image Available</i></div>
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -125,6 +153,7 @@ active
             @if($removeBtnSubmit == 0)
             <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a>
             <a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
+            <a class="btn btn-warning btn-sm" type="button" href="/timesheet/entry/cancel_submit/{{$year}}/{{$month}}" id="copyButton">Cancel Submit</a>
             @elseif($removeBtnSubmit == 29)
             <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{ $year}}/{{$month}}" id="manButton">Download</a>
             @else
@@ -361,6 +390,22 @@ active
         </div>
     </div>
 </div>
+<!-- Modal Profile -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="text-right" width="100px">
+    </div>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="close-icon">
+                    <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
+                </div>
+                <img src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+            </div>
+        </div>
+    </div>
+</div>
+
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
 @endsection
