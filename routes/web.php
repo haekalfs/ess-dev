@@ -210,8 +210,9 @@ Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
 Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
 Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
+Route::put('/medical/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
-Route::put('/medical/update/medical_details/{id}', 'MedicalController@update_medDetail')->middleware('auth');
+// Route::put('/medical/edit/{id}/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 
 
 

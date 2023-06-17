@@ -112,7 +112,8 @@ class MedicalController extends Controller
 
     public function update_medDetail(Request $request, $mdet_id)
     {
-        $user_info = User::find(Auth::user()->id);
+        // $user_info = User::find(Auth::user()->id);
+        // $med = Medical::with('medical_details')->findOrFail($mdet_id);
         $medDet = Medical_details::find($mdet_id);
         $request->validate([
             'attach.*' => 'required|file',
@@ -128,22 +129,22 @@ class MedicalController extends Controller
             $inputAttach->move(public_path($attach_tujuan), $filename);
 
             // Menghapus file profil lama jika ada
-            // $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
-            // if (file_exists($oldCV)) {
-            //     unlink($oldCV);
-            // }
+            $oldCV = public_path($attach_tujuan . '/' .$filename);
+            if (file_exists($oldCV)) {
+                unlink($oldCV);
+            }
 
         } elseif ($medDet->mdet_attachment) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $filename = $medDet->mdet_attachment;
         }
-        $med_detail = Medical_details::find($mdet_id);
+        $med_detail = Medical_details::where('id', $mdet_id)->first();
         $med_detail->mdet_attachment = $filename;
         $med_detail->mdet_amount = $request->input_mdet_amount;
         $med_detail->mdet_desc = $request->input_mdet_desc;
         $med_detail->save();
         
-        return view('medical.medical_edit', ['user_info' => $user_info, 'medDet' => $medDet, 'success' => 'User Edit successfully']);
+        return view('medical.medical_edit', ['medDet' => $medDet, 'success' => 'User Edit successfully']);
 
     }
 }

@@ -8,7 +8,7 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<form method="POST" action="/medical/edit/{{  $md->mdet_id }}" enctype="multipart/form-data">
+{{-- <form method="POST" action="/medical/edit/{{  $med->mdet_id }}" enctype="multipart/form-data"> --}}
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -261,9 +261,10 @@ active
             </div>
         </div>
     </div>
-</form>
+
+{{-- </form> --}}
 {{-- modal Medical detail --}}
-<form action="/medical/update/medical_details/{{ $md->mdet_id }}" enctype="multipart/form-data">
+<form action="/medical/update/{{ $md->mdet_id }}" enctype="multipart/form-data" method="POST">
 @csrf
 @method('PUT')
     <div class="modal fade" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
