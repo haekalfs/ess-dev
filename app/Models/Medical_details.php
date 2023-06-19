@@ -15,6 +15,7 @@ class Medical_details extends Authenticatable
     // use SoftDeletes;
 
     // protected $dates = ['deleted_at'];
+    protected $primaryKey = 'mdet_id';
     protected $table = 'medicals_detail';
     protected $fillable = [
         'mdet_id',
@@ -23,15 +24,13 @@ class Medical_details extends Authenticatable
         'mdet_amount',
         'mdet_desc',
     ];
-    
-    // public static function generateId()
-    // {
-    //     $lastId = Medical_details::orderBy('id', 'desc')->first();
-    //     $newId = $lastId ? $lastId->id + 1 : 1;
-    //     return 'MED_' . str_pad($newId, 4, '0', STR_PAD_LEFT);
-    // }
 
-    public function medical(){
-    	return $this->hasMany('App\Models\Medical');
+    public function medical()
+    {
+        return $this->belongsTo(Medical::class, 'medical_number', 'medical_number');
     }
+
+    // public function medical(){
+    // 	return $this->hasMany('App\Models\Medical');
+    // }
 }

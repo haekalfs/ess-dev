@@ -112,9 +112,9 @@ class MedicalController extends Controller
 
     public function update_medDetail(Request $request, $mdet_id)
     {
-        // $user_info = User::find(Auth::user()->id);
-        // $med = Medical::with('medical_details')->findOrFail($mdet_id);
-        $medDet = Medical_details::find($mdet_id);
+        $user_info = User::find(Auth::user()->id);
+        $med = Medical::with('medical_details')->findOrFail($mdet_id);
+        $medDet = Medical_details::where('medical_number', $mdet_id)->first();
         $request->validate([
             'attach.*' => 'required|file',
             'amount.*' => 'required',
@@ -138,13 +138,14 @@ class MedicalController extends Controller
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $filename = $medDet->mdet_attachment;
         }
-        $med_detail = Medical_details::where('id', $mdet_id)->first();
+        $med_detail = Medical_details::find($mdet_id);
         $med_detail->mdet_attachment = $filename;
         $med_detail->mdet_amount = $request->input_mdet_amount;
         $med_detail->mdet_desc = $request->input_mdet_desc;
         $med_detail->save();
-        
-        return view('medical.medical_edit', ['medDet' => $medDet, 'success' => 'User Edit successfully']);
+
+        return redirect()->back()->with('success', 'Medical Detail Edit Success.');
+
 
     }
 }

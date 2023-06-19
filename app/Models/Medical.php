@@ -29,7 +29,11 @@ class Medical extends Authenticatable
     public function user(){
         return $this->belongsTo('App\Models\User');
     }
-    public function medical_details(){
-    	return $this->hasMany('App\Models\Medical_details');
+    // public function medical_details(){
+    // 	return $this->hasMany('App\Models\Medical_details');
+    // }
+    public function medical_details()
+    {
+        return $this->hasMany(Medical_details::class, 'medical_number', 'medical_number');
     }
 }

@@ -264,7 +264,7 @@ active
 
 {{-- </form> --}}
 {{-- modal Medical detail --}}
-<form action="/medical/update/{{ $md->mdet_id }}" enctype="multipart/form-data" method="POST">
+<form action="/medical/edit/{{ $med->id }}/update/{{ $md->mdet_id }}" enctype="multipart/form-data" method="POST">
 @csrf
 @method('PUT')
     <div class="modal fade" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -294,7 +294,7 @@ active
 							</tr>
                             <tr>
                                 <td><label for="password">Amount :</label>
-                                    <input class="form-control flex" name="input_mdet_amount" placeholder="Amount..." value="Rp. {{ $md->mdet_amount }}"/>
+                                    <input class="form-control flex" name="input_mdet_amount" placeholder="Amount..." value="{{ $md->mdet_amount }}"/>
                                 </td>
                             </tr>
                         </tbody>
