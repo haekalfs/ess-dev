@@ -270,20 +270,24 @@ class TimesheetController extends Controller
         // Get the current day
         $currentDay = date('d');
 
-        // Create the date string in the format Y-m-d
-        $date = $year . '-' . $month . '-' . '01';
+        $date = Carbon::create($year, $month, 1)->startOfMonth()->format('Y-m-d');
+
+        $findAssignment = Project_assignment_user::where('user_id', '=', $userId)
+            ->whereMonth('periode_start', '<=', $month)
+            ->whereDate('periode_end', '>=', $date)
+            ->get();
+
+        $assignmentArray = [];
+        foreach ($findAssignment as $fa) {
+            $assignmentArray[] = $fa->project_assignment_id;
+        }
 
         $assignment = Project_assignment_user::join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
             ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignment_users.*', 'company_projects.*', 'project_assignments.*')
             ->where('project_assignment_users.user_id', '=', $userId)
             ->where('project_assignments.approval_status', 29)
-            ->where(function ($query) use ($month, $year) {
-                $query->whereMonth('project_assignment_users.periode_start', '<=', $month)
-                ->whereMonth('project_assignment_users.periode_end', '>=', $month)
-                ->whereYear('project_assignment_users.periode_start', '=', $year)
-                ->whereYear('project_assignment_users.periode_start', '=', $year);
-            })
+            ->whereIn('project_assignment_users.project_assignment_id', $assignmentArray)
             ->get();
 
         $validStatusIDs = Approval_status::whereIn('id', [2,3,6,8])->pluck('approval_status_id')->toArray();

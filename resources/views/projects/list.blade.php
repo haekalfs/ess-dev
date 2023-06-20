@@ -346,7 +346,7 @@ active
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="password">Fare :</label>
-                                            <input type="text" class="form-control" name="loc_fare">
+                                            <input type="text" class="form-control" name="role_fare">
                                         </div>
                                     </div>
                                     <div class="col-md-1 d-flex justify-content-center align-items-end">

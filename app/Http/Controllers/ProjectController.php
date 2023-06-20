@@ -384,7 +384,8 @@ class ProjectController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'role_code' => 'required',
-            'role_desc' => 'required'
+            'role_desc' => 'required',
+            'role_fare' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -394,6 +395,7 @@ class ProjectController extends Controller
         $role = new Project_role;
         $role->role_code = $request->input('role_code');
         $role->role_name = $request->input('role_desc');
+        $role->fare = $request->role_fare;
         $role->save();
         
         return response()->json(['success'=>'Client created successfully.']);
