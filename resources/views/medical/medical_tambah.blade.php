@@ -34,7 +34,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h5 class="m-0 font-weight-bold text-primary">Medical Form Request Number # MED_{{ $nextMedNumber }}</h5>
+                <h5 class="m-0 font-weight-bold text-primary">Medical Form Request Number # MED_0000{{ $nextId }}</h5>
                 <div class="text-right">
                     <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Add Entry">
                     <input type="submit" class="btn btn-success btn-sm" value="Submit" id="btn-submit">
@@ -64,11 +64,11 @@ active
                     <div class="row" style="zoom:96%; padding-left:20px">
                         <h6>Payment Method  :</h6>
                         <label class="col-md-2">
-                            <input class="form-radio-input" type="radio" name="payment_method" id="payment_method" value="Cash" checked="">
+                            <input class="form-radio-input" type="radio" name="payment_method" id="payment_method" value="Transfer" checked="">
                             <span class="form-radio-sign">Transfer</span>
                         </label>
                         <label class="col-md-4">
-                            <input class="form-radio-input" type="radio" name="payment_method" id="payment_method" value="Transfer" checked="">
+                            <input class="form-radio-input" type="radio" name="payment_method" id="payment_method" value="Cash"  checked="">
                             <span class="form-radio-sign">Cash</span>
                         </label>
                     </div>

@@ -56,12 +56,12 @@ active
                                     <div class="form-group">
                                         <label>Profile Picture:</label>
                                         <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="changeFileName('profile', 'profile-label')">
-                                        <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
+                                            <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="changeFileName('profile', 'profile-label')">
+                                            <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
                                         </div>
                                     </div>
                                     @if($user->users_detail->profile_pic)
-                                        <img style="max-width: 110px; max-height: 110px;" class="img-thumbnail" src="{{ url('/storage/profile_pic/'.$user->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                        <img style="max-width: 110px; max-height: 110px; object-fit:fill;" class="img-thumbnail" src="{{ url('/storage/profile_pic/'.$user->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                     @else
                                     <div class="img-thumbnail no-image"><i class="no-image-text">No Image Available</i></div>
                                     @endif
@@ -70,8 +70,8 @@ active
                                     <div class="form-group">
                                         <label>CV:</label>
                                         <div class="custom-file">
-                                        <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="changeFileName('cv', 'cv-label')">
-                                        <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
+                                            <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="changeFileName('cv', 'cv-label')">
+                                            <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
                                         </div>
                                     </div>
                                     @if($user->users_detail->cv)

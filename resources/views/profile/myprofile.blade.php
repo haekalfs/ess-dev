@@ -39,6 +39,30 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<<<<<<< HEAD
+=======
+<style>
+    .img-profile.rounded-circle.no-image {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-image-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 15vh; /* Atur sesuai kebutuhan Anda */
+}
+
+</style>
+>>>>>>> 2a0ed1c9e4991fc976fb80afb41c31782f377105
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
@@ -57,10 +81,11 @@ active
                         <table class="table table-borderless">
                             <tbody>
                                 <tr class="table-sm text-center">
-                                    <td style="d-flex align-items-center text-center"> @if($user_info->users_detail->profile_pic)
-                                            <img class="img-profile rounded-circle" height="150px"width="140px" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                    <td style="d-flex align-items-center text-center">
+                                        @if($user_info->users_detail->profile_pic)
+                                            <img class="img-profile rounded-circle" height="150px"width="140px" style="object-fit:fill;" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                         @else
-                                            <div class="img-profile rounded-circle"><i class="no-image-text">No Image Available</i></div>
+                                            <div class="img-profile rounded-circle no-image"><i class="no-image-text">No Image Available</i></div>
                                         @endif
                                     </td>
                                 </tr>

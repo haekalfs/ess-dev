@@ -30,7 +30,7 @@ Route::get('/testing', 'TimesheetController@calendar')->middleware('auth');
 Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name('save.entries');//testing
 
 //Timesheet
-    //Editing
+    //Editingg
 Route::get('/get-data/{year}/{month}/{id}', 'TimesheetController@getActivitiesEntry');
 Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')->name('entries.update');
 
@@ -209,6 +209,11 @@ Route::get('/kirimemail','MailerController@index');
 Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
 Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
-Route::get('/medical/history/edit/{id}', 'MedicalController@edit')->middleware('auth');
+Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
+Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
+Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
+// Route::put('/medical/edit/{id}/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
+
+
 
 
