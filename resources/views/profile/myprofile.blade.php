@@ -39,23 +39,6 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<style>
-    .img-thumbnail.no-image {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  display: inline-block;
-  align-items: center;
-  justify-content: center;
-}
-
-.no-image-text {
-  text-align: center;
-}
-</style>
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
@@ -401,8 +384,23 @@ active
     z-index: 9999;
     cursor: pointer;
 }
+.img-thumbnail.no-image {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+}
 
+.no-image-text {
+  text-align: center;
+}
 </style>
+
 <script>
 function changeFileName(inputId, labelId) {
   var input = document.getElementById(inputId);
