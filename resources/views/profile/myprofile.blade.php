@@ -39,30 +39,6 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<<<<<<< HEAD
-=======
-<style>
-    .img-profile.rounded-circle.no-image {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  display: inline-block;
-  align-items: center;
-  justify-content: center;
-}
-
-.no-image-text {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 15vh; /* Atur sesuai kebutuhan Anda */
-}
-
-</style>
->>>>>>> 2a0ed1c9e4991fc976fb80afb41c31782f377105
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
