@@ -935,8 +935,6 @@ class TimesheetController extends Controller
             $removeBtnSubmit = 0;
         }
 
-        dd($Check, $checkisSubmitted);
-
         // Get the current day
         $currentDay = date('d');
 
