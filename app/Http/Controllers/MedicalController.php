@@ -110,11 +110,10 @@ class MedicalController extends Controller
         return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
     }
 
-    public function update_medDetail(Request $request, $mdet_id)
+    public function update_medDetail(Request $request, $mdet_id, $medical_number)
     {
-        $user_info = User::find(Auth::user()->id);
-        $med = Medical::with('medical_details')->findOrFail($mdet_id);
-        $medDet = Medical_details::where('medical_number', $mdet_id)->first();
+        
+        $medDet = Medical_details::where('mdet_id', $medical_number)->first();
         $request->validate([
             'attach.*' => 'required|file',
             'amount.*' => 'required',
@@ -124,9 +123,11 @@ class MedicalController extends Controller
         if ($request->hasFile('inputAttach')){
             $inputAttach = $request->file('inputAttach');
 
-            $filename = $medDet->mdet_attachment;
-            $attach_tujuan = '/storage/med_pic';
-            $inputAttach->move(public_path($attach_tujuan), $filename);
+            $extension = $inputAttach->getClientOriginalExtension();
+            $filename = 'MED0000' . $medical_number . '_' . $mdet_id .  '_' .  Auth::user()->id . '.' . $extension;
+            
+            $attach_tujuan = '/med_pic';
+            $inputAttach->storeAs('public/' . $attach_tujuan, $filename);
 
             // Menghapus file profil lama jika ada
             $oldCV = public_path($attach_tujuan . '/' .$filename);
@@ -138,14 +139,23 @@ class MedicalController extends Controller
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $filename = $medDet->mdet_attachment;
         }
-        $med_detail = Medical_details::find($mdet_id);
-        $med_detail->mdet_attachment = $filename;
-        $med_detail->mdet_amount = $request->input_mdet_amount;
-        $med_detail->mdet_desc = $request->input_mdet_desc;
-        $med_detail->save();
+        // $med_detail = Medical_details::find($mdet_id);
+        $medDet->mdet_id = $medDet->mdet_id;
+        $medDet->mdet_attachment = $filename;
+        $medDet->mdet_amount = $request->input_mdet_amount;
+        $medDet->mdet_desc = $request->input_mdet_desc;
+        $medDet->save();
 
         return redirect()->back()->with('success', 'Medical Detail Edit Success.');
 
 
+    }
+    public function delete_medDetail($mdet_id, $medical_number){
+        DB::table('medicals_detail')
+        ->where('mdet_id', $medical_number)
+        // ->where('medical_number', $medical_number)
+        ->delete();
+
+        return redirect()->back()->with('success', 'Medical Detail Delete Success.');
     }
 }
