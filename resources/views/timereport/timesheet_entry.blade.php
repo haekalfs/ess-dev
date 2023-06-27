@@ -813,12 +813,15 @@ taskSelectRed.addEventListener("change", function() {
 
     if (selectedTaskRed === "StandbyLK") {
         locationSelectRed.value = "LK";
-        locationSelectRed.setAttribute("disabled", true);
+        locationSelectRed.readOnly = true;
+        locationSelectRed.style.pointerEvents = "none";
     } else if (selectedTaskRed === "StandbyLN") {
         locationSelectRed.value = "LN";
-        locationSelectRed.setAttribute("disabled", true);
+        locationSelectRed.readOnly = true;
+        locationSelectRed.style.pointerEvents = "none";
     } else {
-        locationSelectRed.removeAttribute("disabled");
+        locationSelectRed.readOnly = false;
+        locationSelectRed.style.pointerEvents = "auto";
         locationSelectRed.value = "HO";
     }
 });
