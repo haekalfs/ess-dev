@@ -913,6 +913,7 @@ class TimesheetController extends Controller
             $query->select(DB::raw(1))
                 ->from('timesheet_details')
                 ->where('month_periode', $year.intval($month))
+                ->where('user_timesheet', Auth::user()->id)
                 ->where('ts_status_id', [404]);
         })
         ->groupBy('user_timesheet', 'month_periode')
