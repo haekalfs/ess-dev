@@ -216,7 +216,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
         <div class="text-right">
-            {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Bulk Entries</a> --}}
+            @role('s-user') <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Bulk Entries</a> @else @endrole
             <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
         </div>
     </div>
@@ -295,7 +295,7 @@ active
                                     <div class="ml-auto">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckWfh">
-                                            <label class="form-check-label" for="flexCheckWfh">Already uploaded</label>
+                                            <label class="form-check-label" for="flexCheckWfh">Skip</label>
                                         </div>
                                     </div>
                                 </div>
@@ -404,7 +404,7 @@ active
                                     <div class="ml-auto">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">Already uploaded</label>
+                                            <label class="form-check-label" for="flexCheckDefault">Skip</label>
                                         </div>
                                     </div>
                                 </div>

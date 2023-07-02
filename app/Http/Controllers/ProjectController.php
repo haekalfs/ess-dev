@@ -539,6 +539,12 @@ class ProjectController extends Controller
             'company_project_id' => $requestAss->company_project_id
     	]);
 
+        $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
+        $employees = User::whereIn('id', $roleToApprove)->get();
+
+        foreach ($employees as $employee) {
+            dispatch(new NotifyAssignmentCreation($employee));
+        }
         return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
     }
 
