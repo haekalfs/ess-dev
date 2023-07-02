@@ -153,7 +153,7 @@ active
             @if($removeBtnSubmit == 0)
             <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{$year}}/{{$month}}" id="manButton" style="margin-right: 10px;">Download</a>
             <a class="btn btn-primary btn-sm" type="button" href="/timesheet/entry/submit/{{$year}}/{{$month}}" id="copyButton">Submit</a>
-            <a class="btn btn-warning btn-sm" type="button" href="/timesheet/entry/cancel_submit/{{$year}}/{{$month}}" id="copyButton">Cancel Submit</a>
+            {{-- <a class="btn btn-warning btn-sm" type="button" href="/timesheet/entry/cancel_submit/{{$year}}/{{$month}}" id="copyButton">Cancel Submit</a> --}}
             @elseif($removeBtnSubmit == 29)
             <a class="btn btn-secondary btn-sm" type="button" href="/timesheet/entry/preview/print/{{ $year}}/{{$month}}" id="manButton">Download</a>
             @else
