@@ -535,7 +535,7 @@ class ProjectController extends Controller
             'responsibility' => $requestAss->responsibility,
             'periode_start' => $requestAss->periode_start,
             'periode_end' => $requestAss->periode_end,
-            'project_assignment_id' => $uniqueIdP,
+            'project_assignment_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
             'company_project_id' => $requestAss->company_project_id
     	]);
 
