@@ -43,8 +43,10 @@ class ApprovalController extends Controller
 
         $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
         ->where(function($query) {
-            $query->where('RequestTo', Auth::user()->id);
+            $query->where('RequestTo', Auth::user()->id)
+            ->groupBy('user_timesheet', 'month_periode');
         })
+        ->groupBy('user_timesheet', 'month_periode')
         ->count();
 
         $pCount = Project_assignment::where('approval_status', 40)->count();
