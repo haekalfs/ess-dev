@@ -58,7 +58,7 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Timesheet Approval :</label>
-                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                    <input type="text" class="form-control" name="date_prepared" value="" placeholder="">
                                 </div>
                             </div>
                         </div>
@@ -80,11 +80,11 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="comment">Financial Password :</label>
-                                    <input type="password" class="form-control" name="date_prepared" placeholder="">
+                                    <input type="password" class="form-control" name="date_prepared" value="{{ $financialPass }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="comment">Reconfirm Password :</label>
-                                    <input type="password" class="form-control" name="date_prepared" placeholder="">
+                                    <input type="password" class="form-control" name="date_prepared" value="{{ $financialPass }}">
                                 </div>
                             </div>
                         </div>

@@ -37,7 +37,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">Database</h6>
         <div class="text-right">
-            <button class="btn @role('freelancer') btn-primary @else btn-success @endrole btn-sm" type="button" id="manButton"><i class="fas fa-download fa-sm text-white-50"></i> Export Selected</button>
+            {{-- <button class="btn @role('freelancer') btn-primary @else btn-success @endrole btn-sm" type="button" id="manButton"><i class="fas fa-download fa-sm text-white-50"></i> Export Selected</button> --}}
         </div>
     </div>
     <form action="/manage/list/employees/" method="GET">
@@ -47,7 +47,7 @@ active
                 <div class="row d-flex justify-content-start">
                     <div class="col-md-12">
                         <div class="row align-items-center">
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <div class="form-group">
                                     <label for="position_id">Filter by Position:</label>
                                     <select name="position_id" class="form-control" id="position_id">
@@ -56,7 +56,7 @@ active
                                     </select>
                                 </div>
                             </div> 
-                            <div class="col-md-4">  
+                            <div class="col-md-6">  
                                 <div class="form-group">
                                     <label for="status">Status:</label>
                                     <select name="status" class="form-control" id="status">
@@ -66,7 +66,7 @@ active
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4 d-flex align-self-end justify-content-start">
+                            <div class="col-md-1 d-flex align-self-end justify-content-start">
                                 <div class="form-group">
                                     <div class="align-self-center">
                                         <input type="submit" class="btn btn-primary" value="Filter"/>

@@ -74,7 +74,7 @@
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Leaves Information</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-plus"></i> Add New</a>
+            <a data-toggle="modal" data-target="#addLeave" class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-plus"></i> Add New</a>
         </div>
     </div>
     <div class="card-body">
@@ -86,6 +86,7 @@
                 <th>Default Quota</th>
                 <th>Active Periode</th>
                 <th>Expiration</th>
+                <th>Status</th>
                 <th>Quota Left</th>
                 <th>Quota Used</th>
                 <th>Action</th>
@@ -99,6 +100,13 @@
                 <td><span class="long-text">{{ $empLeave->leave->leave_quota }}</span></td>
                 <td>{{ $empLeave->active_periode }}</td>
                 <td>{{ $empLeave->expiration }}</td>
+                <td><?php
+                    if($empLeave->expiration < date('Y-m-d')){
+                        echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
+                    } else {
+                        echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
+                    }
+                ?></td>
                 <td>{{ $empLeave->quota_left }}</td>
                 <td>{{ $empLeave->quota_used }}</td>
                 <td class="text-center">
@@ -156,6 +164,71 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="addLeave" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="addLeaveLabel">Insert New Quota</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form method="post" id="add-leave" action="/leave/manage/add_quota/{{$user_info->id}}">
+                @csrf
+				<div class="modal-body">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Quota Type:</label>
+                                    <select class="form-control" name="addLeaveQuotaType" required>
+                                        @foreach($leaveType as $l)
+                                        <option value="{{$l->id}}">{{ $l->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" name="leaveStatus" id="leaveStatus">
+                                        <label class="custom-control-label" for="leaveStatus">Once in a Service Years?</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Active Periode :</label>
+                                    <input type="date" class="form-control" required autocomplete="off" name="addLeaveActivePeriode" id="addLeaveActivePeriode">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Expiration :</label>
+                                    <input type="date" class="form-control" required autocomplete="off" name="addLeaveExpiration" id="addLeaveExpiration">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Quota :</label>
+                                    <input type="number" class="form-control" required autocomplete="off" name="addLeaveQuota" id="addLeaveQuota">
+                                </div>
+                            </div>
+                        </div>
+				    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" id="add-leave-btn" class="btn btn-primary">Save changes</button>
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
+
 <!-- The success popup modal -->
 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -790,6 +790,9 @@ var locationSelect = document.getElementById("location");
 var taskSelectRed = document.getElementById("task-red");
 var locationSelectRed = document.getElementById("location-red");
 
+var taskSelectUpdate = document.getElementById("update_task");
+var locationSelectUpdate = document.getElementById("update_location");
+
 taskSelect.addEventListener("change", function() {
     var selectedTask = taskSelect.value;
     
@@ -823,6 +826,24 @@ taskSelectRed.addEventListener("change", function() {
         locationSelectRed.readOnly = false;
         locationSelectRed.style.pointerEvents = "auto";
         locationSelectRed.value = "HO";
+    }
+});
+
+taskSelectUpdate.addEventListener("change", function() {
+    var selectedTaskUpdate = taskSelectUpdate.value;
+    
+    if (selectedTaskUpdate === "StandbyLK") {
+        locationSelectUpdate.value = "LK";
+        locationSelectUpdate.readOnly = true;
+        locationSelectUpdate.style.pointerEvents = "none";
+    } else if (selectedTaskUpdate === "StandbyLN") {
+        locationSelectUpdate.value = "LN";
+        locationSelectUpdate.readOnly = true;
+        locationSelectUpdate.style.pointerEvents = "none";
+    } else {
+        locationSelectUpdate.readOnly = false;
+        locationSelectUpdate.style.pointerEvents = "auto";
+        locationSelectUpdate.value = "HO";
     }
 });
 </script>

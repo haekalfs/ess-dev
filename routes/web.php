@@ -110,6 +110,7 @@ Route::get('/leave/manage/all', 'LeaveController@manage')->name('manage_leave')-
 Route::get('/leave/manage/{id}', 'LeaveController@manage_leave_emp')->name('manage_leave_user')->middleware('auth');
 Route::get('/leave/manage/edit/{id}', 'LeaveController@get_leave_emp');
 Route::post('/leave/manage/update/{id}', 'LeaveController@update_leave_emp');
+Route::post('/leave/manage/add_quota/{id}', 'LeaveController@add_leave_quota')->name('addLeaveEmp');
 
 //Project Assignment
 Route::get('/myprojects', 'ProjectController@index')->name('myproject')->middleware('auth');

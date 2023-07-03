@@ -9,6 +9,7 @@ use App\Models\Leave;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Leave_request_history;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Timesheet_approver;
@@ -471,8 +472,9 @@ class LeaveController extends Controller
             $empLeaveQuotaFiveYearTerm = "-";
         }
 
+        $leaveType = Leave::all();
         $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
-		return view('leave.manage_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
+		return view('leave.manage_leave_user', compact('empLeaveQuotaAnnual', 'leaveType', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
 	}
 
     public function get_leave_emp($id)
@@ -523,4 +525,38 @@ class LeaveController extends Controller
         $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
 		return view('leave.edit_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
 	}
+
+    public function add_leave_quota(Request $request, $emp){
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'leaveStatus' => 'required',
+            'addLeaveQuotaType' => 'required',
+            'addLeaveActivePeriode' => 'required',
+            'addLeaveExpiration' => 'required',
+            'addLeaveQuota' => 'required',
+        ]);
+
+        $empLeave = new Emp_leave_quota;
+        $empLeave->user_id = $emp;
+        $empLeave->quota_used = 0;
+        $empLeave->leave_id = $request->addLeaveQuotaType;
+        $onceInServiceYears = $request->leaveStatus; // Get the value of the switch button
+        if ($onceInServiceYears) {
+            $empLeave->once_in_service_years = 1;
+        } else {
+            $empLeave->once_in_service_years = 0;
+        }
+        $empLeave->active_periode = $request->addLeaveActivePeriode;
+        $empLeave->expiration = $request->addLeaveExpiration;
+        $empLeave->quota_left = $request->addLeaveQuota;
+        $empLeave->save();
+
+        $entry = new Notification_alert;
+        $entry->user_id = $emp;
+        $entry->message = "A new quota has been added to your Leave Balance!";
+        $entry->importance = 1;
+        $entry->save();
+
+        return redirect()->back()->with('success', "Leave Quota has been added!");
+    }
 }
