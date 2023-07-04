@@ -1445,7 +1445,7 @@ class TimesheetController extends Controller
         ]);
 
         // var_dump($Year.intval($Month));
-        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_task', 'RequestTo')->orderBy('user_timesheet', 'asc')->orderBy('created_at', 'asc');
+        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_task', 'activity', 'RequestTo')->orderBy('user_timesheet', 'asc')->orderBy('created_at', 'asc');
 
         if ($validator->passes()) {
             $Year = $request->yearOpt;
