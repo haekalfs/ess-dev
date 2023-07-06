@@ -38,8 +38,8 @@ class ApprovalController extends Controller
 {
     public function index()
 	{
-        $accessController = new AccessController();
-        $result = $accessController->usr_acc(202);
+        // $accessController = new AccessController();
+        // $result = $accessController->usr_acc(202);
 
         $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
         ->where(function($query) {
@@ -227,6 +227,10 @@ class ApprovalController extends Controller
         ->where('leave_id', 100)
         ->where('active_periode', '>=', date('Y-m-d'))
         ->sum('quota_left');
+
+        $getYear = date('Y');
+        $expirationYear = $getYear + 1;
+
         if(!$weekendReplacementInCurrentMonth){
             Emp_leave_quota::updateOrCreate([
                 'user_id' => Auth::user()->id,
@@ -234,7 +238,7 @@ class ApprovalController extends Controller
             ], [
                 'quota_left' => 1,
                 'active_periode' => date('Y-m-d'),
-                'expiration' => "9999-01-01",
+                'expiration' => "$expirationYear-04-1", //this should be change to dynamic
                 'once_in_service_years' => false
             ]);
         } else {
