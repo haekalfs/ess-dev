@@ -252,66 +252,66 @@ $(document).ready(function() {
                     // Add click handlers for the edit and delete buttons
                     $('.delete-btn').click(deleteActivity);
                     
-                    // // Create a lookup table of rates for each location
-                    // var rates = {
-                    //     'HO': 70000,
-                    //     'LK': 200000,
-                    //     'LN': 200000,
-                    //     'DK': 115000,
-                    //     'WFH': 45000,
-                    //     'OR' : 140000
-                    // };
+                    // Create a lookup table of rates for each location
+                    var rates = {
+                        'HO': 70000,
+                        'LK': 200000,
+                        'LN': 200000,
+                        'DK': 115000,
+                        'WFH': 45000,
+                        'OR' : 140000
+                    };
 
-                    // // Create an object to store the total for each location
-                    // var totals = {
-                    //     'HO': 0,
-                    //     'LK': 0,
-                    //     'LN': 0,
-                    //     'DK': 0,
-                    //     'WFH': 0,
-                    //     'OR' : 0
-                    // };
-                    // // Update the card body with the counts for each location
-                    // var cardBody = $('.calculations');
-                    // cardBody.empty(); // Clear the card body
-                    // var clickable = $('.clickable2');
-                    // clickable.empty(); // Clear the card body
-                    // // cardBody.append($('<td><h6 class="m-0 font-weight-bold text-primary">Leaves Calculation</h6></td>'));
-                    // var cardBodyTotals = $('.calculationTotals');
-                    // cardBodyTotals.empty(); // Clear the card body
-                    // $.each(counts, function(location, count) {
-                    // // Calculate the result for the current location
-                    // var result = counts[location] * rates[location];
-                    // totals[location] = result;
-                    // // Format the result as Indonesian Rupiah currency
-                    // var formattedResult = result.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-                    // // Create the count text with the formatted result
-                    // var countText = location + ' : ' + count;
-                    //     cardBody.append($('<tr>'));
-                    //     cardBody.append($('<td></td>').text(location));
-                    //     cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
-                    //     cardBody.append($('<td></td>').text(count + ' Days'));
-                    //     cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
-                    //     cardBody.append($('<td></td>').text(formattedResult));
-                    //     cardBody.append($('</tr>'));
-                    //     // cardBodyRates.append($('<td></td>').text(formattedResult));
-                    // });
-                    // // Calculate the overall total
-                    // var overallTotal = 0;
-                    // $.each(totals, function(location, total) {
-                    //     overallTotal += total;
-                    // });
+                    // Create an object to store the total for each location
+                    var totals = {
+                        'HO': 0,
+                        'LK': 0,
+                        'LN': 0,
+                        'DK': 0,
+                        'WFH': 0,
+                        'OR' : 0
+                    };
+                    // Update the card body with the counts for each location
+                    var cardBody = $('.calculations');
+                    cardBody.empty(); // Clear the card body
+                    var clickable = $('.clickable2');
+                    clickable.empty(); // Clear the card body
+                    // cardBody.append($('<td><h6 class="m-0 font-weight-bold text-primary">Leaves Calculation</h6></td>'));
+                    var cardBodyTotals = $('.calculationTotals');
+                    cardBodyTotals.empty(); // Clear the card body
+                    $.each(counts, function(location, count) {
+                    // Calculate the result for the current location
+                    var result = counts[location] * rates[location];
+                    totals[location] = result;
+                    // Format the result as Indonesian Rupiah currency
+                    var formattedResult = result.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                    // Create the count text with the formatted result
+                    var countText = location + ' : ' + count;
+                        cardBody.append($('<tr>'));
+                        cardBody.append($('<td></td>').text(location));
+                        cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
+                        cardBody.append($('<td></td>').text(count + ' Days'));
+                        // cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
+                        // cardBody.append($('<td></td>').text(formattedResult));
+                        cardBody.append($('</tr>'));
+                        // cardBodyRates.append($('<td></td>').text(formattedResult));
+                    });
+                    // Calculate the overall total
+                    var overallTotal = 0;
+                    $.each(totals, function(location, total) {
+                        overallTotal += total;
+                    });
 
-                    // // Format the overall total as Indonesian Rupiah currency
-                    // var formattedTotal = overallTotal.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-                    // // Add the overall total to the card body
-                    // var totalText = 'Overall total: ' + formattedTotal;
+                    // Format the overall total as Indonesian Rupiah currency
+                    var formattedTotal = overallTotal.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                    // Add the overall total to the card body
+                    var totalText = 'Overall total: ' + formattedTotal;
                     // cardBody.append($('<tr>'));
-                    //     cardBody.append($('<td></td>').text('Estimated Total'));
-                    //     cardBody.append($('<td width="30px" class="text-center"></td>'));
-                    //     cardBody.append($('<td></td>'));
-                    //     cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
-                    //     cardBody.append($('<td></td>').text(formattedTotal));
+                    // cardBody.append($('<td></td>').text('Estimated Total'));
+                    // cardBody.append($('<td width="30px" class="text-center"></td>'));
+                    // cardBody.append($('<td></td>'));
+                    // cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
+                    // cardBody.append($('<td></td>').text(formattedTotal));
                     // cardBody.append($('</tr>'));
                 }
             },
