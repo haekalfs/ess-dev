@@ -1069,7 +1069,7 @@ class TimesheetController extends Controller
         $dateCut = Cutoffdate::first();
         // Get the cutoff date for submitting timesheets (7th of the next month)
         $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->date - 1));
-        $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-07-$dateCut->date");
+        $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-09-31");
 
         // Check if the current date is on or after the cutoff date
         if ($currentDate->gte($cutoffDate)) {
@@ -1480,7 +1480,7 @@ class TimesheetController extends Controller
         ]);
 
         // var_dump($Year.intval($Month));
-        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_task', 'activity', 'RequestTo')->orderBy('user_timesheet', 'asc')->orderBy('created_at', 'asc');
+        $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_task', 'activity', 'RequestTo')->orderBy('user_timesheet', 'asc')->orderBy('updated_at', 'asc')->orderBy('ts_status_id', 'asc');
 
         if ($validator->passes()) {
             $Year = $request->yearOpt;
