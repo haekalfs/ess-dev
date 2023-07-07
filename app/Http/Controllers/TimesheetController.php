@@ -268,12 +268,18 @@ class TimesheetController extends Controller
         // Get the current day
         $currentDay = date('d');
 
-        $date = Carbon::create($year, $month, 1)->startOfMonth()->format('Y-m-d');
+        // $date = Carbon::create($year, $month, 1)->startOfMonth()->format('Y-m-d');
+
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
 
         $findAssignment = Project_assignment_user::where('user_id', '=', $userId)
-            ->whereMonth('periode_start', '<=', $month)
-            ->whereDate('periode_end', '>=', $date)
-            ->get();
+        ->where(function ($query) use ($startDate, $endDate) {
+            $query->where('periode_start', '<=', $endDate->endOfMonth()->format('Y-m-d'))
+                ->where('periode_end', '>=', $startDate->startOfMonth()->format('Y-m-d'));
+        })
+        ->get();
+
 
         $assignmentArray = [];
         foreach ($findAssignment as $fa) {
@@ -360,6 +366,26 @@ class TimesheetController extends Controller
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->task;
         $entry->ts_location = $request->location;
+        $findTaskOnSameDay = Timesheet::where('ts_date', $request->clickedDate)->get();
+
+        if (!$findTaskOnSameDay->isEmpty()) {
+            $newTaskStartTime = date('H:i', strtotime($request->from));
+            $newTaskEndTime = date('H:i', strtotime($request->to));
+
+            foreach ($findTaskOnSameDay as $existingTask) {
+                $existingTaskStartTime = $existingTask->ts_from_time;
+                $existingTaskEndTime = $existingTask->ts_to_time;
+
+                if (
+                    ($newTaskStartTime >= $existingTaskStartTime && $newTaskStartTime < $existingTaskEndTime) ||
+                    ($newTaskEndTime > $existingTaskStartTime && $newTaskEndTime <= $existingTaskEndTime) ||
+                    ($newTaskStartTime <= $existingTaskStartTime && $newTaskEndTime >= $existingTaskEndTime)
+                ) {
+                    // Tasks intersect, return an error response or handle accordingly
+                    return response()->json(['error' => 'Task intersects with existing tasks'], 400);
+                }
+            }
+        }
         $entry->ts_from_time = date('H:i', strtotime($request->from));
         $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
@@ -414,7 +440,6 @@ class TimesheetController extends Controller
         $entry->save();
 
         try {
-
             // Store the file if it is provided
             if ($request->hasFile('surat_penugasan_wfh')) {
                 $file = $request->file('surat_penugasan_wfh');
@@ -1004,8 +1029,13 @@ class TimesheetController extends Controller
             $lastUpdatedAt = 'None';
         }
         $info[] = compact('status', 'lastUpdatedAt');
+
+        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->groupBy('ts_date')
+        ->get()
+        ->count();
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month', 'removeBtnSubmit', 'totalHours', 'info', 'assignmentNames', 'srtDate', 'startDate', 'endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month', 'getTotalDays', 'removeBtnSubmit', 'totalHours', 'info', 'assignmentNames', 'srtDate', 'startDate', 'endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
@@ -1117,8 +1147,8 @@ class TimesheetController extends Controller
         // var_dump($countRows);
         foreach ($results as $row) {
             $test = Project_assignment::where('id', $row->ts_task_id)->pluck('company_project_id')->first();
-            $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->pluck('user_id')->first();
-            $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->pluck('user_id')->first();
+            $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
+            $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
             $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
 
             $countIncentive = $row->total_rows * $row->incentive;
@@ -1337,10 +1367,15 @@ class TimesheetController extends Controller
             }
         }
 
+        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->groupBy('ts_date')
+        ->get()
+        ->count();
+
         foreach ($empApproval as $test) {
             Timesheet_detail::updateOrCreate([
                 'user_id' => Auth::user()->id,
-                'workhours' => intval($total_work_hours),
+                'workhours' => intval($total_work_hours) - $getTotalDays,
                 'month_periode' => $year.$month,
                 'RequestTo' => $test['name'],
                 'ts_task' => $test['task'],

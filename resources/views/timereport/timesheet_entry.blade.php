@@ -807,7 +807,7 @@ taskSelect.addEventListener("change", function() {
     } else {
         locationSelect.readOnly = false;
         locationSelect.style.pointerEvents = "auto";
-        locationSelect.value = "HO";
+        // locationSelect.value = "HO";
     }
 });
 
@@ -825,7 +825,7 @@ taskSelectRed.addEventListener("change", function() {
     } else {
         locationSelectRed.readOnly = false;
         locationSelectRed.style.pointerEvents = "auto";
-        locationSelectRed.value = "HO";
+        // locationSelectRed.value = "HO";
     }
 });
 
@@ -843,7 +843,7 @@ taskSelectUpdate.addEventListener("change", function() {
     } else {
         locationSelectUpdate.readOnly = false;
         locationSelectUpdate.style.pointerEvents = "auto";
-        locationSelectUpdate.value = "HO";
+        // locationSelectUpdate.value = "HO";
     }
 });
 </script>
