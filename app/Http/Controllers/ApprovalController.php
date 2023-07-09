@@ -61,7 +61,7 @@ class ApprovalController extends Controller
 
     public function timesheet_approval(Request $request)
     {
-        $Month = date('m');
+        $Month = Carbon::now()->subMonth()->format('m');
         $Year = date('Y');
 
         $nowYear = date('Y');
