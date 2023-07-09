@@ -1103,19 +1103,19 @@ class TimesheetController extends Controller
         $userId = Auth::user()->id;
 
         $subquery = DB::table('timesheet')
-            ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(allowance AS DECIMAL(10, 2)) AS allowance'), 'ts_task_id', 'ts_id_date', 'incentive')
-            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(allowance AS DECIMAL(10, 2)) DESC) AS rn')
+            ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(incentive AS DECIMAL(10, 2)) AS incentive'), 'ts_task_id', 'ts_id_date', 'allowance')
+            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(incentive AS DECIMAL(10, 2)) DESC) AS rn')
             ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
             ->where('ts_user_id', $userId)
-            ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'allowance', 'ts_task_id');
+            ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id');
 
         $sql = '(' . $subquery->toSql() . ') as subquery';
 
         $results = DB::table(DB::raw($sql))
             ->mergeBindings($subquery)
-            ->select('ts_task', 'ts_location', 'ts_user_id', 'allowance as max_allowance', 'ts_task_id', 'incentive', DB::raw('COUNT(*) as total_rows'))
+            ->select('ts_task', 'ts_location', 'ts_user_id', 'incentive as incentive', 'ts_task_id', 'allowance as max_allowance', DB::raw('COUNT(*) as total_rows'))
             ->where('rn', 1)
-            ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'allowance', 'ts_task_id')
+            ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id')
             ->get();
 
         // echo "Total days: " . $totalDays;
