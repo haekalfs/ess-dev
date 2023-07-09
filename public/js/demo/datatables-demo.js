@@ -86,7 +86,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
   $('#listAssignments').DataTable({
-    "order": [[ 2, "desc" ]],
+    "order": [[ 0, "desc" ]],
     "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
     "pageLength": 20
   } );
