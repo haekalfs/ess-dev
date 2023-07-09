@@ -60,6 +60,7 @@ class ProjectController extends Controller
             // ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
             ->select('project_assignments.*', 'company_projects.project_name', 'company_projects.project_code')
             ->whereYear('req_date', $currentYear)
+            ->orderBy('req_date', 'desc')
             ->get();
         return view('projects.assigning', compact('assignment', 'project', 'yearsBefore', 'yearSelected'));
     }
