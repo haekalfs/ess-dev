@@ -61,10 +61,10 @@ active
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
-        <div class="card shadow mb-4">
+        <div class="card shadow mb-4" style="width: 1369px; height: 300px;">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Requested Information</h6>
                 <div class="text-right">
                     <a class="btn btn-danger btn-sm" type="button" href="/medical/history" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
                 </div>
@@ -112,21 +112,21 @@ active
                         <table class="table table-borderless">
 							<thead>
                                 <tr>
-                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Approval Information</th>
+                                    <th style="padding-left: 0;" class="m-0  text-primary" colspan="2">Approval Information</th>
                                 </tr>
                             </thead>
-                           <tr class="table-sm">
-								<td>Approval By</td>
-								<td>: Ronnyy</td>
-							</tr>
-							<tr class="table-sm">
-								<td>Approval Date</td>
-								<td>: 09-06-2023</td>
-							</tr>
-							<tr class="table-sm">
-								<td>Approval Notes</td>
-								<td>: Good</td>
-							</tr>
+                           <tr>
+                                <th>Approval By</th>
+                                <td>: {{$med->approved_by}}</td>
+                            </tr>
+                            <tr>
+                                <th>Approval Date</th>
+                                <td>: {{$med->approved_date}}</td>
+                            </tr>
+                            <tr>
+                                <th>Approval Notes</th>
+                                <td>: {{$med->approved_note}}</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -172,7 +172,7 @@ active
                                     Rp. <span class="amount" id="amount">{{ $md->mdet_amount }}</span>
                                 </td>
 								<td>
-                                    Rp. <span class="amountApproved" id="amountApproved">50.000</span>
+                                    Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
                                     <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >

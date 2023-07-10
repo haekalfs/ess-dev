@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use App\Models\Medical;
+use App\Models\Medical_approval;
 use App\Models\Medical_details;
 use App\Models\User;
 use Illuminate\Contracts\Session\Session as SessionSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
-
+use function GuzzleHttp\Promise\all;
 
 class MedicalController extends Controller
 {
@@ -39,6 +40,10 @@ class MedicalController extends Controller
 
     public function store(Request $request)
     {
+        $data = $request->all();
+
+        // Tampilkan data yang diterima dari form
+        dd($data); 
         $request->validate([
             'attach.*' => 'required|file',
             'amount.*' => 'required',
@@ -115,9 +120,9 @@ class MedicalController extends Controller
         
         $medDet = Medical_details::where('mdet_id', $medical_number)->first();
         $request->validate([
-            'attach.*' => 'required|file',
-            'amount.*' => 'required',
-            'desc.*' => 'required',
+            'attach.*' => 'sometimes|file',
+            'amount.*' => 'sometimes',
+            'desc.*' => 'sometimes',
         ]);
 
         if ($request->hasFile('inputAttach')){
@@ -150,12 +155,60 @@ class MedicalController extends Controller
 
 
     }
+
     public function delete_medDetail($mdet_id, $medical_number){
         DB::table('medicals_detail')
         ->where('mdet_id', $medical_number)
-        // ->where('medical_number', $medical_number)
         ->delete();
 
         return redirect()->back()->with('success', 'Medical Detail Delete Success.');
+    }
+
+
+// Approval Medical
+
+    public function approval_edit($id){
+        $med = Medical::findOrFail($id);
+        $medDet = Medical_details::where('medical_number', $med->id)->get();
+        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet]);
+    }
+
+    public function update_approval (Request $request, $medical_number){
+        $medDet = Medical_details::where('mdet_id', $medical_number)->first();
+        $request->validate([
+            'amount_approved.*' => 'sometimes',
+            'desc.*' => 'sometimes',
+        ]);
+
+        $medDet->amount_approved = $request->input_mdet_amount_approved;
+        $medDet->mdet_desc = $request->input_mdet_desc;
+        $medDet->save();
+
+        return redirect()->back()->with('success', 'Medical Approval Edit Success');
+    }
+
+    public function approve(Request $request, $id)
+    {
+
+        $data = $request->all();
+
+        // Tampilkan data yang diterima dari form
+        dd($data);
+        $request->validate([
+            'input_approve_note' => 'required',
+        ]);
+
+        $totalAmountApproved = $request->input('totalAmountApprovedInput');
+        // Lakukan pengolahan atau penyimpanan ke database menggunakan $totalAmountApproved
+        // ...
+
+        $medical = Medical::findOrFail($id);
+        $medical->approved_by = $request->approved_name;
+        $medical->approved_date = $request->date_approved;
+        $medical->approved_note = $request->input_approve_note;
+        $medical->total_approved = $totalAmountApproved;
+        $medical->med_status = 'Approved';
+        $medical->save();
+        return redirect()->back()->with('success', 'Medical Approval Edit Success');
     }
 }

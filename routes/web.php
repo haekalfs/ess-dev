@@ -72,6 +72,7 @@ Route::get('/development', 'HomeController@notification_indev');
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth');
 Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary')->middleware('auth');
 Route::get('/approval/leave', 'LeaveApprovalController@leave_approval')->name('approval.leave')->middleware('auth');
+Route::get('/approval/medical', 'ApprovalController@medical_approval')->name('approval.medical')->middleware('auth');
 
 Route::match(['get', 'post'], '/approval/leave/approve/{id}', 'LeaveApprovalController@approve')->name('leave.approve')->middleware('auth');
 Route::match(['get', 'post'], '/approval/leave/reject/{id}', 'LeaveApprovalController@reject')->name('leave.reject')->middleware('auth');
@@ -96,6 +97,8 @@ Route::get('/approval/project/assignment/', 'ApprovalProjectController@index')->
 Route::get('/approval/project/assignment/preview/{id}', 'ApprovalProjectController@preview_assignment')->name('preview.project.assignment')->middleware('auth');
 Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectController@approve_assignment')->name('approve.project.assignment')->middleware('auth');
 Route::get('/approval/project/assignment/reject/{id}', 'ApprovalProjectController@reject_assignment')->name('reject.project.assignment')->middleware('auth');
+
+// Approval Medical
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
@@ -213,7 +216,10 @@ Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
 Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
 Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail')->middleware('auth');
-// Route::put('/medical/edit/{id}/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
+Route::get('/medical/approval/{id}', 'MedicalController@approval_edit')->middleware('auth');
+Route::put('/medical/approval/{id}/update/{mdet_id}', 'MedicalController@update_approval')->middleware('auth');
+Route::put('/medical/approval/{id}/approve', 'MedicalController@approve')->middleware('auth');
+Route::put('/medical/approval/{id}/reject', 'MedicalController@reject')->middleware('auth');
 
 
 

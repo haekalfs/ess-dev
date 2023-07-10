@@ -23,6 +23,7 @@ class Medical_details extends Authenticatable
         'mdet_attachment',
         'mdet_amount',
         'mdet_desc',
+        'amount_approved'
     ];
 
     public function medical()
