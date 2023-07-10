@@ -488,6 +488,8 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
+        $findTaskOnSameDay = Timesheet::where('ts_date', $request->clickedDateRed)->where('ts_user_id', Auth::user()->id)->get();
+
         $totalIncentive = 0;
         $totalIncentive = 0;
         $id_project = $request->task;
@@ -556,7 +558,27 @@ class TimesheetController extends Controller
 
         $entry->allowance = $countAllowances;
         $entry->incentive = $totalIncentive;
-        $entry->save();
+        
+        if (!$findTaskOnSameDay->isEmpty()) {
+            $newTaskStartTime = date('H:i', strtotime($request->from));
+            $newTaskEndTime = date('H:i', strtotime($request->to));
+        
+            foreach ($findTaskOnSameDay as $existingTask) {
+                $existingTaskStartTime = $existingTask->ts_from_time;
+                $existingTaskEndTime = $existingTask->ts_to_time;
+        
+                if (($newTaskStartTime >= $existingTaskEndTime)) {
+                    $entry->ts_from_time = date('H:i', strtotime($request->from));
+                    $entry->ts_to_time = date('H:i', strtotime($request->to));
+                    $entry->save();
+                } else {
+                    // Tasks intersect, return an error response or handle accordingly
+                    return response()->json(['error' => 'Task intersects with existing tasks'], 400);
+                }
+            }
+        } else {
+            $entry->save();
+        }
 
         try {
             // Store the file if it is provided
