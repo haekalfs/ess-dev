@@ -688,32 +688,32 @@ active
 </div>
 
 <script>
-document.getElementById("task").addEventListener("change", function() {
-    if (this.value === "Sick") {
-        document.getElementById("activity").value = "-";
-        document.getElementById("location").value = "N/a";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("location").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);
-    } else if(this.value === "Other") {
-        document.getElementById("activity").value = "-";
-        document.getElementById("location").value = "N/a";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("location").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-    } else {
-        document.getElementById("activity").removeAttribute("readonly");
-        document.getElementById("location").removeAttribute("readonly");
-        document.getElementById("start-time").removeAttribute("readonly");
-        document.getElementById("end-time").removeAttribute("readonly");
-    }
-});
+// document.getElementById("task").addEventListener("change", function() {
+//     if (this.value === "Sick") {
+//         document.getElementById("activity").value = "-";
+//         document.getElementById("location").value = "N/a";
+//         document.getElementById("start-time").value = "00:00";
+//         document.getElementById("end-time").value = "00:00";
+//         document.getElementById("activity").setAttribute("readonly", true);
+//         document.getElementById("location").setAttribute("readonly", true);
+//         document.getElementById("start-time").setAttribute("readonly", true);
+//         document.getElementById("end-time").setAttribute("readonly", true);
+//     } else if(this.value === "Other") {
+//         document.getElementById("activity").value = "-";
+//         document.getElementById("location").value = "N/a";
+//         document.getElementById("start-time").value = "00:00";
+//         document.getElementById("end-time").value = "00:00";
+//         document.getElementById("activity").setAttribute("readonly", true);
+//         document.getElementById("location").setAttribute("readonly", true);
+//         document.getElementById("start-time").setAttribute("readonly", true);
+//         document.getElementById("end-time").setAttribute("readonly", true);  
+//     } else {
+//         document.getElementById("activity").removeAttribute("readonly");
+//         document.getElementById("location").removeAttribute("readonly");
+//         document.getElementById("start-time").removeAttribute("readonly");
+//         document.getElementById("end-time").removeAttribute("readonly");
+//     }
+// });
 
 function setupTimeInputs() {
     $('.time-input').datetimepicker({
@@ -804,7 +804,30 @@ taskSelect.addEventListener("change", function() {
         locationSelect.value = "LN";
         locationSelect.readOnly = true;
         locationSelect.style.pointerEvents = "none";
+    } else if (selectedTask === "Other") {
+        locationSelect.value = "N/a";
+        document.getElementById("activity").value = "-";
+        document.getElementById("start-time").value = "00:00";
+        document.getElementById("end-time").value = "00:00";
+        document.getElementById("activity").setAttribute("readonly", true);
+        document.getElementById("start-time").setAttribute("readonly", true);
+        document.getElementById("end-time").setAttribute("readonly", true);  
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
+    } else if (selectedTask === "Sick") {
+        locationSelect.value = "N/a";
+        document.getElementById("activity").value = "-";
+        document.getElementById("start-time").value = "00:00";
+        document.getElementById("end-time").value = "00:00";
+        document.getElementById("activity").setAttribute("readonly", true);
+        document.getElementById("start-time").setAttribute("readonly", true);
+        document.getElementById("end-time").setAttribute("readonly", true);  
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
     } else {
+        document.getElementById("activity").removeAttribute("readonly");
+        document.getElementById("start-time").removeAttribute("readonly");
+        document.getElementById("end-time").removeAttribute("readonly");
         locationSelect.readOnly = false;
         locationSelect.style.pointerEvents = "auto";
         // locationSelect.value = "HO";
@@ -818,11 +841,34 @@ taskSelectRed.addEventListener("change", function() {
         locationSelectRed.value = "LK";
         locationSelectRed.readOnly = true;
         locationSelectRed.style.pointerEvents = "none";
+    } else if (selectedTask === "Other") {
+        document.getElementById("activity").value = "-";
+        document.getElementById("start-time").value = "00:00";
+        document.getElementById("end-time").value = "00:00";
+        document.getElementById("activity").setAttribute("readonly", true);
+        document.getElementById("start-time").setAttribute("readonly", true);
+        document.getElementById("end-time").setAttribute("readonly", true);  
+        locationSelect.value = "N/a";
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
+    } else if (selectedTask === "Sick") {
+        document.getElementById("activity").value = "-";
+        document.getElementById("start-time").value = "00:00";
+        document.getElementById("end-time").value = "00:00";
+        document.getElementById("activity").setAttribute("readonly", true);
+        document.getElementById("start-time").setAttribute("readonly", true);
+        document.getElementById("end-time").setAttribute("readonly", true);  
+        locationSelect.value = "N/a";
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
     } else if (selectedTaskRed === "StandbyLN") {
         locationSelectRed.value = "LN";
         locationSelectRed.readOnly = true;
         locationSelectRed.style.pointerEvents = "none";
     } else {
+        document.getElementById("activity").removeAttribute("readonly");
+        document.getElementById("start-time").removeAttribute("readonly");
+        document.getElementById("end-time").removeAttribute("readonly");
         locationSelectRed.readOnly = false;
         locationSelectRed.style.pointerEvents = "auto";
         // locationSelectRed.value = "HO";

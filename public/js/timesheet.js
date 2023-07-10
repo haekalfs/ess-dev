@@ -352,6 +352,8 @@ $(document).ready(function() {
                     $('.alert-success-saving').show();
                     document.getElementById("activity").removeAttribute("readonly");
                     document.getElementById("location").removeAttribute("readonly");
+                    document.getElementById("location").readOnly = false;
+                    document.getElementById("location").style.pointerEvents = "auto";
                     document.getElementById("start-time").removeAttribute("readonly");
                     document.getElementById("end-time").removeAttribute("readonly");
                     fileInput.removeClass('validate');
