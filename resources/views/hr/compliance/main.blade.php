@@ -14,6 +14,7 @@ active
             <h1 class="h3 mb-2 text-gray-800">Compliance Settings</h1>
             <p class="mb-4 text-danger"><i>Restricted Access</i></p>
         </div>
+        <button class="btn btn-primary" value="Save">Save</button>
     </div>
 
     @if ($message = Session::get('success'))
@@ -37,56 +38,53 @@ active
     </div>
     @endif
     <div class="row">
-        <div class="col-xl-12 col-lg-12">
+        <!-- Area Chart -->
+        <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Employee Information</h6>
-                    <div class="text-right">
-                        <a class="btn btn-secondary btn-sm" type="button" href="" id="manButton">Save</a>
-                    </div>
+                    <h6 class="m-0 font-weight-bold text-primary">Cutoff Date</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="col-md-12">
-                        <div class="col-md-12">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="email">Employee ID :</label>
-                                        <input class="form-control"  name="employee_id" placeholder="Employee ID..." value=""readonly/>
-                                        @if($errors->has('employee_id'))
-                                            <div class="text-danger">
-                                                {{ $errors->first('employee_id')}}
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="password">User ID :</label>
-                                    <input class="form-control flex" id="usr_id" name="usr_id" placeholder="User ID..."/>
-                                    <h6 style="color:red; font-size: 13px; font-style: italic" id="user-id-error"></h6>
+                                    <label for="email">Timesheet Submission :</label>
+                                    <input type="number" class="form-control" name="date_prepared" value="{{ $cutoffDate->date }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Timesheet Approval :</label>
+                                    <input type="text" class="form-control" name="date_prepared" value="" placeholder="">
                                 </div>
                             </div>
                         </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="password">Email :</label>
-                                        <input class="form-control" name="email" placeholder="Email..." />
-                                        @if($errors->has('email'))
-                                            <div class="text-danger">
-                                                {{ $errors->first('email')}}
-                                            </div>
-                                        @endif
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Leave Approval :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="password">Password :</label>
-                                        <input class="form-control" name="password" value="" placeholder="****"/>
-                                    </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Reimburse & Med Approval :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="comment">Financial Password :</label>
+                                    <input type="password" class="form-control" name="date_prepared" value="{{ $financialPass }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="comment">Reconfirm Password :</label>
+                                    <input type="password" class="form-control" name="date_prepared" value="{{ $financialPass }}">
                                 </div>
                             </div>
                         </div>
@@ -94,6 +92,77 @@ active
                 </div>
             </div>
         </div>
+
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Approvers</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Approver 1 :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Approver 1 :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Approver 1 :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Approver 1 :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Prior Approval :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Prior Approval :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Prior Approval :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Prior Approval :</label>
+                                    <input type="number" class="form-control" name="date_prepared" placeholder="1-28/29/30/31....">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </form>
 <style>

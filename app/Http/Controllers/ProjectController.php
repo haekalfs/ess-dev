@@ -529,17 +529,56 @@ class ProjectController extends Controller
             'approval_status' => '40'
     	]);
 
-        Project_assignment_user::create([
-    		'user_id' => $requestAss->req_by,
-    		'role' => $requestAss->role,
-            'responsibility' => $requestAss->responsibility,
-            'periode_start' => $requestAss->periode_start,
-            'periode_end' => $requestAss->periode_end,
-            'project_assignment_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
-            'company_project_id' => $requestAss->company_project_id
-    	]);
+        
+        // Project_assignment_user::create([
+    	// 	'user_id' => $requestAss->req_by,
+    	// 	'role' => $requestAss->role,
+        //     'responsibility' => $requestAss->responsibility,
+        //     'periode_start' => $requestAss->periode_start,
+        //     'periode_end' => $requestAss->periode_end,
+        //     'project_assignment_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
+        //     'company_project_id' => $requestAss->company_project_id
+    	// ]);
 
-        return redirect('/assignment')->with('success', "Assignment #$uniqueIdP from request has been created successfully");
+        $from = Carbon::createFromFormat('Y-m-d', $requestAss->periode_start);
+        $to = Carbon::createFromFormat('Y-m-d', $requestAss->periode_end);
+        $userId = $requestAss->req_by;
+        $companyProjectId = $requestAss->company_project_id;
+
+        $existingAssignment = Project_assignment_user::where('user_id', $userId)
+            ->where('company_project_id', $companyProjectId)
+            ->where(function ($query) use ($from, $to) {
+                $query->where(function ($query) use ($from, $to) {
+                    $query->where('periode_start', '<=', $from->format('Y-m-d'))
+                        ->where('periode_end', '>=', $from->format('Y-m-d'));
+                })->orWhere(function ($query) use ($from, $to) {
+                    $query->where('periode_start', '<=', $to->format('Y-m-d'))
+                        ->where('periode_end', '>=', $to->format('Y-m-d'));
+                });
+            })
+            ->get();
+
+        if ($existingAssignment->isNotEmpty()) {
+            return redirect()->back()->with('failed', "$userId already have an assignment that intersect with current periode!");
+        } else {
+            Project_assignment_user::create([
+                'user_id' => $requestAss->req_by,
+                'role' => $requestAss->role,
+                'responsibility' => $requestAss->responsibility,
+                'periode_start' => $requestAss->periode_start,
+                'periode_end' => $requestAss->periode_end,
+                'project_assignment_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
+                'company_project_id' => $requestAss->company_project_id
+            ]);
+            $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
+            $employees = User::whereIn('id', $roleToApprove)->get();
+
+            // foreach ($employees as $employee) {
+            //     dispatch(new NotifyAssignmentCreation($employee));
+            // }
+            
+            return redirect()->back()->with('success', "$userId has been added to an assignment!");
+        }
     }
 
     public function retrieveProjectData($id)

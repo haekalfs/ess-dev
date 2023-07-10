@@ -256,7 +256,7 @@ $(document).ready(function() {
                     var rates = {
                         'HO': 70000,
                         'LK': 200000,
-                        'LN': 400000,
+                        'LN': 200000,
                         'DK': 115000,
                         'WFH': 45000,
                         'OR' : 140000
@@ -291,8 +291,8 @@ $(document).ready(function() {
                         cardBody.append($('<td></td>').text(location));
                         cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
                         cardBody.append($('<td></td>').text(count + ' Days'));
-                        cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
-                        cardBody.append($('<td></td>').text(formattedResult));
+                        // cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
+                        // cardBody.append($('<td></td>').text(formattedResult));
                         cardBody.append($('</tr>'));
                         // cardBodyRates.append($('<td></td>').text(formattedResult));
                     });
@@ -306,13 +306,13 @@ $(document).ready(function() {
                     var formattedTotal = overallTotal.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
                     // Add the overall total to the card body
                     var totalText = 'Overall total: ' + formattedTotal;
-                    cardBody.append($('<tr>'));
-                        cardBody.append($('<td></td>').text('Estimated Total'));
-                        cardBody.append($('<td width="30px" class="text-center"></td>'));
-                        cardBody.append($('<td></td>'));
-                        cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
-                        cardBody.append($('<td></td>').text(formattedTotal));
-                    cardBody.append($('</tr>'));
+                    // cardBody.append($('<tr>'));
+                    // cardBody.append($('<td></td>').text('Estimated Total'));
+                    // cardBody.append($('<td width="30px" class="text-center"></td>'));
+                    // cardBody.append($('<td></td>'));
+                    // cardBody.append($('<td width="30px" class="text-center"></td>').text(':'));
+                    // cardBody.append($('<td></td>').text(formattedTotal));
+                    // cardBody.append($('</tr>'));
                 }
             },
             error: function(response) {

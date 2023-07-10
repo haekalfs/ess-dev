@@ -33,44 +33,106 @@ active
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Approval History</h6>
-        <div class="text-right">
-        </div>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Timesheets Approvals</h6>
+        {{-- <div class="text-right">
+            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
+        </div> --}}
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Request Date</th>
-                        <th>Timesheet Periode</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($approvals as $approval)
-                    <tr>
-                        <td>{{ $approval->user_timesheet }}</td>
-                        <td>{{ $approval->date_submitted }}</td>
-                        <td>{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
-                        <td class="action text-center">
-                            {{-- <a href="/approval/timesheet/approve/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Approve
-                            </a>
-                            <a onclick='isconfirm();' href="/approval/timesheet/reject/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-danger btn-sm" style="margin-left: 3%;"><i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject</a> --}}
-                            <a href="/approval/timesheet/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Preview</a>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    <form method="GET" action="/approval/timesheet/p">
+        @csrf
+        <div class="card-body">
+            <div class="col-md-12 zoom90">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="email">Employee :</label>
+                            <select class="form-control" name="showOpt" required>
+                                <option value="1">All</option>
+                                @foreach ($employees as $emp)
+                                    <option value="{{ $emp->id }}">{{ $emp->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="password">Year :</label>
+                            <select class="form-control" name="yearOpt" required>
+                                @foreach (array_reverse($yearsBefore) as $year)
+                                    <option value="{{ $year }}" @if ($year == $Year) selected @endif>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="password">Month :</label>
+                            <select class="form-control" name="monthOpt" required>
+                                @foreach (range(1, 12) as $month)
+                                    <option value="{{ $month }}" @if ($month == $Month) selected @endif>{{ date("F", mktime(0, 0, 0, $month, 1)) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 d-flex justify-content-center align-items-end">
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-primary" value="Display">
+                        </div>
+                    </div>
+                    <div class="col-md-12"><br>
+                        <div class="table-responsive">
+                            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Request Date</th>
+                                        <th>Timesheet Periode</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($approvals->isEmpty())
+                                        <tr style="border-bottom: 1px solid #dee2e6;">
+                                            <td colspan="4" class="text-center"><a><i>No Data Available</i></a></td>
+                                        </tr>
+                                    @else
+                                        @foreach($approvals as $index => $approval)
+                                        <tr>
+                                            @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
+                                            <td style="border-bottom: none; border-top: none;"></td>
+                                            <td style="border-bottom: none; border-top: none;">{{ $approval->date_submitted }}</td>
+                                            <td style="border-bottom: none; border-top: none;">{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
+                                            <td style="border-bottom: none; border-top: none;"></td>
+                                            @else
+                                            <td style="border-bottom: none; border-top: none;">{{ $approval->user_timesheet }}</td>
+                                            <td style="border-bottom: none; border-top: none;">{{ $approval->date_submitted }}</td>
+                                            <td style="border-bottom: none; border-top: none;">{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
+                                            <td  style="border-bottom: none; border-top: none;" class="action text-center">
+                                                <a href="/approval/timesheet/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Preview</a>
+                                            </td>
+                                            @endif
+                                        </tr>
+                                        @endforeach
+                                    @endif
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <td colspan="4" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 <style>
 .action{
     width: 300px;
+}
+.invisible {
+    border-top: none;
+    border-bottom: none;
 }
 </style>
 @endsection

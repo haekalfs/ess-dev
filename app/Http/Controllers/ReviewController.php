@@ -51,7 +51,7 @@ class ReviewController extends Controller
             $month_periode = $Year . intval($Month);
 
             $getData = Timesheet_detail::where('month_periode', $month_periode)
-            ->whereNotIn('ts_status_id', ['10', '15'])
+            ->whereNotIn('ts_status_id', [10, 15, 30])
             ->whereIn('RequestTo', $priorApproval)
             ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
             ->groupBy('user_timesheet')->get();
@@ -68,7 +68,7 @@ class ReviewController extends Controller
             });
         } else {
             $getData = Timesheet_detail::where('month_periode', $month_periode)
-            ->whereNotIn('ts_status_id', ['10', '15'])
+            ->whereNotIn('ts_status_id', [10, 15, 30])
             ->whereIn('RequestTo', $priorApproval)
             ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
             ->groupBy('user_timesheet')->get();

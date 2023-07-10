@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendTimesheetApprovalNotification;
 use App\Mail\ApprovalTimesheet;
 use App\Models\Timesheet_detail;
 use App\Models\User;
@@ -48,18 +49,14 @@ class SendTimesheetApprovalReminder extends Command
         $users = User::whereIn('id', $userToApprove)->get();
 
         foreach ($users as $user) {
-            $notification = new ApprovalTimesheet($user);
-            Mail::send('mailer.timesheetapproval', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                        ->subject($notification->emailSubject());
-            });
+            dispatch(new SendTimesheetApprovalNotification($user));
         }
     }
 
     public function schedule(Schedule $schedule)
     {
         $schedule->command('timesheet:send-reminder')
-            ->twiceMonthly(5, 7)
+            ->twiceMonthly(5, 10)
             ->daily();
     }
 }

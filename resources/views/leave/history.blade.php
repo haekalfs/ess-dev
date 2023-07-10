@@ -16,11 +16,11 @@ active
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800">Leave History</h1>
     <div>
-        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
+        {{-- <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
             @foreach (array_reverse($yearsBefore) as $year)
                 <option value="{{ $year }}">{{ $year }}</option>
             @endforeach
-        </select>
+        </select> --}}
     </div>
 </div>
 
@@ -268,6 +268,7 @@ active
                                             <th>Leave ID</th>
                                             <th>Active Periode</th>
                                             <th>Expired On</th>
+                                            <th>Status</th>
                                             <th>Default Quota</th>
                                             <th>Quota Used</th>
                                             <th>Quota Left</th>
@@ -278,7 +279,14 @@ active
                                             <tr>
                                                 <td>{{ $lqa->leave->description }}</td>
                                                 <td>{{ $lqa->active_periode }}</td>
-                                                <td>{{ $lqa->active_periode }}</td>
+                                                <td>{{ $lqa->expiration }}</td>
+                                                <td><?php
+                                                if($lqa->expiration < date('Y-m-d')){
+                                                    echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
+                                                } else {
+                                                    echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
+                                                }
+                                                ?></td>
                                                 <td>{{ $lqa->leave->leave_quota }}</td>
                                                 <td>{{ $lqa->quota_used }}</td>
                                                 <td>{{ $lqa->quota_left }}</td>
@@ -441,6 +449,7 @@ active
                                             <th>Leave ID</th>
                                             <th>Active Periode</th>
                                             <th>Expired On</th>
+                                            <th>Status</th>
                                             <th>Quota</th>
                                             <th>Quota Used</th>
                                             <th>Quota Left</th>
@@ -451,7 +460,14 @@ active
                                             <tr>
                                                 <td>{{ $wrq->leave->description }}</td>
                                                 <td>{{ $wrq->active_periode }}</td>
-                                                <td>{{ $wrq->active_periode }}</td>
+                                                <td>{{ $wrq->expiration }}</td>
+                                                <td><?php
+                                                    if($wrq->expiration < date('Y-m-d')){
+                                                        echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
+                                                    } else {
+                                                        echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
+                                                    }
+                                                ?></td>
                                                 <td>{{ $wrq->quota_left }}</td>
                                                 <td>{{ $wrq->quota_used }}</td>
                                                 <td>{{ $wrq->quota_left }}</td>

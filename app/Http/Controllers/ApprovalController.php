@@ -39,13 +39,15 @@ class ApprovalController extends Controller
 {
     public function index()
 	{
-        $accessController = new AccessController();
-        $result = $accessController->usr_acc(202);
+        // $accessController = new AccessController();
+        // $result = $accessController->usr_acc(202);
 
         $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
         ->where(function($query) {
-            $query->where('RequestTo', Auth::user()->id);
+            $query->where('RequestTo', Auth::user()->id)
+            ->groupBy('user_timesheet', 'month_periode');
         })
+        ->groupBy('user_timesheet', 'month_periode')
         ->count();
 
         $pCount = Project_assignment::where('approval_status', 40)->count();
@@ -58,8 +60,22 @@ class ApprovalController extends Controller
 		return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount]);
 	}
 
-    public function timesheet_approval()
+    public function timesheet_approval(Request $request)
     {
+        $Month = Carbon::now()->subMonth()->format('m');
+        $Year = date('Y');
+
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $employees = User::all();
+
+        $validator = Validator::make($request->all(), [
+            'showOpt' => 'required',
+            'yearOpt' => 'required',
+            'monthOpt' => 'required'
+        ]);
+        
         $currentYear = date('Y');
 
         // Get the current day of the month
@@ -69,12 +85,16 @@ class ApprovalController extends Controller
 
         $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
         // var_dump($checkUserPost);
+        if ($validator->passes()) {
+            $Year = $request->yearOpt;
+            $Month = $request->monthOpt;
+        }
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
                 if (in_array($checkUserPost, [7, 8, 12])) {
-                    $Check = DB::table('timesheet_details')
-                        ->select('*')
-                        ->whereYear('date_submitted', $currentYear)
+                    $Check = Timesheet_detail::select('*')
+                        ->whereYear('date_submitted', $Year)
+                        ->where('month_periode', $Year . intval($Month))
                         ->whereNotIn('ts_status_id', [10, 15])
                         ->whereNotIn('RequestTo', $ts_approver)
                         ->groupBy('user_timesheet', 'month_periode')
@@ -82,51 +102,50 @@ class ApprovalController extends Controller
                         ->pluck('user_timesheet')
                         ->toArray();
                         if (!empty($Check)) {
-                            $approvals = DB::table('timesheet_details')
-                                ->select('*')
-                                ->whereYear('date_submitted', $currentYear)
+                            $approvals = Timesheet_detail::select('*')
+                                ->whereYear('date_submitted', $Year)
+                                ->where('month_periode', $Year . intval($Month))
                                 ->where('RequestTo', Auth::user()->id)
                                 ->whereIn('user_timesheet', $Check)
                                 ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
                         } else {
-                            $approvals = DB::table('timesheet_details')
-                                ->select('*')
+                            $approvals = Timesheet_detail::select('*')
                                 ->where('RequestTo', 'xxhaekalsxx')
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
                         }
                 } else {
-                    $Check = DB::table('timesheet_details')
-                        ->select('*')
-                        ->whereYear('date_submitted', $currentYear)
+                    $Check = Timesheet_detail::select('*')
                         ->whereNotIn('ts_status_id', [10, 15])
                         ->whereNotIn('RequestTo', [Auth::user()->id])
+                        ->whereYear('date_submitted', $Year)
+                        ->where('month_periode', $Year . intval($Month))
                         ->groupBy('user_timesheet', 'month_periode')
                         ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 404 THEN 0 ELSE 1 END)')
                         ->pluck('user_timesheet')
                         ->toArray();
                     if (!empty($Check)) {
-                        $approvals = DB::table('timesheet_details')
-                        ->select('*')
-                        ->whereYear('date_submitted', $currentYear)
+                        $approvals = Timesheet_detail::select('*')
                         ->where('RequestTo', Auth::user()->id)
                         ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                         ->whereIn('user_timesheet', $Check)
+                        ->whereYear('date_submitted', $Year)
+                        ->where('month_periode', $Year . intval($Month))
                         ->groupBy('user_timesheet', 'month_periode')
                         ->get();
                     } else {
-                        $approvals = DB::table('timesheet_details')
-                        ->select('*')
-                        ->whereYear('date_submitted', $currentYear)
+                        $approvals = Timesheet_detail::select('*')
+                        ->whereYear('date_submitted', $Year)
+                        ->where('month_periode', $Year . intval($Month))
                         ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
                         ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                         ->groupBy('user_timesheet', 'month_periode')
                         ->get();
                     }
                 }
-            return view('approval.timesheet_approval', ['approvals' => $approvals]);
+            return view('approval.timesheet_approval', ['approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'Month' => $Month, 'Year' => $Year, 'employees' => $employees]);
         } else {
             // Handle the case when the date is not within the range
             return redirect()->back()->with('failed', 'This page can only be accessed between the 5th - 8th of each month.');
@@ -209,6 +228,10 @@ class ApprovalController extends Controller
         ->where('leave_id', 100)
         ->where('active_periode', '>=', date('Y-m-d'))
         ->sum('quota_left');
+
+        $getYear = date('Y');
+        $expirationYear = $getYear + 1;
+
         if(!$weekendReplacementInCurrentMonth){
             Emp_leave_quota::updateOrCreate([
                 'user_id' => Auth::user()->id,
@@ -216,7 +239,7 @@ class ApprovalController extends Controller
             ], [
                 'quota_left' => 1,
                 'active_periode' => date('Y-m-d'),
-                'expiration' => "9999-01-01",
+                'expiration' => "$expirationYear-04-1", //this should be change to dynamic
                 'once_in_service_years' => false
             ]);
         } else {
@@ -243,7 +266,7 @@ class ApprovalController extends Controller
             'reject_notes' => 'sometimes'
         ]);
 
-        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
+        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.intval($month))->get();
 
         foreach($countRows as $row) { ///test buat dihapus nnti karna double loops
 
