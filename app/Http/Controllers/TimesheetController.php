@@ -349,7 +349,7 @@ class TimesheetController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()]);
         }
-        $findTaskOnSameDay = Timesheet::where('ts_date', $request->clickedDate)->get();
+        $findTaskOnSameDay = Timesheet::where('ts_date', $request->clickedDate)->where('ts_user_id', Auth::user()->id)->get();
 
         $totalIncentive = 0;
         $totalIncentive = 0;
