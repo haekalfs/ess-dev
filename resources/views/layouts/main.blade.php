@@ -226,8 +226,7 @@
             @usr_acc(401)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-project')">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                    aria-expanded="true" aria-controls="collapseThree">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
                     <i class="fas fa-fw fa-code-branch"></i>
                     <span>Project Assignment</span>
                 </a>

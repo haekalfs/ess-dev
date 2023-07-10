@@ -291,7 +291,7 @@ active
 
                                     $total_work_hours += $work_hours;
                                     if ($work_hours > 0) {
-                                        echo intval($work_hours)." Hours";
+                                        echo intval($work_hours - 1)." Hours";
                                     }
                                 ?>
                                 @endif

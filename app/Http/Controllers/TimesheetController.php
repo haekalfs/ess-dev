@@ -1054,7 +1054,7 @@ class TimesheetController extends Controller
         }
         $info[] = compact('status', 'lastUpdatedAt');
 
-        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)
         ->groupBy('ts_date')
         ->get()
         ->count();
@@ -1184,7 +1184,8 @@ class TimesheetController extends Controller
             switch ($row->ts_task) {
                 case "HO":
                 case "Sick":
-                case "Standby":
+                case "StandbyLK":
+                case "StandbyLN":
                 case "Other":
                 case "Absent":
                     switch ($checkUserDept) {
@@ -1200,6 +1201,7 @@ class TimesheetController extends Controller
                                         'task_id' => $row->ts_task_id,
                                         'total_incentive' => $totalIncentive,
                                         'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
                                     ];
                                     $empApproval[] = $newArrayFm;
                                 }
@@ -1214,6 +1216,7 @@ class TimesheetController extends Controller
                                         'task_id' => $row->ts_task_id,
                                         'total_incentive' => $totalIncentive,
                                         'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
                                     ];
                                     $empApproval[] = $newArrayS;
                                 } else {
@@ -1227,6 +1230,7 @@ class TimesheetController extends Controller
                                             'task_id' => $row->ts_task_id,
                                             'total_incentive' => $totalIncentive,
                                             'total_allowance' => $totalAllowances,
+                                            'priority' => 1,
                                         ];
                                         $empApproval[] = $newArrayHO;
                                     }
@@ -1244,6 +1248,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 1,
                                 ];
                                 $empApproval[] = $newArrayService;
                             }
@@ -1259,6 +1264,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 1,
                                 ];
                                 $empApproval[] = $newArrayHO;
                             }
@@ -1274,6 +1280,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 1,
                                 ];
                                 $empApproval[] = $newArrayHO;
                             }
@@ -1293,6 +1300,7 @@ class TimesheetController extends Controller
                             'task_id' => $row->ts_task_id,
                             'total_incentive' => $totalIncentive,
                             'total_allowance' => $totalAllowances,
+                            'priority' => 1,
                         ];
                         $empApproval[] = $newArrayHO;
                     }
@@ -1309,6 +1317,7 @@ class TimesheetController extends Controller
                             'task_id' => $row->ts_task_id,
                             'total_incentive' => $totalIncentive,
                             'total_allowance' => $totalAllowances,
+                            'priority' => 1,
                         ];
                         $empApproval[] = $newArrayPresales;
                     }
@@ -1326,6 +1335,7 @@ class TimesheetController extends Controller
                                 'task_id' => $row->ts_task_id,
                                 'total_incentive' => $totalIncentive,
                                 'total_allowance' => $totalAllowances,
+                                'priority' => 1,
                             ];
                             $empApproval[] = $newArrayHO;
                         }
@@ -1341,6 +1351,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 1,
                                 ];
                                 $empApproval[] = $newArrayS;
                             break;
@@ -1355,6 +1366,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 3,
                                 ];
                                 $empApproval[] = $newArrayPM;
                             }
@@ -1368,6 +1380,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 4,
                                 ];
                                 $empApproval[] = $newArrayPA;
                             }
@@ -1381,6 +1394,7 @@ class TimesheetController extends Controller
                                     'task_id' => $row->ts_task_id,
                                     'total_incentive' => $totalIncentive,
                                     'total_allowance' => $totalAllowances,
+                                    'priority' => 1,
                                 ];
                                 $empApproval[] = $newArrayS;
                             }
@@ -1414,7 +1428,8 @@ class TimesheetController extends Controller
                 'total_allowance' => $test['total_allowance'],
                 'note' => '',
                 'ts_task_id' => $test['task_id'],
-                'user_timesheet' => Auth::user()->id
+                'user_timesheet' => Auth::user()->id,
+                'priority' => $test['priority']
             ]);
         }
         Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year . $month)->where('user_timesheet', Auth::user()->id)->delete();

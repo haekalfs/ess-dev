@@ -29,8 +29,9 @@ active
 </div>
 
 <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
-    Your entry has been deleted.
+    <span class="error-message"></span>
 </div>
+
 
 <div class="alert alert-danger-delete" role="alert" style="display: none;">
     An error occurred while deleting your entry. Please try again.
@@ -224,7 +225,7 @@ active
     <div class="card-body">
         <div class="table-responsive zoom90" style="overflow: hidden;">
             <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
-                Your entry has been deleted.
+                <span class="error-message"></span>
             </div>
             
             <div class="alert alert-danger-delete" role="alert" style="display: none;">

@@ -201,8 +201,13 @@ class ReviewController extends Controller
             $lastUpdatedAt = 'None';
         }
         $info[] = compact('status', 'lastUpdatedAt');
+        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)
+        ->groupBy('ts_date')
+        ->get()
+        ->count();
+
         // return response()->json($activities);
-        return view('review.ts_preview', compact('year', 'month','info', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('review.ts_preview', compact('year', 'month','info', 'getTotalDays', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function print_selected($year, $month, $user_timesheet)

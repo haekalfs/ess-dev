@@ -126,14 +126,45 @@ class ApprovalController extends Controller
                         ->pluck('user_timesheet')
                         ->toArray();
                     if (!empty($Check)) {
-                        $approvals = Timesheet_detail::select('*')
-                        ->where('RequestTo', Auth::user()->id)
-                        ->whereNotIn('ts_status_id', [29, 404, 30, 15])
-                        ->whereIn('user_timesheet', $Check)
-                        ->whereYear('date_submitted', $Year)
-                        ->where('month_periode', $Year . intval($Month))
-                        ->groupBy('user_timesheet', 'month_periode')
-                        ->get();
+                        if(in_array($checkUserPost, [24])){
+                            $checkApprovalPC = Timesheet_detail::select('*')
+                            ->whereIn('priority', [3,4])
+                            ->whereYear('date_submitted', $Year)
+                            ->whereIn('user_timesheet', $Check)
+                            ->where('month_periode', $Year . intval($Month))
+                            ->groupBy('user_timesheet', 'month_periode')
+                            ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 ELSE 0 END)')
+                            ->pluck('user_timesheet')
+                            ->toArray();
+                            if(!empty($checkApprovalPC)){
+                                $approvals = Timesheet_detail::select('*')
+                                ->where('RequestTo', Auth::user()->id)
+                                ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                ->whereIn('user_timesheet', $checkApprovalPC)
+                                ->whereYear('date_submitted', $Year)
+                                ->where('month_periode', $Year . intval($Month))
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->get();
+                            } else {
+                                //gagal
+                                $approvals = Timesheet_detail::select('*')
+                                ->whereYear('date_submitted', $Year)
+                                ->where('month_periode', $Year . intval($Month))
+                                ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+                                ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->get();
+                            }
+                        } else {
+                            $approvals = Timesheet_detail::select('*')
+                            ->where('RequestTo', Auth::user()->id)
+                            ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                            ->whereIn('user_timesheet', $Check)
+                            ->whereYear('date_submitted', $Year)
+                            ->where('month_periode', $Year . intval($Month))
+                            ->groupBy('user_timesheet', 'month_periode')
+                            ->get();
+                        }
                     } else {
                         $approvals = Timesheet_detail::select('*')
                         ->whereYear('date_submitted', $Year)
@@ -406,7 +437,12 @@ class ApprovalController extends Controller
             $lastUpdatedAt = 'None';
         }
         $info[] = compact('status', 'lastUpdatedAt');
+        
+        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)
+        ->groupBy('ts_date')
+        ->get()
+        ->count();
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 }
