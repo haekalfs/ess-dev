@@ -41,7 +41,7 @@ active
 @endif
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Project Assignment</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Project Assignment <small><a><i>(Order By Latest Created)</i></a>&nbsp;<i class="fas fa-sort-amount-down"></i></small></h6>
         <div class="text-right">
             <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Assignment</a>
         </div>

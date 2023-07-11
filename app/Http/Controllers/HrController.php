@@ -15,12 +15,15 @@ class HrController extends Controller
     public function index(){
 		//Cutoff Date Timesheet Submission
 		$Cutoffdate = Cutoffdate::find(1);
-		$timesheetApprovals = Timesheet_approval_cutoff_date::find(1);
+		$CutoffdateTimesheetApproval = Cutoffdate::find(2);
+		$leaveApprovalCutoffdate = Cutoffdate::find(3);
+		$reimburseApprovalCutoffdate = Cutoffdate::find(4);
+
 		$financialPasscode = Financial_password::find(1);
 		$financialPass = Crypt::decrypt($financialPasscode->password);
 
 		$approvers = Timesheet_approver::all();
 
-		return view('hr.compliance.main', ['cutoffDate' => $Cutoffdate, 'timesheetApprovals' => $timesheetApprovals, 'financialPass' => $financialPass]); 
+		return view('hr.compliance.main', ['cutoffDate' => $Cutoffdate, 'tsCutoffdate' => $CutoffdateTimesheetApproval, 'leaveCutoffdate' => $leaveApprovalCutoffdate, 'reimburseCutoffdate' => $reimburseApprovalCutoffdate, 'financialPass' => $financialPass]); 
 	}
 }

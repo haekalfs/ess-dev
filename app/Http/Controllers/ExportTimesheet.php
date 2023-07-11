@@ -58,6 +58,7 @@ class ExportTimesheet extends Controller
                     ->on('td.created_at', '=', 't.latest_created_at');
             })
             ->where('td.ts_status_id', 29)
+            ->whereNotIn('ts_task', ['Other', 'Sick'])
             ->groupBy('td.user_timesheet', 'td.ts_task', 'td.ts_location')
             ->select('td.*', 'u.name', 'ud.employee_id')
             ->get();
@@ -72,6 +73,7 @@ class ExportTimesheet extends Controller
                         ->where('timesheet_details.month_periode', $Year.intval($Month))
                         ->groupBy('user_timesheet');
                 })
+                ->whereNotIn('ts_task', ['Other', 'Sick'])
                 ->where('ts_status_id', 29)
                 ->where('timesheet_details.month_periode', $Year.intval($Month))
                 ->groupBy('user_timesheet')

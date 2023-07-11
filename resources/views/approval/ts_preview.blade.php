@@ -304,7 +304,7 @@ active
 
                                     $total_work_hours += $work_hours;
                                     if ($work_hours > 0) {
-                                        echo intval($work_hours)." Hours";
+                                        echo intval($work_hours - 1)." Hours";
                                     }
                                 ?>
                                 @endif
@@ -320,9 +320,9 @@ active
                     <tr class="table-sm">
                         <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
                         @if($total_work_hours < $totalHours)
-                        <td class="text-center text-danger font-weight-bold" title="Should be above {{ $totalHours }} Hours"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours <?php $percentage = (intval($total_work_hours) / $totalHours) * 100; echo "(".$percentage."%)";?></i></td>
+                        <td class="text-center text-danger font-weight-bold" title="Should be above {{ $totalHours }} Hours"><i>Total Workhours : <?php echo intval($total_work_hours) - $getTotalDays; ?> Hours <?php $percentage = ((intval($total_work_hours) - $getTotalDays) / $totalHours) * 100; echo "(".$percentage."%)";?></i></td>
                         @else
-                        <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours); ?> Hours <?php $percentage = (intval($total_work_hours) / $totalHours) * 100; echo "(".$percentage."%)";?></i></td>
+                        <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours) - $getTotalDays; ?> Hours <?php $percentage = ((intval($total_work_hours) - $getTotalDays) / $totalHours) * 100; echo "(".$percentage."%)";?></i></td>
                         @endif
                     </tr>
                 </tbody>

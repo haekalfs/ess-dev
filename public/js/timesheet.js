@@ -121,7 +121,8 @@ $(document).ready(function() {
             url: '/activities/' + activityId,
             type: 'DELETE',
             success: function(response) {
-                $('.alert-success-delete').show();
+                $('.alert-danger').text("Task has been deleted!");
+                $('.alert-danger').show();
                 setTimeout(function() {
                     $('.alert-success-delete').fadeOut('slow');
                 }, 3000);
@@ -133,6 +134,7 @@ $(document).ready(function() {
                 fetchActivities(yearput, monthput);
             },
             error: function(response,jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').text("An error occured!");
                 $('.alert-danger-delete').show();
                 setTimeout(function() {
                     $('.alert-danger-delete').fadeOut('slow');
@@ -151,7 +153,8 @@ $(document).ready(function() {
             url: '/activities/all/' + activityYear + '/' + activityMonth,
             type: 'DELETE',
             success: function(response) {
-                $('.alert-success-delete').show();
+                $('.alert-danger').text("All tasks has been deleted!");
+                $('.alert-danger').show();
                 setTimeout(function() {
                     $('.alert-success-delete').fadeOut('slow');
                 }, 3000);
@@ -163,6 +166,7 @@ $(document).ready(function() {
                 fetchActivities(yearput, monthput);
             },
             error: function(response,jqXHR, textStatus, errorThrown) {
+                $('.alert-danger').text("An error occured!");
                 $('.alert-danger-delete').show();
                 setTimeout(function() {
                     $('.alert-danger-delete').fadeOut('slow');
@@ -352,6 +356,8 @@ $(document).ready(function() {
                     $('.alert-success-saving').show();
                     document.getElementById("activity").removeAttribute("readonly");
                     document.getElementById("location").removeAttribute("readonly");
+                    document.getElementById("location").readOnly = false;
+                    document.getElementById("location").style.pointerEvents = "auto";
                     document.getElementById("start-time").removeAttribute("readonly");
                     document.getElementById("end-time").removeAttribute("readonly");
                     fileInput.removeClass('validate');
@@ -366,8 +372,9 @@ $(document).ready(function() {
                     fetchActivities(yearput, monthput);
                 },
                 error: function(response,jqXHR, textStatus, errorThrown) {
-                    console.log(response);
                     $('#entry-form')[0].reset();
+                    var errorMessage = response.responseJSON.error; // Get the error message from the JSON response
+                    $('.alert-danger').text(errorMessage);
                     $('.alert-danger').show();
                     setTimeout(function() {
                         $('.alert-danger').fadeOut('slow');
@@ -425,6 +432,8 @@ $(document).ready(function() {
                 error: function(response,jqXHR, textStatus, errorThrown) {
                     console.log(response);
                     $('#entry-form-red')[0].reset();
+                    var errorMessage = response.responseJSON.error; // Get the error message from the JSON response
+                    $('.alert-danger').text(errorMessage);
                     $('.alert-danger').show();
                     setTimeout(function() {
                         $('.alert-danger').fadeOut('slow');
