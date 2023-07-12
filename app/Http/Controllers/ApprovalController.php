@@ -229,19 +229,18 @@ class ApprovalController extends Controller
                     ->whereNotIn('ts_status_id', [10, 15])
                     ->whereNotIn('RequestTo', [Auth::user()->id])
                     ->groupBy('user_timesheet', 'month_periode')
-                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 20 THEN 0 ELSE 1 END)')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 0 ELSE 1 END)')
                     ->pluck('user_timesheet')
                     ->toArray();
 
             if (!empty($Check)) {
-                $tsStatusId = '30';
                 Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
                 ->where('ts_user_id', $user_timesheet)
                 ->update(['ts_status_id' => $tsStatusId]);
             } else {
                 Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
                 ->where('ts_user_id', $user_timesheet)
-                ->update(['ts_status_id' => 30]);
+                ->update(['ts_status_id' => $tsStatusId]);
             }
         }
 

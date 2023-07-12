@@ -215,6 +215,8 @@ Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medD
 Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
 // Route::put('/medical/edit/{id}/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 
+Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history')->middleware('auth');
+Route::get('/reimbursement/history/create', 'ReimburseController@create_request')->name('reimburse-new-req')->middleware('auth');
 
 
 
