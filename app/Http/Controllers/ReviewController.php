@@ -201,7 +201,7 @@ class ReviewController extends Controller
             $lastUpdatedAt = 'None';
         }
         $info[] = compact('status', 'lastUpdatedAt');
-        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)
+        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', $user_id)
         ->groupBy('ts_date')
         ->get()
         ->count();
