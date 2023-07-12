@@ -222,8 +222,13 @@ class ExportTimesheet extends Controller
             $headers = [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ];
-    
-            return response()->download($filePath, 'output.xlsx', $headers);
+            
+            // Create a DateTime object using the year and month value
+            $dateTime = DateTime::createFromFormat('m', $Month);
+
+            // Get the month name
+            $monthName = $dateTime->format('F');
+            return response()->download($filePath, "$monthName-$Year.xlsx", $headers);
         } else {
             abort(403, 'Unauthorized');
         }        
