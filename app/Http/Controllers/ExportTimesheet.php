@@ -34,14 +34,14 @@ class ExportTimesheet extends Controller
         $password = $request->query('password');
 
         $getPassword = Financial_password::find(1);
-        $storedHashedPassword = Crypt::decrypt($getPassword->password);
+        $storedHashedPassword = $getPassword->password;
 
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($Year, $Month, 1)->startOfMonth();
         $endDate = Carbon::create($Year, $Month)->endOfMonth();
 
         // Compare the hashed passwords
-        if ($password === $storedHashedPassword) {
+        if (Hash::check($password, $storedHashedPassword)) {
             $templatePath = public_path('template_fm.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
