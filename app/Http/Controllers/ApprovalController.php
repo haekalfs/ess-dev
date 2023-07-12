@@ -94,10 +94,10 @@ class ApprovalController extends Controller
                     $Check = Timesheet_detail::select('*')
                         ->whereYear('date_submitted', $Year)
                         ->where('month_periode', $Year . intval($Month))
-                        ->whereNotIn('ts_status_id', [10, 15])
+                        ->whereNotIn('ts_status_id', [10])
                         ->whereNotIn('RequestTo', $ts_approver)
                         ->groupBy('user_timesheet', 'month_periode')
-                        ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 ELSE 0 END)')
+                        ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 WHEN ts_status_id = 15 THEN 1 ELSE 0 END)')
                         ->pluck('user_timesheet')
                         ->toArray();
                         if (!empty($Check)) {
