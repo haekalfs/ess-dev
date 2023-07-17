@@ -223,6 +223,8 @@ Route::put('/medical/approval/{id}/update/{mdet_id}', 'MedicalController@update_
 Route::put('/medical/approval/{id}/approve', 'MedicalController@approve')->middleware('auth');
 Route::put('/medical/approval/{id}/reject', 'MedicalController@reject')->middleware('auth');
 
+Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history')->middleware('auth');
+Route::get('/reimbursement/history/create', 'ReimburseController@create_request')->name('reimburse-new-req')->middleware('auth');
 
 
 
