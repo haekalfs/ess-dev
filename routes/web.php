@@ -198,6 +198,7 @@ Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middlewa
 Route::get('/hr/compliance/', 'HrController@index')->middleware('auth');
 Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet')->middleware('auth');
 Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save')->middleware('auth');
+Route::put("/hr/compliance/update/regulations", 'HrController@update_regulation')->middleware('auth');
 
 //Department and Position
 Route::get('/hrtools/manage/position', 'DepPosController@index')->middleware('auth');

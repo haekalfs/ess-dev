@@ -388,58 +388,32 @@ totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString().replace(/
 
 // Amount Approved
 // Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
-var amountElements = document.getElementsByClassName("amountApprovedInput");
-var totalAmountApproved = 0;
+document.addEventListener("DOMContentLoaded", function() {
+    var amountElements1 = document.getElementsByClassName("amountApproved");
+    var totalAmountApproved = 0;
 
-for (var i = 0; i < amountElements.length; i++) {
-  var amountText = amountElements[i].textContent;
-  var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
-  totalAmount += amountNumber;
-}
+    for (var i = 0; i < amountElements1.length; i++) {
+    var amountText1 = amountElements1[i].textContent;
+    var amountApprovedNumber = parseFloat(amountText1.replace(/\./g, "").replace(",", "."));
+    totalAmountApproved += amountApprovedNumber;
+    }
 
-// Menampilkan total amount di tempat pertama
-var totalAmountApprovedDisplay1 = document.getElementById("totalAmountApproved1");
-totalAmountApprovedDisplay1.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
+    // Menampilkan total amount di tempat pertama
+    var totalAmountApprovedDisplay1 = document.getElementById("totalAmountApproved1");
+    totalAmountApprovedDisplay1.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
 
-// Menampilkan total amount di tempat 2
-var totalAmountApprovedDisplay2 = document.getElementById("totalAmountApproved2");
-totalAmountApprovedDisplay2.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
+    // Menampilkan total amount di tempat 2
+    var totalAmountApprovedDisplay2 = document.getElementById("totalAmountApproved2");
+    totalAmountApprovedDisplay2.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
 
-// /// Menampilkan total amount di modal approve
-var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput").value;
-totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "");
-// var amountElements = document.getElementsByClassName("amountApprovedInput");
-// var totalAmount = 0;
-
-// for (var i = 0; i < amountElements.length; i++) {
-//   var amountText = amountElements[i].textContent;
-//   var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
-//   totalAmount += amountApprovedNumber;
-// }
-// var totalAmountApprovedSpan1 = document.getElementById("totalAmountApproved1");
-// var totalAmountApprovedSpan = document.getElementById("totalAmountApproved2");
-// var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput");
-
-// totalAmountApprovedSpan1.textContent = totalAmount;
-// totalAmountApprovedSpan.textContent = totalAmount;
-// totalAmountApprovedInput.value = totalAmount;
-var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput").value;
-
-fetch('/medical/approval/{{ $med->id }}/approve', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ totalAmount: totalAmountApprovedInput })
-})
-.then(response => response.json())
-.then(data => {
-  // Proses respons dari server
-})
-.catch(error => {
-  // Tangani kesalahan
+    // /// Menampilkan total amount di modal approve
+    var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput").value;
+    totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "");
+    // Your code here
+    var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput");
+    if (totalAmountApprovedInput) {
+        totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "");
+    } 
 });
-
 </script>
-
 @endsection

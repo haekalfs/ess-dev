@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Cutoffdate;
 use App\Models\Financial_password;
+use App\Models\Timesheet;
 use App\Models\Timesheet_approval_cutoff_date;
 use App\Models\Timesheet_approver;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
@@ -19,11 +21,141 @@ class HrController extends Controller
 		$leaveApprovalCutoffdate = Cutoffdate::find(3);
 		$reimburseApprovalCutoffdate = Cutoffdate::find(4);
 
-		$financialPasscode = Financial_password::find(1);
-		$financialPass = Crypt::decrypt($financialPasscode->password);
-
+		$users = User::all();
 		$approvers = Timesheet_approver::all();
 
-		return view('hr.compliance.main', ['cutoffDate' => $Cutoffdate, 'tsCutoffdate' => $CutoffdateTimesheetApproval, 'leaveCutoffdate' => $leaveApprovalCutoffdate, 'reimburseCutoffdate' => $reimburseApprovalCutoffdate, 'financialPass' => $financialPass]); 
+		//Finance And GA
+		$FGA_Approve1 = Timesheet_approver::where('id', 10 )->first();
+		$FGA_Approve2 = Timesheet_approver::where('id', 45)->first();
+		$FGA_Approve3 = Timesheet_approver::where('id', 15)->first();
+
+		//Technology And HCM
+		$THC_Approve1 = Timesheet_approver::where('id', 11)->first();
+		$THC_Approve2 = Timesheet_approver::where('id', 60)->first();
+
+		//Sales And Marketing
+		$SM_Approve1 = Timesheet_approver::where('id', 50)->first();
+		$SM_Approve2 = Timesheet_approver::where('id', 55)->first();
+
+		//Services
+		$Service_Approve1 = Timesheet_approver::where('id', 20)->first();
+		$Service_Approve2 = Timesheet_approver::where('id', 40)->first();
+
+		//DEFAULT
+		$Default_Approve1 = Timesheet_approver::where('id', 29)->first();
+		$Default_Approve2 = Timesheet_approver::where('id', 28)->first();
+
+		return view('hr.compliance.main', 
+		['cutoffDate' => $Cutoffdate, 
+		'tsCutoffdate' => $CutoffdateTimesheetApproval, 
+		'leaveCutoffdate' => $leaveApprovalCutoffdate, 
+		'reimburseCutoffdate' => $reimburseApprovalCutoffdate, 
+		'approver' => $approvers, 
+		'user' => $users, 
+		'FGA1' => $FGA_Approve1,
+		'FGA2' => $FGA_Approve2,
+		'Finance' => $FGA_Approve3,
+		'THC1' => $THC_Approve1,
+		'THC2' => $THC_Approve2,
+		'SM1' => $SM_Approve1,
+		'SM2' => $SM_Approve2,
+		'Service1' => $Service_Approve1,
+		'Service2' => $Service_Approve2,
+		'Default1' => $Default_Approve1,
+		'Default2' => $Default_Approve2,
+
+		]); 
+	}
+
+	public function update_regulation(Request $request){
+	
+		$request->validate([
+			'FGA_FA' => 'sometimes',
+			'FGA_PA' => 'sometimes',
+			'THC_FA' => 'sometimes',
+			'THC_PA' => 'sometimes',
+
+		]);
+
+		//Password Finance
+			$Newpassword = $request->input('confirmPassword');
+			$hash = Hash::make($Newpassword);
+
+			$password_finance = Financial_password::where('id', 1)->first();
+			$password_finance->password = $hash;
+			$password_finance->save();
+
+		// Cutoff Date
+			// Cutoff Date Submit TS
+			$Cutoffdate_input = Cutoffdate::where('id', 1)->first();
+			$Cutoffdate_input->closed_date = $request->ts_submit_date;
+			$Cutoffdate_input->save();
+
+			// Cutoff Date Approve TS
+			$CutoffdateTimesheetApproval_input = Cutoffdate::where('id', 2)->first();
+			$CutoffdateTimesheetApproval_input->closed_date = $request->ts_approve_date;
+			$CutoffdateTimesheetApproval_input->save();
+
+			// Cutoff Date Approve Leave
+			$leaveApprovalCutoffdate_input = Cutoffdate::where('id', 3)->first();
+			$leaveApprovalCutoffdate_input->closed_date = $request->leave_approve_date;
+			$leaveApprovalCutoffdate_input->save();
+
+			// Cutoff Date Approve Reimburse
+			$reimburseApprovalCutoffdate_input = Cutoffdate::where('id', 4)->first();
+			$reimburseApprovalCutoffdate_input->closed_date = $request->reimburse_approve_date;
+			$reimburseApprovalCutoffdate_input->save();
+
+		// Approver
+			// Finance & GA
+			$input_FGA_Approve1 = Timesheet_approver::where('id', 10)->first();
+			$input_FGA_Approve1->approver = $request->FGA_FA;
+			$input_FGA_Approve1->save();
+
+			$input_FGA_Approve2 = Timesheet_approver::where('id', 45)->first();
+			$input_FGA_Approve2->approver = $request->FGA_PA;
+			$input_FGA_Approve2->save();
+
+			$input_FGA_Approve3 = Timesheet_approver::where('id', 15)->first();
+			$input_FGA_Approve3->approver = $request->Finance_approver;
+			$input_FGA_Approve3->save();
+			
+			//Technology And HCM
+			$input_THC_Approve1 = Timesheet_approver::where('id', 11)->first();
+			$input_THC_Approve1->approver = $request->THM_FA;
+			$input_THC_Approve1->save();
+
+			$input_THC_Approve2 = Timesheet_approver::where('id', 60)->first();
+			$input_THC_Approve2->approver = $request->THM_PA;
+			$input_THC_Approve2->save();
+
+			//Sales And Marketing
+			$input_SM_Approve1 = Timesheet_approver::where('id', 50)->first();
+			$input_SM_Approve1->approver = $request->SM_FA;
+			$input_SM_Approve1->save();
+
+			$input_SM_Approve2 = Timesheet_approver::where('id', 55)->first();
+			$input_SM_Approve2->approver = $request->SM_PA;
+			$input_SM_Approve2->save();
+
+			//Services
+			$input_Service_Approve1 = Timesheet_approver::where('id', 20)->first();
+			$input_Service_Approve1->approver = $request->Service_FA;
+			$input_Service_Approve1->save();
+
+			$input_Service_Approve2 = Timesheet_approver::where('id', 40)->first();
+			$input_Service_Approve2->approver = $request->Service_PA;
+			$input_Service_Approve2->save();
+
+			//DEFAULT
+			$input_Default_Approve1 = Timesheet_approver::where('id', 29)->first();
+			$input_Default_Approve1->approver = $request->Default_FA;
+			$input_Default_Approve1->save();
+
+			$input_Default_Approve2 = Timesheet_approver::where('id', 28)->first();
+			$input_Default_Approve2->approver = $request->Default_PA;
+			$input_Default_Approve2->save();
+
+		return redirect()->back()->with('success', 'Compilance Edit Success');
 	}
 }

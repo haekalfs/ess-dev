@@ -7,7 +7,9 @@ active
 @endsection
 
 @section('content')
-<form method="POST" action="/hr/compliance/update/regulations">
+<form action="/hr/compliance/update/regulations" method="POST" onsubmit="return validatePassword();">
+@method('PUT')
+@csrf
     <!-- Page Heading -->
     <div class="row align-items-center">
         <div class="col">
@@ -51,13 +53,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Timesheet Submission :</label>
-                                    <input type="number" class="form-control" name="date_prepared" value="{{ $cutoffDate->closed_date }}">
+                                    <input type="number" class="form-control" name="ts_submit_date" value="{{ $cutoffDate->closed_date }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Timesheet Approval :</label>
-                                    <input type="text" class="form-control" name="date_prepared" value="{{ $tsCutoffdate->closed_date }}">
+                                    <input type="text" class="form-control" name="ts_approve_date" value="{{ $tsCutoffdate->closed_date }}">
                                 </div>
                             </div>
                         </div>
@@ -65,13 +67,13 @@ active
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Leave Approval :</label>
-                                    <input type="number" class="form-control" name="date_prepared" value="{{ $leaveCutoffdate->closed_date }}">
+                                    <input type="number" class="form-control" name="leave_approve_date" value="{{ $leaveCutoffdate->closed_date }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Reimburse & Med Approval :</label>
-                                    <input type="number" class="form-control" name="date_prepared" value="{{ $reimburseCutoffdate->closed_date }}">
+                                    <input type="number" class="form-control" name="reimburse_approve_date" value="{{ $reimburseCutoffdate->closed_date }}">
                                 </div>
                             </div>
                         </div>
@@ -84,7 +86,7 @@ active
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Cutoff Date</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Password</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -92,13 +94,14 @@ active
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="comment">Financial Password :</label>
-                                    <input type="password" class="form-control" name="date_prepared" value="{{ $financialPass }}">
+                                    <label for="comment">New Financial Password :</label>
+                                    <input type="password" class="form-control" id="password" name="password" value="">
                                 </div>
                                 <div class="form-group">
                                     <label for="comment">Reconfirm Password :</label>
-                                    <input type="password" class="form-control" name="date_prepared" value="{{ $financialPass }}">
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="">
                                 </div>
+                                <span id="passwordError" style="color: red;"></span>
                             </div>
                         </div>
                     </div>
@@ -130,14 +133,36 @@ active
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="email">First Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="FGA_FA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $FGA1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="password">Prior Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="FGA_PA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $FGA2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="email">Staff Finance Approver :</label>
+                                                        <select class="form-control" name="Finance_approver" >
+                                                            <option selected disabled>Choose...</option>
+                                                            @foreach($user as $us)
+                                                            <option value="{{ $us->id }}" @if( $us->id == $Finance->approver ) selected @endif >{{ $us->name }}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </td>
@@ -159,13 +184,23 @@ active
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="email">First Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="THM_FA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $THC1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="password">Prior Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="THM_PA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $THC2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -188,13 +223,23 @@ active
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="email">First Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="SM_FA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $SM1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="password">Prior Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="SM_PA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $SM2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -217,13 +262,23 @@ active
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="email">First Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="Service_FA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $Service1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="password">Prior Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="Service_PA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $Service2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -246,13 +301,23 @@ active
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="email">First Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="Default_FA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $Default1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="password">Prior Approver :</label>
-                                                            <input type="number" class="form-control" name="date_prepared">
+                                                            <select class="form-control" name="Default_PA" >
+                                                                <option selected disabled>Choose...</option>
+                                                                @foreach($user as $us)
+                                                                <option value="{{ $us->id }}" @if( $us->id == $Default2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -302,4 +367,19 @@ active
         color: #fff;
     }
 </style>
+<script>
+    function validatePassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+        var errorElement = document.getElementById("passwordError");
+
+        if (password !== confirmPassword) {
+            errorElement.innerHTML = "Password tidak cocok";
+            return false;
+        } else {
+            errorElement.innerHTML = "";
+            return true;
+        }
+    }
+</script>
 @endsection
