@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExitClearancePrint;
 use App\Models\Cutoffdate;
 use App\Models\Financial_password;
 use App\Models\Timesheet;
 use App\Models\Timesheet_approval_cutoff_date;
 use App\Models\Timesheet_approver;
 use App\Models\User;
+use App\Models\Users_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\TemplateProcessor;
+use Dompdf\Dompdf;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class HrController extends Controller
 {
@@ -158,4 +165,83 @@ class HrController extends Controller
 
 		return redirect()->back()->with('success', 'Compilance Edit Success');
 	}
+
+	public function exit_clear(){
+
+		$user = User::with('users_detail')
+		->whereHas('users_detail', function ($query) {
+			$query->whereNull('resignation_date');
+		})->get();
+
+		$data = User::with('users_detail')
+		->whereHas('users_detail', function ($query) {
+			$query->whereNotNull('resignation_date');
+		})->get();
+
+		// $userall = User::with('users_detail')->first();
+		return view('hr.exit_clearance.exit_main', ['data' => $data, 'us_List' => $user, ]);
+	}
+
+	public function print($id)
+	{
+		$user = User::with('users_detail')->findOrFail($id);
+		$templatePath = public_path('exitclearance_temp.docx');
+
+		$positionName = $user->users_detail->position->position_name ?? '';
+		// Ambil bulan saat ini dalam bahasa Indonesia
+		$bulan = date('F');
+
+		// Daftar bulan dalam bahasa Indonesia
+		$daftarBulan = [
+			'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+			'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+		];
+
+		$templateProcessor = new TemplateProcessor($templatePath);
+		$templateProcessor->setValue('name', $user->name);
+		$templateProcessor->setValue('emp_id', $user->users_detail->employee_id);
+		$templateProcessor->setValue('position', $positionName);
+		$templateProcessor->setValue('no_ID', $user->users_detail->usr_id_no);
+		$templateProcessor->setValue('D', date('d') );
+		$templateProcessor->setValue('M', $daftarBulan[date('n') - 1]);
+		$templateProcessor->setValue('Y', date('Y'));
+		// Tambahkan nilai lain sesuai kebutuhan Anda
+
+
+		// Simpan file
+		$outputPath = public_path('Exit Clearance '.$user->name.'.docx');
+		$templateProcessor->saveAs($outputPath);
+
+		return response()->download($outputPath)->deleteFileAfterSend(true);
+	}
+
+	public function resign_emp(Request $request)
+	{
+		// Validasi input jika diperlukan
+		$request->validate([
+			'inputUser' => 'required',
+			'resign_date' => 'required|date',
+		]);
+
+		// Ambil data input dari form
+		$userId = $request->inputUser;
+		$resignDate = $request->resign_date;
+
+		// Cari objek Users_detail berdasarkan user_id
+		$userDetail = Users_detail::where('user_id', $userId)->first();
+
+		if ($userDetail) {
+			// Update kolom status_active dan resignation_date
+			$userDetail->status_active = 'nonActive';
+			$userDetail->resignation_date = $resignDate;
+			$userDetail->save();
+
+			// Berhasil, lakukan redirect atau respons sesuai kebutuhan
+			return redirect()->back()->with('success', 'Data berhasil disimpan.');
+		} else {
+			// User tidak ditemukan, lakukan redirect atau respons sesuai kebutuhan
+			return redirect()->back()->with('error', 'User tidak ditemukan.');
+		}
+	}
+
 }

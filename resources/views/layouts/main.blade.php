@@ -286,7 +286,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">HR Access:</h6>
                         <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
-                        <a class="collapse-item" href="/development">A2. Exit Clearance</a>
+                        <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
                         <a class="collapse-item" href="/development">A3. Vendor List</a>
                         <a class="collapse-item" href="/development">A4. News Feed</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}

@@ -1512,7 +1512,10 @@ class TimesheetController extends Controller
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
 
-        $employees = User::all();
+        $employees = User::with('users_detail')
+		->whereHas('users_detail', function ($query) {
+			$query->whereNull('resignation_date');
+		})->get();
 
         $validator = Validator::make($request->all(), [
             'showOpt' => 'required',

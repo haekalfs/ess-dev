@@ -193,12 +193,16 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
 Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');
 Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users');
 
-//HR TOOLS
+//Company Regulation 
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth');
 Route::get('/hr/compliance/', 'HrController@index')->middleware('auth');
 Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet')->middleware('auth');
 Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save')->middleware('auth');
 Route::put("/hr/compliance/update/regulations", 'HrController@update_regulation')->middleware('auth');
+    // Exit Clearance
+    Route::get('/hr/exit_clearance/', 'HrController@exit_clear')->middleware('auth');
+    Route::get('/hr/exit_clearance/print/{id}', 'HrController@print')->middleware('auth');
+    Route::put('/hr/exit_clearance/resign_emp', 'HrController@resign_emp')->middleware('auth');
 
 //Department and Position
 Route::get('/hrtools/manage/position', 'DepPosController@index')->middleware('auth');
