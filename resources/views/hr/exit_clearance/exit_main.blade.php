@@ -66,7 +66,7 @@ active
                     <td>{{$p->users_detail->hired_date}}</td>
                     <td>{{$p->users_detail->resignation_date}}</td>
                     <td>
-                        <a href="/hr/exit_clearance/print/{{ $p->id }}" title="Print" class="btn btn-primary btn-sm ml-3" >
+                        <a href="/hr/exit_clearance/print/{{ $p->id }}" target="_blank" title="Print" class="btn btn-primary btn-sm ml-3" >
                             <i class="fas fa-fw fa-print "></i>
                             Print
                         </a>

@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\TemplateProcessor;
-use Dompdf\Dompdf;
-use Barryvdh\DomPDF\Facade as PDF;
+use Ilovepdf\Ilovepdf;
+use Exception;
 
 class HrController extends Controller
 {
@@ -188,10 +188,8 @@ class HrController extends Controller
 		$templatePath = public_path('exitclearance_temp.docx');
 
 		$positionName = $user->users_detail->position->position_name ?? '';
-		// Ambil bulan saat ini dalam bahasa Indonesia
 		$bulan = date('F');
 
-		// Daftar bulan dalam bahasa Indonesia
 		$daftarBulan = [
 			'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
 			'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -202,18 +200,39 @@ class HrController extends Controller
 		$templateProcessor->setValue('emp_id', $user->users_detail->employee_id);
 		$templateProcessor->setValue('position', $positionName);
 		$templateProcessor->setValue('no_ID', $user->users_detail->usr_id_no);
-		$templateProcessor->setValue('D', date('d') );
+		$templateProcessor->setValue('D', date('d'));
 		$templateProcessor->setValue('M', $daftarBulan[date('n') - 1]);
 		$templateProcessor->setValue('Y', date('Y'));
-		// Tambahkan nilai lain sesuai kebutuhan Anda
 
-
-		// Simpan file
-		$outputPath = public_path('Exit Clearance '.$user->name.'.docx');
+		// Simpan file Word
+		$outputPath = public_path('Exit Clearance ' . $user->name . '.docx');
 		$templateProcessor->saveAs($outputPath);
 
-		return response()->download($outputPath)->deleteFileAfterSend(true);
+		// Convert the Word file to PDF using iLovePDF API
+		$apiPublicKey = 'project_public_58ccb352acd03ede9a96cc4251942fe5_x3t5t1d006d6f6675cf7272092eba8a4909d1';
+		$apiSecretKey = 'secret_key_1574ad48ae54707085bce8b2a2d1585c_6-YEB8d06c4afe04ba378cdc81b2365e1aaad';
+
+		$ilovepdf = new Ilovepdf($apiPublicKey, $apiSecretKey);
+
+		// Start the task for converting to PDF
+		$task = $ilovepdf->newTask('officepdf');
+
+		// Add the uploaded file to the task
+		$task->addFile($outputPath);
+
+		// Execute the task
+		$task->execute();
+
+		// Download the converted PDF file directly to the user's browser
+		$task->download();
+		$outputPathPDF = public_path('Exit Clearance ' . $user->name . '.pdf');
+
+		// Delete the temporary file
+		unlink($outputPath);
+		
+		return response()->download($outputPathPDF)->deleteFileAfterSend(true);
 	}
+
 
 	public function resign_emp(Request $request)
 	{
