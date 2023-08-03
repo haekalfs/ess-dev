@@ -51,7 +51,7 @@ class ProjectController extends Controller
         $yearsBefore = range($nowYear - 4, $nowYear);
 
         $currentYear = date('Y');
-        if($yearSelected){
+        if ($yearSelected) {
             $currentYear = $yearSelected;
         }
         $project = Company_project::all();
@@ -66,12 +66,12 @@ class ProjectController extends Controller
 
     public function add_project_assignment(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'no_doc' => 'required',
-    		'ref_doc' => 'sometimes',
+            'ref_doc' => 'sometimes',
             'project' => 'required',
             'notes' => 'sometimes'
-    	]);
+        ]);
 
         $uniqueIdP = hexdec(substr(uniqid(), 0, 8));
 
@@ -80,20 +80,20 @@ class ProjectController extends Controller
         }
 
         Project_assignment::create([
-            'id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
-    		'assignment_no' => $request->no_doc,
-    		'reference_doc' => $request->ref_doc,
+            'id' => $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc),
+            'assignment_no' => $request->no_doc,
+            'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
             'req_by' => Auth::user()->id,
-            'task_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
+            'task_id' => $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc),
             'company_project_id' => $request->project,
             'notes' => $request->notes,
             'approval_status' => '40'
-    	]);
+        ]);
 
-        $url = $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc);
+        $url = $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc);
 
-        $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
+        $roleToApprove = Usr_role::where('role_name', 'service_dir')->pluck('user_id')->toArray();
         $employees = User::whereIn('id', $roleToApprove)->get();
 
         foreach ($employees as $employee) {
@@ -104,7 +104,7 @@ class ProjectController extends Controller
 
     public function project_assignment_member($assignment_id)
     {
-        Project_assignment_user::where('id', )->count();
+        Project_assignment_user::where('id',)->count();
         $assignment = DB::table('project_assignments')
             ->join('company_projects', 'project_assignments.company_project_id', '=', 'company_projects.id')
             // ->join('project_assignments', 'project_assignment_users.project_assignment_id', '=', 'project_assignments.id')
@@ -112,13 +112,13 @@ class ProjectController extends Controller
             ->where('project_assignments.id', '=', $assignment_id)
             ->get();
         // var_dump($assignment);
-        foreach ($assignment as $as){
+        foreach ($assignment as $as) {
             $project = Client::where('id', $as->client_id)->first();
-            if ($as->approval_status == 40){
+            if ($as->approval_status == 40) {
                 $status = "Waiting for Approval";
-            } elseif($as->approval_status == 29) {
+            } elseif ($as->approval_status == 29) {
                 $status = 1;
-            } elseif($as->approval_status == 404) {
+            } elseif ($as->approval_status == 404) {
                 $status = 404;
             } else {
                 $status = "Unknown Status";
@@ -131,7 +131,7 @@ class ProjectController extends Controller
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
         return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'stat' => $status, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
-    
+
     public function project_assignment_member_view($assignment_id)
     {
         $assignment = DB::table('project_assignments')
@@ -140,13 +140,13 @@ class ProjectController extends Controller
             ->select('project_assignments.*', 'company_projects.*')
             ->where('project_assignments.id', '=', $assignment_id)
             ->get();
-        foreach ($assignment as $as){
+        foreach ($assignment as $as) {
             $project = Client::where('id', $as->client_id)->first();
-            if ($as->approval_status == 40){
+            if ($as->approval_status == 40) {
                 $status = "Waiting for Approval";
-            } elseif($as->approval_status == 29) {
+            } elseif ($as->approval_status == 29) {
                 $status = "Approved";
-            } elseif($as->approval_status == 404) {
+            } elseif ($as->approval_status == 404) {
                 $status = "Rejected";
             } else {
                 $status = "Unknown Status";
@@ -173,7 +173,7 @@ class ProjectController extends Controller
         } else {
             Project_assignment_user::where('id', $usr_id)->delete();
         }
-        
+
         return redirect()->back()->with('failed', 'Member deleted!');
     }
 
@@ -198,16 +198,16 @@ class ProjectController extends Controller
 
     public function add_project_member(Request $request, $assignment_id)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'emp_name' => 'required',
-    		'emp_role' => 'required',
+            'emp_role' => 'required',
             'emp_resp' => 'required',
             'fromTime' => 'required',
             'toTime' => 'required'
-    	]);
+        ]);
 
         $company_code = Project_assignment::where('id', $assignment_id)->get();
-        
+
         foreach ($company_code as $project) {
             $company_project_id = $project->company_project_id;
         }
@@ -261,33 +261,33 @@ class ProjectController extends Controller
     {
         // Get the Timesheet records between the start and end dates
         $activities = Client::all();
-        
+
         return response()->json($activities);
     }
 
     public function create_new_project(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'p_code' => 'required',
             'p_name' => 'required',
             'p_client' => 'required',
-    		'p_location' => 'required',
+            'p_location' => 'required',
             'address' => 'required',
             'from' => 'required',
             'to' => 'required'
-    	]);
+        ]);
 
         $location = Project_location::find($request->p_location);
         Company_project::create([
             // 'id' => $uniqueId,
-    		'project_code' => $request->p_code,
-    		'alias' => $location->location_code,
+            'project_code' => $request->p_code,
+            'alias' => $location->location_code,
             'project_name' => $request->p_name,
             'address' => $request->address,
             'periode_start' => $request->from,
             'periode_end' => $request->to,
             'client_id' => $request->p_client
-    	]);
+        ]);
 
         return redirect('/project_list')->with('success', 'Project Create successfully');
     }
@@ -307,8 +307,8 @@ class ProjectController extends Controller
         $client->client_name = $request->input('client_name');
         $client->address = $request->input('address');
         $client->save();
-        
-        return response()->json(['success'=>'Client created successfully.', 'client' => $client]);
+
+        return response()->json(['success' => 'Client created successfully.', 'client' => $client]);
     }
 
     public function delete_client($id)
@@ -358,8 +358,8 @@ class ProjectController extends Controller
         $loc->description = $request->input('loc_desc');
         $loc->fare = $request->input('loc_fare');
         $loc->save();
-        
-        return response()->json(['success'=>'Client created successfully.']);
+
+        return response()->json(['success' => 'Client created successfully.']);
     }
 
     public function listProjectRoles()
@@ -397,8 +397,8 @@ class ProjectController extends Controller
         $role->role_name = $request->input('role_desc');
         $role->fare = $request->role_fare;
         $role->save();
-        
-        return response()->json(['success'=>'Client created successfully.']);
+
+        return response()->json(['success' => 'Client created successfully.']);
     }
 
     public function company_project_view($id)
@@ -437,28 +437,28 @@ class ProjectController extends Controller
         $request = Requested_assignment::all();
         return view('projects.requested_assignment', ['request' => $request]);
     }
-    
+
     public function requested_assignment_entry(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'emp_name' => 'required',
             'emp_role' => 'required',
             'project' => 'required',
-    		'emp_resp' => 'required',
+            'emp_resp' => 'required',
             'fromTime' => 'required',
             'toTime' => 'required'
-    	]);
+        ]);
 
         Requested_assignment::create([
-    		'req_date' => date('Y-m-d'),
-    		'req_by' => $request->emp_name,
+            'req_date' => date('Y-m-d'),
+            'req_by' => $request->emp_name,
             'role' => $request->emp_role,
             'responsibility' => $request->emp_resp,
             'company_project_id' => $request->project,
             'periode_start' => $request->fromTime,
             'periode_end' => $request->toTime,
             'status' => 0
-    	]);
+        ]);
 
         return redirect('/myprojects')->with('success', 'Assignment has been requested!');
     }
@@ -480,8 +480,8 @@ class ProjectController extends Controller
         $entry->message = "Your Assignment Request is Approved!";
         $entry->importance = 1;
         $entry->save();
-        
-        Session::flash('success',"You approved the assignment request!");
+
+        Session::flash('success', "You approved the assignment request!");
         return redirect()->back();
     }
 
@@ -497,17 +497,17 @@ class ProjectController extends Controller
         $entry->importance = 404;
         $entry->save();
 
-        Session::flash('failed',"You rejected the assignment request!");
+        Session::flash('failed', "You rejected the assignment request!");
         return redirect()->back();
     }
 
     public function add_project_assignment_from_request(Request $request, $id)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'no_doc' => 'required',
-    		'ref_doc' => 'sometimes',
+            'ref_doc' => 'sometimes',
             'notes' => 'sometimes'
-    	]);
+        ]);
 
         $requestAss = Requested_assignment::find($id);
 
@@ -518,27 +518,27 @@ class ProjectController extends Controller
         }
 
         Project_assignment::create([
-            'id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
-    		'assignment_no' => $request->no_doc,
-    		'reference_doc' => $request->ref_doc,
+            'id' => $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc),
+            'assignment_no' => $request->no_doc,
+            'reference_doc' => $request->ref_doc,
             'req_date' => date('Y-m-d'),
             'req_by' => Auth::user()->id,
-            'task_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
+            'task_id' => $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc),
             'company_project_id' => $requestAss->company_project_id,
             'notes' => $request->notes,
             'approval_status' => '40'
-    	]);
+        ]);
 
-        
+
         // Project_assignment_user::create([
-    	// 	'user_id' => $requestAss->req_by,
-    	// 	'role' => $requestAss->role,
+        // 	'user_id' => $requestAss->req_by,
+        // 	'role' => $requestAss->role,
         //     'responsibility' => $requestAss->responsibility,
         //     'periode_start' => $requestAss->periode_start,
         //     'periode_end' => $requestAss->periode_end,
         //     'project_assignment_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
         //     'company_project_id' => $requestAss->company_project_id
-    	// ]);
+        // ]);
 
         $from = Carbon::createFromFormat('Y-m-d', $requestAss->periode_start);
         $to = Carbon::createFromFormat('Y-m-d', $requestAss->periode_end);
@@ -567,16 +567,16 @@ class ProjectController extends Controller
                 'responsibility' => $requestAss->responsibility,
                 'periode_start' => $requestAss->periode_start,
                 'periode_end' => $requestAss->periode_end,
-                'project_assignment_id' => $uniqueIdP.preg_replace("/[^0-9]/", "", $request->no_doc),
+                'project_assignment_id' => $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc),
                 'company_project_id' => $requestAss->company_project_id
             ]);
-            $roleToApprove = Usr_role::where('role_name' ,'service_dir')->pluck('user_id')->toArray();
+            $roleToApprove = Usr_role::where('role_name', 'service_dir')->pluck('user_id')->toArray();
             $employees = User::whereIn('id', $roleToApprove)->get();
 
-            // foreach ($employees as $employee) {
-            //     dispatch(new NotifyAssignmentCreation($employee));
-            // }
-            
+            foreach ($employees as $employee) {
+                dispatch(new NotifyAssignmentCreation($employee));
+            }
+
             return redirect()->back()->with('success', "$userId has been added to an assignment!");
         }
     }
@@ -585,7 +585,7 @@ class ProjectController extends Controller
     {
         // Get the Timesheet records between the start and end dates
         $project = Company_project::find($id);
-        
+
         return response()->json($project);
     }
 
@@ -612,11 +612,11 @@ class ProjectController extends Controller
 
         $cp = Company_project::find($id);
         $clientId = $request->input('p_client');
-        if($clientId == NULL || $clientId == ''){
+        if ($clientId == NULL || $clientId == '') {
             $clientId = $cp->client_id;
         }
         $p_loc = $request->input('p_location');
-        if($p_loc == NULL || $p_loc == ''){
+        if ($p_loc == NULL || $p_loc == '') {
             $p_loc = $cp->alias;
         }
         $cp->project_code = $request->input('p_code');
@@ -627,15 +627,15 @@ class ProjectController extends Controller
         $cp->periode_end = $formattedTo;
         $cp->client_id = $clientId;
         $cp->save();
-        
-        return response()->json(['success'=>'Project updated successfully.']);
+
+        return response()->json(['success' => 'Project updated successfully.']);
     }
 
     public function retrieveUsrPeriodData($id)
     {
         // Get the Timesheet records between the start and end dates
         $usrData = Project_assignment_user::find($id);
-        
+
         return response()->json($usrData);
     }
 
@@ -651,12 +651,12 @@ class ProjectController extends Controller
         }
 
         $usr = Project_assignment_user::find($usr_id);
-        if(!empty($request->fromPeriode)){
+        if (!empty($request->fromPeriode)) {
             $usr->periode_start = $request->fromPeriode;
         }
         $usr->periode_end = $request->toPeriode;
         $usr->save();
-        
-        return response()->json(['success'=>'User Periode updated successfully.']);
+
+        return response()->json(['success' => 'User Periode updated successfully.']);
     }
 }
