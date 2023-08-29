@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Role_template;
+use App\Models\API_key;
 use App\Models\User;
 use App\Models\User_access;
 use App\Models\Usr_role;
@@ -244,5 +245,50 @@ class ManagementController extends Controller
     {
         $r_name = Role::findOrFail($id);
         return view('/hrtools/manage/roles', compact('role_template'));
+    }
+
+
+    // API Setting
+
+    public function index_api()
+    {
+        $api_all = API_key::all();
+        return view('/management/manage_api', compact('api_all', ));
+    }
+
+    public function add_api (Request $request)
+    {
+        $lastId = API_KEY::orderBy('id', 'desc')->first();
+        $nextId = ($lastId) ? $lastId->id + 1 : 1;
+
+        $request->validate([
+            'add_name_api' => 'required',
+            'add_public_key' => 'required',
+            'add_secret_key' => 'required',
+        ]);
+
+       API_key::create([
+            'id' => $nextId,
+            'name' => $request->add_name_api,
+            'public_key' => $request->add_public_key,
+            'secret_key' => $request->add_secret_key,
+        ]);
+
+        return redirect()->back()->with('success', 'New API KEY Add Success');
+    }
+
+    public function update_api(Request $request, $id)
+    {
+        $request->validate([
+            'input_public_key.*' => 'sometimes',
+            'input_secret_key' => 'sometimes',
+        ]);
+
+        $api_edit = API_key::find($id);
+        $api_edit->public_key = $request->input_public_key;
+        $api_edit->secret_key = $request->input_secret_key;
+        $api_edit->save();
+
+        return redirect()->back()->with('success', 'API KEY Update Success');
     }
 }

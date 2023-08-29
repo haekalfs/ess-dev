@@ -10,6 +10,7 @@ use App\Models\Timesheet_approval_cutoff_date;
 use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
+use App\Models\API_key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
@@ -37,7 +38,7 @@ class HrController extends Controller
 		$FGA_Approve3 = Timesheet_approver::where('id', 15)->first();
 
 		//Technology And HCM
-		$THC_Approve1 = Timesheet_approver::where('id', 11)->first();
+		$THC_Approve1 = Timesheet_approver::where('id', 25)->first();
 		$THC_Approve2 = Timesheet_approver::where('id', 60)->first();
 
 		//Sales And Marketing
@@ -128,7 +129,7 @@ class HrController extends Controller
 			$input_FGA_Approve3->save();
 			
 			//Technology And HCM
-			$input_THC_Approve1 = Timesheet_approver::where('id', 11)->first();
+			$input_THC_Approve1 = Timesheet_approver::where('id', 25)->first();
 			$input_THC_Approve1->approver = $request->THM_FA;
 			$input_THC_Approve1->save();
 
