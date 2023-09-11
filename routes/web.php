@@ -72,6 +72,7 @@ Route::get('/development', 'HomeController@notification_indev');
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth');
 Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary')->middleware('auth');
 Route::get('/approval/leave', 'LeaveApprovalController@leave_approval')->name('approval.leave')->middleware('auth');
+Route::get('/approval/medical', 'ApprovalController@medical_approval')->name('approval.medical')->middleware('auth');
 
 Route::match(['get', 'post'], '/approval/leave/approve/{id}', 'LeaveApprovalController@approve')->name('leave.approve')->middleware('auth');
 Route::match(['get', 'post'], '/approval/leave/reject/{id}', 'LeaveApprovalController@reject')->name('leave.reject')->middleware('auth');
@@ -96,6 +97,8 @@ Route::get('/approval/project/assignment/', 'ApprovalProjectController@index')->
 Route::get('/approval/project/assignment/preview/{id}', 'ApprovalProjectController@preview_assignment')->name('preview.project.assignment')->middleware('auth');
 Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectController@approve_assignment')->name('approve.project.assignment')->middleware('auth');
 Route::get('/approval/project/assignment/reject/{id}', 'ApprovalProjectController@reject_assignment')->name('reject.project.assignment')->middleware('auth');
+
+// Approval Medical
 
 //myprofile
 Route::get('/myprofile', 'MyProfileController@index')->name('myprofile')->middleware('auth');
@@ -190,11 +193,16 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
 Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');
 Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users');
 
-//HR TOOLS
+//Company Regulation 
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth');
 Route::get('/hr/compliance/', 'HrController@index')->middleware('auth');
 Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet')->middleware('auth');
 Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save')->middleware('auth');
+Route::put("/hr/compliance/update/regulations", 'HrController@update_regulation')->middleware('auth');
+    // Exit Clearance
+    Route::get('/hr/exit_clearance/', 'HrController@exit_clear')->middleware('auth');
+    Route::get('/hr/exit_clearance/print/{id}', 'HrController@print')->middleware('auth');
+    Route::put('/hr/exit_clearance/resign_emp', 'HrController@resign_emp')->middleware('auth');
 
 //Department and Position
 Route::get('/hrtools/manage/position', 'DepPosController@index')->middleware('auth');
@@ -211,9 +219,13 @@ Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
 Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
 Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
-Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
-// Route::put('/medical/edit/{id}/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
+Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
+Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail')->middleware('auth');
+Route::get('/medical/approval/{id}', 'MedicalController@approval_edit')->middleware('auth');
+Route::put('/medical/approval/{id}/update/{mdet_id}', 'MedicalController@update_approval')->middleware('auth');
+Route::put('/medical/approval/{id}/approve', 'MedicalController@approve')->middleware('auth');
+Route::put('/medical/approval/{id}/reject', 'MedicalController@reject')->middleware('auth');
 
 Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history')->middleware('auth');
 Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req')->middleware('auth');

@@ -23,17 +23,20 @@ class Medical extends Authenticatable
         'med_req_date',
         'med_payment',
         'med_status',
-        'med_total_amount'
+        'med_total_amount',
+        'approved_by',
+        'approved_note',
+        'total_approved',
+        'approved_date',
     ];
 
     public function user(){
         return $this->belongsTo('App\Models\User');
     }
-    // public function medical_details(){
-    // 	return $this->hasMany('App\Models\Medical_details');
-    // }
+    
     public function medical_details()
     {
         return $this->hasMany(Medical_details::class, 'medical_number', 'medical_number');
     }
+    
 }

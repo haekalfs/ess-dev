@@ -10,6 +10,7 @@ use App\Models\Approval_status;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
+use App\Models\Medical;
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
@@ -443,5 +444,13 @@ class ApprovalController extends Controller
         ->count();
         // return response()->json($activities);
         return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+    }
+
+
+    // Medical Approval
+    public function medical_approval(){
+        $medical = Medical::all();
+        $name = User::all();
+        return view('/approval/medical_approval', ['medical' => $medical, 'name' => $name]);
     }
 }

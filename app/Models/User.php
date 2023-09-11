@@ -81,4 +81,9 @@ class User extends Authenticatable
     public function leave_request(){
     	return $this->hasMany('App\Models\Leave_request');
     }
+    
+    public function approver()
+    {
+        return $this->hasOne('App\Models\Timesheet_approver');
+    }
 }
