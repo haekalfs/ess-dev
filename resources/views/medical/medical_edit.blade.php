@@ -61,12 +61,12 @@ active
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
-        <div class="card shadow mb-4">
+        <div class="card shadow mb-4" style="width: 1369px; height: 300px;">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Employee Information</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Requested Information</h6>
                 <div class="text-right">
-                    <a class="btn btn-danger btn-sm" type="button" href="{{ url()->previous() }}" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
+                    <a class="btn btn-danger btn-sm" type="button" href="/medical/history" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -112,21 +112,21 @@ active
                         <table class="table table-borderless">
 							<thead>
                                 <tr>
-                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Approval Information</th>
+                                    <th style="padding-left: 0;" class="m-0  text-primary" colspan="2">Approval Information</th>
                                 </tr>
                             </thead>
-                           <tr class="table-sm">
-								<td>Approval By</td>
-								<td>: Ronnyy</td>
-							</tr>
-							<tr class="table-sm">
-								<td>Approval Date</td>
-								<td>: 09-06-2023</td>
-							</tr>
-							<tr class="table-sm">
-								<td>Approval Notes</td>
-								<td>: Good</td>
-							</tr>
+                           <tr>
+                                <th>Approval By</th>
+                                <td>: {{$med->approved_by}}</td>
+                            </tr>
+                            <tr>
+                                <th>Approval Date</th>
+                                <td>: {{$med->approved_date}}</td>
+                            </tr>
+                            <tr>
+                                <th>Approval Notes</th>
+                                <td>: {{$med->approved_note}}</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -163,28 +163,33 @@ active
 							<tr>
 								<td class="centered-button">
                                     {{-- <img style="width: 80px; height: 80px; object-fit:fill;" class="img-fluid" src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" alt="Attachment" data-toggle="modal" data-target="#myModal{{ $md->mdet_id}}"> --}}
-									<button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#myModal{{ $md->mdet_id }}">View</button></td>
+									<button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#myModal{{ $md->mdet_id }}">View</button>
+                                </td>
 								<td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
                                     {{ $md->mdet_desc }}
                                 </td>
-								<td id="amount">Rp. {{ $md->mdet_amount }}</td>
-								<td>Rp. 50.000</td>
+								<td>
+                                    Rp. <span class="amount" id="amount">{{ $md->mdet_amount }}</span>
+                                </td>
+								<td>
+                                    Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
+                                </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
                                     <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
                                         <i class="fas fa-fw fa-edit justify-content-center"></i>
                                     </a>
-                                    <a href="#" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                                    <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
                                 </td>
 							</tr>
 							@endforeach
                             <tr class="p-3 mb-2 bg-secondary text-white" style="border-bottom: 1px solid #dee2e6;">
-                                <td colspan="2" class="text-center">Total </td>
+                                <td colspan="2" class="text-center">Total</td>
 								<td class="text-start" id="totalAmount">
-                                    <input hidden id="totalAmountInput" name="totalAmountInput" value="">
-                                    <a>Total Amount :</a><a class="text-danger" id="totalAmount" name="totalAmount"></a>
+                                    <span id="totalAmountDisplay" name="totalAmountDisplay"></span>
                                 </td>
-								<td colspan="2" 
-                                class="text-start">{{ $med->med_total_amount }}</td>
+								<td colspan="2" class="text-start" id="totalAmountApproved">
+                                    <span id="totalAmountApprovedDisplay" name="totalAmountApprovedDisplay"></span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -271,7 +276,7 @@ active
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="myModalLabel">Medical Detail Edit </h5>
+                    <h5 class="modal-title" id="myModalLabel">Medical Detail Edit #{{ $md->mdet_id }} </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -284,7 +289,7 @@ active
                                     <img class="img-fluid mt-4 mb-4" style="width: 350px; height: auto;" src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}"  alt="Attachment">
                                     <div class="custom-file mb-4">
                                         <input type="file" class="custom-file-input" id="inputAttach" name="inputAttach" aria-describedby="inputGroupFileAddon01" onchange="changeFileName('inputAttach', 'inputAttach-label')">
-                                        <label class="custom-file-label" for="inputAttach-label" id="inputAttach-label">Choose file</label>
+                                        <label class="custom-file-label" for="file" id="inputAttach-label">Choose file</label>
                                     </div>
                                 </td>
 								<td>
@@ -294,7 +299,7 @@ active
 							</tr>
                             <tr>
                                 <td><label for="password">Amount :</label>
-                                    <input class="form-control flex" name="input_mdet_amount" placeholder="Amount..." value="{{ $md->mdet_amount }}"/>
+                                    <input class="form-control flex" name="input_mdet_amount" placeholder="Amount..." value="{{ $md->mdet_amount }}" oninput="formatAmount(this)"/>
                                 </td>
                             </tr>
                         </tbody>
@@ -317,13 +322,59 @@ active
             $(this).find('.modal-title').focus();
         });
     });
-</script>
-<script>
-    
+
+function formatAmount(input) {
+  // Mengambil nilai input
+  let amount = input.value;
+
+  // Menghapus karakter selain angka
+  amount = amount.replace(/\D/g, '');
+
+  // Menambahkan pemisah ribuan setiap 3 angka
+  amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  // Memperbarui nilai input dengan format terbaru
+  input.value = amount;
+}
+
 function changeFileName(inputId, labelId) {
   var input = document.getElementById(inputId);
   var label = document.getElementById(labelId);
   label.textContent = input.files[0].name;
 }
+
+
+//Amount
+// Mengubah titik menjadi angka biasa dan menghitung total amount
+var amountElements = document.getElementsByClassName("amount");
+var totalAmount = 0;
+
+for (var i = 0; i < amountElements.length; i++) {
+  var amountText = amountElements[i].textContent;
+  var amountNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
+  totalAmount += amountNumber;
+}
+
+// Menampilkan total amount
+var totalAmountDisplay = document.getElementById("totalAmount");
+totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString();
+
+
+
+// Amount Approved
+// Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
+var amountElements = document.getElementsByClassName("amountApproved");
+var totalAmountApproved = 0;
+
+for (var i = 0; i < amountElements.length; i++) {
+  var amountText = amountElements[i].textContent;
+  var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
+  totalAmountApproved += amountApprovedNumber;
+}
+
+// Menampilkan total amount
+var totalAmountApprovedDisplay = document.getElementById("totalAmountApproved");
+totalAmountApprovedDisplay.textContent = "Rp. " + totalAmountApproved.toLocaleString();
+
 </script>
 @endsection

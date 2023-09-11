@@ -183,7 +183,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         @usr_acc(502)
                         <h6 class="collapse-header">My Reimburse:</h6>
-                        <a class="collapse-item" href="/development">History</a>
+                        <a class="collapse-item" href="/reimbursement/history">History</a>
                         @else
                         @endusr_acc
                         @usr_acc(503)
@@ -280,13 +280,13 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHRSystem"
                     aria-expanded="true" aria-controls="collapseHRSystem">
                     <i class="fas fa-fw fa-tools"></i>
-                    <span>HR Tools</span>
+                    <span>Company Regulation</span>
                 </a>
                 <div id="collapseHRSystem" class="collapse" aria-labelledby="headingHRSystem" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">HR Access:</h6>
                         <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
-                        <a class="collapse-item" href="/development">A2. Exit Clearance</a>
+                        <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
                         <a class="collapse-item" href="/development">A3. Vendor List</a>
                         <a class="collapse-item" href="/development">A4. News Feed</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}

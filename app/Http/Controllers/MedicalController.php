@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use App\Models\Medical;
+use App\Models\Medical_approval;
 use App\Models\Medical_details;
 use App\Models\User;
 use Illuminate\Contracts\Session\Session as SessionSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
-
+use function GuzzleHttp\Promise\all;
 
 class MedicalController extends Controller
 {
@@ -39,6 +40,10 @@ class MedicalController extends Controller
 
     public function store(Request $request)
     {
+        $data = $request->all();
+
+        // Tampilkan data yang diterima dari form
+        dd($data); 
         $request->validate([
             'attach.*' => 'required|file',
             'amount.*' => 'required',
@@ -110,23 +115,24 @@ class MedicalController extends Controller
         return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
     }
 
-    public function update_medDetail(Request $request, $mdet_id)
+    public function update_medDetail(Request $request, $mdet_id, $medical_number)
     {
-        $user_info = User::find(Auth::user()->id);
-        $med = Medical::with('medical_details')->findOrFail($mdet_id);
-        $medDet = Medical_details::where('medical_number', $mdet_id)->first();
+        
+        $medDet = Medical_details::where('mdet_id', $medical_number)->first();
         $request->validate([
-            'attach.*' => 'required|file',
-            'amount.*' => 'required',
-            'desc.*' => 'required',
+            'attach.*' => 'sometimes|file',
+            'amount.*' => 'sometimes',
+            'desc.*' => 'sometimes',
         ]);
 
         if ($request->hasFile('inputAttach')){
             $inputAttach = $request->file('inputAttach');
 
-            $filename = $medDet->mdet_attachment;
-            $attach_tujuan = '/storage/med_pic';
-            $inputAttach->move(public_path($attach_tujuan), $filename);
+            $extension = $inputAttach->getClientOriginalExtension();
+            $filename = 'MED0000' . $medical_number . '_' . $mdet_id .  '_' .  Auth::user()->id . '.' . $extension;
+            
+            $attach_tujuan = '/med_pic';
+            $inputAttach->storeAs('public/' . $attach_tujuan, $filename);
 
             // Menghapus file profil lama jika ada
             $oldCV = public_path($attach_tujuan . '/' .$filename);
@@ -138,14 +144,71 @@ class MedicalController extends Controller
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $filename = $medDet->mdet_attachment;
         }
-        $med_detail = Medical_details::find($mdet_id);
-        $med_detail->mdet_attachment = $filename;
-        $med_detail->mdet_amount = $request->input_mdet_amount;
-        $med_detail->mdet_desc = $request->input_mdet_desc;
-        $med_detail->save();
+        // $med_detail = Medical_details::find($mdet_id);
+        $medDet->mdet_id = $medDet->mdet_id;
+        $medDet->mdet_attachment = $filename;
+        $medDet->mdet_amount = $request->input_mdet_amount;
+        $medDet->mdet_desc = $request->input_mdet_desc;
+        $medDet->save();
 
         return redirect()->back()->with('success', 'Medical Detail Edit Success.');
 
 
+    }
+
+    public function delete_medDetail($mdet_id, $medical_number){
+        DB::table('medicals_detail')
+        ->where('mdet_id', $medical_number)
+        ->delete();
+
+        return redirect()->back()->with('success', 'Medical Detail Delete Success.');
+    }
+
+
+// Approval Medical
+
+    public function approval_edit($id){
+        $med = Medical::findOrFail($id);
+        $medDet = Medical_details::where('medical_number', $med->id)->get();
+        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet]);
+    }
+
+    public function update_approval (Request $request, $medical_number){
+        $medDet = Medical_details::where('mdet_id', $medical_number)->first();
+        $request->validate([
+            'amount_approved.*' => 'sometimes',
+            'desc.*' => 'sometimes',
+        ]);
+
+        $medDet->amount_approved = $request->input_mdet_amount_approved;
+        $medDet->mdet_desc = $request->input_mdet_desc;
+        $medDet->save();
+
+        return redirect()->back()->with('success', 'Medical Approval Edit Success');
+    }
+
+    public function approve(Request $request, $id)
+    {
+
+        $data = $request->all();
+
+        // Tampilkan data yang diterima dari form
+        dd($data);
+        $request->validate([
+            'input_approve_note' => 'required',
+        ]);
+
+        $totalAmountApproved = $request->input('totalAmountApprovedInput');
+        // Lakukan pengolahan atau penyimpanan ke database menggunakan $totalAmountApproved
+        // ...
+
+        $medical = Medical::findOrFail($id);
+        $medical->approved_by = $request->approved_name;
+        $medical->approved_date = $request->date_approved;
+        $medical->approved_note = $request->input_approve_note;
+        $medical->total_approved = $totalAmountApproved;
+        $medical->med_status = 'Approved';
+        $medical->save();
+        return redirect()->back()->with('success', 'Medical Approval Edit Success');
     }
 }

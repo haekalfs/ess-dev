@@ -92,7 +92,7 @@ active
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="amount">Amount (Rp) :</label>
-                                                    <input type="text" class="form-control" name="amount[]" id="amount" value="" required required oninput="formatAmount(this)" >
+                                                    <input type="text" class="form-control" name="amount[]" id="amount" value="" required oninput="formatAmount(this)" >
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="description">Description :</label>
@@ -243,17 +243,17 @@ undoButton.addEventListener("click", function (event) {
 });
 
 function formatAmount(input) {
-  // Mengambil nilai input
-  let amount = input.value;
+    // Mengambil nilai input
+    let amount = input.value;
 
-  // Menghapus karakter selain angka
-  amount = amount.replace(/\D/g, '');
+    // Menghapus karakter selain angka
+    amount = amount.replace(/\D/g, '');
 
-  // Menambahkan pemisah ribuan setiap 3 angka
-  amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    // Menambahkan pemisah ribuan setiap 3 angka
+    amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-  // Memperbarui nilai input dengan format terbaru
-  input.value = amount;
+    // Memperbarui nilai input dengan format terbaru
+    input.value = amount;
 }
 
 function formatRupiah(angka, prefix) {
