@@ -45,7 +45,7 @@ class SendTimesheetApprovalReminder extends Command
     public function handle()
     {
         // $users = User::where('id', 'haekals')->get();
-        $userToApprove = Timesheet_detail::groupBy('RequestTo')->pluck('RequestTo')->toArray();
+        $userToApprove = Timesheet_detail::where('ts_status_id', 20)->groupBy('RequestTo')->pluck('RequestTo')->toArray();
         $users = User::whereIn('id', $userToApprove)->get();
 
         foreach ($users as $user) {
