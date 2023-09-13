@@ -105,7 +105,7 @@ active
         <h6 class="m-0 font-weight-bold text-primary">Medical History</h6>
         <div class="text-right">
             <a href="/medical/entry" class="btn btn-primary btn-sm">New Request</a>
-            <a href="" class="btn btn-primary btn-sm">View Report</a>
+            {{-- <a href="" class="btn btn-primary btn-sm">View Report</a> --}}
         </div>
     </div>
     <!-- Card Body -->
@@ -116,22 +116,26 @@ active
                         <th>Request Number</th>
                         <th>Request Date</th>
                         <th>Payment</th>
-                        <th>Status</th>
+                        {{-- <th>Status</th> --}}
                         <th width="120px">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($med as $q)
-                    <tr >
-                        <td>MED_0000{{$q->id}}</td>
+                    <tr>
+                        <td>MED_0000{{$q->med_number}}</td>
                         <td>{{$q->med_req_date}}</td>
                         <td>{{$q->med_payment}}</td>
-                        <td>{{$q->med_status}}</td>
+                        {{-- <td>{{ $approvalStatus->approval_status }}</td> --}}
                         <td class="row-cols-2 justify-content-betwen text-center">
-                            <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
+                            @if(!empty($medButton))
+                            <a href="/medical/edit/{{ $q->id }}M" title="Edit" class="btn btn-warning btn-sm" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>
                             </a>
-                            <a href="/medical/delete/{{ $q->id }}" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                            <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                            @else
+                            
+                            @endif
                         </td>
                     </tr>
                     @endforeach
@@ -140,4 +144,27 @@ active
     </div>
 </div>
 
+@foreach($med as $q)
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title  text-white" id="staticBackdropLabel">Alert !!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <img class="mb-2" width="96" height="96" src="https://img.icons8.com/color/96/general-warning-sign.png" alt="general-warning-sign"/>
+        <h6>Are You Sure Want Delete This Record !!!</h6>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn-sm btn-primary" data-dismiss="modal">Cancel</button>
+        <a href="/medical/delete/{{ $q->id }}M" title="Hapus" class="btn btn-danger btn-sm" >Yes Im Sure</a>
+      </div>
+    </div>
+  </div>
+</div>
+@endforeach
 @endsection

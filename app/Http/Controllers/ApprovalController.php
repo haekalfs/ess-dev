@@ -11,6 +11,8 @@ use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Medical;
+use App\Models\Medical_details;
+use App\Models\Medical_approval;
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
@@ -38,27 +40,96 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class ApprovalController extends Controller
 {
     public function index()
-	{
+    {
         // $accessController = new AccessController();
         // $result = $accessController->usr_acc(202);
 
         $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
-        ->where(function($query) {
-            $query->where('RequestTo', Auth::user()->id)
-            ->groupBy('user_timesheet', 'month_periode');
-        })
-        ->groupBy('user_timesheet', 'month_periode')
-        ->count();
+            ->where(function ($query) {
+                $query->where('RequestTo', Auth::user()->id)
+                    ->groupBy('user_timesheet', 'month_periode');
+            })
+            ->groupBy('user_timesheet', 'month_periode')
+            ->count();
 
         $pCount = Project_assignment::where('approval_status', 40)->count();
         $leaveCount = Leave_request_approval::whereNotIn('status', ['20', '30', '29', '404'])
-        ->where(function($query) {
-            $query->where('RequestTo', Auth::user()->id);
-        })
-        ->count();
-
-		return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount]);
-	}
+            ->where(function ($query) {
+                $query->where('RequestTo', Auth::user()->id);
+            })
+            ->count();
+            
+// Medical Count
+        $checkUserPost = Auth::user()->users_detail->position->id;
+        $ts_approver = Timesheet_approver::whereIn('id', [10, 15, 20, 25, 29, 50])->pluck('approver')->toArray();
+        //direktur
+        if (in_array($checkUserPost, [7, 8, 12])) {
+            $Check = Medical_approval::whereIn('RequestTo', $ts_approver)
+            ->whereNotIn('RequestTo', [Auth::user()->id])
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
+            ->groupBy('RequestTo')
+            ->pluck('RequestTo')
+            ->toArray();
+            // var_dump($Check);
+            if (!empty($Check)) {
+                $medCount = Medical_approval::where('RequestTo', Auth::user()->id)
+                ->whereNotIn('status', [20, 29, 404])
+                ->whereNotIn('RequestTo', $Check)
+                    ->groupBy('medical_id')
+                    ->count();
+            } else {
+                $medCount = Medical_approval::where('RequestTo', 'xxhaekalsxx')
+                    ->groupBy('medical_id')
+                    ->count();
+            }
+        } else {
+            //selain direktur
+            $Check = Medical_approval::whereNotIn('status', [10])
+                ->whereNotIn('RequestTo', $ts_approver)
+                ->groupBy('RequestTo')
+                ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
+                ->pluck('RequestTo')
+                ->toArray();
+            // var_dump($Check);
+            if (!empty($Check)) {
+                // special routes
+                if (in_array($checkUserPost, [21])) {
+                    $checkApprovalMed = Medical_approval::whereIn('RequestTo', $Check)
+                    ->whereNotIn('RequestTo', [Auth::user()->id])
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
+                    ->groupBy('RequestTo')
+                    ->pluck('RequestTo')
+                    ->toArray();
+                    if (!empty($checkApprovalMed)) {
+                        $medCount = Medical_approval::where('RequestTo', Auth::user()->id)
+                            ->whereNotIn('status', [29, 404])
+                            ->whereNotIn('RequestTo', $checkApprovalMed)
+                            ->groupBy('medical_id')
+                            ->count();
+                    } else {
+                        //gagal
+                        $medCount = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+                            ->whereNotIn('status', [20, 29, 404, 30, 15])
+                            ->groupBy('medical_id')
+                            ->count();
+                    }
+                } else {
+                    // regular routes
+                    $medCount = Medical_approval::where('RequestTo', Auth::user()->id)
+                    ->whereNotIn('status', [20, 29, 404, 30])
+                        // ->whereIn('RequestTo', $Check)
+                        ->groupBy('medical_id')
+                        ->count();
+                }
+            } else {
+                $medCount = Medical_approval::where('RequestTo', "stopppp")
+                    ->whereNotIn('status', [29, 404, 30])
+                    ->groupBy('medical_id')
+                    ->count();
+            }
+        }
+        return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
+    }
 
     public function timesheet_approval(Request $request)
     {
@@ -75,7 +146,7 @@ class ApprovalController extends Controller
             'yearOpt' => 'required',
             'monthOpt' => 'required'
         ]);
-        
+
         $currentYear = date('Y');
 
         // Get the current day of the month
@@ -83,7 +154,7 @@ class ApprovalController extends Controller
 
         $checkUserPost = Auth::user()->users_detail->position->id;
 
-        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
+        $ts_approver = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         if ($validator->passes()) {
             $Year = $request->yearOpt;
@@ -91,45 +162,45 @@ class ApprovalController extends Controller
         }
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
-                if (in_array($checkUserPost, [7, 8, 12])) {
-                    $Check = Timesheet_detail::select('*')
+            if (in_array($checkUserPost, [7, 8, 12])) {
+                $Check = Timesheet_detail::select('*')
+                    ->whereYear('date_submitted', $Year)
+                    ->where('month_periode', $Year . intval($Month))
+                    ->whereNotIn('ts_status_id', [10])
+                    ->whereNotIn('RequestTo', $ts_approver)
+                    ->groupBy('user_timesheet', 'month_periode')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 WHEN ts_status_id = 15 THEN 1 ELSE 0 END)')
+                    ->pluck('user_timesheet')
+                    ->toArray();
+                if (!empty($Check)) {
+                    $approvals = Timesheet_detail::select('*')
                         ->whereYear('date_submitted', $Year)
                         ->where('month_periode', $Year . intval($Month))
-                        ->whereNotIn('ts_status_id', [10])
-                        ->whereNotIn('RequestTo', $ts_approver)
+                        ->where('RequestTo', Auth::user()->id)
+                        ->whereIn('user_timesheet', $Check)
+                        ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                         ->groupBy('user_timesheet', 'month_periode')
-                        ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 WHEN ts_status_id = 15 THEN 1 ELSE 0 END)')
-                        ->pluck('user_timesheet')
-                        ->toArray();
-                        if (!empty($Check)) {
-                            $approvals = Timesheet_detail::select('*')
-                                ->whereYear('date_submitted', $Year)
-                                ->where('month_periode', $Year . intval($Month))
-                                ->where('RequestTo', Auth::user()->id)
-                                ->whereIn('user_timesheet', $Check)
-                                ->whereNotIn('ts_status_id', [29, 404, 30, 15])
-                                ->groupBy('user_timesheet', 'month_periode')
-                                ->get();
-                        } else {
-                            $approvals = Timesheet_detail::select('*')
-                                ->where('RequestTo', 'xxhaekalsxx')
-                                ->groupBy('user_timesheet', 'month_periode')
-                                ->get();
-                        }
+                        ->get();
                 } else {
-                    $Check = Timesheet_detail::select('*')
-                        ->whereNotIn('ts_status_id', [10, 15])
-                        ->whereNotIn('RequestTo', [Auth::user()->id])
-                        ->whereYear('date_submitted', $Year)
-                        ->where('month_periode', $Year . intval($Month))
+                    $approvals = Timesheet_detail::select('*')
+                        ->where('RequestTo', 'xxhaekalsxx')
                         ->groupBy('user_timesheet', 'month_periode')
-                        ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 404 THEN 0 ELSE 1 END)')
-                        ->pluck('user_timesheet')
-                        ->toArray();
-                    if (!empty($Check)) {
-                        if(in_array($checkUserPost, [24])){
-                            $checkApprovalPC = Timesheet_detail::select('*')
-                            ->whereIn('priority', [3,4])
+                        ->get();
+                }
+            } else {
+                $Check = Timesheet_detail::select('*')
+                    ->whereNotIn('ts_status_id', [10, 15])
+                    ->whereNotIn('RequestTo', [Auth::user()->id])
+                    ->whereYear('date_submitted', $Year)
+                    ->where('month_periode', $Year . intval($Month))
+                    ->groupBy('user_timesheet', 'month_periode')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 404 THEN 0 ELSE 1 END)')
+                    ->pluck('user_timesheet')
+                    ->toArray();
+                if (!empty($Check)) {
+                    if (in_array($checkUserPost, [24])) {
+                        $checkApprovalPC = Timesheet_detail::select('*')
+                            ->whereIn('priority', [3, 4])
                             ->whereYear('date_submitted', $Year)
                             ->whereIn('user_timesheet', $Check)
                             ->where('month_periode', $Year . intval($Month))
@@ -137,8 +208,8 @@ class ApprovalController extends Controller
                             ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 ELSE 0 END)')
                             ->pluck('user_timesheet')
                             ->toArray();
-                            if(!empty($checkApprovalPC)){
-                                $approvals = Timesheet_detail::select('*')
+                        if (!empty($checkApprovalPC)) {
+                            $approvals = Timesheet_detail::select('*')
                                 ->where('RequestTo', Auth::user()->id)
                                 ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                                 ->whereIn('user_timesheet', $checkApprovalPC)
@@ -146,18 +217,18 @@ class ApprovalController extends Controller
                                 ->where('month_periode', $Year . intval($Month))
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
-                            } else {
-                                //gagal
-                                $approvals = Timesheet_detail::select('*')
+                        } else {
+                            //gagal
+                            $approvals = Timesheet_detail::select('*')
                                 ->whereYear('date_submitted', $Year)
                                 ->where('month_periode', $Year . intval($Month))
                                 ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
                                 ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
-                            }
-                        } else {
-                            $approvals = Timesheet_detail::select('*')
+                        }
+                    } else {
+                        $approvals = Timesheet_detail::select('*')
                             ->where('RequestTo', Auth::user()->id)
                             ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                             ->whereIn('user_timesheet', $Check)
@@ -165,17 +236,17 @@ class ApprovalController extends Controller
                             ->where('month_periode', $Year . intval($Month))
                             ->groupBy('user_timesheet', 'month_periode')
                             ->get();
-                        }
-                    } else {
-                        $approvals = Timesheet_detail::select('*')
+                    }
+                } else {
+                    $approvals = Timesheet_detail::select('*')
                         ->whereYear('date_submitted', $Year)
                         ->where('month_periode', $Year . intval($Month))
                         ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
                         ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                         ->groupBy('user_timesheet', 'month_periode')
                         ->get();
-                    }
                 }
+            }
             return view('approval.timesheet_approval', ['approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'Month' => $Month, 'Year' => $Year, 'employees' => $employees]);
         } else {
             // Handle the case when the date is not within the range
@@ -191,14 +262,14 @@ class ApprovalController extends Controller
             'approval_notes' => 'sometimes'
         ]);
 
-        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.$month)->get();
+        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year . $month)->get();
 
-        $timesheetApproversDir = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver');
+        $timesheetApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver');
         $checkUserDir = $timesheetApproversDir->toArray();
         foreach ($countRows as $row) {
             $tsStatusId = '30';
             $activity = 'Approved';
-        
+
             switch (true) {
                 case in_array(Auth::user()->id, $checkUserDir):
                     $tsStatusId = '29';
@@ -208,8 +279,8 @@ class ApprovalController extends Controller
                     $tsStatusId = '30';
                     break;
             }
-        
-            $approve = Timesheet_detail::where('month_periode', $year.$month)
+
+            $approve = Timesheet_detail::where('month_periode', $year . $month)
                 ->where('user_timesheet', $user_timesheet)
                 ->where('RequestTo', Auth::user()->id)
                 ->where('ts_task_id', $row->ts_task_id);
@@ -225,44 +296,44 @@ class ApprovalController extends Controller
             $currentYear = date('Y');
 
             $Check = DB::table('timesheet_details')
-                    ->select('*')
-                    ->whereYear('date_submitted', $currentYear)
-                    ->whereNotIn('ts_status_id', [10, 15])
-                    ->whereNotIn('RequestTo', [Auth::user()->id])
-                    ->groupBy('user_timesheet', 'month_periode')
-                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 0 ELSE 1 END)')
-                    ->pluck('user_timesheet')
-                    ->toArray();
+                ->select('*')
+                ->whereYear('date_submitted', $currentYear)
+                ->whereNotIn('ts_status_id', [10, 15])
+                ->whereNotIn('RequestTo', [Auth::user()->id])
+                ->groupBy('user_timesheet', 'month_periode')
+                ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 0 ELSE 1 END)')
+                ->pluck('user_timesheet')
+                ->toArray();
 
             if (!empty($Check)) {
-                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
-                ->where('ts_user_id', $user_timesheet)
-                ->update(['ts_status_id' => $tsStatusId]);
+                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
+                    ->where('ts_user_id', $user_timesheet)
+                    ->update(['ts_status_id' => $tsStatusId]);
             } else {
-                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
-                ->where('ts_user_id', $user_timesheet)
-                ->update(['ts_status_id' => $tsStatusId]);
+                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
+                    ->where('ts_user_id', $user_timesheet)
+                    ->update(['ts_status_id' => $tsStatusId]);
             }
         }
 
         $approverName = Auth::user()->name;
         $entry = new Notification_alert;
         $entry->user_id = $user_timesheet;
-        $ts_name = date("F", mktime(0, 0, 0, $month, 1)).' - '.$year;
+        $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
         $entry->importance = 1;
         $entry->save();
 
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
         $countWeekendReplacement = Emp_leave_quota::where('user_id', $user_timesheet)
-        ->where('leave_id', 100)
-        ->where('active_periode', '>=', date('Y-m-d'))
-        ->sum('quota_left');
+            ->where('leave_id', 100)
+            ->where('active_periode', '>=', date('Y-m-d'))
+            ->sum('quota_left');
 
         $getYear = date('Y');
         $expirationYear = $getYear + 1;
 
-        if(!$weekendReplacementInCurrentMonth){
+        if (!$weekendReplacementInCurrentMonth) {
             Emp_leave_quota::updateOrCreate([
                 'user_id' => Auth::user()->id,
                 'leave_id' => 100,
@@ -285,7 +356,7 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return redirect('/approval/timesheet/p')->with('success',"You approved $user_timesheet timereport!");
+        return redirect('/approval/timesheet/p')->with('success', "You approved $user_timesheet timereport!");
     }
 
     public function reject(Request $request, $user_timesheet, $year, $month)
@@ -296,11 +367,11 @@ class ApprovalController extends Controller
             'reject_notes' => 'sometimes'
         ]);
 
-        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year.intval($month))->get();
+        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year . intval($month))->get();
 
-        foreach($countRows as $row) { ///test buat dihapus nnti karna double loops
+        foreach ($countRows as $row) { ///test buat dihapus nnti karna double loops
 
-            $reject = Timesheet_detail::where('month_periode', $year.$month)
+            $reject = Timesheet_detail::where('month_periode', $year . $month)
                 ->where('user_timesheet', $user_timesheet)
                 ->where('RequestTo', Auth::user()->id)
                 ->where('ts_task_id', $row->ts_task_id);
@@ -315,9 +386,9 @@ class ApprovalController extends Controller
             }
         }
 
-        Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
-        ->where('ts_user_id', $user_timesheet)
-        ->update(['ts_status_id' => '404']);
+        Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
+            ->where('ts_user_id', $user_timesheet)
+            ->update(['ts_status_id' => '404']);
 
         $employees = User::where('id', $user_timesheet)->get();
 
@@ -326,17 +397,17 @@ class ApprovalController extends Controller
         }
         $entry = new Notification_alert;
         $entry->user_id = $user_timesheet;
-        $ts_name = date("F", mktime(0, 0, 0, $month, 1)).' - '.$year;
+        $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been rejected!";
         $entry->importance = 404;
         $entry->save();
 
-        return redirect('/approval/timesheet/p')->with('failed',"You rejected $user_timesheet timereport!");
+        return redirect('/approval/timesheet/p')->with('failed', "You rejected $user_timesheet timereport!");
     }
 
     public function ts_preview($user_id, $year, $month)
-	{
-		// $year = Crypt::decrypt($year);
+    {
+        // $year = Crypt::decrypt($year);
         // $month = Crypt::decrypt($month);
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
@@ -354,14 +425,14 @@ class ApprovalController extends Controller
         for ($day = 1; $day <= $lastDay; $day++) {
             // Set the day of the month
             $dateToCount->setDate($year, $month, $day);
-            
+
             // Check if the day is a weekday (Monday to Friday)
             if ($dateToCount->format('N') <= 5) {
                 $totalWeekdays++;
             }
         }
 
-        $totalHours = $totalWeekdays * 8; 
+        $totalHours = $totalWeekdays * 8;
 
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
@@ -372,7 +443,7 @@ class ApprovalController extends Controller
 
         $user_info = User::find($user_id);
 
-        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year.intval($month))->get(); 
+        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year . intval($month))->get();
 
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
@@ -384,13 +455,13 @@ class ApprovalController extends Controller
             ->whereYear('project_assignment_users.periode_start', $year)
             ->whereYear('project_assignment_users.periode_end', $year)
             ->where('project_assignments.approval_status', 29)
-            ->get(); 
+            ->get();
 
         $leaveApproved = [];
         $checkLeaveApproval = Leave_request::where('req_by', $user_id)->pluck('id');
-        foreach ($checkLeaveApproval as $chk){
+        foreach ($checkLeaveApproval as $chk) {
             $checkApp = Leave_request_approval::where('leave_request_id', $chk)->where('status', 29)->pluck('leave_request_id')->first();
-            if(!empty($checkApp)){
+            if (!empty($checkApp)) {
                 $leaveApproved[] = $checkApp;
             }
         }
@@ -415,20 +486,20 @@ class ApprovalController extends Controller
         }
 
         $assignmentNames = $assignment->pluck('project_name')->implode(', ');
-        if($assignment->isEmpty()){
+        if ($assignment->isEmpty()) {
             $assignmentNames = "None";
         }
 
         $info = [];
         $lastUpdate = DB::table('timesheet')
-                ->whereMonth('ts_date', $month)
-                ->whereYear('ts_date', $year)
-                ->orderBy('updated_at', 'desc')
-                ->where('ts_user_id', $user_id)
-                ->first();
+            ->whereMonth('ts_date', $month)
+            ->whereYear('ts_date', $year)
+            ->orderBy('updated_at', 'desc')
+            ->where('ts_user_id', $user_id)
+            ->first();
         if ($lastUpdate) {
             $status = Approval_status::where('approval_status_id', $lastUpdate->ts_status_id)->pluck('status_desc')->first();
-            if(!$status){
+            if (!$status) {
                 $status = "Unknown Status";
             }
             $lastUpdatedAt = $lastUpdate->updated_at;
@@ -437,20 +508,226 @@ class ApprovalController extends Controller
             $lastUpdatedAt = 'None';
         }
         $info[] = compact('status', 'lastUpdatedAt');
-        
+
         $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', $user_id)
-        ->groupBy('ts_date')
-        ->get()
-        ->count();
+            ->groupBy('ts_date')
+            ->get()
+            ->count();
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate', 'endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
 
     // Medical Approval
-    public function medical_approval(){
-        $medical = Medical::all();
+    public function medical_approval()
+    {
         $name = User::all();
-        return view('/approval/medical_approval', ['medical' => $medical, 'name' => $name]);
+
+        $checkUserPost = Auth::user()->users_detail->position->id;
+        $ts_approver = Timesheet_approver::whereIn('id', [10, 15, 20, 25, 29, 50])->pluck('approver')->toArray();
+            //direktur
+            if (in_array($checkUserPost, [7, 8, 12])) {
+                $Check = Medical_approval::whereIn('RequestTo', $ts_approver)
+                    ->whereNotIn('RequestTo', [Auth::user()->id])
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
+                    ->groupBy('RequestTo')
+                    ->pluck('RequestTo')    
+                    ->toArray();
+                    // var_dump($Check);
+                if (!empty($Check)) {
+                   $medical = Medical_approval::where('RequestTo', Auth::user()->id)
+                        ->whereNotIn('status', [20, 29, 404])
+                        ->whereNotIn('RequestTo', $Check)
+                        ->groupBy('medical_id')
+                        ->get();
+                } else {
+                    $medical = Medical_approval::where('RequestTo', 'xxhaekalsxx')
+                        ->groupBy('medical_id')
+                        ->get();
+                }
+            } else {
+                //selain direktur
+                $Check = Medical_approval::whereNotIn('status', [10])
+                    ->whereNotIn('RequestTo', $ts_approver)
+                    ->groupBy('RequestTo')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
+                    ->pluck('RequestTo')
+                    ->toArray();
+                    // var_dump($Check);
+                if (!empty($Check)) {
+                    // special routes
+                    if (in_array($checkUserPost, [21])) {
+                        $checkApprovalMed = Medical_approval::whereIn('RequestTo', $Check)
+                            ->whereNotIn('RequestTo', [Auth::user()->id])
+                            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
+                            ->groupBy('RequestTo')
+                            ->pluck('RequestTo')
+                            ->toArray();
+                        if (!empty($checkApprovalMed)) {
+                           $medical = Medical_approval::where('RequestTo', Auth::user()->id)
+                                ->whereNotIn('status', [29, 404])
+                                ->whereNotIn('RequestTo', $checkApprovalMed)
+                                ->groupBy('medical_id')
+                                ->get();
+                        } else {
+                            //gagal
+                           $medical = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+                                ->whereNotIn('status', [20, 29, 404, 30, 15])
+                                ->groupBy('medical_id')
+                                ->get();
+                        }
+                    } else {
+                        // regular routes
+                        $medical = Medical_approval::where('RequestTo', Auth::user()->id)
+                        ->whereNotIn('status', [20, 29, 404, 30])
+                        // ->whereIn('RequestTo', $Check)
+                        ->groupBy('medical_id')
+                        ->get();
+                    }
+                } else {
+                    $medical = Medical_approval::where('RequestTo', "stopppp")
+                        ->whereNotIn('status', [29, 404, 30])
+                        ->groupBy('medical_id')
+                        ->get();
+                }
+            }
+        return view('/approval/medical_approval', ['medical' => $medical, 'name' => $name,]);
     }
+
+    public function approval_edit($id)
+    {
+        
+        
+        $checkLevel = Timesheet_approver::whereIn('id', [40, 45, 55, 60, 99])->pluck('approver');
+        $checkUserLevel = $checkLevel->toArray();
+        
+        $med = Medical::findOrFail($id);
+
+        $medDet = Medical_details::where('medical_id', $med->id)->get();
+
+        $medAppUpdate = Medical_approval::where('medical_id', $med->id)
+        ->whereNotIn('RequestTo', [Auth::user()->id])
+        ->whereNotIN('status', [15])
+        ->orderByDesc('updated_at')
+        ->orderBy('medical_id')
+        ->first();
+
+        $medButton = Medical_approval::where('medical_id', $med->id)
+        ->whereIn('RequestTo', $checkUserLevel)
+        ->where('RequestTo', Auth::user()->id)
+        ->get();
+        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet, 'medAppUpdate' => $medAppUpdate, 'medButton' => $medButton]);
+    }
+
+    public function update_approval(Request $request, $mdet_id, $medical_id)
+    {
+
+        $medDet = Medical_details::where('mdet_id', $medical_id)->first();
+        $request->validate([
+            'input_mdet_amount_approved' => 'sometimes',
+            'input_mdet_desc' => 'sometimes',
+        ]);
+        $medDet->amount_approved = $request->input_mdet_amount_approved;
+        $medDet->mdet_desc = $request->input_mdet_desc;
+        $medDet->save();
+
+        return redirect()->back()->with('success', 'Medical Approval Edit Success');
+    }
+
+    public function approve_medical(Request $request, $id)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'input_approve_note' => 'required',
+        ]);
+
+        $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
+        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+
+        $totalAmountApproved = $request->input('totalAmountApprovedInput');
+
+        $countRows = medical_approval::where('medical_id', $id)->where('RequestTo', Auth::user()->id)->get();
+
+        $medApproveFinance = Timesheet_approver::whereIn('id', [99])->pluck('approver');
+        $checkApprovalMed = $medApproveFinance->toArray();
+        $medApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver');
+        $checkUserDir = $medApproversDir->toArray();
+        
+        foreach ($countRows as $row) {
+            $medStatusId = '29';
+            // $activity = 'Approved';
+
+            switch (true) {
+                case in_array(Auth::user()->id, $checkApprovalMed):
+                    $medStatusId = '29';
+                    // $activity = 'All Approved';
+                    break;
+                default:
+                    $medStatusId = '20';
+                    break;
+            }
+
+            $approve = medical_approval::where('RequestTo', Auth::user()->id)->where('medical_id', $row->medical_id);
+
+            if ($validator->passes()) {
+                $notes = $request->input_approve_note;
+                $approve->update(['status' => $medStatusId, 'approval_notes' => $notes, 'approval_date' => date('Y-m-d') ]);
+            } else {
+                $approve->update(['status' => $medStatusId, ]);
+            }
+            
+            // $Check = Medical_approval::whereNotIn('status', [15])
+            //     ->whereNotIn('RequestTo', [Auth::user()->id])
+            //     ->groupBy('medical_id')
+            //     ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 0 ELSE 1 END)')
+            //     ->pluck('RequestTo')
+            //     ->toArray();
+            // if (!empty($Check)) {
+            //     Medical_approval::where('RequestTo', [Auth::user()->id])
+            //         ->update(['status' => $medStatusId]);
+            // } else {
+            //     Medical_approval::where('RequestTo', [Auth::user()->id])
+            //     ->update(['status' => $medStatusId]);
+            // }
+        }
+        $medical = Medical::findOrFail($id);
+        $medical->total_amount_approved = $totalAmountApproved;
+        $medical->save();
+
+        return redirect('/approval/medical')->with('success', "You've Approved $userName Medical Reimburse ");
+    }
+
+    public function reject_medical(Request $request, $id)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'input_reject_note' => 'required'
+        ]);
+
+        $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
+        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+
+        $countRows = medical_approval::where('medical_id', $id)->where('RequestTo', Auth::user()->id)->get();
+
+        foreach ($countRows as $row) { ///test buat dihapus nnti karna double loops
+
+            $reject = medical_approval::where('RequestTo', Auth::user()->id)->where('medical_id', $row->medical_id);
+
+            // $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_status_id', 'RequestTo');
+
+            if ($validator->passes()) {
+                $notes = $request->input_reject_note;
+                $reject->update(['status' => '404', 'approval_notes' => $notes, 'approval_date' => date('Y-m-d')]);
+            } else {
+                $reject->update(['status' => '404',]);
+            }
+        }
+
+        // medical_approval::where('RequestTo', $user_timesheet)
+        //     ->update(['ts_status_id' => '404']);
+
+        return redirect('/approval/medical')->with('failed', "You rejected $userName Medical Reimburse !");
+    }
+
 }
+

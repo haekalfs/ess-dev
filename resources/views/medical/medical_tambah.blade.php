@@ -45,7 +45,7 @@ active
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-7">
-                            <small style="color: red;"><u><i>This Version Only Support 3 Items! You Can Edit It Later.</i></u></small>
+                            <small style="color: red;"><u><i>This Version Only Support 6 Items! You Can Edit It Later.</i></u></small>
                         </div>
                         <br>
                         <div class="col-md-5 justify-content-between flex-row">
@@ -73,14 +73,17 @@ active
                         </label>
                     </div>
                     <br>
-                    <div class="col-md-12">
-                        <div class="row" style="padding-left:40px">
-                            <div class="col-md-4">
-                                <div class="col" style="zoom: 80%;">
-                                    <div class="card" id="originalForm"  >
+                    <div >
+                        <div >
+                            <div class="row">
+                                <div id="originalForm" class="col-md-4">
+                                    <div class="card"   style="border: 1px solid #ccc; padding: 10px; margin: 10px; width: 400px; display: inline-block;">
                                         <input type="text" class="form-control" name="no_item[]" id="no_item" hidden value="1" required>
                                         <div class="card-header py-3 d-flex flex-row align-items-start justify-content-between">
                                             <h5 class="m-0 font-weight-bold text-primary" id="items_label">ENTRY #</h5>
+                                            <button type="button" id="closeButton" class="close" style="display:none;">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
                                         </div>
                                         <div class="card-body">
                                             <div class="col-md-12" >
@@ -103,11 +106,8 @@ active
                                     </div>
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="row" style="zoom: 80%;">
-                                    <div class="card-columns" id="targetContainer" style="display:flex; ">
-
-                                    </div>
+                            <div >
+                                <div >
                                 </div>
                             </div>
                         </div>
@@ -120,7 +120,7 @@ active
                 </div>
                 <div class="text-right">
                     <input hidden id="totalAmountInput" name="totalAmountInput" value="">
-                    <a>Total Amount :</a><a class="text-danger" id="totalAmount" name="totalAmount"></a>
+                    <a>Total Amount :   Rp. </a><a class="text-danger" id="totalAmount" name="totalAmount"></a>
                 </div>
             </div>
         </div>
@@ -130,11 +130,9 @@ active
 const originalForm = document.querySelector("#originalForm");
 const copyButton = document.querySelector("#copyButton");
 const undoButton = document.querySelector("#undoButton");
-const targetContainer = document.querySelector("#targetContainer");
 
 let clonedForms = [];
 let copyCounter = 0;
-
 
 function formatInput(a, b){
     var fileInput = document.getElementById(a);
@@ -145,14 +143,27 @@ function formatInput(a, b){
     };
 }
 
-    
+// Call formatInput function for the original form
+formatInput("attach", "custom-file-label");
+
+// Event listener for input amount changes
+document.addEventListener("input", function (event) {
+    if (event.target && event.target.id.startsWith("amount")) {
+        calculateTotalAmount();
+    }
+});
 copyButton.addEventListener("click", function (event) {
     // Prevent the copy button from submitting the form
     event.preventDefault();
 
-    if (copyCounter < 2) {
+    
         // Clone the original form
         const clonedForm = originalForm.cloneNode(true);
+
+        // Set the input values to empty for the cloned form
+        clonedForm.querySelector("#attach").value = "";
+        clonedForm.querySelector("#amount").value = "";
+        clonedForm.querySelector("#desc").value = "";
 
         const itemInput = clonedForm.querySelector("#attach");
         itemInput.name = "attach[]";
@@ -162,45 +173,67 @@ copyButton.addEventListener("click", function (event) {
 
         const amountInput = clonedForm.querySelector("#desc");
         amountInput.name = "desc[]";
-        
-        const totalAmount = document.getElementById('#totalAmount');
 
         clonedForm.querySelector("#no_item").value = `${copyCounter + 2}`;
-        clonedForm.querySelector("#attach").value = ``;
-        clonedForm.querySelector("#amount").value = ``;
-        clonedForm.querySelector("#desc").value = ``;
-        
 
         clonedForm.querySelector("#items_label").id = `items_label${copyCounter}`;
         clonedForm.querySelector("#attach").id = `attach${copyCounter}`;
         clonedForm.querySelector("#custom-file-label").id = `custom-file-label${copyCounter}`;
         clonedForm.querySelector("#amount").id = `amount${copyCounter}`;
         clonedForm.querySelector("#desc").id = `desc${copyCounter}`;
-        
 
-        targetContainer.id = `targetContainer` + targetContainer.childElementCount;
-        // Append the cloned form to the target container
-        targetContainer.appendChild(clonedForm);
+        const lastClonedForm = document.querySelector(`#originalForm + [id^="originalForm"]`);
+        if (lastClonedForm) {
+            lastClonedForm.after(clonedForm);
+        } else {
+            originalForm.after(clonedForm);
+        }
 
         // Add the cloned form to the array
         clonedForms.push(clonedForm);
 
-        document.querySelector(`#items_label0`).innerHTML = `ENTRY #2 `;
+        // Reset the label for the cloned input
+        const labelId = `custom-file-label${copyCounter}`;
+        const clonedLabel = clonedForm.querySelector(`#${labelId}`);
+        clonedLabel.textContent = "Input Image";
+
+        // Call formatInput function for the cloned form
+        formatInput(`attach${copyCounter}`, labelId);
+        
+        // Add a button to delete the cloned form
+        const closeButton = clonedForm.querySelector("#closeButton");
+        closeButton.style.display = "block"; // Show the close button
+
+        closeButton.addEventListener("click", function () {
+            // Remove the cloned form
+            calculateTotalAmount(); // Recalculate the total amount
+            clonedForm.remove();
+        // ... Other cleanup or adjustments you need to do ...
+        // Update the copyCounter and hide the undoButton if needed
+        // copyCounter--;
+        // if (copyCounter < 1) {
+        //     undoButton.style.display = "none";
+        // }
+        });
+        
+
+        // Set the label for the newly added cloned form
+        // clonedForm.querySelector(`#items_label${copyCounter}`).innerHTML = `ENTRY #${copyCounter + 2}`;
+
         // Increase the copy counter
         copyCounter++;
-        
+
         // Show the undo button
         undoButton.style.display = "block";
-        
-        clonedForm.querySelector(`#items_label1`).innerHTML = `ENTRY #3 `;
-    }
-   
-    document.querySelector(`#items_label0`).innerHTML = `ENTRY #2 `;
+    
+
+
     // Submit the form data to the Laravel controller
     const medForm = document.querySelector("#btn-submit");
         medForm.addEventListener("submit", function(event) {
         event.preventDefault();
 
+        
         const formData = new FormData(medForm);
 
         const totalAmount = document.getElementById('totalAmount').value;
@@ -221,26 +254,62 @@ copyButton.addEventListener("click", function (event) {
 
 });
 
-// Function to undo the creation of the copied form
-function undoCreation() {
+
+// Event listener for input amount changes
+document.addEventListener("input", function (event) {
+    if (event.target && event.target.id.startsWith("amount")) {
+        calculateTotalAmount();
+    }
+});
+
+
+// Function to calculate total amount
+function calculateTotalAmount() {
+    let totalAmount = 0;
+
+    // Get the amount from the original form
+    const originalAmountInput = document.querySelector("#amount");
+    const amountORValue = parseFloat(originalAmountInput.value.replace(/\./g, "").replace(",", ".")) || 0;
+
+    // Add the amount from the original form to the total
+    totalAmount += amountORValue;
+
+    // Loop through cloned forms to add their amounts to the total
+    for (let i = 0; i < clonedForms.length; i++) {
+        const clonedForm = clonedForms[i];
+        const amountInput = clonedForm.querySelector(`#amount${i}`);
+        if (amountInput) {
+            const amountValue = parseFloat(amountInput.value.replace(/\./g, "").replace(",", ".")) || 0;
+            totalAmount += amountValue;
+        }
+    }
+
+    // Update the total amount display
+    const totalAmountDisplay = document.getElementById("totalAmount");
+    totalAmountDisplay.textContent = totalAmount.toLocaleString().replace(/,/g, '.');  // Adjust as needed
+
+   const totalAmountInput = document.getElementById("totalAmountInput");
+    totalAmountInput.value = totalAmount;
+}
+
+
+undoButton.addEventListener("click", function (event) {
+    event.preventDefault();
+
     if (clonedForms.length > 0) {
         const lastClonedForm = clonedForms.pop();
-        targetContainer.removeChild(lastClonedForm);
+        lastClonedForm.remove();
+
+        // Decrement the copy counter
         copyCounter--;
-        
+
+        // Hide the undo button if no more forms to undo
         if (clonedForms.length === 0) {
             undoButton.style.display = "none";
         }
     }
-
-}
-
-undoButton.addEventListener("click", function (event) {
-    // Prevent the undo button from submitting the form
-    event.preventDefault();
-    undoCreation();
-    document.getElementById("totalAmount").innerHTML= document.getElementById("amount").value.replace(formatRupiah);
 });
+
 
 function formatAmount(input) {
     // Mengambil nilai input
@@ -255,62 +324,6 @@ function formatAmount(input) {
     // Memperbarui nilai input dengan format terbaru
     input.value = amount;
 }
-
-function formatRupiah(angka, prefix) {
-    var number_string = angka.toString().replace(/[^,\d]/g, ''),
-        split = number_string.split(','),
-        sisa = split[0].length % 3,
-        rupiah = split[0].substr(0, sisa),
-        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-        separator = sisa ? '.' : '';
-        rupiah += separator + ribuan.join('.');
-    }
-
-    if (rupiah.length > 9) {
-        var billions = rupiah.substring(0, rupiah.length - 9);
-        var millions = rupiah.substring(rupiah.length - 9);
-        rupiah = billions + "" + millions + "";
-    }
-
-    rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-    return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
-}
-
-
-
-document.getElementById("originalForm").addEventListener("input", function() {
-    let attachment = formatInput("attach","custom-file-label");
-    let amount = document.getElementById("amount").value.replace(/[^0-9]/g, '');
-    let total = +amount
-    let formattedAmount = formatRupiah(total, amount);
-    document.getElementById("totalAmount").innerHTML = formattedAmount;
-    document.getElementById("totalAmountInput").value = formattedAmount;
-});
-
-document.getElementById("targetContainer").addEventListener("input", function() {
-    let attachment = formatInput("attach0","custom-file-label0");
-    let amount = document.getElementById("amount").value.replace(/[^0-9]/g, '');
-    let amount1 = document.getElementById("amount0").value.replace(/[^0-9]/g, '');
-    let total = +amount + +amount1;
-    let formattedAmount = formatRupiah(total, amount1);
-    document.getElementById("totalAmount").innerHTML = formattedAmount;
-    document.getElementById("totalAmountInput").value = formattedAmount;
-});
-
-document.getElementById("targetContainer").addEventListener("input", function() {
-    let attachment = formatInput("attach1","custom-file-label1");
-    let amount = document.getElementById("amount").value.replace(/[^0-9]/g, '');
-    let amount1 = document.getElementById("amount0").value.replace(/[^0-9]/g, '');
-    let amount2 = document.getElementById("amount1").value.replace(/[^0-9]/g, '');
-    let total = +amount + +amount1 + +amount2;
-    let formattedAmount = formatRupiah(total, amount2);
-    document.getElementById("totalAmount").innerHTML= formattedAmount;
-    document.getElementById("totalAmountInput").value = formattedAmount;
-});
-
-
 
 </script>
 @endsection

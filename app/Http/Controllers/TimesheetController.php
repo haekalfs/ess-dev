@@ -1408,6 +1408,7 @@ class TimesheetController extends Controller
         }
 
         $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->where('ts_user_id', Auth::user()->id)
         ->groupBy('ts_date')
         ->get()
         ->count();

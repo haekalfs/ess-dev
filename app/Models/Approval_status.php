@@ -13,4 +13,9 @@ class Approval_status extends Model
     public function leave_request(){
     	return $this->hasMany('App\Models\Leave_request');
     }
+
+    public function medical_approval()
+    {
+        return $this->hasMany('App\Models\Medical_approval');
+    }
 }

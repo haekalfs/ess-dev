@@ -193,6 +193,11 @@ Route::get('/management/security_&_roles/manage/roles', 'ManagementController@ma
 Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');
 Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users');
 
+// API KEY Setting
+Route::get('/manage/api_key', 'ManagementController@index_api')->name('API_KEY_setting')->middleware('auth');
+Route::post('/manage/api_key/add_api', 'ManagementController@add_api')->name('API_KEY_setting')->middleware('auth');
+Route::put('/manage/api_key/update/{id}', 'ManagementController@update_api')->name('API_KEY_update')->middleware('auth');
+
 //Company Regulation 
 Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete')->middleware('auth');
 Route::get('/hr/compliance/', 'HrController@index')->middleware('auth');
@@ -222,10 +227,13 @@ Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
 Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
 Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail')->middleware('auth');
-Route::get('/medical/approval/{id}', 'MedicalController@approval_edit')->middleware('auth');
-Route::put('/medical/approval/{id}/update/{mdet_id}', 'MedicalController@update_approval')->middleware('auth');
-Route::put('/medical/approval/{id}/approve', 'MedicalController@approve')->middleware('auth');
-Route::put('/medical/approval/{id}/reject', 'MedicalController@reject')->middleware('auth');
+
+Route::get('/medical/manage', 'MedicalController@index_manage')->middleware('auth');
+//medical approva
+Route::get('/medical/approval/{id}', 'ApprovalController@approval_edit')->middleware('auth');
+Route::put('/medical/approval/{id}M/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
+Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
+Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')->middleware('auth');
 
 Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history')->middleware('auth');
 Route::get('/reimbursement/history/create', 'ReimburseController@create_request')->name('reimburse-new-req')->middleware('auth');

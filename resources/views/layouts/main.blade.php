@@ -214,7 +214,7 @@
                         @endusr_acc
                         @usr_acc(603)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Manage Reimburse</a>
+                        <a class="collapse-item" href="/medical/manage">Manage Medical </a>
                         @else
                         @endusr_acc
                     </div>
@@ -266,6 +266,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Administrator Access:</h6>
                         <a class="collapse-item" href="/manage/users">Manage Users</a>
+                        <a class="collapse-item" href="/manage/api_key">API Key Setting</a>
                         <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>User Access Controller (UAC)</i></a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/list/employees">Employees Database</a>
