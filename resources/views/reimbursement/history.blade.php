@@ -43,7 +43,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Reimbursement Request History</h6>
         <div class="text-right">
-            <a href="/reimbursement/history/create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Request</a>
+            <a href="/reimbursement/create/request" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Request</a>
         </div>
     </div>
     <div class="card-body">
@@ -157,7 +157,11 @@ active
 <script>
     function redirectToPageAssignment() {
         var selectedOption = document.getElementById("yearSelected").value;
+<<<<<<< HEAD
         var url = "{{ url('/assignment') }}"; // Specify the base URL
+=======
+        var url = "{{ url('/reimbursement/history') }}"; // Specify the base URL
+>>>>>>> d332f228c6cdc499c51ce82d36f4c4e81fb5347f
 
         url += "/" + selectedOption;
 

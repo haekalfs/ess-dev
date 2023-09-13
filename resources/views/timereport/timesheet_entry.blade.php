@@ -794,15 +794,26 @@ var locationSelectRed = document.getElementById("location-red");
 var taskSelectUpdate = document.getElementById("update_task");
 var locationSelectUpdate = document.getElementById("update_location");
 
+
+///// NEED PERBAIKAN
+var selectedTask = taskSelect.value;
+locationSelect.value = "HO";
+locationSelect.readOnly = true;
+locationSelect.style.pointerEvents = "none";
+
 taskSelect.addEventListener("change", function() {
     var selectedTask = taskSelect.value;
     
     if (selectedTask === "StandbyLK") {
         locationSelect.value = "LK";
         locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
+        locationSelect.style.pointerEvents = "none"; 
     } else if (selectedTask === "StandbyLN") {
         locationSelect.value = "LN";
+        locationSelect.readOnly = true;
+        locationSelect.style.pointerEvents = "none";
+    } else if (selectedTask === "HO") {
+        locationSelect.value = "HO";
         locationSelect.readOnly = true;
         locationSelect.style.pointerEvents = "none";
     } else if (selectedTask === "Other") {

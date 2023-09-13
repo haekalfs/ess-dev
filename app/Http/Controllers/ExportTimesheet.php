@@ -53,7 +53,7 @@ class ExportTimesheet extends Controller
             ->join(DB::raw("(SELECT user_timesheet, MAX(created_at) AS latest_created_at
                             FROM timesheet_details
                             WHERE ts_status_id = 29 AND month_periode = '{$month_periode}'
-                            GROUP BY user_timesheet) t"), function ($join) {
+                            GROUP BY user_timesheet, ts_task, ts_location) t"), function ($join) {
                 $join->on('td.user_timesheet', '=', 't.user_timesheet')
                     ->on('td.created_at', '=', 't.latest_created_at');
             })
