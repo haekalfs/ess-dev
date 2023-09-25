@@ -187,7 +187,9 @@ class HrController extends Controller
 	{
 		$user = User::with('users_detail')->findOrFail($id);
 		$templatePath = public_path('exitclearance_temp.docx');
+		$key = API_key::where('id', 1)->first();
 
+		
 		$positionName = $user->users_detail->position->position_name ?? '';
 		$bulan = date('F');
 
@@ -210,8 +212,8 @@ class HrController extends Controller
 		$templateProcessor->saveAs($outputPath);
 
 		// Convert the Word file to PDF using iLovePDF API
-		$apiPublicKey = 'project_public_58ccb352acd03ede9a96cc4251942fe5_x3t5t1d006d6f6675cf7272092eba8a4909d1';
-		$apiSecretKey = 'secret_key_1574ad48ae54707085bce8b2a2d1585c_6-YEB8d06c4afe04ba378cdc81b2365e1aaad';
+		$apiPublicKey = $key->public_key;
+		$apiSecretKey = $key->secret_key;
 
 		$ilovepdf = new Ilovepdf($apiPublicKey, $apiSecretKey);
 
