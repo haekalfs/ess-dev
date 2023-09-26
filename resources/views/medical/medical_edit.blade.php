@@ -61,7 +61,7 @@ active
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
-        <div class="card shadow mb-4" style="width: 1369px; height: 300px;">
+        <div class="card shadow mb-4" >
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Requested Information</h6>
@@ -101,14 +101,14 @@ active
                                     <td>Payment</td>
                                     <td>: {{$med->med_payment}}</td>
                                 </tr>
-								<tr class="table-sm">
+								{{-- <tr class="table-sm">
                                     <td>Status</td>
                                     <td>: {{$med->med_status}}</td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-md-4">
+                    {{-- <div class="col-md-4">
                         <table class="table table-borderless">
 							<thead>
                                 <tr>
@@ -128,7 +128,7 @@ active
                                 <td>: {{$med->approved_note}}</td>
                             </tr>
                         </table>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -140,7 +140,7 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Medical Details Number #MED_0000{{ $med->id }}</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Medical Details Number #MED_0000{{ $med->med_number }}</h6>
                 <div class="text-right">
                     {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a> --}}
                 </div>
@@ -175,10 +175,13 @@ active
                                     Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
+                                    @if(empty($medButton))
                                     <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
                                         <i class="fas fa-fw fa-edit justify-content-center"></i>
                                     </a>
-                                    <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                                    @else
+                                    @endif
+                                    {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
                                 </td>
 							</tr>
 							@endforeach
@@ -186,6 +189,7 @@ active
                                 <td colspan="2" class="text-center">Total</td>
 								<td class="text-start" id="totalAmount">
                                     <span id="totalAmountDisplay" name="totalAmountDisplay"></span>
+                                    <input type="text" id="totalAmountInput" name="totalAmountInput" value="" hidden>
                                 </td>
 								<td colspan="2" class="text-start" id="totalAmountApproved">
                                     <span id="totalAmountApprovedDisplay" name="totalAmountApprovedDisplay"></span>
@@ -215,17 +219,30 @@ active
                     <table class="table table-bordered table-sm zoom90">
                         <thead class="thead-light">
                             <tr>
-                                <th>Username</th>
-                                <th>Project</th>
-                                <th>Status</th>
                                 <th>Approver</th>
+                                <th>Status</th>
+                                <th>Date Approved</th>
                                 <th>Notes</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            
-                            <tr style="border-bottom: 1px solid #dee2e6;">
+                            @foreach($medApp as $workflow)
+                                <tr>
+                                    <td>{{$workflow->user->name}}</td>
+                                    <td>@switch($workflow->status)
+                                        @case('15') Waiting For Approval @break 
+                                        @case('20') Approved @break 
+                                        @case('29') Approved By Finance @break
+                                        @case('404') Rejected @break
+                                        @default Unknown Status @endswitch
+                                    </td>
+                                    <td>{{$workflow->approval_date}}</td>
+                                    <td>{{$workflow->approval_notes}}</td>
+                                </tr>
+                            @endforeach
+                            {{-- <tr style="border-bottom: 1px solid #dee2e6;">
                                 <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
-                            </tr>
+                            </tr> --}}
                         </tbody>
                     </table>
                 </div>
@@ -249,10 +266,10 @@ active
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Attachment -->
 @foreach($medDet as $md)
     <div class="modal fade" id="myModal{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="myModalLabel">Attachment</h5>
@@ -273,7 +290,7 @@ active
 @csrf
 @method('PUT')
     <div class="modal fade" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="myModalLabel">Medical Detail Edit #{{ $md->mdet_id }} </h5>
@@ -282,28 +299,24 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered table-sm zoom90">
-                        <tbody>
-							<tr>
-								<td rowspan="2" class="align-items-center text-center">
-                                    <img class="img-fluid mt-4 mb-4" style="width: 350px; height: auto;" src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}"  alt="Attachment">
-                                    <div class="custom-file mb-4">
-                                        <input type="file" class="custom-file-input" id="inputAttach" name="inputAttach" aria-describedby="inputGroupFileAddon01" onchange="changeFileName('inputAttach', 'inputAttach-label')">
-                                        <label class="custom-file-label" for="file" id="inputAttach-label">Choose file</label>
-                                    </div>
-                                </td>
-								<td>
-                                    <label for="password">Description :</label>
-                                    <textarea class="form-control flex" name="input_mdet_desc" placeholder="Description..." style="height: auto">{{ $md->mdet_desc }}</textarea>
-                                </td>
-							</tr>
-                            <tr>
-                                <td><label for="password">Amount :</label>
-                                    <input class="form-control flex" name="input_mdet_amount" placeholder="Amount..." value="{{ $md->mdet_amount }}" oninput="formatAmount(this)"/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="col-md-12" >
+                        <div class="form-group">
+                            <label for="password">Description :</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="inputAttach" name="inputAttach" aria-describedby="inputGroupFileAddon01" onchange="changeFileName('inputAttach', 'inputAttach-label')">
+                                <label class="custom-file-label" for="file" id="inputAttach-label">Choose file</label>
+                            </div>
+                        </div>
+                        <small style="color: red;"><i>if you don't want to change the attachment, you don't need to input a new attachment</i></small>
+                        <div class="form-group mt-2">
+                            <label for="password">Description :</label>
+                            <textarea class="form-control flex" name="input_mdet_desc" placeholder="Description..." style="height: auto">{{ $md->mdet_desc }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Amount :</label>
+                            <input class="form-control flex" name="input_mdet_amount" placeholder="Amount..." value="{{ $md->mdet_amount }}" oninput="formatAmount(this)"/>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-sm btn-danger" data-dismiss="modal" aria-label="Close">Cancel</button>
@@ -345,36 +358,41 @@ function changeFileName(inputId, labelId) {
 
 
 //Amount
-// Mengubah titik menjadi angka biasa dan menghitung total amount
-var amountElements = document.getElementsByClassName("amount");
-var totalAmount = 0;
+    // Mengubah titik menjadi angka biasa dan menghitung total amount
+    var amountElements = document.getElementsByClassName("amount");
+    var totalAmount = 0;
 
-for (var i = 0; i < amountElements.length; i++) {
-  var amountText = amountElements[i].textContent;
-  var amountNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
-  totalAmount += amountNumber;
-}
+    for (var i = 0; i < amountElements.length; i++) {
+    var amountText = amountElements[i].textContent;
+    var amountNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
+    totalAmount += amountNumber;
+    }
 
-// Menampilkan total amount
-var totalAmountDisplay = document.getElementById("totalAmount");
-totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString();
+    // Menampilkan total amount
+    var totalAmountDisplay = document.getElementById("totalAmount");
+    totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString();
+     // Update total amount approved in input field
+    var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput");
+    if (totalAmountApprovedInput) {
+        totalAmountApprovedInput.value = totalAmount.toLocaleString().replace(/\./g, "").replace(",", ".");
+    }
 
 
 
 // Amount Approved
-// Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
-var amountElements = document.getElementsByClassName("amountApproved");
-var totalAmountApproved = 0;
+    // Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
+    var amountElements = document.getElementsByClassName("amountApproved");
+    var totalAmountApproved = 0;
 
-for (var i = 0; i < amountElements.length; i++) {
-  var amountText = amountElements[i].textContent;
-  var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
-  totalAmountApproved += amountApprovedNumber;
-}
+    for (var i = 0; i < amountElements.length; i++) {
+    var amountText = amountElements[i].textContent;
+    var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
+    totalAmountApproved += amountApprovedNumber;
+    }
 
-// Menampilkan total amount
-var totalAmountApprovedDisplay = document.getElementById("totalAmountApproved");
-totalAmountApprovedDisplay.textContent = "Rp. " + totalAmountApproved.toLocaleString();
+    // Menampilkan total amount
+    var totalAmountApprovedDisplay = document.getElementById("totalAmountApproved");
+    totalAmountApprovedDisplay.textContent = "Rp. " + totalAmountApproved.toLocaleString();
 
 </script>
 @endsection

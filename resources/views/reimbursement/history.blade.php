@@ -88,7 +88,11 @@ active
 <script>
     function redirectToPageAssignment() {
         var selectedOption = document.getElementById("yearSelected").value;
+<<<<<<< HEAD
+        var url = "{{ url('/assignment') }}"; // Specify the base URL
+=======
         var url = "{{ url('/reimbursement/history') }}"; // Specify the base URL
+>>>>>>> d332f228c6cdc499c51ce82d36f4c4e81fb5347f
 
         url += "/" + selectedOption;
 

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Medical extends Authenticatable
 {
     use HasFactory;
-    use SoftDeletes;
+    // use SoftDeletes;
 
     protected $dates = ['deleted_at'];
     protected $table = 'medicals';
@@ -36,7 +36,13 @@ class Medical extends Authenticatable
     
     public function medical_details()
     {
-        return $this->hasMany(Medical_details::class, 'medical_number', 'medical_number');
+        return $this->hasMany('App\Models\Medical_details');
+    }
+
+    public function medical_approval()
+    {
+        return $this->hasMany('App\Models\Medical_approval', 'id', 'medical_id')
+        ->withDefault();
     }
     
 }

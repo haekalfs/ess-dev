@@ -61,7 +61,9 @@ class ReviewController extends Controller
                     ->from('timesheet_details')
                     ->where('ts_status_id', 29)
                     ->where('month_periode', $month_periode)
-                    ->groupBy('user_timesheet');
+                    ->groupBy('user_timesheet')
+                    ->groupBy('ts_task')
+                    ->groupBy('ts_location');
             }, 't', function ($join) {
                 $join->on('timesheet_details.user_timesheet', '=', 't.user_timesheet')
                     ->on('timesheet_details.created_at', '=', 't.latest_created_at');
@@ -78,7 +80,9 @@ class ReviewController extends Controller
                     ->from('timesheet_details')
                     ->where('ts_status_id', 29)
                     ->where('month_periode', $month_periode)
-                    ->groupBy('user_timesheet');
+                    ->groupBy('user_timesheet')
+                    ->groupBy('ts_task')
+                    ->groupBy('ts_location');
             }, 't', function ($join) {
                 $join->on('timesheet_details.user_timesheet', '=', 't.user_timesheet')
                     ->on('timesheet_details.created_at', '=', 't.latest_created_at');

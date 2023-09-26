@@ -235,6 +235,7 @@ CREATE TABLE `timesheet_approver` (
 --
 -- Dumping data for table `timesheet_approver`
 --
+INSERT INTO `` (`id`,`name`,`public_key`,`secret_key`,`created_at`,`updated_at`) VALUES (1,'I Love PDF API','project_public_58ccb352acd03ede9a96cc4251942fe5_x3t5t1d006d6f6675cf7272092eba8a4909d1','secret_key_1574ad48ae54707085bce8b2a2d1585c_6-YEB8d06c4afe04ba378cdc81b2365e1aaad','2023-07-31',NULL);
 
 LOCK TABLES `timesheet_approver` WRITE;
 /*!40000 ALTER TABLE `timesheet_approver` DISABLE KEYS */;

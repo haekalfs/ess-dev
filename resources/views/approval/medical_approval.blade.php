@@ -46,21 +46,21 @@ active
                         <th>Request Date</th>
                         <th>Request By</th>
                         <th>Payment</th>
-                        <th>Status</th> 
+                        {{-- <th>Status</th>  --}}
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($medical as $med)
                     <tr>
-                        <td>MED_0000{{ $med->id }}</td>
-                        <td>{{ $med->med_req_date }}</td>
-                        <td>{{ $med->user->name }}</td>
-                        <td>{{ $med->med_payment }}</td>
-                        <td>{{ $med->med_status }}</td>
+                        <td>MED_0000{{ $med->medical->med_number }}</td>
+                        <td>{{ $med->medical->med_req_date }}</td>
+                        <td>{{ $med->medical->user->name }}</td>
+                        <td>{{ $med->medical->med_payment }}</td>
+                        {{-- <td>{{ $med->med_status }}</td> --}}
                         <td class="row-cols-2 justify-content-betwen text-center">
-                            <a href="/medical/approval/{{ $med->id }}" title="Edit" class="btn btn-primary btn-sm" >
-                                <i class="fas fa-fw fa-eye justify-content-center"></i> view
+                            <a href="/medical/approval/{{ $med->medical_id }}" title="Edit" class="btn btn-primary btn-sm" >
+                                <i class="fas fa-fw fa-eye justify-content-center"></i> View
                             </a>
                         </td>
                     </tr>

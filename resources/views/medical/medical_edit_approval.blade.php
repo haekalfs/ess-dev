@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800" style="font-weight:bold">Medical Request Number # MED_0000{{ $med->id }}</h1>
+    <h1 class="h4 mb-0 text-gray-800" style="font-weight:bold">Medical Request Number # MED_0000{{ $med->med_number }}</h1>
     <div>
         <a class="btn btn-danger btn-sm" type="button" href="/approval/medical" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
     </div>
@@ -89,10 +89,10 @@ active
                         <th>Payment Method</th>
                         <td style="text-align: start; font-weight:500">: {{$med->med_payment}}</td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <th>Status</th>
                         <td style="text-align: start; font-weight:500">: {{$med->med_status}}</td>
-                    </tr>
+                    </tr> --}}
                   </tr>
               </table>
             </div>
@@ -112,15 +112,15 @@ active
                     <tr>
                       <tr>
                           <th>Approval By</th>
-                          <td style="text-align: start; font-weight:500">: {{$med->approved_by}}</td>
+                          <td style="text-align: start; font-weight:500">: @if ($medAppUpdate){{ $medAppUpdate->user->name }}@else @endif</td>
                       </tr>
                       <tr>
                           <th>Approval Date</th>
-                          <td style="text-align: start; font-weight:500">: {{$med->approved_date}}</td>
+                          <td style="text-align: start; font-weight:500">: @if ($medAppUpdate){{$medAppUpdate->approval_date}}@else @endif</td>
                       </tr>
                       <tr>
                           <th>Approval Notes</th>
-                          <td style="text-align: start; font-weight:500;"> : {{$med->approved_note}}</td>
+                          <td style="text-align: start; font-weight:500;"> : @if ($medAppUpdate){{$medAppUpdate->approval_notes}}@else @endif</td>
                       </tr>
                       {{-- <tr>
                           <th>Total Leave Available</th>
@@ -138,7 +138,11 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Medical Details Number #MED_0000{{ $med->id }}</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
+                <div class="text-right">
+                    <a class="btn btn-success btn-sm" type="button"  data-toggle="modal" data-target="#approveModal" id="addButton">Approve</a>
+                    <a class="btn btn-danger btn-sm" type="button"  data-toggle="modal" data-target="#rejectModal" id="addButton">Reject</a>
+                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -171,10 +175,12 @@ active
                                     Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
+                                   @if($medButton->isNotEmpty())
                                     <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                        <i class="fas fa-fw fa-edit justify-content-center"></i>
+                                        <i class="fas fa-fw fa-edit justify-content-center"></i>Edit
                                     </a>
-                                    <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                                    @endif
+                                    {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
                                 </td>
 							</tr>
 							@endforeach
@@ -185,19 +191,14 @@ active
                                     <input id="totalAmount" name="totalAmount" value="" hidden>
                                 </td>
 								<td colspan="2" class="text-start" >
-                                    <span id="totalAmountApproved1" name="totalAmountApproved"></span>
-                                    <input id="totalAmountApprovedInput" name="totalAmountApprovedInput" value="" hidden>
+                                    <span id="totalAmountApproved" name="totalAmountApproved"></span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="card-footer py-3 d-flex flex-row align-items-center justify-content-between">
-                <div class="text-right">
-                    <a class="btn btn-success btn-md" type="button"  data-toggle="modal" data-target="#approveModal" id="addButton">Approve</a>
-                    <a class="btn btn-danger btn-md" type="button"  data-toggle="modal" data-target="#rejectModal" id="addButton">Reject</a>
-                </div>
+            <div class="card-footer">
             </div>
         </div>
     </div>
@@ -206,11 +207,29 @@ active
 <span id="span2"></span>
 
 <!-- Modal -->
-{{-- modal Medical detail --}}
 @foreach($medDet as $md)
-<form action="/medical/approval/{{ $med->id }}/update/{{ $md->mdet_id }}" method="POST">
-@csrf
-@method('PUT')
+<form action="/medical/approval/{{ $med->id }}M/update/{{ $md->mdet_id }}" method="POST">
+    @csrf
+    @method('PUT')
+
+<!-- Modal Attachment -->
+    <div class="modal fade" id="myModal{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Attachment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" class="img-fluid" alt="Attachment">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{{-- modal Medical detail --}}
     <div class="modal fade" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -248,7 +267,7 @@ active
 @endforeach
 
 {{-- Modal Approve --}}
-<form action="/medical/approval/{{ $med->id }}/approve" method="POST" enctype="multipart/form-data" id="approve">
+<form action="/medical/approval/{{ $med->id }}M/approve" method="POST" enctype="multipart/form-data" id="approve">
 @csrf
 @method('PUT')
 <div class="modal fade" id="approveModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -291,7 +310,7 @@ active
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer bg-success">
+            <div class="modal-footer">
                 <button type="button" class="btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
                 <input type="submit" class="btn btn-success btn-sm" value="Submit" id="btn-submit">
             </div>
@@ -300,6 +319,9 @@ active
 </div>
 </form>
 {{-- Modal Reject --}}
+<form action="/medical/approval/{{ $med->id }}M/reject" method="POST" enctype="multipart/form-data" id="reject">
+@csrf
+@method('PUT')
 <div class="modal fade" id="rejectModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document" style="width: 350px">
         <div class="modal-content">
@@ -313,32 +335,36 @@ active
                 <table class="table table-borderless table-sm">
                     <tbody>
                         <tr>
-                            <td style="width: 175px;">
-                                <label for="password">Reject By :</label>
-                                <p>{{ Auth::user()->name }}</p>
+                            <th>Rejected By :</th>
+                            <th>Rejected Date :</th>
+                        </tr>
+                        <tr>
+                           <td>
+                                <span name='rejected_name'> {{ Auth::user()->name }}</span>
+                                <input name='rejected_name' value="{{ Auth::user()->name }}" readonly hidden>
                             </td>
                             <td>
-                                <label for="password">Reject Date :</label>
-                                <p>{{ now()->format('Y-m-d') }}</p>                                    
+                                <span name='date_rejected'>{{ now()->format('Y-m-d') }}</span>
+                                <input name='date_rejected' value="{{ now()->format('Y-m-d') }}" readonly hidden>                                
                             </td>
                         </tr>
                         <tr>
                             <td colspan="2">
                                 <label for="password">Notes :</label>
-                                <textarea class="form-control flex" name="input_approve_note" placeholder="Notes..." ></textarea>
+                                <textarea class="form-control flex" name="input_reject_note" placeholder="Notes..." ></textarea>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer bg-danger">
+            <div class="modal-footer ">
                 <button type="button" class="btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
                 <button class="btn-sm btn-primary">Reject</button>
             </div>
         </div>
     </div>
 </div>
-
+</form>
 
 <!-- JavaScript untuk mengaktifkan modal Bootstrap -->
 <script>
@@ -389,31 +415,31 @@ totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString().replace(/
 // Amount Approved
 // Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
 document.addEventListener("DOMContentLoaded", function() {
-    var amountElements1 = document.getElementsByClassName("amountApproved");
+    var amountApprovedElements = document.getElementsByClassName("amountApproved");
     var totalAmountApproved = 0;
 
-    for (var i = 0; i < amountElements1.length; i++) {
-    var amountText1 = amountElements1[i].textContent;
-    var amountApprovedNumber = parseFloat(amountText1.replace(/\./g, "").replace(",", "."));
-    totalAmountApproved += amountApprovedNumber;
+    for (var i = 0; i < amountApprovedElements.length; i++) {
+        var amountText = amountApprovedElements[i].textContent;
+        var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
+        totalAmountApproved += amountApprovedNumber;
     }
 
-    // Menampilkan total amount di tempat pertama
-    var totalAmountApprovedDisplay1 = document.getElementById("totalAmountApproved1");
+    // Display total amount approved in different locations
+    var totalAmountApprovedDisplay1 = document.getElementById("totalAmountApproved");
     totalAmountApprovedDisplay1.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
 
-    // Menampilkan total amount di tempat 2
     var totalAmountApprovedDisplay2 = document.getElementById("totalAmountApproved2");
     totalAmountApprovedDisplay2.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
 
-    // /// Menampilkan total amount di modal approve
-    var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput").value;
-    totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "");
-    // Your code here
+    // Update total amount approved in input field
     var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput");
     if (totalAmountApprovedInput) {
-        totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "");
-    } 
+        totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "").replace(",", ".");
+    }
 });
+// Simpan nilai totalApprovedAmount dalam input tersembunyi saat menghitungnya
+document.getElementById('totalAmountApprovedInput').value = totalApprovedAmountInput;
+
+
 </script>
 @endsection
