@@ -72,14 +72,18 @@ class TimesheetController extends Controller
                 }
                 $encryptYear = Crypt::encrypt($currentYear);
                 $encryptMonth = Crypt::encrypt($entry);
+
                 $validStatusIDs = Approval_status::whereIn('id', [2, 3, 6, 8])->pluck('approval_status_id')->toArray();
                 $isSubmitted = in_array($lastUpdate->ts_status_id, $validStatusIDs);
+
                 $lastUpdatedAt = $lastUpdate->updated_at;
                 $editUrl = "/timesheet/entry/" . $encryptYear . "/" . $encryptMonth;
             } else {
                 $encryptYear = Crypt::encrypt($currentYear);
                 $encryptMonth = Crypt::encrypt($entry);
+
                 $isSubmitted = false;
+
                 $status = 'None';
                 $lastUpdatedAt = 'None';
                 $editUrl = "/timesheet/entry/" . $encryptYear . "/" . $encryptMonth;
@@ -1157,12 +1161,12 @@ class TimesheetController extends Controller
 
         Timesheet_detail::updateOrCreate([
             'user_id' => Auth::user()->id,
-            'workhours' => intval($total_work_hours),
             'activity' => 'Submitted',
             'month_periode' => $year . $month,
         ], [
             'ts_status_id' => 15,
             'date_submitted' => date('Y-m-d'),
+            'workhours' => intval($total_work_hours),
             'note' => '',
             'ts_task' => '-',
             'RequestTo' => '-',
@@ -1415,12 +1419,12 @@ class TimesheetController extends Controller
         foreach ($empApproval as $test) {
             Timesheet_detail::updateOrCreate([
                 'user_id' => Auth::user()->id,
-                'workhours' => intval($total_work_hours) - $getTotalDays,
                 'month_periode' => $year.$month,
                 'RequestTo' => $test['name'],
                 'ts_task' => $test['task'],
                 'ts_location' => $test['location']
             ], [
+                'workhours' => intval($total_work_hours) - $getTotalDays,
                 'ts_mandays' => $test['mandays'],
                 'activity' => 'Waiting for Approval',
                 'roleAs' => $test['role'],
