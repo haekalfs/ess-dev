@@ -1099,7 +1099,7 @@ class TimesheetController extends Controller
         $dateCut = Cutoffdate::first();
         // Get the cutoff date for submitting timesheets (7th of the next month)
         $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->date - 1));
-        $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-09-31");
+        // $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-09-31");
 
         // Check if the current date is on or after the cutoff date
         if ($currentDate->gte($cutoffDate)) {
