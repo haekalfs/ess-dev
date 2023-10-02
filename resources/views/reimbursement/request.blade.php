@@ -7,7 +7,7 @@ active
 @endsection
 
 @section('content')
-<form method="post" action="/po/store" id="myForm">
+<form method="post" action="/reimbursement/create/submit" id="myForm">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-2 text-gray-800">New Reimbursement Request #1</h1>
@@ -151,7 +151,7 @@ active
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="password">Description :</label>
-                                                        <input type="text" class="form-control" name="unit[]" id="unit" value="" required>
+                                                        <input type="text" class="form-control" name="description[]" id="description" value="" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-12">
@@ -160,7 +160,7 @@ active
                                                             <div class="input-group-prepend">
                                                                 <div class="input-group-text">Rp.</div>
                                                             </div>
-                                                            <input type="text" class="form-control" id="result" name="result[]" placeholder="Amount" value="">
+                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Amount" value="">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -174,6 +174,7 @@ active
             </div>
         </div><br>
     </form>
+<<<<<<< HEAD
 
 <script>
 // Get references to the radio buttons and the "project" select element
@@ -278,6 +279,8 @@ othersRadio.addEventListener('change', function () {
     });
 </script>
 
+=======
+>>>>>>> 28940b2ea8ca950caa65b018020c36506c688a3a
 @endsection
 
 @section('javascript')
