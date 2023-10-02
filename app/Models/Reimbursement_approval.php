@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Reimbursement_approval extends Model
 {
     use HasFactory;
+    protected $table = "reimbursement_approval";
 }

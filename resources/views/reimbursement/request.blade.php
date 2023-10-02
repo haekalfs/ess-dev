@@ -7,7 +7,7 @@ active
 @endsection
 
 @section('content')
-<form method="post" action="/po/store" id="myForm">
+<form method="post" action="/reimbursement/create/submit" id="myForm">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-2 text-gray-800">New Reimbursement Request #1</h1>
@@ -151,7 +151,7 @@ active
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
                                                         <label for="password">Description :</label>
-                                                        <input type="text" class="form-control" name="unit[]" id="unit" value="" required>
+                                                        <input type="text" class="form-control" name="description[]" id="description" value="" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-12">
@@ -160,7 +160,7 @@ active
                                                             <div class="input-group-prepend">
                                                                 <div class="input-group-text">Rp.</div>
                                                             </div>
-                                                            <input type="text" class="form-control" id="result" name="result[]" placeholder="Amount" value="">
+                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Amount" value="">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -174,110 +174,6 @@ active
             </div>
         </div><br>
     </form>
-
-<script>
-// Get references to the radio buttons and the "project" select element
-const projectSelect = document.getElementById('project');
-const projectRadio = document.getElementById('projectRadio');
-const othersRadio = document.getElementById('othersRadio');
-
-// Add event listeners to both radio buttons
-projectRadio.addEventListener('change', function () {
-    if (this.checked) {
-        // Enable the "project" select element
-        projectSelect.disabled = false;
-    }
-});
-
-othersRadio.addEventListener('change', function () {
-    if (this.checked) {
-        // Disable the "project" select element
-        projectSelect.disabled = true;
-    }
-});
-
-    const originalForm = document.querySelector("#originalForm");
-    const copyButton = document.querySelector("#copyButton");
-    const undoButton = document.querySelector("#undoButton");
-    const targetContainer = document.querySelector("#targetContainer");
-    const form = document.querySelector("#btn-submit");
-
-    let copyCounter = 0;
-
-    copyButton.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        if (copyCounter < 6) {
-            const clonedForm = originalForm.cloneNode(true);
-
-            // Modify the input's name attributes
-            const itemInput = clonedForm.querySelector("#receipt");
-            itemInput.name = "receipt[]";
-
-            const unitInput = clonedForm.querySelector("#unit");
-            unitInput.name = "unit[]";
-
-            const priceInput = clonedForm.querySelector("#result");
-            priceInput.name = "result[]";
-
-            // Clear input values
-            itemInput.value = "";
-            unitInput.value = "";
-            priceInput.value = "";
-
-            // Generate unique IDs for cloned elements
-            itemInput.id = `receipt${copyCounter}`;
-            unitInput.id = `unit${copyCounter}`;
-            priceInput.id = `result${copyCounter}`;
-
-            // Append the cloned form to the target container
-            targetContainer.appendChild(clonedForm);
-
-            // Increase the copy counter
-            copyCounter++;
-
-            // Show the undo button
-            undoButton.style.display = "block";
-        }
-    });
-
-    undoButton.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        if (copyCounter > 0) {
-            // Remove the last cloned form
-            targetContainer.removeChild(targetContainer.lastChild);
-
-            // Decrease the copy counter
-            copyCounter--;
-
-            // Hide the undo button if necessary
-            if (copyCounter === 0) {
-                undoButton.style.display = "none";
-            }
-        }
-    });
-
-    // Submit the form data to the Laravel controller
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const formData = new FormData(form);
-
-        fetch("/reimbursement/create/submit", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    });
-</script>
-
 @endsection
 
 @section('javascript')
