@@ -795,7 +795,7 @@ var taskSelectUpdate = document.getElementById("update_task");
 var locationSelectUpdate = document.getElementById("update_location");
 
 
-///// NEED PERBAIKAN
+///// NEED PERBAIKAN    
 var selectedTask = taskSelect.value;
 locationSelect.value = "HO";
 locationSelect.readOnly = true;

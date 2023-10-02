@@ -266,6 +266,42 @@ class ApprovalController extends Controller
 
         $timesheetApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver');
         $checkUserDir = $timesheetApproversDir->toArray();
+
+        $Check = DB::table('timesheet_details')
+                    ->select('*')
+                    ->where('month_periode', $year.$month)
+                    ->where('user_timesheet', $user_timesheet)
+                    ->whereNotIn('ts_status_id', [10, 15, 29])
+                    ->whereNotIn('RequestTo', $checkUserDir)
+                    ->groupBy('user_timesheet', 'month_periode')
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 1 ELSE 0 END)')
+                    ->count();
+
+        if (!empty($Check)) {
+            $tsStatusId = 29;
+            Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+            ->where('ts_user_id', $user_timesheet)
+            ->update(['ts_status_id' => $tsStatusId]);
+        } else {
+            $checkTotalRows = DB::table('timesheet_details')
+                    ->select('*')
+                    ->where('month_periode', $year.$month)
+                    ->where('user_timesheet', $user_timesheet)
+                    ->whereNotIn('ts_status_id', [10, 15])
+                    ->count();
+            if ($checkTotalRows == 1){
+                $tsStatusId = 29;
+                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+                ->where('ts_user_id', $user_timesheet)
+                ->update(['ts_status_id' => $tsStatusId]);
+            } else {
+                $tsStatusId = 30;
+                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date',$month)
+                ->where('ts_user_id', $user_timesheet)
+                ->update(['ts_status_id' => $tsStatusId]);
+            }
+        }
+
         foreach ($countRows as $row) {
             $tsStatusId = '30';
             $activity = 'Approved';
