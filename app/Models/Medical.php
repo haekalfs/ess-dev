@@ -13,6 +13,7 @@ class Medical extends Authenticatable
 {
     use HasFactory;
     // use SoftDeletes;
+    public $incrementing = false;
 
     protected $dates = ['deleted_at'];
     protected $table = 'medicals';
@@ -30,10 +31,11 @@ class Medical extends Authenticatable
         'approved_date',
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo('App\Models\User');
     }
-    
+
     public function medical_details()
     {
         return $this->hasMany('App\Models\Medical_details');
@@ -41,8 +43,6 @@ class Medical extends Authenticatable
 
     public function medical_approval()
     {
-        return $this->hasMany('App\Models\Medical_approval', 'id', 'medical_id')
-        ->withDefault();
+        return $this->hasMany('App\Models\Medical_approval');
     }
-    
 }

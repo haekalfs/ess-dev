@@ -15,7 +15,7 @@ class Medical_approval extends Authenticatable
     // use SoftDeletes;
 
     protected $dates = ['deleted_at'];
-    protected $table = 'medicals_approval';
+    protected $table = 'medical_approvals';
     protected $fillable = [
         'id',
         'medical_id',

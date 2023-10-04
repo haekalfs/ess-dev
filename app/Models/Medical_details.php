@@ -16,7 +16,7 @@ class Medical_details extends Authenticatable
 
     // protected $dates = ['deleted_at'];
     protected $primaryKey = 'mdet_id';
-    protected $table = 'medicals_detail';
+    protected $table = 'medicals_details';
     protected $fillable = [
         'mdet_id',
         'medical_id',
@@ -28,7 +28,7 @@ class Medical_details extends Authenticatable
 
     public function medical()
     {
-        return $this->belongsTo(Medical::class, 'medical_number', 'medical_number');
+        return $this->belongsTo(Medical::class, 'medical_id');
     }
 
     // public function medical(){

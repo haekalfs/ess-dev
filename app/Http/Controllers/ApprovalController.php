@@ -597,7 +597,6 @@ class ApprovalController extends Controller
     public function approval_edit($id)
     {
         
-        
         $checkLevel = Timesheet_approver::whereIn('id', [40, 45, 55, 60, 99])->pluck('approver');
         $checkUserLevel = $checkLevel->toArray();
         

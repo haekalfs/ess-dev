@@ -224,12 +224,14 @@ Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
 Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
 Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
+Route::get('/medical/edit/{id}/download', 'MedicalController@download')->middleware('auth');
+Route::get('/medical/edit/{id}/resubmit', 'MedicalController@resubmit')->middleware('auth');
 Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
 Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
 Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail')->middleware('auth');
 
 Route::get('/medical/manage', 'MedicalController@index_manage')->middleware('auth');
-//medical approva
+//medical approval
 Route::get('/medical/approval/{id}', 'ApprovalController@approval_edit')->middleware('auth');
 Route::put('/medical/approval/{id}M/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
 Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
