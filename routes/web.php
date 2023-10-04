@@ -239,7 +239,7 @@ Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')
 
 Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history')->middleware('auth');
 Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req')->middleware('auth');
-Route::get('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission')->middleware('auth');
+Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission')->middleware('auth');
 
 
 

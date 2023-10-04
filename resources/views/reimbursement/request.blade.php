@@ -7,11 +7,11 @@ active
 @endsection
 
 @section('content')
-<form method="post" action="/po/store" id="myForm">
+<form method="post" action="/reimbursement/create/submit" id="myForm">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-2 text-gray-800">New Reimbursement Request #1</h1>
-        <input class="btn btn-md btn-primary shadow-sm" id="btn-submit" type="submit" name="submit_task" value="+ Submit Request">
+        <input class="btn btn-md btn-primary shadow-sm" id="submit-request" type="submit" name="submit-request" value="+ Submit Request">
     </div>
     
         {{ csrf_field() }}
@@ -32,11 +32,11 @@ active
                             <div class="col-md-12">
                                 <label>Type of Reimbursement :</label><br />
                                 <label class="col-md-6">
-                                    <input class="form-radio-input" type="radio" name="type_reimburse" value="1" checked="">
+                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="1" checked="">
                                     <span class="form-radio-sign">Project</span>
                                 </label>
                                 <label class="col-md-5">
-                                    <input class="form-radio-input" type="radio" name="type_reimburse" value="0">
+                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="0">
                                     <span class="form-radio-sign">Others</span>
                                 </label>
                             </div>
@@ -138,44 +138,33 @@ active
                                 </div>
                             </div>
                             <hr>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="formContainer" class="row">
-                                        <div class="col-md-4" id="originalForm">
-                                            <div class="col-md-12">
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <input type="file" class="custom-file-input" id="receipt" name="receipt[]">
-                                                            <label class="custom-file-label" for="receipt" id="receipt-label">Choose file</label> 
-                                                        </div>
+                            <div class="col-lg-12">
+                                <div class="row" id="targetContainer">
+                                    <div class="col-md-4" id="originalForm">
+                                        
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <input type="file" class="file-input" id="receipt" name="receipt[]">
                                                     </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <label for="password">Description :</label>
-                                                            <input type="text" class="form-control" name="unit[]" id="unit" value="" required>
-                                                        </div>
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="password">Description :</label>
+                                                        <input type="text" class="form-control" name="description[]" id="description" value="" required>
                                                     </div>
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <div class="input-group mb-2">
-                                                                <div class="input-group-prepend">
-                                                                    <div class="input-group-text">Rp.</div>
-                                                                </div>
-                                                                <input type="text" class="form-control" id="result" name="result[]" placeholder="amount" value="">
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <div class="input-group mb-2">
+                                                            <div class="input-group-prepend">
+                                                                <div class="input-group-text">Rp.</div>
                                                             </div>
+                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Amount" value="">
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div id="targetContainer">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="m-0 font-weight-bold text-right" style="color: red;"><span id="ppn-label">: Total</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -185,10 +174,29 @@ active
             </div>
         </div><br>
     </form>
-<style>
+<<<<<<< HEAD
 
-</style>
 <script>
+// Get references to the radio buttons and the "project" select element
+const projectSelect = document.getElementById('project');
+const projectRadio = document.getElementById('projectRadio');
+const othersRadio = document.getElementById('othersRadio');
+
+// Add event listeners to both radio buttons
+projectRadio.addEventListener('change', function () {
+    if (this.checked) {
+        // Enable the "project" select element
+        projectSelect.disabled = false;
+    }
+});
+
+othersRadio.addEventListener('change', function () {
+    if (this.checked) {
+        // Disable the "project" select element
+        projectSelect.disabled = true;
+    }
+});
+
     const originalForm = document.querySelector("#originalForm");
     const copyButton = document.querySelector("#copyButton");
     const undoButton = document.querySelector("#undoButton");
@@ -200,7 +208,7 @@ active
     copyButton.addEventListener("click", function (event) {
         event.preventDefault();
 
-        if (copyCounter < 2) {
+        if (copyCounter < 6) {
             const clonedForm = originalForm.cloneNode(true);
 
             // Modify the input's name attributes
@@ -271,6 +279,8 @@ active
     });
 </script>
 
+=======
+>>>>>>> 28940b2ea8ca950caa65b018020c36506c688a3a
 @endsection
 
 @section('javascript')
