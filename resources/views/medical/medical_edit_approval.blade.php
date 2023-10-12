@@ -69,7 +69,7 @@ active
 <div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
-        <div class="card shadow mb-4" style="width: 750px; height: 245px;">
+        <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Request Information</h6>
@@ -101,7 +101,7 @@ active
 
     <!-- Pie Chart -->
     <div class="col-xl-6 col-lg-6">
-        <div class="card shadow mb-4" style="width: 750px; height: 245px;">
+        <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Approval Information</h6>
@@ -208,7 +208,7 @@ active
 
 <!-- Modal -->
 @foreach($medDet as $md)
-<form action="/medical/approval/{{ $med->id }}M/update/{{ $md->mdet_id }}" method="POST">
+<form action="/medical/approval/{{ $med->id }}/update/{{ $md->mdet_id }}" method="POST">
     @csrf
     @method('PUT')
 
@@ -267,7 +267,7 @@ active
 @endforeach
 
 {{-- Modal Approve --}}
-<form action="/medical/approval/{{ $med->id }}M/approve" method="POST" enctype="multipart/form-data" id="approve">
+<form action="/medical/approval/{{ $med->id }}/approve" method="POST" enctype="multipart/form-data" id="approve">
 @csrf
 @method('PUT')
 <div class="modal fade" id="approveModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -319,7 +319,7 @@ active
 </div>
 </form>
 {{-- Modal Reject --}}
-<form action="/medical/approval/{{ $med->id }}M/reject" method="POST" enctype="multipart/form-data" id="reject">
+<form action="/medical/approval/{{ $med->id }}/reject" method="POST" enctype="multipart/form-data" id="reject">
 @csrf
 @method('PUT')
 <div class="modal fade" id="rejectModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">

@@ -8,7 +8,13 @@ active
 
 @section('content')
 <!-- Page Heading -->
-{{-- <form method="POST" action="/medical/edit/{{  $med->mdet_id }}" enctype="multipart/form-data"> --}}
+<form method="POST" action="/medical/edit/{{  $med->id }}/resubmit" enctype="multipart/form-data">
+<div class="d-sm-flex align-items-center justify-content-end">
+    <div class="mb-3 text-right ">
+        <a class="btn btn-secondary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/download" target="_blank" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a>
+        <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/resubmit" id="manButton"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
+    </div>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -172,15 +178,55 @@ active
                                     Rp. <span class="amount" id="amount">{{ $md->mdet_amount }}</span>
                                 </td>
 								<td>
-                                    Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
+                                    @php
+                                        $approved = false;
+                                    @endphp
+                                    @foreach ($med->medical_approval as $m)
+                                        @if ($m->status == 29)
+                                            Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
+                                            @php
+                                                $approved = true;
+                                                break;
+                                            @endphp
+                                        @endif
+                                    @endforeach
+                                    
+                                    @unless ($approved)
+                                        Rp. 0
+                                    @endunless
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
-                                    @if(empty($medButton))
-                                    <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                        <i class="fas fa-fw fa-edit justify-content-center"></i>
-                                    </a>
+                                    @php
+                                        $approved = false;
+                                    @endphp
+                                    @foreach ($med->medical_approval as $m)
+                                        @if ($m->status == 29 ||$m->status == 20)
+                                           @php
+                                                $approved = true;
+                                                // break;
+                                            @endphp
+                                        @endif
+                                        @if ($m->status == 404)
+                                            @php
+                                                $approved = false; // Set to false if 404 is encountered
+                                                break;
+                                            @endphp
+                                        @endif
+                                        
+                                    @endforeach
+                                    
+                                    @unless ($approved)
+                                         <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                            <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
+                                        </a>
+                                    @endunless
+
+                                    {{-- @if(empty($medButton))
+                                        <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                            <i class="fas fa-fw fa-edit justify-content-center"></i>
+                                        </a>
                                     @else
-                                    @endif
+                                    @endif --}}
                                     {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
                                 </td>
 							</tr>
