@@ -130,18 +130,18 @@ active
                     <!-- Card Body -->
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-xl-8 col-lg-8">
+                            <div class="col-xl-6 col-lg-6">
                                 <table class="zoom80">
                                     <thead>
                                         <tr>
-                                            <th>Allowances Calculations :</th>
+                                            <th>Mandays :</th>
                                         </tr>
                                     </thead>
                                     <tbody class="calculations">
                                     </tbody>
-                                </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
+                                </table>
                             </div>
-                            <div class="col-xl-4 col-lg-4">
+                            <div class="col-xl-6 col-lg-6">
                                 <table class="zoom80">
                                     <thead>
                                         <tr>
@@ -151,7 +151,7 @@ active
                                     <tbody>
                                         <td>
                                         @forelse($leaveRequests as $leaves)
-                                            <li class="zoom90" style="font-size: 12px;">
+                                            <li>
                                                 @foreach ($leaves->dateGroups as $key => $group)
                                                     @if ($key > 0)
                                                         -

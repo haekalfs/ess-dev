@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">User Access Controller (UAC)</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-user-tag"></i> User Access Controller (UAC)</h1>
     <div>
         <a class="btn btn-danger btn-sm" href="/management/security_&_roles/manage/access" style="margin-right: 10px;"><i class="fas fa-users-slash fa-sm text-white-50"></i> Manage Access</a>
         <a class="btn btn-danger btn-sm" href="/management/security_&_roles/manage/roles"><i class="fas fa-users-cog fa-sm text-white-50"></i> Manage Roles</a>
@@ -29,7 +29,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Users Roles</h6>
         <div class="text-right">

@@ -46,7 +46,7 @@
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav @role('freelancer') bg-gradient-success @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav @role('admin') bg-gradient-pink  @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
