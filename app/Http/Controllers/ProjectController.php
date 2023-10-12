@@ -112,8 +112,10 @@ class ProjectController extends Controller
             ->where('project_assignments.id', '=', $assignment_id)
             ->get();
         // var_dump($assignment);
+        $refNum = '';
         foreach ($assignment as $as) {
             $project = Client::where('id', $as->client_id)->first();
+            $refNum = $as->assignment_no;
             if ($as->approval_status == 40) {
                 $status = "Waiting for Approval";
             } elseif ($as->approval_status == 29) {
@@ -129,7 +131,7 @@ class ProjectController extends Controller
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
-        return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'stat' => $status, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
+        return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'refNum' => $refNum, 'stat' => $status, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
 
     public function project_assignment_member_view($assignment_id)

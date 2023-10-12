@@ -7,8 +7,8 @@ active
 @endsection
 
 @section('content')
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">@if($stat == 404)<span class="text-danger"> @else @endif Project Assignment #{{ $assignment_id }}</span></h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> @if($stat == 404)<span class="text-danger"> @else @endif Project Assignment #{{ $refNum }}</span></h1>
     @if($stat == 1)
     @else
     <a href="#" onclick="deleteAssignment(event, {{$assignment_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
@@ -52,8 +52,8 @@ active
                                 <tbody>
                                     @foreach($assignment as $row)
                                     <tr class="table-sm">
-                                        <td style="width: 150px;">No.</td>
-                                        <td>: {{ $row->assignment_no }}</td>
+                                        <td style="width: 150px;">Assignment ID.</td>
+                                        <td>: {{ $row->task_id }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Date</td>
