@@ -72,6 +72,7 @@ Route::get('/development', 'HomeController@notification_indev');
 Route::get('/approval', 'ApprovalController@index')->name('approval.main')->middleware('auth');
 Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary')->middleware('auth');
 Route::get('/approval/leave', 'LeaveApprovalController@leave_approval')->name('approval.leave')->middleware('auth');
+Route::get('/approval/reimburse', 'ReimbursementApprovalController@reimbursement_approval')->name('approval.reimburse')->middleware('auth');
 Route::get('/approval/medical', 'ApprovalController@medical_approval')->name('approval.medical')->middleware('auth');
 
 Route::match(['get', 'post'], '/approval/leave/approve/{id}', 'LeaveApprovalController@approve')->name('leave.approve')->middleware('auth');
@@ -238,6 +239,17 @@ Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')
 Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history')->middleware('auth');
 Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req')->middleware('auth');
 Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission')->middleware('auth');
+Route::get('/reimbursement/view/{id}', 'ReimburseController@view_details')->name('reimburse-view-req')->middleware('auth');
+Route::get('/retrieveReimburseData/{id}', 'ReimburseController@retrieveReimburseData')->middleware('auth');
+Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData')->middleware('auth');
+Route::get('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse')->middleware('auth');
+Route::get('reimbursement/view/preview/{id}', 'ReimburseController@previewPdf')->name('pdf.preview')->middleware('auth');
 
+Route::get('/approval/reimburse/view/{id}', 'ReimbursementApprovalController@view_details')->name('reimburse.approval-view-req')->middleware('auth');
 
+Route::match(['get', 'post'], '/approval/reimburse/view/approve/{id}', 'ReimbursementApprovalController@approve')->name('reimburse.approve')->middleware('auth');
+Route::match(['get', 'post'], '/approval/reimburse/view/reject/{id}', 'ReimbursementApprovalController@reject')->name('reimburse.reject')->middleware('auth');
+Route::get('/retrieveApproverList/{id}', 'ReimbursementApprovalController@listApprover')->name('list-approver')->middleware('auth');
 
+Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement')->middleware('auth');
+Route::get('/reimbursement/export/all/{month}/{year}', 'ReimburseController@export_excel')->middleware('auth');

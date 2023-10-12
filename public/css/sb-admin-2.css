@@ -11515,3 +11515,19 @@ form .post-image p,
     font-size: 22px;
     font-weight: bold;
 }
+
+.dot-checklist {
+  display: flex;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background-color: red; /* Default red color */
+}
+
+.dot.approved {
+  background-color: green; /* Green color for approved items */
+}
