@@ -150,7 +150,7 @@ active
                                   Thank you for your attention.
                                   <br>Sincerely,<br><br>
                                   Perdana Consulting</p>
-                                <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_perdana365_onmicrosoft_com/ET8qcmGYOk9LtyebhqZmJroBM1FHsHF3OZ3sg_s3lxvTVg" class="card-link">Read more</a>
+                                <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_office365_perdana_co_id/ET8qcmGYOk9LtyebhqZmJroB2_6CQ1EGsEpGH0b5tmtZYQ?e=5ddh4u" class="card-link">Read more</a>
                             </div>
                         </div>
                     </div>
