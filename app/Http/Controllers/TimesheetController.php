@@ -142,6 +142,21 @@ class TimesheetController extends Controller
             }
         }
 
+
+        // Get the hired_date
+        $hired_date = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first();
+        $hired_date = new DateTime($hired_date);
+
+        $yearH = $hired_date->format('Y');
+
+        $formattedDatesHired = [];
+        $currentDateH = clone $hired_date;
+
+        while ($currentDateH->format('m') >= "1" && $currentDateH->format('Y') == $yearH) {
+            $formattedDatesHired[] = $currentDateH->format('Ymd');
+            $currentDateH->modify('-1 day');
+        }
+
         // Check tanggal merah berdasarkan libur nasional
         if (isset($array[$date->format('Ymd')])) {
             return "red";
@@ -157,7 +172,9 @@ class TimesheetController extends Controller
             $dateToCheck = $date->format('Ymd');
             if (in_array($dateToCheck, $formattedDates)) {
                 return 2907;
-            } else {
+            } elseif(in_array($dateToCheck, $formattedDatesHired)){
+                return 404;
+            }else {
                 return "";
             }
         }
@@ -218,6 +235,7 @@ class TimesheetController extends Controller
         }
         $pLocations = Project_location::all();
 
+        
         $checkUserAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->get();
 
         if ($checkUserAssignment->isEmpty()) {
@@ -1073,25 +1091,25 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
-        $checkisSubmitted = DB::table('timesheet_details')
-            ->select('*')
-            ->whereYear('date_submitted', $year)
-            ->where('user_timesheet', Auth::user()->id)
-            ->whereNotIn('ts_status_id', [10, 404])
-            ->where('month_periode', $year . intval($month))
-            ->whereNotExists(function ($query) use ($year, $month) {
-                $query->select(DB::raw(1))
-                    ->from('timesheet_details')
-                    ->where('month_periode', $year . intval($month))
-                    ->where('ts_status_id', [404]);
-            })
-            ->groupBy('user_timesheet', 'month_periode')
-            ->get();
+        // $checkisSubmitted = DB::table('timesheet_details')
+        //     ->select('*')
+        //     ->whereYear('date_submitted', $year)
+        //     ->where('user_timesheet', Auth::user()->id)
+        //     ->whereNotIn('ts_status_id', [10, 404])
+        //     ->where('month_periode', $year . intval($month))
+        //     ->whereNotExists(function ($query) use ($year, $month) {
+        //         $query->select(DB::raw(1))
+        //             ->from('timesheet_details')
+        //             ->where('month_periode', $year . intval($month))
+        //             ->where('ts_status_id', [404]);
+        //     })
+        //     ->groupBy('user_timesheet', 'month_periode')
+        //     ->get();
 
-        if (!$checkisSubmitted->isEmpty()) {
-            Session::flash('failed', 'Your Timesheet has already been submitted!');
-            return redirect()->back();
-        }
+        // if (!$checkisSubmitted->isEmpty()) {
+        //     Session::flash('failed', 'Your Timesheet has already been submitted!');
+        //     return redirect()->back();
+        // }
 
         // Get the current date
         $currentDate = Carbon::now();

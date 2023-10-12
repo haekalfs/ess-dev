@@ -81,6 +81,10 @@ active
                                                 <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                     <a><i class="fas fa-plane-departure fa-sm"></i></a>
                                                 </td>
+                                            @elseif ($status === 404)
+                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">
+                                                    <a><i class="fas fa-user-slash fa-xs"></i></a>
+                                                </td>
                                             @else
                                                 <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
                                             @endif
