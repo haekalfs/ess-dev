@@ -53,7 +53,7 @@ active
                     <tr>
                         <th>Form ID</th>
                         <th>Request Date</th>
-                        <th>Purpose of Reimbursement</th>
+                        <th>Type of Reimbursement</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -63,16 +63,43 @@ active
                     <tr>
                         <td>{{ $reimb->f_id }}</td>
                         <td>{{ $reimb->created_at }}</td>
-                        <td><span class="long-text">{{ $assign->f_purpose_of_purchase }}</span></td>
-                        <td>@if($reimb->status_id == 40)
-                            <span class="m-0 font-weight-bold text-danger">Waiting for Approval Service Diretor</span>
+                        <td><span class="long-text">{{ $reimb->f_type }}</span></td>
+                        <td>@if($reimb->status_id == 20)
+                            <span class="m-0 font-weight-bold text-danger">Waiting for Approval</span>
                             @elseif($reimb->status_id == 29) 
-                            <span class="m-0 font-weight-bold text-primary">Approved by Service Director</span>
+                            <span class="m-0 font-weight-bold text-primary">Approved</span>
                             @else 
                             <span class="m-0 font-weight-bold text-danger">Rejected</span>
                             @endif
                         </td>
-                        <td class="text-center"><a class="btn btn-primary btn-sm" href="/assignment/member/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a></td>
+                        {{-- <td class="text-center">
+                            <a class="btn btn-primary btn-sm" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
+                            <a href="/reimbursement/history/cancel/{{ $reimb->id }}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel
+                            </a>
+                        </td> --}}
+                        <td class="text-center" style="width: 290px;">
+                            @php
+                                $approved = false;
+                            @endphp
+                            
+                            @foreach ($reimb->approval as $status)
+                                @if ($status->status == 29 || $status->status == 30 || $status->status == 404)
+                                    <a class="btn btn-primary btn-sm" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
+                                    @php
+                                        $approved = true;
+                                        break;
+                                    @endphp
+                                @endif
+                            @endforeach
+                                
+                            @unless ($approved)
+                                <a class="btn btn-primary btn-sm" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
+                                <a href="/reimbursement/history/cancel/{{ $reimb->id }}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel
+                                </a>
+                            @endunless
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -88,11 +115,7 @@ active
 <script>
     function redirectToPageAssignment() {
         var selectedOption = document.getElementById("yearSelected").value;
-<<<<<<< HEAD
-        var url = "{{ url('/assignment') }}"; // Specify the base URL
-=======
         var url = "{{ url('/reimbursement/history') }}"; // Specify the base URL
->>>>>>> d332f228c6cdc499c51ce82d36f4c4e81fb5347f
 
         url += "/" + selectedOption;
 
@@ -102,5 +125,5 @@ active
 @endsection
 
 @section('javascript')
-<script src="{{ asset('js/project.js') }}"></script>
+<script src="{{ asset('js/reimburse.js') }}"></script>
 @endsection

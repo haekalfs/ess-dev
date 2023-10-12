@@ -36,10 +36,6 @@ class ExportTimesheet extends Controller
         $getPassword = Financial_password::find(1);
         $storedHashedPassword = $getPassword->password;
 
-        // Get the start and end dates for the selected month
-        $startDate = Carbon::create($Year, $Month, 1)->startOfMonth();
-        $endDate = Carbon::create($Year, $Month)->endOfMonth();
-
         // Compare the hashed passwords
         if (Hash::check($password, $storedHashedPassword)) {
             $templatePath = public_path('template_fm.xlsx');
@@ -111,15 +107,8 @@ class ExportTimesheet extends Controller
     
             // Initialize the last printed user name
             $lastUser = '';
-            $lastAllowance = 0;
             $lastWorkhours = '';
-            $totalAllowances = 0;
-            $totalIncentive = 0;
-            $countIncentive = [];
-            $lastTotalMandays = 0;
             $firstRow = true; // Flag to check if it's the first row for each user
-            $incentiveArray = [];
-            $allowanceArray = [];
             $totalSum = 0;
             $total = [];
     
@@ -157,12 +146,7 @@ class ExportTimesheet extends Controller
                     $countUserRows = $countTotalRowsEachUser->where('user_timesheet', $row->user_timesheet)->count();
 
                     // Reset the total allowances for the new user
-                    $allowanceArray = [];
-                    $incentiveArray = [];
-                    $totalAllowances = 0;
-                    $totalIncentive = 0;
                     $total = [];
-                    $countIncentive = [];
                     $lastUser = $row->user_timesheet;
                 }
                 

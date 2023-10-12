@@ -187,7 +187,7 @@
                         @endusr_acc
                         @usr_acc(503)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Manage Reimburse</a>
+                        <a class="collapse-item" href="/reimbursement/manage/">Manage Reimburse</a>
                         @else
                         @endusr_acc
                     </div>

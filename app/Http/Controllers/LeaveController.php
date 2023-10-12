@@ -317,14 +317,14 @@ class LeaveController extends Controller
             break;
         }
 
-        // $employees = User::whereIn('id', $userToApprove)->get();
-        // $userName = Auth::user()->name;
+        $employees = User::whereIn('id', $userToApprove)->get();
+        $userName = Auth::user()->name;
 
-        // foreach ($employees as $employee) {
-        //     dispatch(new NotifyLeaveApproval($employee, $userName));
-        // }
+        foreach ($employees as $employee) {
+            dispatch(new NotifyLeaveApproval($employee, $userName));
+        }
 
-        // Leave_request::where('RequestTo', Auth::user()->id)->delete();
+        Leave_request::where('RequestTo', Auth::user()->id)->delete();
 
         return redirect("/leave/history")->with('success', "Leave Request Submitted Successfully");
     }
@@ -338,9 +338,6 @@ class LeaveController extends Controller
 
         $status = '';
 
-        // foreach($leave_request_history as $lrh){
-        //     $quota
-        // }
         foreach ($leaveRequest as $lr) {
             if($lr->status == 29 || $lr->status == 20){
                 $status = "Approved";

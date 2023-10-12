@@ -82,15 +82,15 @@ active
                       </tr>
                       <tr>
                           <th>5 Year Term</th>
-                          <td style="text-align: start; font-weight:500">: </td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
                       </tr>
                       <tr>
                           <th>Weekend Replacement</th>
-                          <td style="text-align: start; font-weight:500">: </td>
+                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaWeekendReplacement }}</td>
                       </tr>
                       <tr>
                           <th>Total Leave Available</th>
-                          <td style="text-align: start; font-weight:500">: </td>
+                          <td style="text-align: start; font-weight:500">: {{ $totalQuota }}</td>
                       </tr>
                     </tr>
                 </table>
@@ -116,7 +116,7 @@ active
                         <th>Request Number</th>
                         <th>Request Date</th>
                         <th>Payment</th>
-                        {{-- <th>Status</th> --}}
+                        <th>Status</th>
                         <th width="120px">Action</th>
                     </tr>
                 </thead>
@@ -126,16 +126,50 @@ active
                         <td>MED_0000{{$q->med_number}}</td>
                         <td>{{$q->med_req_date}}</td>
                         <td>{{$q->med_payment}}</td>
-                        {{-- <td>{{ $approvalStatus->approval_status }}</td> --}}
-                        <td class="row-cols-2 justify-content-betwen text-center">
-                            @if(!empty($medButton))
-                            <a href="/medical/edit/{{ $q->id }}M" title="Edit" class="btn btn-warning btn-sm" >
-                                <i class="fas fa-fw fa-edit justify-content-center"></i>
-                            </a>
-                            <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
-                            @else
+                        <td>
+                            @php
+                                $approved = false;
+                            @endphp
+                            @foreach ($q->medical_approval as $md)
+                                @if ($md->status == 29)
+                                        All Approved <i class="fa fa-check" aria-hidden="true"></i>
+                                    @php
+                                        $approved = true;
+                                        break;
+                                    @endphp
+                                @elseif ($md->status == 404)
+                                        Rejected <i class="fa fa-exclamation" aria-hidden="true"></i>
+                                    @php
+                                        $approved = true;
+                                        break;
+                                    @endphp
+                                @endif
+                            @endforeach
                             
-                            @endif
+                            @unless ($approved)
+                                Waiting For All Approval <i class="fa fa-spinner" aria-hidden="true"></i>
+                            @endunless
+                        </td>
+                        <td class="row-cols-2 justify-content-betwen text-center">
+                            @php
+                                $approved = false;
+                            @endphp
+                            @foreach ($q->medical_approval as $md)
+                                @if ($md->status == 29 || $md->status == 20 || $md->status == 404)
+                                        <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $q->id }}" id="manButton"><i class="fas fa-fw fa-eye fa-sm"></i>View</a>
+                                    @php
+                                        $approved = true;
+                                        break;
+                                    @endphp
+                                @endif
+                            @endforeach
+                            
+                            @unless ($approved)
+                                <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                    <i class="fas fa-fw fa-edit justify-content-center"></i>
+                                </a>
+                                <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                            @endunless
                         </td>
                     </tr>
                     @endforeach
@@ -161,7 +195,7 @@ active
       </div>
       <div class="modal-footer justify-content-center">
         <button type="button" class="btn-sm btn-primary" data-dismiss="modal">Cancel</button>
-        <a href="/medical/delete/{{ $q->id }}M" title="Hapus" class="btn btn-danger btn-sm" >Yes Im Sure</a>
+        <a href="/medical/delete/{{ $q->id }}" title="Hapus" class="btn btn-danger btn-sm" >Yes Im Sure</a>
       </div>
     </div>
   </div>

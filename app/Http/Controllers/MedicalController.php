@@ -11,10 +11,14 @@ use App\Models\Medical_details;
 use App\Models\User;
 use App\Models\Timesheet_approver;
 use App\Models\Project_assignment_user;
+use App\Models\Emp_leave_quota;
 use Illuminate\Contracts\Session\Session as SessionSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\TemplateProcessor;
+use Ilovepdf\Ilovepdf;
 
 use function GuzzleHttp\Promise\all;
 
@@ -27,16 +31,31 @@ class MedicalController extends Controller
 
         // Mendapatkan data medis sesuai dengan pengguna yang login
         $med = Medical::where('user_id', $user->id)->get();
-        
-        $medButton = Medical::where('user_id', $user->id)
-        ->join('medicals_approval', 'medicals.id', '=', 'medicals_approval.medical_id')
-        ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 15 THEN 1 ELSE 0 END)')
-        ->groupBy('medical_id')
-        ->pluck('medical_id')
-        ->toArray();
-        
-        var_dump($medButton);
-        return view('medical.medical', ['med' => $med, 'medButton' => $medButton ]);
+
+        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
+        ->where('leave_id', 10)
+        ->where('expiration', '>=', date('Y-m-d'))
+        ->sum('quota_left');
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
+        ->where('leave_id', 100)
+        ->where('expiration', '>=', date('Y-m-d'))
+        ->sum('quota_left');
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+        ->where('user_id', Auth::user()->id)
+        ->where('leave_id', 20)
+        ->sum('quota_left');
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
+        if ($empLeaveQuotaFiveYearTerm == NULL) {
+            $empLeaveQuotaFiveYearTerm = "-";
+        }
+        return view('medical.medical', 
+        [
+            'med' => $med, 
+            'empLeaveQuotaAnnual' => $empLeaveQuotaAnnual,
+            'empLeaveQuotaWeekendReplacement' => $empLeaveQuotaWeekendReplacement,
+            'empLeaveQuotaFiveYearTerm' => $empLeaveQuotaFiveYearTerm,
+            'totalQuota' => $totalQuota 
+        ]);
     }
     public function entry()
     {
@@ -50,7 +69,7 @@ class MedicalController extends Controller
     {
 
         $request->validate([
-            'attach.*' => 'required|file',
+            'attach.*' => 'required|mimes:jpeg,png,gif,bmp|image',
             'amount.*' => 'required',
             'desc.*' => 'required',
         ]);
@@ -100,7 +119,7 @@ class MedicalController extends Controller
         $medical->med_payment = $request->payment_method;
         $medical->med_total_amount = $request->totalAmountInput;
         $medical->save();
-      
+
         // Menambahkan titik kembali pada hasil perhitungan
         // $formattedResult = number_format($result, 2, ',', '.');
 
@@ -116,6 +135,7 @@ class MedicalController extends Controller
 
             $amount = str_replace('.', '', $amounts[$key]); // Menghilangkan titik
             $result = $amount * 0.8;
+            $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
 
             // Menyimpan file attach ke dalam folder yang diinginkan
             $attach_tujuan = '/storage/med_pic';
@@ -128,7 +148,7 @@ class MedicalController extends Controller
             $meddet->mdet_attachment = $filename;
             $meddet->mdet_amount = $amounts[$key];
             $meddet->mdet_desc = $descriptions[$key];
-            $meddet->amount_approved =  $result;
+            $meddet->amount_approved =  $roundedAmount;
             $meddet->save();
         }
 
@@ -173,7 +193,7 @@ class MedicalController extends Controller
                 return redirect()->back()->with('failed', "You haven't assigned to any department! Ask HR Dept to correcting your account details");
                 break;
         }
-        foreach($userToApprove as $uTA){
+        foreach ($userToApprove as $uTA) {
             $medical_approve = new Medical_approval();
             $medical_approve->medical_id = $nextId;
             $medical_approve->RequestTo = $uTA;
@@ -190,19 +210,21 @@ class MedicalController extends Controller
         $medDet = Medical_details::where('medical_id', $med->id)->get();
         $medApp = Medical_approval::where('medical_id', $med->id)->get();
 
-        $medButton = Medical_approval::where('medical_id', $med->id)
-        ->whereIn('status', [29])
-        ->pluck('medical_id', 'status')
-        ->toArray();
-// dd($medButton);
-        return view('medical.medical_edit', 
-        [
-            'medButton' => $medButton,
-            'med' => $med, 
-            'user_info' => $user_info, 
-            'medDet' => $medDet, 
-            'medApp' => $medApp
-        ]);
+        // $medButton = Medical_approval::where('medical_id', $med->id)
+        //     ->whereIn('status', [20, 29])
+        //     ->pluck('medical_id', 'status')
+        //     ->toArray();
+        // dd($medButton);
+        return view(
+            'medical.medical_edit',
+            [
+                
+                'med' => $med,
+                'user_info' => $user_info,
+                'medDet' => $medDet,
+                'medApp' => $medApp
+            ]
+        );
     }
 
     public function delete_med_all($id)
@@ -210,7 +232,7 @@ class MedicalController extends Controller
         Medical::findOrFail($id)->delete();
         Medical_details::where('medical_id', $id)->delete();
         Medical_approval::where('medical_id', $id)->delete();
-    // dd($id);
+        // dd($id);
         $user = Auth::user();
         $med = Medical::where('user_id', $user->id)->get();
         return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
@@ -221,7 +243,7 @@ class MedicalController extends Controller
 
         $medDet = Medical_details::where('mdet_id', $medical_id)->first();
         $request->validate([
-            'attach.*' => 'sometimes|file',
+            'attach.*' => 'sometimes|mimes:jpeg,png,gif,bmp|image',
             'amount.*' => 'sometimes',
             'desc.*' => 'sometimes',
         ]);
@@ -263,8 +285,94 @@ class MedicalController extends Controller
         return redirect()->back()->with('success', 'Medical Detail Delete Success.');
     }
 
+    public function download($id)
+    {
+        $user_info = User::find(Auth::user()->id);
+        $med = Medical::findOrFail($id);
+        $medicalDetails = Medical_details::where('medical_id', $med->id)->get();
 
-// Medical Manage
+        $templatePath = public_path('medical_temp.docx');
+        // $key = API_key::where('id', 1)->first();
+        // dd($medDet);
+        
+        $templateProcessor = new TemplateProcessor($templatePath);
+        $templateProcessor->setValue('emp_id', $user_info->users_detail->employee_id);
+        $templateProcessor->setValue('emp_name', $user_info->name);
+        $templateProcessor->setValue('emp_hired_date', $user_info->users_detail->hired_date);
+        $templateProcessor->setValue('req_date', $med->med_req_date);
+        $templateProcessor->setValue('payment', $med->med_payment);
+        $totalAmountFormatted = number_format($med->med_total_amount, 0, '.', '.');
+        $templateProcessor->setValue('total_amount', $totalAmountFormatted);
+
+        // Loop melalui medical details
+        $rowCount = count($medicalDetails);
+        foreach ($medicalDetails as $i => $medDet) {
+            // Gantikan placeholder untuk setiap medical detail
+            $templateProcessor->setValue("AMOUNT$i", $medDet->mdet_amount);
+            $templateProcessor->setValue("DESC$i", $medDet->mdet_desc);
+
+            // Simpan gambar ke direktori 'public/med_pic'
+            $gambar = $medDet->mdet_attachment;
+            $gambarPath = public_path('storage/med_pic/' . $gambar);
+
+            // Tambahkan gambar ke dokumen Word
+            $templateProcessor->setImageValue("ATTACHMENT$i", array('path' => $gambarPath, 'width' => 500, 'height' => 700, 'margin-top' => 100));
+
+            // If there are less than 3 rows, set the remaining rows to empty strings
+            if ($rowCount < 3) {
+                for ($i = $rowCount; $i < 3; $i++) {
+                    $templateProcessor->setValue("AMOUNT$i", "");
+                    $templateProcessor->setValue("DESC$i", "");
+                    $templateProcessor->setValue("ATTACHMENT$i", "");
+                }
+            }
+        }
+        // Simpan file Word
+        $outputPath = public_path('Medical Reimbursement ' . $user_info->name . '.docx');
+        $templateProcessor->saveAs($outputPath);
+
+        // // Convert the Word file to PDF using iLovePDF API
+        // $apiPublicKey = $key->public_key;
+        // $apiSecretKey = $key->secret_key;
+
+        // $ilovepdf = new Ilovepdf($apiPublicKey, $apiSecretKey);
+
+        // // Start the task for converting to PDF
+        // $task = $ilovepdf->newTask('officepdf');
+
+        // // Add the uploaded file to the task
+        // $task->addFile($outputPath);
+
+        // // Execute the task
+        // $task->execute();
+
+        // // Download the converted PDF file directly to the user's browser
+        // $task->download();
+        // $outputPathPDF = public_path('Exit Clearance ' . $user->name . '.pdf');
+
+        // // Delete the temporary file
+        // unlink($outputPath);
+
+        return response()->download($outputPath)->deleteFileAfterSend(true);
+    }
+
+
+    public function resubmit(Request $request, $id)
+    {
+        $med = Medical::find($id);
+        // $medDet = Medical_details::where('medical_id', $med->id)->get();
+        $medApp = Medical_approval::where('medical_id', $med->id)->get();
+
+        foreach($medApp as $mA){
+            $mA->status = 15;
+            $mA->save();
+
+        }
+
+        return redirect('/medical/history')->with('success', 'Re-Submit Your Medical Successfully.');
+    }
+      
+    // Medical Manage
     public function index_manage()
     {
         $user = User::all();
@@ -278,6 +386,4 @@ class MedicalController extends Controller
         $years = range($currentYear, $currentYear - 10);
         return view('medical.medical_manage', ['user' => $user, 'months' => $months,  'years' => $years]);
     }
-
-
 }

@@ -16,6 +16,7 @@ use App\Models\Medical_approval;
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
+use App\Models\Reimbursement_approval;
 use App\Models\Surat_penugasan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
@@ -58,8 +59,14 @@ class ApprovalController extends Controller
                 $query->where('RequestTo', Auth::user()->id);
             })
             ->count();
-            
-// Medical Count
+        
+        $reimbCount = Reimbursement_approval::whereNotIn('status', ['30', '29', '404'])->groupBy('reimbursement_id')
+            ->where(function ($query) {
+                $query->where('RequestTo', Auth::user()->id);
+            })
+            ->count();
+
+        // Medical Count
         $checkUserPost = Auth::user()->users_detail->position->id;
         $ts_approver = Timesheet_approver::whereIn('id', [10, 15, 20, 25, 29, 50])->pluck('approver')->toArray();
         //direktur
@@ -128,7 +135,7 @@ class ApprovalController extends Controller
                     ->count();
             }
         }
-        return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
+        return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'reimbCount' => $reimbCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
     }
 
     public function timesheet_approval(Request $request)
@@ -632,7 +639,6 @@ class ApprovalController extends Controller
 
     public function approval_edit($id)
     {
-        
         
         $checkLevel = Timesheet_approver::whereIn('id', [40, 45, 55, 60, 99])->pluck('approver');
         $checkUserLevel = $checkLevel->toArray();

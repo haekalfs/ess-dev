@@ -116,7 +116,7 @@ active
                         </thead>
                         <tbody>
                             @php
-                                $row_number = 1;
+                                $row_number = 1; 
                             @endphp
                             @foreach ($project_member as $usr)
                                 <tr>

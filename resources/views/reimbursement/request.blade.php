@@ -7,17 +7,17 @@ active
 @endsection
 
 @section('content')
-<form method="post" action="/reimbursement/create/submit" id="myForm">
+<form method="post" action="/reimbursement/create/submit" enctype="multipart/form-data" id="myForm">
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-2 text-gray-800">New Reimbursement Request #1</h1>
-        <input class="btn btn-md btn-primary shadow-sm" id="submit-request" type="submit" name="submit-request" value="+ Submit Request">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> New Reimbursement Request #{{ $nextID }}</h1>
+        <button class="btn btn-md btn-primary shadow-sm" id="showConfirmation" type="button">+ Submit Request</button>
     </div>
     
         {{ csrf_field() }}
     
     
-        <div class="row">
+        <div class="row zoom90">
             <!-- Area Chart -->
             <div class="col-xl-6 col-lg-6">
                 <div class="card shadow mb-4">
@@ -32,51 +32,67 @@ active
                             <div class="col-md-12">
                                 <label>Type of Reimbursement :</label><br />
                                 <label class="col-md-6">
-                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="1" checked="">
+                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="Project" checked="">
                                     <span class="form-radio-sign">Project</span>
                                 </label>
                                 <label class="col-md-5">
-                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="0">
+                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="Others">
                                     <span class="form-radio-sign">Others</span>
                                 </label>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group" id="projectSelect">
+                                    <select class="form-control" id="project" name="project">
+                                        <option value="0" disabled selected>Select a project</option>
+                                        @foreach($projects as $project)
+                                        <option value="{{$project->id}}">{{ $project->project_name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <select class="form-control" id="reimbursementType" name="reimbursementType" style="display: none;">
+                                        <option value="0" disabled selected>Select a type</option>
+                                        <option value="Travel Reimbursement">Travel Reimbursement</option>
+                                        <option value="Expense Reimbursement">Expense Reimbursement</option>
+                                        <option value="Healthcare Reimbursement">Healthcare Reimbursement</option>
+                                        <option value="Tuition Reimbursement">Tuition Reimbursement</option>
+                                        <option value="Mileage Reimbursement">Mileage Reimbursement</option>
+                                        <option value="Cell Phone Reimbursement">Cell Phone Reimbursement</option>
+                                        <option value="Business Meal Reimbursement">Business Meal Reimbursement</option>
+                                        <option value="Relocation Reimbursement">Relocation Reimbursement</option>
+                                        <option value="Vendor or Supplier Reimbursement">Vendor or Supplier Reimbursement</option>
+                                        <option value="Petty Cash Reimbursement">Petty Cash Reimbursement</option>
+                                        <option value="Others Reimbursement">Others</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <label>Payment Method :</label><br />
-                                <label class="col-md-6">
-                                    <input class="form-radio-input" type="radio" name="payment_method" value="1" checked="">
-                                    <span class="form-radio-sign">Transfer Bank</span>
-                                </label>
                                 <label class="col-md-5">
-                                    <input class="form-radio-input" type="radio" name="payment_method" value="2">
+                                    <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
                                     <span class="form-radio-sign">Cash</span>
                                 </label>
+                                <label class="col-md-6">
+                                    <input class="form-radio-input" type="radio" name="payment_method" value="Transfer Bank">
+                                    <span class="form-radio-sign">Transfer Bank</span>
+                                </label>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Project :</label>
-                                    <select class="form-control" id="project" name="project" required>
-                                        @foreach($projects as $project)
-                                        <option value="{{$project->id}}">{{ $project->project_name}}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="col-md-12" id="accountNumberField" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-12"><br>
+                                        <h6 class="m-0 font-weight-bold text-primary" id="judul">Your Account Number : {{ Auth::user()->users_detail->usr_bank_account }} ({{ Auth::user()->users_detail->usr_bank_name }})</h6>
+                                        {{-- <div class="form-group">
+                                            <label for="email">Account Number :</label>
+                                            <input type="text" class="form-control" name="account_no" id="accountNo" value="{{ Auth::user()->users_detail->usr_bank_name }} : {{ Auth::user()->users_detail->usr_bank_account }}" readonly>
+                                        </div> --}}
+                                    </div>
+                                    {{-- <div class="col-md-2 d-flex align-items-end">
+                                        <div class="form-group">
+                                            <button type="button" id="editButton" class="btn btn-primary">Edit</button>
+                                        </div>
+                                    </div>--}}
                                 </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Request Approval To :</label>
-                                    <select class="form-control" id="approver" name="approver" required>
-                                        @foreach($approver as $app)
-                                        <option value="{{$app->id}}">{{ $app->department_name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                            </div>                            
                         </div>
                     </div>
                 </div>
@@ -93,13 +109,21 @@ active
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="comment">Purpose of Reimbursement :</label>
-                            <textarea class="form-control" id="comment" rows="3" name="purposes" required></textarea>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="password">Request Approval To :</label>
+                                    <select class="form-control" id="approver" name="approver" required>
+                                        @foreach($approver as $app)
+                                        <option value="{{$app->id}}">{{ $app->department_name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="comment">Notes :</label>
-                            <textarea class="form-control" id="comment" rows="4" name="notes" required></textarea>
+                            <textarea class="form-control" id="comment" rows="1" name="notes" required></textarea>
                         </div>
                     </div>
                 </div>
@@ -113,18 +137,17 @@ active
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary" id="judul">Receipt & Amount</h6>
                         <div class="text-right">
-                            <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Add New Item">
-                        </div>
+                            <div class="btn-group">
+                                <button class="btn btn-danger btn-sm" type="button" id="undoButton" style="display: none; margin-right: 10px;"><i class="fas fa-fw fa-trash-alt"></i></button>
+                                <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Add New Item">
+                                </div>
+                        </div>                        
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
                         
                         <div class="col-md-12">
                             <div class="row">
-                                {{-- <small style="color: red;"><u><i>This Version Only Support 1 Item!</i></u></small> --}}
-                                <div class="col-md-7">
-                                    <small style="color: red;"><u><i>*NOTE : Besides uploading files, the original receipt must be given to finance for verification.</i></u></small>
-                                </div>
                                 <div class="col-md-5 justify-content-between flex-row">
                                     <div class="row">
                                         <div class="col-md-9">
@@ -137,7 +160,6 @@ active
                                     </div>
                                 </div>
                             </div>
-                            <hr>
                             <div class="col-lg-12">
                                 <div class="row" id="targetContainer">
                                     <div class="col-md-4" id="originalForm">
@@ -145,7 +167,7 @@ active
                                             <div class="row">
                                                 <div class="col-lg-12">
                                                     <div class="form-group">
-                                                        <input type="file" class="file-input" id="receipt" name="receipt[]">
+                                                        <input type="file" class="file-input" id="receipt" name="receipt[]" multiple required>
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-12">
@@ -160,7 +182,7 @@ active
                                                             <div class="input-group-prepend">
                                                                 <div class="input-group-text">Rp.</div>
                                                             </div>
-                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Amount" value="">
+                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -172,115 +194,29 @@ active
                     </div>
                 </div>
             </div>
-        </div><br>
-    </form>
-<<<<<<< HEAD
+        </div>
+    <br>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Submission</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to submit this request?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
-<script>
-// Get references to the radio buttons and the "project" select element
-const projectSelect = document.getElementById('project');
-const projectRadio = document.getElementById('projectRadio');
-const othersRadio = document.getElementById('othersRadio');
-
-// Add event listeners to both radio buttons
-projectRadio.addEventListener('change', function () {
-    if (this.checked) {
-        // Enable the "project" select element
-        projectSelect.disabled = false;
-    }
-});
-
-othersRadio.addEventListener('change', function () {
-    if (this.checked) {
-        // Disable the "project" select element
-        projectSelect.disabled = true;
-    }
-});
-
-    const originalForm = document.querySelector("#originalForm");
-    const copyButton = document.querySelector("#copyButton");
-    const undoButton = document.querySelector("#undoButton");
-    const targetContainer = document.querySelector("#targetContainer");
-    const form = document.querySelector("#btn-submit");
-
-    let copyCounter = 0;
-
-    copyButton.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        if (copyCounter < 6) {
-            const clonedForm = originalForm.cloneNode(true);
-
-            // Modify the input's name attributes
-            const itemInput = clonedForm.querySelector("#receipt");
-            itemInput.name = "receipt[]";
-
-            const unitInput = clonedForm.querySelector("#unit");
-            unitInput.name = "unit[]";
-
-            const priceInput = clonedForm.querySelector("#result");
-            priceInput.name = "result[]";
-
-            // Clear input values
-            itemInput.value = "";
-            unitInput.value = "";
-            priceInput.value = "";
-
-            // Generate unique IDs for cloned elements
-            itemInput.id = `receipt${copyCounter}`;
-            unitInput.id = `unit${copyCounter}`;
-            priceInput.id = `result${copyCounter}`;
-
-            // Append the cloned form to the target container
-            targetContainer.appendChild(clonedForm);
-
-            // Increase the copy counter
-            copyCounter++;
-
-            // Show the undo button
-            undoButton.style.display = "block";
-        }
-    });
-
-    undoButton.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        if (copyCounter > 0) {
-            // Remove the last cloned form
-            targetContainer.removeChild(targetContainer.lastChild);
-
-            // Decrease the copy counter
-            copyCounter--;
-
-            // Hide the undo button if necessary
-            if (copyCounter === 0) {
-                undoButton.style.display = "none";
-            }
-        }
-    });
-
-    // Submit the form data to the Laravel controller
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const formData = new FormData(form);
-
-        fetch("/reimbursement/create/submit", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    });
-</script>
-
-=======
->>>>>>> 28940b2ea8ca950caa65b018020c36506c688a3a
 @endsection
 
 @section('javascript')
