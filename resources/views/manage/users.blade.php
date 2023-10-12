@@ -30,7 +30,7 @@ active
 @endif
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-user"></i> Manage Users</h1>
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-users"></i> Manage Users</h1>
     <div>
         <a class="btn btn-success btn-sm shadow-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Position & Department</a>
     </div>

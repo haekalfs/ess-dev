@@ -9,8 +9,8 @@ active
 <form method="POST" action="/users/store" enctype="multipart/form-data">
     @csrf
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Add New User</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-user-plus"></i>&nbsp; Add New User</h1>
     <input type="submit" class="btn btn-success btn-sm" value="Simpan">
 </div>
 
@@ -34,7 +34,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-    <div class="row">
+    <div class="row zoom90">
         <!-- Area Chart -->
         <div class="col-xl-12 col-lg-12">
             <div class="card shadow mb-4">
@@ -212,7 +212,7 @@ active
         </div>
     </div>
 
-    <div class="row">
+    <div class="row zoom90">
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->

@@ -29,8 +29,8 @@ active
 </div>
 @endif
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Exit Clearance</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-running"></i> Exit Clearance</h1>
 </div>
 <div class="card shadow mb-4">
     <!-- Card Header - Dropdown -->
@@ -61,7 +61,13 @@ active
                     <td>{{$p->users_detail->employee_id}}</td>
                     <td>{{$p->id }}</td>
                     <td>{{$p->name}}</td>
-                    <td>{{$p->users_detail->status_active}}</td>
+                    <td class="text-center">
+                        @if ($p->users_detail->status_active == "Active")
+                            <i class="fas fa-user-check" style="color: #0053fa;"></i>
+                        @else
+                            <i class="fas fa-user-times" style="color: #ff0000;"></i>
+                        @endif
+                    </td>
                     <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
                     <td>{{$p->users_detail->hired_date}}</td>
                     <td>{{$p->users_detail->resignation_date}}</td>
