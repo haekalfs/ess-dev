@@ -62,6 +62,7 @@ $(document).ready(function() {
                     url: '/get-data/' + year + '/' + month + '/' + activityId,
                     type: 'GET',
                     success: function(response) {
+                        fetchLocationProjectUpdate(response.ts_task_id);
                         // Set the values of the form fields with the data received from the server
                         $('#updateModal').find('#update_task').val(response.ts_task_id);
                         $('#updateModal').find('#update_location').val(response.ts_location);
@@ -93,6 +94,8 @@ $(document).ready(function() {
                     success: function(response) {
                         $('.alert-success-saving').show();
                         $('#update-form')[0].reset();
+                        $('#updateLocationSelect').css('display', 'block');
+                        fetchLocationProjectUpdate(1);
                             setTimeout(function() {
                                 $('.alert-success-saving').fadeOut('slow');
                             }, 3000);
@@ -364,6 +367,8 @@ $(document).ready(function() {
                     $('#fileInputIfexistWfh').hide();
                     
                     $('#entry-form')[0].reset();
+                    $('#locationContainer').css('display', 'block');
+                    fetchLocationProject(1);
                     $('#sp-label').text('Choose File');
                     setTimeout(function() {
                         $('.alert-success-saving').fadeOut('slow');
@@ -422,6 +427,9 @@ $(document).ready(function() {
                     document.getElementById("start-time").removeAttribute("readonly");
                     document.getElementById("end-time").removeAttribute("readonly");
                     $('#entry-form-red')[0].reset();
+                    $('#locationContainerRed').css('display', 'block');
+                    fetchLocationProjectRed(1);
+                    $('.validate-red').removeClass('is-invalid');
                     $('#sp-label').text('Choose File');
                     setTimeout(function() {
                         $('.alert-success-saving').fadeOut('slow');
@@ -477,6 +485,8 @@ $(document).ready(function() {
                 document.getElementById("start-time").removeAttribute("readonly");
                 document.getElementById("end-time").removeAttribute("readonly");
                 $('#multiple-entry-form')[0].reset();
+                $('#locationContainer').css('display', 'block');
+                fetchLocationProject(1);
                 $(function() {
                     initializeDateRangePicker();
                   });
@@ -559,3 +569,212 @@ $(function() {
     }
   });
 });
+
+
+function fetchLocationProject(selectedValue) {
+    if (selectedValue) {  // Check if selectedValue is not empty
+        $.ajax({
+            url: '/getLocationProject/' + selectedValue,
+            method: 'GET',
+            success: function(response) {
+                var selectLocation = $('#location'); // Get the <select> element
+
+                // Clear existing options
+                selectLocation.empty();
+
+                // Populate the <select> element with options from the response
+                $.each(response, function(index, location) {
+                    selectLocation.append($('<option>', {
+                        value: location.location_code,
+                        text: location.description
+                    }));
+                });
+
+                var taskSelect = $('#task');
+                var locationSelect = $('#location'); // Store the location element
+            
+                function updateLocation(selectedTask) {
+                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                        $('#locationContainer').css('display', 'block');
+                        locationSelect.val(selectedTask.substr(-2));
+                        locationSelect.prop('readonly', true);
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.css('pointer-events', 'none');
+                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                        $('#locationContainer').css('display', 'none');
+                        $('#activity, #start-time, #end-time').val("-");
+                        $('#activity, #start-time, #end-time').prop('readonly', true);
+                        locationSelect.prop('readonly', true);
+                        locationSelect.css('pointer-events', 'none');
+                    } else {
+                        $('#locationContainer').css('display', 'block');
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.prop('readonly', false);
+                        locationSelect.css('pointer-events', 'auto');
+                    }
+                }
+            
+                taskSelect.on('change', function() {
+                    var selectedTask = taskSelect.val();
+                    updateLocation(selectedTask);
+                });
+                
+                // Initialize based on the initial selected value
+                var initialSelectedTask = taskSelect.val();
+                updateLocation(initialSelectedTask);
+            },
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#task').on('change', function() {
+        var selectedValue = $(this).val();
+        fetchLocationProject(selectedValue);
+    });
+});
+
+fetchLocationProject(1);
+
+function fetchLocationProjectRed(selectedValue) {
+    if (selectedValue) {  // Check if selectedValue is not empty
+        $.ajax({
+            url: '/getLocationProject/' + selectedValue,
+            method: 'GET',
+            success: function(response) {
+                var selectLocation = $('#location-red'); // Get the <select> element
+
+                // Clear existing options
+                selectLocation.empty();
+
+                // Populate the <select> element with options from the response
+                $.each(response, function(index, location) {
+                    selectLocation.append($('<option>', {
+                        value: location.location_code,
+                        text: location.description
+                    }));
+                });
+
+                var taskSelect = $('#task-red');
+                var locationSelect = $('#location-red'); // Store the location element
+            
+                function updateLocation(selectedTask) {
+                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                        $('#locationContainerRed').css('display', 'block');
+                        locationSelect.val(selectedTask.substr(-2));
+                        locationSelect.prop('readonly', true);
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.css('pointer-events', 'none');
+                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                        $('#locationContainerRed').css('display', 'none');
+                        $('#activity, #start-time, #end-time').val("-");
+                        $('#activity, #start-time, #end-time').prop('readonly', true);
+                        locationSelect.prop('readonly', true);
+                        locationSelect.css('pointer-events', 'none');
+                    } else {
+                        $('#locationContainerRed').css('display', 'block');
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.prop('readonly', false);
+                        locationSelect.css('pointer-events', 'auto');
+                    }
+                }
+            
+                taskSelect.on('change', function() {
+                    var selectedTask = taskSelect.val();
+                    updateLocation(selectedTask);
+                });
+                
+                // Initialize based on the initial selected value
+                var initialSelectedTask = taskSelect.val();
+                updateLocation(initialSelectedTask);
+            },
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#task-red').on('change', function() {
+        var selectedValue = $(this).val();
+        fetchLocationProjectRed(selectedValue);
+    });
+});
+
+fetchLocationProjectRed(1);
+
+
+function fetchLocationProjectUpdate(selectedValue) {
+    if (selectedValue) {  // Check if selectedValue is not empty
+        $.ajax({
+            url: '/getLocationProject/' + selectedValue,
+            method: 'GET',
+            success: function(response) {
+                var selectLocation = $('#update_location'); // Get the <select> element
+
+                // Clear existing options
+                selectLocation.empty();
+
+                // Populate the <select> element with options from the response
+                $.each(response, function(index, location) {
+                    selectLocation.append($('<option>', {
+                        value: location.location_code,
+                        text: location.description
+                    }));
+                });
+
+                var taskSelect = $('#update_task');
+                var locationSelect = $('#update_location'); // Store the location element
+            
+                function updateLocation(selectedTask) {
+                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                        $('#updateLocationSelect').css('display', 'block');
+                        locationSelect.val(selectedTask.substr(-2));
+                        locationSelect.prop('readonly', true);
+                        $('#update_activity, #update_from, #update_to').prop('readonly', false);
+                        locationSelect.css('pointer-events', 'none');
+                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                        $('#updateLocationSelect').css('display', 'none');
+                        $('#update_activity, #update_from, #update_to').val("-");
+                        $('#update_activity, #update_from, #update_to').prop('readonly', true);
+                        locationSelect.prop('readonly', true);
+                        locationSelect.css('pointer-events', 'none');
+                    } else {
+                        $('#updateLocationSelect').css('display', 'block');
+                        $('#update_activity, #update_from, #update_to').prop('readonly', false);
+                        locationSelect.prop('readonly', false);
+                        locationSelect.css('pointer-events', 'auto');
+                    }
+                }
+            
+                taskSelect.on('change', function() {
+                    var selectedTask = taskSelect.val();
+                    updateLocation(selectedTask);
+                });
+                
+                // Initialize based on the initial selected value
+                var initialSelectedTask = taskSelect.val();
+                updateLocation(initialSelectedTask);
+            },
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#update_task').on('change', function() {
+        var selectedValue = $(this).val();
+        fetchLocationProjectUpdate(selectedValue);
+    });
+});
+
+fetchLocationProjectUpdate(1);

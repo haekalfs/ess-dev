@@ -389,9 +389,16 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->task;
-        $entry->ts_location = $request->location;
-        $entry->ts_from_time = date('H:i', strtotime($request->from));
-        $entry->ts_to_time = date('H:i', strtotime($request->to));
+        if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+            $tsLoc = "-";
+        } else {
+            $tsLoc = $request->location;
+        }        
+        $entry->ts_location = $tsLoc;
+        $entry->ts_from_time = $request->from;
+        $entry->ts_to_time = $request->to;
+        // $entry->ts_from_time = date('H:i', strtotime($request->from));
+        // $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = 10;
 
@@ -528,9 +535,14 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDateRed;
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->task;
-        $entry->ts_location = $request->location;
-        $entry->ts_from_time = date('H:i', strtotime($request->from));
-        $entry->ts_to_time = date('H:i', strtotime($request->to));
+        if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+            $tsLoc = "-";
+        } else {
+            $tsLoc = $request->location;
+        }        
+        $entry->ts_location = $tsLoc;
+        $entry->ts_from_time = $request->from;
+        $entry->ts_to_time = $request->to;
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
 
@@ -755,9 +767,14 @@ class TimesheetController extends Controller
                 $entry->ts_date = $startDate->format('Y-m-d');
                 $entry->ts_task = $ts_task_id;
                 $entry->ts_task_id = $request->task;
-                $entry->ts_location = $request->location;
-                $entry->ts_from_time = date('H:i', strtotime($request->from));;
-                $entry->ts_to_time = date('H:i', strtotime($request->to));
+                if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+                    $tsLoc = "-";
+                } else {
+                    $tsLoc = $request->location;
+                }        
+                $entry->ts_location = $tsLoc;
+                $entry->ts_from_time = $request->from;
+                $entry->ts_to_time = $request->to;
                 $entry->ts_activity = $request->activity;
                 $entry->ts_status_id = '10';
                 $entry->allowance = $countAllowances;
@@ -802,9 +819,14 @@ class TimesheetController extends Controller
         }
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->update_task;
-        $entry->ts_location = $request->update_location;
-        $entry->ts_from_time = date('H:i', strtotime($inputFromTimeUpdate));
-        $entry->ts_to_time = date('H:i', strtotime($inputToTimeUpdate));
+        if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+            $tsLoc = "-";
+        } else {
+            $tsLoc = $request->update_location;
+        }        
+        $entry->ts_location = $tsLoc;
+        $entry->ts_from_time = $inputFromTimeUpdate;
+        $entry->ts_to_time = $inputToTimeUpdate;
         $entry->ts_activity = $request->update_activity;
 
         $user = Auth::user();
@@ -1586,5 +1608,36 @@ class TimesheetController extends Controller
 
         // File not found
         abort(404);
+    }
+
+    public function getLocationProject($task_id)
+    {
+        $itemData = Project_assignment_user::where('project_assignment_id', $task_id)->pluck('company_project_id')->toArray();
+
+            if (empty($itemData)) {
+                $getLoc = Project_location::all(); // Change $getLoc to $getLocations
+            } else {
+                $getLocations = Company_project::whereIn('id', $itemData)->pluck('alias')->toArray();
+
+                // Initialize an array to store distinct locations
+                $distinctLocations = [];
+        
+                // Loop through the locations
+                foreach ($getLocations as $locations) {
+                    // Split the comma-separated values into an array
+                    $locationArray = explode(', ', $locations);
+                    
+                    // Add each distinct location to the result array
+                    $distinctLocations = array_merge($distinctLocations, $locationArray);
+                }
+        
+                // Remove duplicates
+                $distinctLocations = array_unique($distinctLocations);
+        
+                // You now have an array of distinct locations
+                $getLoc = Project_location::whereIn('location_code', $distinctLocations)->get();
+            }
+
+        return response()->json($getLoc);
     }
 }

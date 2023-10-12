@@ -255,3 +255,5 @@ Route::get('/retrieveApproverList/{id}', 'ReimbursementApprovalController@listAp
 
 Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement')->middleware('auth');
 Route::get('/reimbursement/export/all/{month}/{year}', 'ReimburseController@export_excel')->middleware('auth');
+
+Route::get('/getLocationProject/{id}', 'TimesheetController@getLocationProject')->name('list-location')->middleware('auth');

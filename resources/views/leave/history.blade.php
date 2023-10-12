@@ -13,14 +13,18 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Leave History</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-plane-departure"></i> Leave History</h1>
     <div>
         {{-- <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
             @foreach (array_reverse($yearsBefore) as $year)
                 <option value="{{ $year }}">{{ $year }}</option>
             @endforeach
         </select> --}}
+        
+        <button class="btn @role('freelancer') btn-success @else btn-warning @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveQuota" id="manButton" style="margin-right: 5px;">Leave Quota</button>
+        <button class="btn @role('freelancer') btn-success @else btn-success @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveUsage" id="manButton" style="margin-right: 5px;">Usage</button>
+        <button class="btn @role('freelancer') btn-success @else btn-danger @endrole btn-sm" type="button" data-toggle="modal" data-target=".weekendRep" id="weekendRep">Weekend Replacement</button>
     </div>
 </div>
 
@@ -115,9 +119,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">Leave History</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#leaveRequest" id="leaveRequestBtn" style="margin-right: 5px;">Create Request</a>
-            <button class="btn @role('freelancer') btn-success @else btn-secondary @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveQuota" id="manButton" style="margin-right: 5px;">Leave Quota</button>
-            <button class="btn @role('freelancer') btn-success @else btn-danger @endrole btn-sm" type="button" data-toggle="modal" data-target=".weekendRep" id="weekendRep">Weekend Replacement</button>
+            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#leaveRequest" id="leaveRequestBtn">Create Request</a>
         </div>
     </div>
     <div class="card-body">
@@ -248,7 +250,7 @@ active
 	</div>
 </div>
 <div class="modal fade leaveQuota" tabindex="-1" role="dialog" aria-labelledby="leaveQuota" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
 				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Leave Quota Information</h5>
@@ -256,7 +258,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-            <div class="modal-body" style="height: 500px; overflow-y: auto;">
+            <div class="modal-body" style="height: 400px; overflow-y: auto;">
                 <div class="col-md-12 zoom90">
                     <div class="row">
                         <div class="col-md-12">
@@ -296,6 +298,28 @@ active
                                 </table>
                             </div><br>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade leaveUsage" tabindex="-1" role="dialog" aria-labelledby="leaveQuota" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Leave Quota Usage</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+            <div class="modal-body" style="height: 400px; overflow-y: auto;">
+                <div class="col-md-12 zoom90">
+                    <div class="row">
                         <div class="col-md-12">
                             <h6 class="h6 text-danger mb-2"><i>Leave Quota Usage</i></h6>
                             <div class="table-responsive">

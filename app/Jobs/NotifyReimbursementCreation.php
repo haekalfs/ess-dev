@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\ApprovalLeave;
+use App\Mail\ReimbursementCreation;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -39,8 +40,8 @@ class NotifyReimbursementCreation implements ShouldQueue
      */
     public function handle()
     {
-        $notification = new ApprovalLeave($this->employee, $this->userName);
-        Mail::send('mailer.approval_leave', $notification->data(), function ($message) use ($notification) {
+        $notification = new ReimbursementCreation($this->employee, $this->userName);
+        Mail::send('mailer.reimburse_approval', $notification->data(), function ($message) use ($notification) {
             $message->to($notification->emailTo())
                     ->subject($notification->emailSubject());
         });

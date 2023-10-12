@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyReimbursementCreation;
 use App\Models\Company_project;
 use App\Models\Department;
 use App\Models\Financial_password;
@@ -158,6 +159,7 @@ class ReimburseController extends Controller
                 $data->reimbursement_id = $uniqueId;
                 $data->save();
 
+                $userToApprove = [];
                 switch (true) {
                     case ($RequestTo == 4):
                         foreach($approvalFinance_GA as $approverGa){
@@ -167,6 +169,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
+                            $userToApprove[] = $approverGa->approver; 
                         }
                         break;
                         // No break statement here, so it will continue to the next case
@@ -178,6 +181,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
+                            $userToApprove[] = $approverService->approver; 
                         }
                         if(!$usersWithPMRole->isEmpty()){
                             foreach($usersWithPMRole as $approverPM){
@@ -187,6 +191,7 @@ class ReimburseController extends Controller
                                     'reimb_item_id' => $itemId,
                                     'reimbursement_id' => $uniqueId
                                 ]);
+                                $userToApprove[] = $approverPM->approver; 
                             }
                         }
                         break;
@@ -198,6 +203,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
+                            $userToApprove[] = $approverHCM->approver; 
                         }
                         break;
                     case ($RequestTo == 1):
@@ -208,6 +214,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
+                            $userToApprove[] = $approverSales->approver; 
                         }
                         break; // Add break statement here to exit the switch block after executing the case
                     default:
@@ -224,8 +231,15 @@ class ReimburseController extends Controller
                     'reimb_item_id' => $itemId,
                     'reimbursement_id' => $uniqueId
                 ]);
+                $userToApprove[] = $fm->approver;
             }
         
+            $employees = User::whereIn('id', $userToApprove)->get();
+            $userName = Auth::user()->name;
+
+            foreach ($employees as $employee) {
+                dispatch(new NotifyReimbursementCreation($employee, $userName));
+            }
             Session::flash('success',"Request has been submitted!");
             return redirect('/reimbursement/history');
         } else {

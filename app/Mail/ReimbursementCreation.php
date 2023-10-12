@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ApprovalLeave extends Mailable
+class ReimbursementCreation extends Mailable
     {
         protected $employee;
         protected $userName;
@@ -25,19 +25,19 @@ class ApprovalLeave extends Mailable
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
                 'userName' => $this->userName,
-                'link' => 'https://timereport.perdana.co.id/approval/leave'
+                'link' => 'https://timereport.perdana.co.id/approval/reimburse/'
             ];
     
-            $subject = 'Leave Approval Reminder';
+            $subject = 'Reimbursement Approval Reminder';
     
-            return $this->markdown('mailer.approval_leave', $data)
+            return $this->markdown('mailer.reimburse_approval', $data)
                         ->subject($subject)
                         ->to($this->employee->email);
         }
     
         public function emailSubject()
         {
-            return 'Leave Approval Reminder';
+            return 'Reimbursement Approval Reminder';
         }
     
         public function emailTo()
@@ -51,7 +51,7 @@ class ApprovalLeave extends Mailable
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
                 'userName' => $this->userName,
-                'link' => 'https://timereport.perdana.co.id/approval/leave'
+                'link' => 'https://timereport.perdana.co.id/approval/reimbursement/'
             ];
         }
     }

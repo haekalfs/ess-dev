@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Timesheet Entry</h1>
-<p class="mb-4">Timesheet Entry for {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{$year}}</a>. <small style="color: red;"><u><i>This app is still under development. You may find fault on inputs</i></u></small></p>
+<h1 class="h3 font-weight-bold zoom90 mb-2 text-gray-800"><i class="fas fa-calendar"></i> Timesheet Entry</h1>
+<p class="mb-4">Timesheet Entry for {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{$year}}</a>.</p>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -78,13 +78,12 @@ active
                                             @if ($status === "red")
                                                 <td data-toggle="modal" class="clickable text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
                                             @elseif ($status === 2907)
-                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <a><i class="fas fa-plane-departure fa-sm"></i></a>
+                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {{-- <a><i class="fas fa-plane-departure fa-sm"></i></a> --}}
                                                 </td>
                                             @elseif ($status === 404)
-                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">
-                                                    <a><i class="fas fa-user-slash fa-xs"></i></a>
-                                                </td>
+                                            <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.
+                                            </td>
                                             @else
                                                 <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
                                             @endif
@@ -343,14 +342,15 @@ active
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Location :</label>
-                                    <select class="form-control" id="location" name="location" required>
+                                <div class="form-group" id="locationContainer">
+                                    <label for="location">Location :</label>
+                                    <select class="form-control" id="location" name="location" required></select>
+                                    {{-- <select class="form-control" id="location" name="location" required>
                                         @foreach($pLocations as $loc)
                                             <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
                         </div>
@@ -452,14 +452,15 @@ active
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
+                                <div class="form-group" id="locationContainerRed">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="location-red" name="location" required>
+                                    <select class="form-control" id="location-red" name="location" required></select>
+                                    {{-- <select class="form-control" id="location-red" name="location" required>
                                         @foreach($pLocations as $loc)
                                             <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
                         </div>
@@ -553,14 +554,15 @@ active
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
+                                <div class="form-group" id="updateLocationSelect">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="update_location" name="update_location" required>
+                                    <select class="form-control" id="update_location" name="update_location" required></select>
+                                    {{-- <select class="form-control" id="update_location" name="update_location" required>
                                         @foreach($pLocations as $loc)
                                             <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
                         </div>
@@ -789,8 +791,6 @@ function changeFileName(inputId, labelId) {
   label.textContent = input.files[0].name;
 }
 
-var taskSelect = document.getElementById("task");
-var locationSelect = document.getElementById("location");
 
 var taskSelectRed = document.getElementById("task-red");
 var locationSelectRed = document.getElementById("location-red");
@@ -798,98 +798,6 @@ var locationSelectRed = document.getElementById("location-red");
 var taskSelectUpdate = document.getElementById("update_task");
 var locationSelectUpdate = document.getElementById("update_location");
 
-
-///// NEED PERBAIKAN    
-var selectedTask = taskSelect.value;
-locationSelect.value = "HO";
-locationSelect.readOnly = true;
-locationSelect.style.pointerEvents = "none";
-
-taskSelect.addEventListener("change", function() {
-    var selectedTask = taskSelect.value;
-    
-    if (selectedTask === "StandbyLK") {
-        locationSelect.value = "LK";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none"; 
-    } else if (selectedTask === "StandbyLN") {
-        locationSelect.value = "LN";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "HO") {
-        locationSelect.value = "HO";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "Other") {
-        locationSelect.value = "N/a";
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "Sick") {
-        locationSelect.value = "N/a";
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else {
-        document.getElementById("activity").removeAttribute("readonly");
-        document.getElementById("start-time").removeAttribute("readonly");
-        document.getElementById("end-time").removeAttribute("readonly");
-        locationSelect.readOnly = false;
-        locationSelect.style.pointerEvents = "auto";
-        // locationSelect.value = "HO";
-    }
-});
-
-taskSelectRed.addEventListener("change", function() {
-    var selectedTaskRed = taskSelectRed.value;
-
-    if (selectedTaskRed === "StandbyLK") {
-        locationSelectRed.value = "LK";
-        locationSelectRed.readOnly = true;
-        locationSelectRed.style.pointerEvents = "none";
-    } else if (selectedTask === "Other") {
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.value = "N/a";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "Sick") {
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.value = "N/a";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTaskRed === "StandbyLN") {
-        locationSelectRed.value = "LN";
-        locationSelectRed.readOnly = true;
-        locationSelectRed.style.pointerEvents = "none";
-    } else {
-        document.getElementById("activity").removeAttribute("readonly");
-        document.getElementById("start-time").removeAttribute("readonly");
-        document.getElementById("end-time").removeAttribute("readonly");
-        locationSelectRed.readOnly = false;
-        locationSelectRed.style.pointerEvents = "auto";
-        // locationSelectRed.value = "HO";
-    }
-});
 
 taskSelectUpdate.addEventListener("change", function() {
     var selectedTaskUpdate = taskSelectUpdate.value;

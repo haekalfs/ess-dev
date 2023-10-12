@@ -63,8 +63,8 @@ active
                                         <td>: {{ $project->client->client_name }}</td>
                                     </tr>
                                     <tr class="table-sm">
-                                        <td style="width: 150px;">Address</td>
-                                        <td>: {{ $project->address }}</td>
+                                        <td style="width: 150px;">Locations</td>
+                                        <td>: {{ $project->alias }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -148,7 +148,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/project_list/update" method="post" id="editForm">
+			<form method="post" id="editForm">
                 @csrf
                 <input type="hidden" name="project_id" id="project_id" value="">
 				<div class="modal-body" style="">
@@ -185,11 +185,10 @@ active
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="p_location">Location :</label>
-                                    <select class="form-control" id="p_location" name="p_location" required>
-                                        <option disabled selected>Select to update...</option>
-                                        @foreach($locations as $key => $location)
-                                            <option value="{{$location->location_code}}">{{ $location->description }}</option>
+                                    <label for="password">Location :</label>
+                                    <select class="form-control js-example-basic-multiple" style="width: 100%;" name="p_location[]" multiple="multiple">
+                                        @foreach($locations as $location)
+                                            <option value="{{$location->id}}">{{ $location->description}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -281,5 +280,13 @@ active
 @endsection
 
 @section('javascript')
+<script>
+    $(document).ready(function() {
+        $('.js-example-basic-multiple').select2({
+            width: 'resolve',
+            dropdownAutoWidth: 'false' // need to override the changed default
+        });
+    });
+</script>
 <script src="{{ asset('js/project.js') }}"></script>
 @endsection

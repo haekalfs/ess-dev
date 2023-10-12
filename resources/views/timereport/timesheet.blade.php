@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Timesheet</h1>
+<div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-calendar"></i> Timesheet</h1>
     <div>
         <select class="form-control" id="task" name="task" required onchange="redirectToPage()">
             @foreach (array_reverse($yearsBefore) as $year)
@@ -60,7 +60,7 @@ active
                                     <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit
                                 </a>
                             @endif
-                            <a href="{{ $entry['previewUrl'] }}" class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" style="margin-left: 3%;">Preview</a>
+                            <a href="{{ $entry['previewUrl'] }}" class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" style="margin-left: 3%;"><i class="fas fa-eye"></i> Preview</a>
                         </td>
                     </tr>
                     @endforeach
@@ -71,7 +71,7 @@ active
 </div>
 <style>
 .action{
-    width: 180px;
+    width: 200px;
 }
 </style>
 <script>

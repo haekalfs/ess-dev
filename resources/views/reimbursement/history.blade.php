@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Reimbursement History</h1>
+<div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+    <h1 class="h4 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement History</h1>
     <div>
         <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
             @foreach (array_reverse($yearsBefore) as $year)
@@ -39,7 +39,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Reimbursement Request History</h6>
         <div class="text-right">

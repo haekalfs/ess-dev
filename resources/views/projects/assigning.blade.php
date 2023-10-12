@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Project Assignment</h1>
+<div class="d-sm-flex align-items-center justify-content-between zoom90 mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Project Assignment</h1>
     <div>
         <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
             @foreach (array_reverse($yearsBefore) as $year)
@@ -64,12 +64,12 @@ active
                         <td>{{ $assign->req_date }}</td>
                         <td>{{ $assign->assignment_no }}</td>
                         <td><span class="long-text">{{ $assign->project_name }}</span></td>
-                        <td>@if($assign->approval_status == 40)
-                            <span class="m-0 font-weight-bold text-danger">Waiting for Approval Service Diretor</span>
+                        <td class="text-center">@if($assign->approval_status == 40)
+                            <i class="fas fa-spinner fa-spin" style="color: #808080;"></i>
                             @elseif($assign->approval_status == 29) 
-                            <span class="m-0 font-weight-bold text-primary">Approved by Service Director</span>
+                            <i class="fas fa-check-circle" style="color: #0050db;"></i>
                             @else 
-                            <span class="m-0 font-weight-bold text-danger">Rejected</span>
+                            <i class="fas fa-times-circle" style="color: #ff0000;"></i>
                             @endif
                         </td>
                         <td class="text-center"><a class="btn btn-primary btn-sm" href="/assignment/member/{{ $assign->id }}"><i class='fas fa-fw fa-eye'></i> View</a></td>
