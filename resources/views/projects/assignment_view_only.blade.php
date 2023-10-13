@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Project Assignment #{{ $assignment_id }}</h1>
-<p class="mb-4 text-danger"><i>{{ $stat }}</i></a></p>
+<h1 class="h4 mb-0 font-weight-bold zoom90 text-gray-800"><i class="fas fa-network-wired"></i> Project Assignment #{{ $assignment_id }}</h1>
+<p class="mb-4 text-danger zoom90"><i>{{ $stat }}</i></a></p>
 
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -31,7 +31,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-    <div class="row">
+    <div class="row zoom90">
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Accordion -->
