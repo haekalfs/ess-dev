@@ -104,7 +104,7 @@ class TimesheetController extends Controller
 
         while (!$cachedData && $attempts < $maxAttempts) {
             try {
-                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json");
+                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
                 $array = json_decode($json, true);
                 Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
                 $cachedData = $array;
@@ -158,21 +158,25 @@ class TimesheetController extends Controller
         }
 
         // Check tanggal merah berdasarkan libur nasional
-        if (isset($array[$date->format('Ymd')])) {
+        $dateToCheck = $date->format('Y-m-d');
+        // if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true) {
+        //     $description = $array[$dateToCheck]['summary'][0];
+        //     // Use $description as needed.
+        //     return "red";
+        // }
+        if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true) {
             return "red";
         }
         // Check tanggal merah berdasarkan hari minggu
-        elseif ($date->format('D') === "Sun") {
-            return "red";
-        } elseif ($date->format('D') === "Sat") {
+        elseif ($date->format('D') === "Sun" || $date->format('D') === "Sat") {
             return "red";
         }
         // Bukan tanggal merah
         else {
-            $dateToCheck = $date->format('Ymd');
-            if (in_array($dateToCheck, $formattedDates)) {
+            $dateToCheck2 = $date->format('Ymd');
+            if (in_array($dateToCheck2, $formattedDates)) {
                 return 2907;
-            } elseif(in_array($dateToCheck, $formattedDatesHired)){
+            } elseif(in_array($dateToCheck2, $formattedDatesHired)){
                 return 404;
             }else {
                 return "";

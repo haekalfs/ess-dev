@@ -349,7 +349,6 @@ $(document).on('click', '.btn-edit', function() {
     var projectId = $(this).data('project-id');
     $('#project_id').val(projectId);
     
-    // Make an AJAX request to fetch the project data and populate the form fields
     $.ajax({
         url: '/retrieveProjectData/' + projectId,
         method: 'GET',
@@ -360,12 +359,21 @@ $(document).on('click', '.btn-edit', function() {
             $('#address').val(response.address);
             $('#from').val(moment(response.periode_start).format('YYYY-MM-DD'));
             $('#to').val(moment(response.periode_end).format('YYYY-MM-DD'));
+    
+            // Set the selected value for the "p_client" select element
+            var selectedClientId = response.client_id; // Assuming response.client_id contains the ID of the selected client.
+            $('#p_client option').each(function() {
+                if ($(this).val() == selectedClientId) {
+                    $(this).prop('selected', true);
+                }
+            });
         },
         error: function(xhr) {
             // Handle error
             console.log(xhr.responseText);
         }
     });
+    
 });
 
 $(document).on('click', '#submitEdit', function() {
