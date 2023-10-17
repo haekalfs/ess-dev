@@ -11325,6 +11325,10 @@ body.sidebar-toggled footer.sticky-footer {
   zoom: 70%;
 }
 
+.zoom50{
+  zoom: 50%;
+}
+
 .long-text {
     display: block;
     overflow: hidden;
@@ -11347,6 +11351,14 @@ body.sidebar-toggled footer.sticky-footer {
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 200px; /* adjust the max-width to fit your table design */
+}
+
+.shorter-text2 {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100px; /* adjust the max-width to fit your table design */
 }
 
 .timesheet:hover .card {

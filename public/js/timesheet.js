@@ -39,6 +39,12 @@ $(document).ready(function () {
         $('#clickedDate').val(formattedDate);
         $('#clickedDateRed').val(formattedDate);
     });
+
+    // Handle the anchor click event using event delegation
+    $(document).on('click', '.inner-anchor', function (event) {
+        event.stopPropagation(); // Prevent the anchor click event from propagating
+        // Add your specific anchor click event handling here
+    });
 });
 
 //this is my save function 
@@ -92,6 +98,10 @@ $(document).ready(function() {
                     url: '/update-entries/' + activityId,
                     data: updateData,
                     success: function(response) {
+                        for (var i = 1; i <= 31; i++) {
+                            var descRemove = $('#desc' + i);
+                            descRemove.empty();
+                        }
                         $('.alert-success-saving').show();
                         $('#update-form')[0].reset();
                         $('#updateLocationSelect').css('display', 'block');
@@ -124,15 +134,19 @@ $(document).ready(function() {
             url: '/activities/' + activityId,
             type: 'DELETE',
             success: function(response) {
+                for (var i = 1; i <= 31; i++) {
+                    var descRemove = $('#desc' + i);
+                    descRemove.empty();
+                }
                 $('.alert-danger').text("Task has been deleted!");
                 $('.alert-danger').show();
                 setTimeout(function() {
                     $('.alert-success-delete').fadeOut('slow');
                 }, 3000);
-                for (var i = 1; i <= 31; i++) {
-                    var taskEntry = $('#task_entry' + i);
-                    taskEntry.removeClass('border-bottom-primary');
-                  }
+                // for (var i = 1; i <= 31; i++) {
+                //     var taskEntry = $('#task_entry' + i);
+                //     taskEntry.removeClass('border-bottom-primary');
+                //   }
                 $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
@@ -156,15 +170,19 @@ $(document).ready(function() {
             url: '/activities/all/' + activityYear + '/' + activityMonth,
             type: 'DELETE',
             success: function(response) {
+                for (var i = 1; i <= 31; i++) {
+                    var descRemove = $('#desc' + i);
+                    descRemove.empty();
+                }
                 $('.alert-danger').text("All tasks has been deleted!");
                 $('.alert-danger').show();
                 setTimeout(function() {
                     $('.alert-success-delete').fadeOut('slow');
                 }, 3000);
-                for (var i = 1; i <= 31; i++) {
-                    var taskEntry = $('#task_entry' + i);
-                    taskEntry.removeClass('border-bottom-primary');
-                  }
+                // for (var i = 1; i <= 31; i++) {
+                //     var taskEntry = $('#task_entry' + i);
+                //     taskEntry.removeClass('border-bottom-primary');
+                //   }
                 $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
@@ -191,6 +209,10 @@ $(document).ready(function() {
             success: function(response) {
                 // Clear the table body
                 $('#activity-table').empty();
+                for (var i = 1; i <= 31; i++) {
+                    var descRemove = $('#desc' + i);
+                    descRemove.empty();
+                }
                 // Check if the response is empty or null
                 if (response.length === 0) {
                     // Display a message to the user
@@ -229,8 +251,13 @@ $(document).ready(function() {
                         counts[activity.ts_location] += 1;
 
                         var day = date.getDate();
-                        var taskEntry = $('#task_entry' + day);
-                        taskEntry.addClass('border-bottom-primary');
+                        // var taskEntry = $('#task_entry' + day);
+                        // taskEntry.addClass('border-bottom-primary');
+
+                        var descTask = $('#desc' + day);
+                        // descTask.append('&#x2022; ' + activity.ts_task);
+                        // descTask.append('<br>');
+                        descTask.append($('<a></a>').addClass('shorter-text round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
                     });
 
                     var rowsPerPageSelect = $('#rowsPerPage');
@@ -356,6 +383,10 @@ $(document).ready(function() {
                 contentType: false, // Set contentType to false, as we are sending FormData
                 processData: false, // Set processData to false, as we are sending FormData
                 success: function(response) {
+                    for (var i = 1; i <= 31; i++) {
+                        var descRemove = $('#desc' + i);
+                        descRemove.empty();
+                    }
                     $('.alert-success-saving').show();
                     document.getElementById("activity").removeAttribute("readonly");
                     document.getElementById("location").removeAttribute("readonly");

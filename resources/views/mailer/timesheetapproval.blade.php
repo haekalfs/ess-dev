@@ -2,6 +2,9 @@
 
 <p>This is timesheet approval reminder, and some user's timesheets require your approval. Kindly request your review for the documents.</p>
 
+<p>Month :</p>
+<p>Link : https://timereport.perdana.co.id/approval/timesheet/p?_token=Kn5zpeeBb4qPfgnPhqo8hwF00a1wtsw2OaartL6b&monthOpt=6&showOpt=1&yearOpt=2023</p>
+
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>
 <p>Regards,<br><img src="{{ asset('img/PC-01Mailer.png') }}" style="height: 40px; width: 90px;" /> <br><strong>ESS Admin</strong></p><br>

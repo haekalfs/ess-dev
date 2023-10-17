@@ -168,7 +168,7 @@ class ApprovalController extends Controller
             $Month = $request->monthOpt;
         }
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 1 && $currentDay <= 31) {
+        if ($currentDay >= 17 && $currentDay <= 31) {
             if (in_array($checkUserPost, [7, 8, 12, 10])) {
                 $Check = Timesheet_detail::select('*')
                     ->whereYear('date_submitted', $Year)
