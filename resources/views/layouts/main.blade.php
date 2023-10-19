@@ -46,7 +46,7 @@
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav @role('admin') bg-gradient-pink  @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav @role('admin') bg-gradient-primary  @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
@@ -287,7 +287,7 @@
                         <h6 class="collapse-header">HR Access:</h6>
                         <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
                         <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
-                        <a class="collapse-item" href="/development">A3. Vendor List</a>
+                        <a class="collapse-item" href="/vendor-list">A3. Vendor List</a>
                         <a class="collapse-item" href="/development">A4. News Feed</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>

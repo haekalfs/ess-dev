@@ -12,9 +12,10 @@ class ApprovalTimesheet extends Mailable
     {
         protected $employee;
     
-        public function __construct(User $employee)
+        public function __construct(User $employee, $month_periode)
         {
             $this->employee = $employee;
+            $this->month_periode = $month_periode;
         }
     
         public function build()
@@ -22,7 +23,8 @@ class ApprovalTimesheet extends Mailable
             $data = [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
+                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p',
+                'month_periode' => $this->month_periode
             ];
     
             $subject = 'Timesheet Approval Reminder';
@@ -47,7 +49,8 @@ class ApprovalTimesheet extends Mailable
             return [
                 'name' => $this->employee->name,
                 'email' => $this->employee->email,
-                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p'
+                'link' => 'https://timereport.perdana.co.id/approval/timesheet/p',
+                'month_periode' => $this->month_periode,
             ];
         }
     }

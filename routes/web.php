@@ -257,3 +257,7 @@ Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage
 Route::get('/reimbursement/export/all/{month}/{year}', 'ReimburseController@export_excel')->middleware('auth');
 
 Route::get('/getLocationProject/{id}', 'TimesheetController@getLocationProject')->name('list-location')->middleware('auth');
+
+//vendor List
+Route::get('/vendor-list', 'VendorController@index')->name('index-vendor')->middleware('auth');
+Route::post('/vendor-list/new-entry', 'VendorController@new_entry')->name('add_vendor')->middleware('auth');

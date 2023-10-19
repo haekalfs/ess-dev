@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\ApprovalTimesheet;
+use App\Models\Timesheet_detail;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +36,13 @@ class SendTimesheetApprovalNotification implements ShouldQueue
      */
     public function handle()
     {
-        $notification = new ApprovalTimesheet($this->user);
+        $monthPeriod = Timesheet_detail::select('id', 'month_periode')
+        ->where('ts_status_id', 20)
+        ->where('RequestTo', $this->user->id)
+        ->groupBy('id', 'month_periode')
+        ->get();
+
+        $notification = new ApprovalTimesheet($this->user, $monthPeriod);
         Mail::send('mailer.timesheetapproval', $notification->data(), function ($message) use ($notification) {
             $message->to($notification->emailTo())
                     ->subject($notification->emailSubject());

@@ -257,7 +257,7 @@ $(document).ready(function() {
                         var descTask = $('#desc' + day);
                         // descTask.append('&#x2022; ' + activity.ts_task);
                         // descTask.append('<br>');
-                        descTask.append($('<a></a>').addClass('shorter-text round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
+                        descTask.append($('<a></a>').addClass('shorter-textbox round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + '&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
                     });
 
                     var rowsPerPageSelect = $('#rowsPerPage');

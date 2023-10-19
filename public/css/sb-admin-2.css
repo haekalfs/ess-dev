@@ -11353,6 +11353,30 @@ body.sidebar-toggled footer.sticky-footer {
   max-width: 200px; /* adjust the max-width to fit your table design */
 }
 
+.shorter-textbox {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 240px; /* adjust the max-width to fit your table design */
+}
+
+.shorter-textDiv {
+  height: 100px; /* Set the fixed height for the div */
+  overflow: auto; /* Enable vertical scrolling if content exceeds the height */
+  scrollbar-width: thin; /* Hide the scrollbar for Firefox */
+  -webkit-overflow-scrolling: touch; /* Enable touch-based scrolling for iOS */
+}
+
+/* For Webkit-based browsers (Chrome, Safari) */
+.shorter-textDiv::-webkit-scrollbar {
+  width: 6px; /* Adjust the scrollbar width as needed */
+}
+
+.shorter-textDiv::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Set the scrollbar thumb color */
+}
+
 .shorter-text2 {
   display: block;
   overflow: hidden;
