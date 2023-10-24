@@ -707,7 +707,6 @@ active
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="submit" id="update-entry" class="btn btn-primary" data-dismiss="modal">Save changes</button>
             </div>
         </div>
     </div>

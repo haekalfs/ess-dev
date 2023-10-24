@@ -26,20 +26,20 @@ Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->midd
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/logout', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //testing
-Route::get('/testing', 'TimesheetController@calendar')->middleware('auth');
-Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name('save.entries');//testing
+// Route::get('/testing', 'TimesheetController@calendar')->middleware('auth');
+// Route::post('/timesheet/entry/saves', 'TimesheetController@save_entries')->name('save.entries');
 
 //Timesheet
     //Editingg
-Route::get('/get-data/{year}/{month}/{id}', 'TimesheetController@getActivitiesEntry');
-Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')->name('entries.update');
+Route::get('/get-data/{year}/{month}/{id}', 'TimesheetController@getActivitiesEntry')->middleware('auth');
+Route::post('/update-entries/{id}', 'TimesheetController@updateActivitiesEntry')->name('entries.update')->middleware('auth');
 
 Route::get('/timesheet/{yearSelected?}', 'TimesheetController@index')->middleware('auth')->name('timesheet');
 Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry')->middleware('auth');
-Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
-Route::post('//save_entries/holiday', 'TimesheetController@save_entries_on_holiday')->name('entries.store.holiday');
-Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store');
-Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
+Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store')->middleware('auth');
+Route::post('/save_entries/holiday', 'TimesheetController@save_entries_on_holiday')->name('entries.store.holiday')->middleware('auth');
+Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store')->middleware('auth');
+Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities')->middleware('auth');
     //DELETE
 Route::delete('/activities/{id}', 'TimesheetController@destroy')->middleware('auth');
 Route::delete('/activities/all/{year}/{month}', 'TimesheetController@destroy_all')->middleware('auth');
@@ -177,22 +177,22 @@ function () {
 
 //Management
 Route::get('/management/security_&_roles/', 'ManagementController@roles')->middleware('auth');
-Route::get('/management/security_&_roles/manage/access', 'ManagementController@manage_access');
-Route::get('/management/security_&_roles/manage/roles', 'ManagementController@manage_roles');
+Route::get('/management/security_&_roles/manage/access', 'ManagementController@manage_access')->middleware('auth')->middleware(['checkRole:admin,manager']);
+Route::get('/management/security_&_roles/manage/roles', 'ManagementController@manage_roles')->middleware('auth');
     //link non-page
-    Route::get('/management/security_&_roles/remove/roles/{id}', 'ManagementController@remove_roles_from_user');
-    Route::get('/management/security_&_roles/remove/access/{id}', 'ManagementController@remove_access');
+    Route::get('/management/security_&_roles/remove/roles/{id}', 'ManagementController@remove_roles_from_user')->middleware('auth');
+    Route::get('/management/security_&_roles/remove/access/{id}', 'ManagementController@remove_access')->middleware('auth');
 
-    Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles');
-    Route::match(['get', 'post'], '/management/security_&_roles/add/access/', 'ManagementController@grant_access_to_roles');
+    Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles')->middleware('auth');
+    Route::match(['get', 'post'], '/management/security_&_roles/add/access/', 'ManagementController@grant_access_to_roles')->middleware('auth');
 
-    Route::post('/manage/roles/add_roles', 'ManagementController@add_roles');
-    Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles');
-    Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete');
+    Route::post('/manage/roles/add_roles', 'ManagementController@add_roles')->middleware('auth');
+    Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles')->middleware('auth');
+    Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete')->middleware('auth');
 
 //Employees Database
 Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database')->middleware('auth');
-Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users');
+Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users')->middleware('auth');
 
 // API KEY Setting
 Route::get('/manage/api_key', 'ManagementController@index_api')->name('API_KEY_setting')->middleware('auth');
@@ -218,7 +218,7 @@ Route::post('/manage/add_position', 'DepPosController@add_position')->middleware
 Route::get('/manage/delete_position/{id}', 'DepPosController@delete_position')->middleware('auth');
 
 ///Mailer
-Route::get('/kirimemail','MailerController@index');
+Route::get('/kirimemail','MailerController@index')->middleware('auth');
 
 //medical reimburse
 Route::get('/medical/history', 'MedicalController@index')->middleware('auth');

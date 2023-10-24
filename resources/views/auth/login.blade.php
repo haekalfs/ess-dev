@@ -13,11 +13,11 @@
                             alt="First slide">
                     </div>
                     <div class="carousel-item">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess-2.png') }}"
                             alt="Second slide">
                     </div>
                     <div class="carousel-item">
-                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
+                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ess-3.png') }}"
                             alt="Third slide">
                     </div>
                 </div>

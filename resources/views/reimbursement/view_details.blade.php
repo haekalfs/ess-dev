@@ -154,13 +154,13 @@ active
                                         
                                         @foreach ($usr->approval as $status)
                                             @if ($status->status == 29)
-                                                <a><i class="far fa-check-circle fa-spin"></i></a>
+                                                <a><i class="fas fa-check-circle" style="color: #005eff;"></i> <small>Approved</small></a>
                                                 @php
                                                     $approved = true;
                                                     break;
                                                 @endphp
                                             @elseif ($status->status == 404)
-                                                <a><i class="far fa-times-circle"></i></a>
+                                                <a><i class="fas fa-times-circle" style="color: #ff0000;"></i> <small>Rejected</small></a>
                                                 @php
                                                     $approved = true;
                                                     break;
@@ -169,7 +169,7 @@ active
                                         @endforeach
                                             
                                         @unless ($approved)
-                                            <a><i class="fas fa-spinner fa-spin"></i></a>    
+                                            <a><i class="fas fa-spinner fa-spin"></i> <small>Waiting for Approval</small></a>    
                                         @endunless
                                     </td>
                                     <td class="text-center" style="width: 290px;">
