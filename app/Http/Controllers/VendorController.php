@@ -11,7 +11,7 @@ class VendorController extends Controller
     public function index()
     {
         $vendorData = Vendor_list::all();
-        $url = "http://localhost:8080";
+        $url = "https://e-form.perdana.co.id";
         return view('misc.vendor-list.index', ['vdData' => $vendorData, 'urlEform' => $url]);
     }
 
@@ -45,5 +45,21 @@ class VendorController extends Controller
         ]);
 
         return redirect()->back()->with('success', "Vendor data has been added!");
+    }
+
+    public function delete($id)
+    {
+        // Find the document by its ID
+        $vendor = Vendor_list::find($id);
+
+        // Check if the document exists
+        if (!$vendor) {
+            return redirect()->back()->with('failed', 'Vendor data not found.');
+        }
+
+        // Delete the document
+        $vendor->delete();
+
+        return redirect()->back()->with('success', 'Vendor data has been removed successfully.');
     }
 }

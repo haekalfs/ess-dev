@@ -261,3 +261,4 @@ Route::get('/getLocationProject/{id}', 'TimesheetController@getLocationProject')
 //vendor List
 Route::get('/vendor-list', 'VendorController@index')->name('index-vendor')->middleware('auth');
 Route::post('/vendor-list/new-entry', 'VendorController@new_entry')->name('add_vendor')->middleware('auth');
+Route::get('/vendor-list/item/delete/{id}', 'VendorController@delete')->middleware('auth');

@@ -71,9 +71,9 @@ active
                                 </a>
                                 <div class='dropdown-menu' aria-labelledby='dropdownMenu2'>
                                     <a class='dropdown-item' target="_blank" href="{{$urlEform}}/po/create-from-vendor/{{ $record->id }}"><i class="fas fa-fw fa-print"></i> Create PO</a>
-                                    <a class='dropdown-item' href="{{$urlEform}}/pr/create-from-vendor/{{ $record->id }}"><i class="fas fa-fw fa-print"></i> Create PR</a>
+                                    <a class='dropdown-item' href="#"><i class="fas fa-fw fa-print"></i> Create PR</a>
                                     <hr>
-                                    <a class='dropdown-item' href="/po/view/{{ $record->id }}"><i class="fas fa-fw fa-trash-alt"></i> Delete</a>
+                                    <a class='dropdown-item' href="/vendor-list/item/delete/{{ $record->id }}"><i class="fas fa-fw fa-trash-alt"></i> Delete</a>
                                 </div>
                             </div>
                         </td>
