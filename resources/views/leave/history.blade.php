@@ -21,10 +21,7 @@ active
                 <option value="{{ $year }}">{{ $year }}</option>
             @endforeach
         </select> --}}
-        
-        <button class="btn @role('freelancer') btn-success @else btn-warning @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveQuota" id="manButton" style="margin-right: 5px;">Leave Quota</button>
-        <button class="btn @role('freelancer') btn-success @else btn-success @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveUsage" id="manButton" style="margin-right: 5px;">Usage</button>
-        <button class="btn @role('freelancer') btn-success @else btn-danger @endrole btn-sm" type="button" data-toggle="modal" data-target=".weekendRep" id="weekendRep">Weekend Replacement</button>
+        <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" data-toggle="modal" data-target=".leaveUsage" id="manButton" style="margin-right: 5px;"><i class="fas fa-eye"></i> Leave Information</button>
     </div>
 </div>
 
@@ -249,8 +246,9 @@ active
 		</div>
 	</div>
 </div>
-<div class="modal fade leaveQuota" tabindex="-1" role="dialog" aria-labelledby="leaveQuota" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+
+<div class="modal fade leaveUsage" tabindex="-1" role="dialog" aria-labelledby="leaveQuota" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
 				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Leave Quota Information</h5>
@@ -258,100 +256,140 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
+            <ul class="nav nav-tabs" id="pageTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="page1-tab" data-toggle="tab" href="#page1" role="tab" aria-controls="page1" aria-selected="true"><i class="fas fa-calendar-day"></i> Quota</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="page2-tab" data-toggle="tab" href="#page2" role="tab" aria-controls="page2" aria-selected="false"><i class="fas fa-plane-departure"></i> Usage</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-calendar-week" style="color: #ff0000;"></i> Replacement</a>
+                </li>
+            </ul>
             <div class="modal-body" style="height: 400px; overflow-y: auto;">
-                <div class="col-md-12 zoom90">
-                    <div class="row">
-                        <div class="col-md-12">
-                            {{-- <h6 class="h6 text-danger mb-2"><i>Leave Quota Information</i></h6> --}}
-                            <div class="table-responsive">
-                                <table class="table table-bordered zoom90" id="dataTableProject" width="100%" cellspacing="0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>Leave ID</th>
-                                            <th>Active Periode</th>
-                                            <th>Expired On</th>
-                                            <th>Status</th>
-                                            <th>Default Quota</th>
-                                            <th>Quota Used</th>
-                                            <th>Quota Left</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($leaveQuotaAnnual as $lqa)
-                                            <tr>
-                                                <td>{{ $lqa->leave->description }}</td>
-                                                <td>{{ $lqa->active_periode }}</td>
-                                                <td>{{ $lqa->expiration }}</td>
-                                                <td><?php
-                                                if($lqa->expiration < date('Y-m-d')){
-                                                    echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
-                                                } else {
-                                                    echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
-                                                }
-                                                ?></td>
-                                                <td>{{ $lqa->leave->leave_quota }}</td>
-                                                <td>{{ $lqa->quota_used }}</td>
-                                                <td>{{ $lqa->quota_left }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div><br>
+                <div class="tab-content" id="pageTabContent">
+                    <div class="tab-pane fade show active" id="page1" role="tabpanel" aria-labelledby="page1-tab">
+                        <div class="col-md-12 zoom90">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{-- <h6 class="h6 text-danger mb-2"><i>Leave Quota Information</i></h6> --}}
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered zoom90" id="dataTableProject" width="100%" cellspacing="0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Leave ID</th>
+                                                    <th>Active Periode</th>
+                                                    <th>Expired On</th>
+                                                    <th>Status</th>
+                                                    <th>Default Quota</th>
+                                                    <th>Quota Used</th>
+                                                    <th>Quota Left</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($leaveQuotaAnnual as $lqa)
+                                                    <tr>
+                                                        <td>{{ $lqa->leave->description }}</td>
+                                                        <td>{{ $lqa->active_periode }}</td>
+                                                        <td>{{ $lqa->expiration }}</td>
+                                                        <td><?php
+                                                        if($lqa->expiration < date('Y-m-d')){
+                                                            echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
+                                                        } else {
+                                                            echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
+                                                        }
+                                                        ?></td>
+                                                        <td>{{ $lqa->leave->leave_quota }}</td>
+                                                        <td>{{ $lqa->quota_used }}</td>
+                                                        <td>{{ $lqa->quota_left }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div><br>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade leaveUsage" tabindex="-1" role="dialog" aria-labelledby="leaveQuota" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Leave Quota Usage</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-            <div class="modal-body" style="height: 400px; overflow-y: auto;">
-                <div class="col-md-12 zoom90">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h6 class="h6 text-danger mb-2"><i>Leave Quota Usage</i></h6>
-                            <div class="table-responsive">
-                                <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>Request Date</th>
-                                            <th>Quota Type</th>
-                                            <th>Total Days Requested</th>
-                                            <th>Quota Used</th>
-                                            <th>Quota Left</th>
-                                            <th>Description</th>
-                                            <th>Quota Active Periode</th>
-                                            <th>Quota Expiration</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($leaveQuotaUsage as $lqu)
-                                            <tr>
-                                                <td>{{ $lqu->req_date }}</td>
-                                                <td>{{ $lqu->leave->description }}</td>
-                                                <td>{{ $lqu->requested_days }}</td>
-                                                <td>- {{ $lqu->quota_used }}</td>
-                                                <td>{{ $lqu->quota_left }}</td>
-                                                <td>{{ $lqu->description }}</td>
-                                                <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
-                                                <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div><br>
+                    <div class="tab-pane fade" id="page2" role="tabpanel" aria-labelledby="page2-tab">
+                        <div class="col-md-12 zoom90">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Request Date</th>
+                                                    <th>Quota Type</th>
+                                                    <th>Total Days Requested</th>
+                                                    <th>Quota Used</th>
+                                                    <th>Quota Left</th>
+                                                    <th>Description</th>
+                                                    <th>Quota Active Periode</th>
+                                                    <th>Quota Expiration</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($leaveQuotaUsage as $lqu)
+                                                    <tr>
+                                                        <td>{{ $lqu->req_date }}</td>
+                                                        <td>{{ $lqu->leave->description }}</td>
+                                                        <td>{{ $lqu->requested_days }}</td>
+                                                        <td>- {{ $lqu->quota_used }}</td>
+                                                        <td>{{ $lqu->quota_left }}</td>
+                                                        <td>{{ $lqu->description }}</td>
+                                                        <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
+                                                        <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div><br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="page3" role="tabpanel" aria-labelledby="page3-tab">
+                        <div class="col-md-12 zoom90">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered zoom90" id="weekendReplacement" width="100%" cellspacing="0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Leave ID</th>
+                                                    <th>Active Periode</th>
+                                                    <th>Expired On</th>
+                                                    <th>Status</th>
+                                                    <th>Quota</th>
+                                                    <th>Quota Used</th>
+                                                    <th>Quota Left</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($weekendReplacementQuota as $wrq)
+                                                    <tr>
+                                                        <td>{{ $wrq->leave->description }}</td>
+                                                        <td>{{ $wrq->active_periode }}</td>
+                                                        <td>{{ $wrq->expiration }}</td>
+                                                        <td><?php
+                                                            if($wrq->expiration < date('Y-m-d')){
+                                                                echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
+                                                            } else {
+                                                                echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
+                                                            }
+                                                        ?></td>
+                                                        <td>{{ $wrq->quota_left }}</td>
+                                                        <td>{{ $wrq->quota_used }}</td>
+                                                        <td>{{ $wrq->quota_left }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -444,64 +482,6 @@ active
                             <!-- Ajax Data -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade weekendRep" tabindex="-1" role="dialog" aria-labelledby="weekendRep" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content">
-        <div class="modal-header border-bottom-1">
-				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Weekend Replacement</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-            <div class="modal-body" style="height: 350px; overflow-y: auto;">
-                <div class="col-md-12 zoom90">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="table-responsive">
-                                <table class="table table-bordered zoom90" id="weekendReplacement" width="100%" cellspacing="0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>Leave ID</th>
-                                            <th>Active Periode</th>
-                                            <th>Expired On</th>
-                                            <th>Status</th>
-                                            <th>Quota</th>
-                                            <th>Quota Used</th>
-                                            <th>Quota Left</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($weekendReplacementQuota as $wrq)
-                                            <tr>
-                                                <td>{{ $wrq->leave->description }}</td>
-                                                <td>{{ $wrq->active_periode }}</td>
-                                                <td>{{ $wrq->expiration }}</td>
-                                                <td><?php
-                                                    if($wrq->expiration < date('Y-m-d')){
-                                                        echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
-                                                    } else {
-                                                        echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
-                                                    }
-                                                ?></td>
-                                                <td>{{ $wrq->quota_left }}</td>
-                                                <td>{{ $wrq->quota_used }}</td>
-                                                <td>{{ $wrq->quota_left }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">

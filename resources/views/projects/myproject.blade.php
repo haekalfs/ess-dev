@@ -59,7 +59,11 @@ active
                     <tr>
                         <td>{{ $record->id }}</td>
                         <td>{{ $record->project_code }}</td>
-                        <td>{{ $record->project_name }}</td>
+                        <td>{{ $record->project_name }}
+                        @if (now()->diffInDays(Carbon\Carbon::parse($record->created_at)) < 3)
+                            <span class="text-danger"><small><i> &#x2728;</i></small></span>
+                        @endif                        
+                        </td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
                         <td class="text-center">

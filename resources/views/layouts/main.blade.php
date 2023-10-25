@@ -176,7 +176,7 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReimburse"
                     aria-expanded="true" aria-controls="collapseReimburse">
                     <i class="fas fa-fw fa-money-check-alt"></i>
-                    <span>Reimburse</span>
+                    <span>Reimbursement</span>
                 </a>
                 <div id="collapseReimburse" class="collapse" aria-labelledby="headingReimburse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
@@ -187,7 +187,7 @@
                         @endusr_acc
                         @usr_acc(503)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/reimbursement/manage/">Manage Reimburse</a>
+                        <a class="collapse-item" href="/reimbursement/manage/">Manage</a>
                         @else
                         @endusr_acc
                     </div>

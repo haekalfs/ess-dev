@@ -60,7 +60,14 @@ active
                                     <i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Edit
                                 </a>
                             @endif
-                            <a href="{{ $entry['previewUrl'] }}" class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" style="margin-left: 3%;"><i class="fas fa-eye"></i> Preview</a>
+                            @if ($entry['notify'])
+                                <a href="{{ $entry['previewUrl'] }}" class="btn btn-primary notification-item btn-sm position-relative" data-notification-id="{{ $entry['notify'] }} style="margin-left: 3%;">
+                                    <i class="fas fa-eye"></i> Preview
+                                    <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">!</span>
+                                </a>
+                            @else
+                            <a href="{{ $entry['previewUrl'] }}" class="btn btn-primary btn-sm" style="margin-left: 3%;"><i class="fas fa-eye"></i> Preview</a>
+                            @endif
                         </td>
                     </tr>
                     @endforeach

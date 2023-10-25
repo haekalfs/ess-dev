@@ -12,6 +12,7 @@ use App\Models\Cutoffdate;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;
@@ -59,6 +60,12 @@ class TimesheetController extends Controller
         }
         $entries = [];
         foreach (range(1, $currentMonth) as $entry) {
+            $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->where('month_periode', $currentYear.$entry)->first();
+            if($getNotification){
+                $notify = $getNotification->id;
+            } else {
+                $notify = false;
+            }
             $month = date("F", mktime(0, 0, 0, $entry, 1));
             $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $entry)
@@ -92,7 +99,7 @@ class TimesheetController extends Controller
             $encryptYear = Crypt::encrypt($currentYear);
             $encryptMonth = Crypt::encrypt($entry);
             $previewUrl = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
-            $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
+            $entries[] = compact('month', 'notify', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
         }
         return view('timereport.timesheet', compact('entries', 'yearsBefore', 'yearSelected'));
     }

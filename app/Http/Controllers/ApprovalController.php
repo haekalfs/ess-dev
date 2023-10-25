@@ -365,6 +365,8 @@ class ApprovalController extends Controller
         $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
         $entry->importance = 1;
+        $entry->month_periode = $year.$month;
+        $entry->type = 2;
         $entry->save();
 
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
