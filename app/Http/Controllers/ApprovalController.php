@@ -11,6 +11,7 @@ use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Medical;
+use App\Models\Emp_medical_balance;
 use App\Models\Medical_details;
 use App\Models\Medical_approval;
 use App\Models\Notification_alert;
@@ -60,74 +61,11 @@ class ApprovalController extends Controller
             ->count();
             
 // Medical Count
-        $checkUserPost = Auth::user()->users_detail->position->id;
-        $ts_approver = Timesheet_approver::whereIn('id', [10, 15, 20, 25, 29, 50])->pluck('approver')->toArray();
-        //direktur
-        if (in_array($checkUserPost, [7, 8, 12])) {
-            $Check = Medical_approval::whereIn('RequestTo', $ts_approver)
-            ->whereNotIn('RequestTo', [Auth::user()->id])
-            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
-            ->groupBy('RequestTo')
-            ->pluck('RequestTo')
-            ->toArray();
-            // var_dump($Check);
-            if (!empty($Check)) {
-                $medCount = Medical_approval::where('RequestTo', Auth::user()->id)
-                ->whereNotIn('status', [20, 29, 404])
-                ->whereNotIn('RequestTo', $Check)
-                    ->groupBy('medical_id')
-                    ->count();
-            } else {
-                $medCount = Medical_approval::where('RequestTo', 'xxhaekalsxx')
-                    ->groupBy('medical_id')
-                    ->count();
-            }
-        } else {
-            //selain direktur
-            $Check = Medical_approval::whereNotIn('status', [10])
-                ->whereNotIn('RequestTo', $ts_approver)
-                ->groupBy('RequestTo')
-                ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
-                ->pluck('RequestTo')
-                ->toArray();
-            // var_dump($Check);
-            if (!empty($Check)) {
-                // special routes
-                if (in_array($checkUserPost, [21])) {
-                    $checkApprovalMed = Medical_approval::whereIn('RequestTo', $Check)
-                    ->whereNotIn('RequestTo', [Auth::user()->id])
-                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
-                    ->groupBy('RequestTo')
-                    ->pluck('RequestTo')
-                    ->toArray();
-                    if (!empty($checkApprovalMed)) {
-                        $medCount = Medical_approval::where('RequestTo', Auth::user()->id)
-                            ->whereNotIn('status', [29, 404])
-                            ->whereNotIn('RequestTo', $checkApprovalMed)
-                            ->groupBy('medical_id')
-                            ->count();
-                    } else {
-                        //gagal
-                        $medCount = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
-                            ->whereNotIn('status', [20, 29, 404, 30, 15])
-                            ->groupBy('medical_id')
-                            ->count();
-                    }
-                } else {
-                    // regular routes
-                    $medCount = Medical_approval::where('RequestTo', Auth::user()->id)
-                    ->whereNotIn('status', [20, 29, 404, 30])
-                        // ->whereIn('RequestTo', $Check)
-                        ->groupBy('medical_id')
-                        ->count();
-                }
-            } else {
-                $medCount = Medical_approval::where('RequestTo', "stopppp")
-                    ->whereNotIn('status', [29, 404, 30])
-                    ->groupBy('medical_id')
-                    ->count();
-            }
-        }
+        $ts_approver = Timesheet_approver::where('id', [99])->pluck('approver')->toArray();
+        $medCount = Medical_approval::whereIn('RequestTo', $ts_approver)
+            ->where('RequestTo', Auth::user()->id)
+            ->whereNotIn('status', [20, 29, 404])
+            ->count();
         return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
     }
 
@@ -560,98 +498,63 @@ class ApprovalController extends Controller
         $name = User::all();
 
         $checkUserPost = Auth::user()->users_detail->position->id;
-        $ts_approver = Timesheet_approver::whereIn('id', [10, 15, 20, 25, 29, 50])->pluck('approver')->toArray();
-            //direktur
-            if (in_array($checkUserPost, [7, 8, 12])) {
-                $Check = Medical_approval::whereIn('RequestTo', $ts_approver)
-                    ->whereNotIn('RequestTo', [Auth::user()->id])
-                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
-                    ->groupBy('RequestTo')
-                    ->pluck('RequestTo')    
-                    ->toArray();
-                    // var_dump($Check);
-                if (!empty($Check)) {
-                   $medical = Medical_approval::where('RequestTo', Auth::user()->id)
-                        ->whereNotIn('status', [20, 29, 404])
-                        ->whereNotIn('RequestTo', $Check)
-                        ->groupBy('medical_id')
-                        ->get();
-                } else {
-                    $medical = Medical_approval::where('RequestTo', 'xxhaekalsxx')
-                        ->groupBy('medical_id')
-                        ->get();
-                }
-            } else {
-                //selain direktur
-                $Check = Medical_approval::whereNotIn('status', [10])
-                    ->whereNotIn('RequestTo', $ts_approver)
-                    ->groupBy('RequestTo')
-                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
-                    ->pluck('RequestTo')
-                    ->toArray();
-                    // var_dump($Check);
-                if (!empty($Check)) {
-                    // special routes
-                    if (in_array($checkUserPost, [21])) {
-                        $checkApprovalMed = Medical_approval::whereIn('RequestTo', $Check)
-                            ->whereNotIn('RequestTo', [Auth::user()->id])
-                            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
-                            ->groupBy('RequestTo')
-                            ->pluck('RequestTo')
-                            ->toArray();
-                        if (!empty($checkApprovalMed)) {
-                           $medical = Medical_approval::where('RequestTo', Auth::user()->id)
-                                ->whereNotIn('status', [29, 404])
-                                ->whereNotIn('RequestTo', $checkApprovalMed)
-                                ->groupBy('medical_id')
-                                ->get();
-                        } else {
-                            //gagal
-                           $medical = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
-                                ->whereNotIn('status', [20, 29, 404, 30, 15])
-                                ->groupBy('medical_id')
-                                ->get();
-                        }
-                    } else {
-                        // regular routes
-                        $medical = Medical_approval::where('RequestTo', Auth::user()->id)
-                        ->whereNotIn('status', [20, 29, 404, 30])
-                        // ->whereIn('RequestTo', $Check)
-                        ->groupBy('medical_id')
-                        ->get();
-                    }
-                } else {
-                    $medical = Medical_approval::where('RequestTo', "stopppp")
-                        ->whereNotIn('status', [29, 404, 30])
-                        ->groupBy('medical_id')
-                        ->get();
-                }
-            }
+        $ts_approver = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
+            //MAS RONNY
+            // if (in_array($checkUserPost, [21])) {
+            //     $Check = Medical_approval::whereNotIn('RequestTo', $ts_approver)
+            //         ->whereNotIn('RequestTo', [Auth::user()->id])
+            //         ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
+            //         ->groupBy('RequestTo')
+            //         ->pluck('RequestTo')    
+            //         ->toArray();
+            //         var_dump($Check);
+            //     if (!empty($Check)) {
+            //        $medical = Medical_approval::where('RequestTo', Auth::user()->id)
+            //             ->whereNotIn('status', [20, 29, 404])
+            //             ->whereNotIn('RequestTo', $Check)
+            //             ->groupBy('medical_id')
+            //             ->get();
+            //     } else {
+            //     //gagal
+            //     $medical = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+            //         ->whereNotIn('status', [20, 29, 404, 30, 15, 10])
+            //         ->groupBy('medical_id')
+            //         ->get();
+            //     }
+            // } else {
+                // HR
+            $medical = Medical_approval::whereIn('RequestTo', $ts_approver)
+                ->where('RequestTo', Auth::user()->id)
+                ->whereNotIn('status', [20, 29, 404])
+                ->groupBy('medical_id')
+                ->get();
+            // }
+            
         return view('/approval/medical_approval', ['medical' => $medical, 'name' => $name,]);
     }
 
     public function approval_edit($id)
     {
-        
-        $checkLevel = Timesheet_approver::whereIn('id', [40, 45, 55, 60, 99])->pluck('approver');
-        $checkUserLevel = $checkLevel->toArray();
-        
+                
         $med = Medical::findOrFail($id);
-
+        $userMedId = $med->user_id;
         $medDet = Medical_details::where('medical_id', $med->id)->get();
 
         $medAppUpdate = Medical_approval::where('medical_id', $med->id)
-        ->whereNotIn('RequestTo', [Auth::user()->id])
+        ->whereIn('RequestTo', [Auth::user()->id])
         ->whereNotIN('status', [15])
         ->orderByDesc('updated_at')
         ->orderBy('medical_id')
         ->first();
 
-        $medButton = Medical_approval::where('medical_id', $med->id)
-        ->whereIn('RequestTo', $checkUserLevel)
-        ->where('RequestTo', Auth::user()->id)
-        ->get();
-        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet, 'medAppUpdate' => $medAppUpdate, 'medButton' => $medButton]);
+        $currentYear = Carbon::now()->year;
+        $medBalance = Emp_medical_balance::where('user_id', $userMedId)
+        ->where('active_periode', '<=', $currentYear)
+        ->where('expiration', '>=', $currentYear)
+        ->first();
+        $medBalance = Emp_medical_balance::where('user_id', $med->user_id)->first();
+
+        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet, 'medAppUpdate' => $medAppUpdate, 'medBalance' => $medBalance]);
     }
 
     public function update_approval(Request $request, $mdet_id, $medical_id)
@@ -672,64 +575,60 @@ class ApprovalController extends Controller
     public function approve_medical(Request $request, $id)
     {
 
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'input_approve_note' => 'required',
         ]);
 
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
         $userName = $user_med->user->name; // Mengambil nama pengguna terkait
-
+        $userMedId =$user_med->user_id;
         $totalAmountApproved = $request->input('totalAmountApprovedInput');
 
-        $countRows = medical_approval::where('medical_id', $id)->where('RequestTo', Auth::user()->id)->get();
+        $medApproveFinance = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
 
-        $medApproveFinance = Timesheet_approver::whereIn('id', [99])->pluck('approver');
-        $checkApprovalMed = $medApproveFinance->toArray();
-        $medApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver');
-        $checkUserDir = $medApproversDir->toArray();
+        $medApprove = medical_approval::whereIn('RequestTo', $medApproveFinance)->where('RequestTo', Auth::user()->id)->where('medical_id', $id)->first();
         
-        foreach ($countRows as $row) {
-            $medStatusId = '29';
-            // $activity = 'Approved';
-
-            switch (true) {
-                case in_array(Auth::user()->id, $checkApprovalMed):
-                    $medStatusId = '29';
-                    // $activity = 'All Approved';
-                    break;
-                default:
-                    $medStatusId = '20';
-                    break;
-            }
-
-            $approve = medical_approval::where('RequestTo', Auth::user()->id)->where('medical_id', $row->medical_id);
-
-            if ($validator->passes()) {
-                $notes = $request->input_approve_note;
-                $approve->update(['status' => $medStatusId, 'approval_notes' => $notes, 'approval_date' => date('Y-m-d') ]);
-            } else {
-                $approve->update(['status' => $medStatusId, ]);
-            }
-            
-            // $Check = Medical_approval::whereNotIn('status', [15])
-            //     ->whereNotIn('RequestTo', [Auth::user()->id])
-            //     ->groupBy('medical_id')
-            //     ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 0 ELSE 1 END)')
-            //     ->pluck('RequestTo')
-            //     ->toArray();
-            // if (!empty($Check)) {
-            //     Medical_approval::where('RequestTo', [Auth::user()->id])
-            //         ->update(['status' => $medStatusId]);
-            // } else {
-            //     Medical_approval::where('RequestTo', [Auth::user()->id])
-            //     ->update(['status' => $medStatusId]);
-            // }
-        }
+        $medApprove->status = 29;
+        $medApprove->approval_notes = $request->input_approve_note;
+        $medApprove->approval_date = $request->date_approved;
+        $medApprove->save();
+       
         $medical = Medical::findOrFail($id);
+        $medical->paid_status = 29;
         $medical->total_amount_approved = $totalAmountApproved;
         $medical->save();
 
-        return redirect('/approval/medical')->with('success', "You've Approved $userName Medical Reimburse ");
+        $currentYear = Carbon::now()->year;
+
+// Cari $medBalance yang masih aktif dan memiliki tahun yang sama
+        $medBalance = Emp_medical_balance::where('user_id', $userMedId)
+        ->where('active_periode', '<=', $currentYear)
+        ->where('expiration', '>=', $currentYear)
+        ->first();
+
+        if ($medBalance) {
+            $balance = $medBalance->medical_balance;
+            $balanceAmount = str_replace('.', '', $balance);
+            $AmountApproved =  str_replace('.', '', $totalAmountApproved);
+            $total = $balanceAmount - $AmountApproved;
+            $formattedTotal = number_format($total, 0, ',', '.');
+
+            $medBalance->medical_balance = $formattedTotal;
+            $medBalance->save();
+
+            $deducted = $medBalance->medical_deducted;
+            $deductedAmount = str_replace('.', '', $deducted);
+            $AmountApproved =  str_replace('.', '', $totalAmountApproved);
+            $totalDeducted = $deductedAmount + $AmountApproved;
+            $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
+
+            $medBalance->medical_deducted = $formattedDeductedTotal;
+            $medBalance->save();
+
+            return redirect('/approval/medical')->with('success', "You've Approved $userName Medical Reimburse ");
+        } else {
+            return response()->json(['message' => 'Data Emp_medical_balance aktif untuk tahun ' . $currentYear . ' tidak ditemukan'], 404);
+        }
     }
 
     public function reject_medical(Request $request, $id)
@@ -742,24 +641,18 @@ class ApprovalController extends Controller
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
         $userName = $user_med->user->name; // Mengambil nama pengguna terkait
 
-        $countRows = medical_approval::where('medical_id', $id)->where('RequestTo', Auth::user()->id)->get();
+        $medApproveFinance = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
 
-        foreach ($countRows as $row) { ///test buat dihapus nnti karna double loops
+        $medApprove = medical_approval::whereIn('RequestTo', $medApproveFinance)->where('RequestTo', Auth::user()->id)->where('medical_id', $id)->first();
 
-            $reject = medical_approval::where('RequestTo', Auth::user()->id)->where('medical_id', $row->medical_id);
+        $medApprove->status = 404;
+        $medApprove->approval_notes = $request->input_approve_note;
+        $medApprove->approval_date = $request->date_approved;
+        $medApprove->save();
 
-            // $approvals = Timesheet_detail::groupBy('user_timesheet', 'ts_status_id', 'RequestTo');
-
-            if ($validator->passes()) {
-                $notes = $request->input_reject_note;
-                $reject->update(['status' => '404', 'approval_notes' => $notes, 'approval_date' => date('Y-m-d')]);
-            } else {
-                $reject->update(['status' => '404',]);
-            }
-        }
-
-        // medical_approval::where('RequestTo', $user_timesheet)
-        //     ->update(['ts_status_id' => '404']);
+        $medical = Medical::findOrFail($id);
+        $medical->paid_status = 404;
+        $medical->save();
 
         return redirect('/approval/medical')->with('failed', "You rejected $userName Medical Reimburse !");
     }
