@@ -60,14 +60,19 @@ class ApprovalController extends Controller
                 $query->where('RequestTo', Auth::user()->id);
             })
             ->count();
-            
-// Medical Count
+        
+        $reimbCount = Reimbursement_approval::whereNotIn('status', ['30', '29', '404'])->groupBy('reimbursement_id')
+            ->where(function ($query) {
+                $query->where('RequestTo', Auth::user()->id);
+            })
+            ->count();
+
         $ts_approver = Timesheet_approver::where('id', [99])->pluck('approver')->toArray();
         $medCount = Medical_approval::whereIn('RequestTo', $ts_approver)
-            ->where('RequestTo', Auth::user()->id)
-            ->whereNotIn('status', [20, 29, 404])
-            ->count();
-        return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
+        ->where('RequestTo', Auth::user()->id)
+        ->whereNotIn('status', [20, 29, 404])
+        ->count();
+        return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'reimbCount' => $reimbCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
     }
 
     public function timesheet_approval(Request $request)
@@ -496,149 +501,147 @@ class ApprovalController extends Controller
 
 
     // Medical Approval
-    public function medical_approval()
-    {
-        $name = User::all();
+public function medical_approval()
+{
+$name = User::all();
 
-        $checkUserPost = Auth::user()->users_detail->position->id;
-        $ts_approver = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
-            //MAS RONNY
-            // if (in_array($checkUserPost, [21])) {
-            //     $Check = Medical_approval::whereNotIn('RequestTo', $ts_approver)
-            //         ->whereNotIn('RequestTo', [Auth::user()->id])
-            //         ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
-            //         ->groupBy('RequestTo')
-            //         ->pluck('RequestTo')    
-            //         ->toArray();
-            //         var_dump($Check);
-            //     if (!empty($Check)) {
-            //        $medical = Medical_approval::where('RequestTo', Auth::user()->id)
-            //             ->whereNotIn('status', [20, 29, 404])
-            //             ->whereNotIn('RequestTo', $Check)
-            //             ->groupBy('medical_id')
-            //             ->get();
-            //     } else {
-            //     //gagal
-            //     $medical = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
-            //         ->whereNotIn('status', [20, 29, 404, 30, 15, 10])
-            //         ->groupBy('medical_id')
-            //         ->get();
-            //     }
-            // } else {
-                // HR
-            $medical = Medical_approval::whereIn('RequestTo', $ts_approver)
-                ->where('RequestTo', Auth::user()->id)
-                ->whereNotIn('status', [20, 29, 404])
-                ->groupBy('medical_id')
-                ->get();
-            // }
-            
-        return view('/approval/medical_approval', ['medical' => $medical, 'name' => $name,]);
-    }
+$checkUserPost = Auth::user()->users_detail->position->id;
+$ts_approver = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
+//MAS RONNY
+// if (in_array($checkUserPost, [21])) {
+// $Check = Medical_approval::whereNotIn('RequestTo', $ts_approver)
+// ->whereNotIn('RequestTo', [Auth::user()->id])
+// ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 20 THEN 1 ELSE 0 END)')
+// ->groupBy('RequestTo')
+// ->pluck('RequestTo')
+// ->toArray();
+// var_dump($Check);
+// if (!empty($Check)) {
+// $medical = Medical_approval::where('RequestTo', Auth::user()->id)
+// ->whereNotIn('status', [20, 29, 404])
+// ->whereNotIn('RequestTo', $Check)
+// ->groupBy('medical_id')
+// ->get();
+// } else {
+// //gagal
+// $medical = Medical_approval::where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+// ->whereNotIn('status', [20, 29, 404, 30, 15, 10])
+// ->groupBy('medical_id')
+// ->get();
+// }
+// } else {
+// HR
+$medical = Medical_approval::whereIn('RequestTo', $ts_approver)
+->where('RequestTo', Auth::user()->id)
+->whereNotIn('status', [20, 29, 404])
+->groupBy('medical_id')
+->get();
+// }
 
-    public function approval_edit($id)
-    {
-                
-        $med = Medical::findOrFail($id);
-        $userMedId = $med->user_id;
-        $medDet = Medical_details::where('medical_id', $med->id)->get();
+return view('/approval/medical_approval', ['medical' => $medical, 'name' => $name,]);
+}
 
-        $medAppUpdate = Medical_approval::where('medical_id', $med->id)
-        ->whereIn('RequestTo', [Auth::user()->id])
-        ->whereNotIN('status', [15])
-        ->orderByDesc('updated_at')
-        ->orderBy('medical_id')
-        ->first();
+public function approval_edit($id)
+{
 
-        $currentYear = Carbon::now()->year;
-        $medBalance = Emp_medical_balance::where('user_id', $userMedId)
-        ->where('active_periode', '<=', $currentYear)
-        ->where('expiration', '>=', $currentYear)
-        ->first();
-        $medBalance = Emp_medical_balance::where('user_id', $med->user_id)->first();
+$med = Medical::findOrFail($id);
+$userMedId = $med->user_id;
+$medDet = Medical_details::where('medical_id', $med->id)->get();
 
-        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet, 'medAppUpdate' => $medAppUpdate, 'medBalance' => $medBalance]);
+$medAppUpdate = Medical_approval::where('medical_id', $med->id)
+->whereIn('RequestTo', [Auth::user()->id])
+->whereNotIN('status', [15])
+->orderByDesc('updated_at')
+->orderBy('medical_id')
+->first();
+
+$currentYear = Carbon::now()->year;
+$medBalance = Emp_medical_balance::where('user_id', $userMedId)
+->where('active_periode', '<=', $currentYear) ->where('expiration', '>=', $currentYear)
+    ->first();
+    $medBalance = Emp_medical_balance::where('user_id', $med->user_id)->first();
+
+    return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet, 'medAppUpdate' => $medAppUpdate, 'medBalance' => $medBalance]);
     }
 
     public function update_approval(Request $request, $mdet_id, $medical_id)
     {
 
-        $medDet = Medical_details::where('mdet_id', $medical_id)->first();
-        $request->validate([
-            'input_mdet_amount_approved' => 'sometimes',
-            'input_mdet_desc' => 'sometimes',
-        ]);
-        $medDet->amount_approved = $request->input_mdet_amount_approved;
-        $medDet->mdet_desc = $request->input_mdet_desc;
-        $medDet->save();
+    $medDet = Medical_details::where('mdet_id', $medical_id)->first();
+    $request->validate([
+    'input_mdet_amount_approved' => 'sometimes',
+    'input_mdet_desc' => 'sometimes',
+    ]);
+    $medDet->amount_approved = $request->input_mdet_amount_approved;
+    $medDet->mdet_desc = $request->input_mdet_desc;
+    $medDet->save();
 
-        return redirect()->back()->with('success', 'Medical Approval Edit Success');
+    return redirect()->back()->with('success', 'Medical Approval Edit Success');
     }
 
     public function approve_medical(Request $request, $id)
     {
 
-        $request->validate([
-            'input_approve_note' => 'required',
-        ]);
+    $request->validate([
+    'input_approve_note' => 'required',
+    ]);
 
-        $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
-        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
-        $userMedId =$user_med->user_id;
-        $totalAmountApproved = $request->input('totalAmountApprovedInput');
+    $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
+    $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+    $userMedId =$user_med->user_id;
+    $totalAmountApproved = $request->input('totalAmountApprovedInput');
 
-        $medApproveFinance = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
+    $medApproveFinance = Timesheet_approver::whereIn('id', [99])->pluck('approver')->toArray();
 
-        $medApprove = medical_approval::whereIn('RequestTo', $medApproveFinance)->where('RequestTo', Auth::user()->id)->where('medical_id', $id)->first();
-        
-        $medApprove->status = 29;
-        $medApprove->approval_notes = $request->input_approve_note;
-        $medApprove->approval_date = $request->date_approved;
-        $medApprove->save();
-       
-        $medical = Medical::findOrFail($id);
-        $medical->paid_status = 29;
-        $medical->total_amount_approved = $totalAmountApproved;
-        $medical->save();
+    $medApprove = medical_approval::whereIn('RequestTo', $medApproveFinance)->where('RequestTo', Auth::user()->id)->where('medical_id', $id)->first();
 
-        $currentYear = Carbon::now()->year;
+    $medApprove->status = 29;
+    $medApprove->approval_notes = $request->input_approve_note;
+    $medApprove->approval_date = $request->date_approved;
+    $medApprove->save();
 
-// Cari $medBalance yang masih aktif dan memiliki tahun yang sama
-        $medBalance = Emp_medical_balance::where('user_id', $userMedId)
-        ->where('active_periode', '<=', $currentYear)
-        ->where('expiration', '>=', $currentYear)
+    $medical = Medical::findOrFail($id);
+    $medical->paid_status = 29;
+    $medical->total_amount_approved = $totalAmountApproved;
+    $medical->save();
+
+    $currentYear = Carbon::now()->year;
+
+    // Cari $medBalance yang masih aktif dan memiliki tahun yang sama
+    $medBalance = Emp_medical_balance::where('user_id', $userMedId)
+    ->where('active_periode', '<=', $currentYear) ->where('expiration', '>=', $currentYear)
         ->first();
 
         if ($medBalance) {
-            $balance = $medBalance->medical_balance;
-            $balanceAmount = str_replace('.', '', $balance);
-            $AmountApproved =  str_replace('.', '', $totalAmountApproved);
-            $total = $balanceAmount - $AmountApproved;
-            $formattedTotal = number_format($total, 0, ',', '.');
+        $balance = $medBalance->medical_balance;
+        $balanceAmount = str_replace('.', '', $balance);
+        $AmountApproved = str_replace('.', '', $totalAmountApproved);
+        $total = $balanceAmount - $AmountApproved;
+        $formattedTotal = number_format($total, 0, ',', '.');
 
-            $medBalance->medical_balance = $formattedTotal;
-            $medBalance->save();
+        $medBalance->medical_balance = $formattedTotal;
+        $medBalance->save();
 
-            $deducted = $medBalance->medical_deducted;
-            $deductedAmount = str_replace('.', '', $deducted);
-            $AmountApproved =  str_replace('.', '', $totalAmountApproved);
-            $totalDeducted = $deductedAmount + $AmountApproved;
-            $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
+        $deducted = $medBalance->medical_deducted;
+        $deductedAmount = str_replace('.', '', $deducted);
+        $AmountApproved = str_replace('.', '', $totalAmountApproved);
+        $totalDeducted = $deductedAmount + $AmountApproved;
+        $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
 
-            $medBalance->medical_deducted = $formattedDeductedTotal;
-            $medBalance->save();
+        $medBalance->medical_deducted = $formattedDeductedTotal;
+        $medBalance->save();
 
-            return redirect('/approval/medical')->with('success', "You've Approved $userName Medical Reimburse ");
+        return redirect('/approval/medical')->with('success', "You've Approved $userName Medical Reimburse ");
         } else {
-            return response()->json(['message' => 'Data Emp_medical_balance aktif untuk tahun ' . $currentYear . ' tidak ditemukan'], 404);
+        return response()->json(['message' => 'Data Emp_medical_balance aktif untuk tahun ' . $currentYear . ' tidak ditemukan'], 404);
         }
-    }
+        }
 
-    public function reject_medical(Request $request, $id)
-    {
+        public function reject_medical(Request $request, $id)
+        {
 
         $validator = Validator::make($request->all(), [
-            'input_reject_note' => 'required'
+        'input_reject_note' => 'required'
         ]);
 
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
@@ -659,6 +662,4 @@ class ApprovalController extends Controller
 
         return redirect('/approval/medical')->with('failed', "You rejected $userName Medical Reimburse !");
     }
-
 }
-
