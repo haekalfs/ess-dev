@@ -112,7 +112,7 @@ class ReimburseController extends Controller
 
         // Validate the form data
         $data = $request->validate([
-            'receipt.*' => 'required|max:10048',
+            'receipt.*' => 'required|file|mimes:pdf,doc,docx,jpg,png,jpeg|max:10048',
             'description.*' => 'required',
         ]);
 
