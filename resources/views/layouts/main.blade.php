@@ -208,12 +208,13 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         @usr_acc(602)
                         <h6 class="collapse-header">My Medical Reimburse:</h6>
-                        <a class="collapse-item" href="/medical/history">History <small style="color: red;"><i> &nbsp;&nbsp;Medical</i></small></a>
+                        <a class="collapse-item" href="/medical/history">History</a>
                         @else
                         @endusr_acc
                         @usr_acc(603)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/medical/manage">Manage Medical </a>
+                        <a class="collapse-item" href="/medical/review">Review <small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></a>
+                        <a class="collapse-item" href="/medical/manage">Manage Medical <small style="color: red;"><i> &nbsp;&nbsp;FM</i></small></a>
                         @else
                         @endusr_acc
                     </div>

@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Timesheet_approver;
 use App\Models\Project_assignment_user;
 use App\Models\Emp_leave_quota;
+use App\Models\Emp_medical_balance;
 use Illuminate\Contracts\Session\Session as SessionSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -32,6 +33,10 @@ class MedicalController extends Controller
         // Mendapatkan data medis sesuai dengan pengguna yang login
         $med = Medical::where('user_id', $user->id)->get();
 
+        $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)
+        ->first();
+
+        // dd($emp_medical_balance);
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->where('leave_id', 10)
         ->where('expiration', '>=', date('Y-m-d'))
@@ -48,9 +53,11 @@ class MedicalController extends Controller
         if ($empLeaveQuotaFiveYearTerm == NULL) {
             $empLeaveQuotaFiveYearTerm = "-";
         }
+
         return view('medical.medical', 
         [
-            'med' => $med, 
+            'med' => $med,
+            'emp_medical_balance' => $emp_medical_balance,
             'empLeaveQuotaAnnual' => $empLeaveQuotaAnnual,
             'empLeaveQuotaWeekendReplacement' => $empLeaveQuotaWeekendReplacement,
             'empLeaveQuotaFiveYearTerm' => $empLeaveQuotaFiveYearTerm,
@@ -69,7 +76,7 @@ class MedicalController extends Controller
     {
 
         $request->validate([
-            'attach.*' => 'required|mimes:jpeg,png,gif,bmp|image',
+            'attach.*' => 'required|file',
             'amount.*' => 'required',
             'desc.*' => 'required',
         ]);
@@ -78,21 +85,8 @@ class MedicalController extends Controller
         $amounts = $request->input('amount');
         $descriptions = $request->input('desc');
 
-        // User Medical Approval
-        $checkUserDept = Auth::user()->users_detail->department->id;
 
-        $approvalFinance_GA = Timesheet_approver::whereIn('id', [10, 45, 99])
-            ->get();
-        $approvalSales = Timesheet_approver::whereIn('id', [50, 45, 99])
-            ->get();
-        $approvalHCM = Timesheet_approver::whereIn('id', [10, 60, 99])
-            ->get();
-        $approvalService = Timesheet_approver::whereIn('id', [20, 40, 99])
-            ->get();
-
-        $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
-        $usersWithPMRole = Project_assignment_user::whereIn('project_assignment_id', $findAssignment)->where('role', 'PM')->get();
-
+        $approval = Timesheet_approver::whereIn('id', [99])->first();
         // ID Medical
         $lastId = Medical::orderBy('id', 'desc')->first();
 
@@ -116,19 +110,13 @@ class MedicalController extends Controller
         $medical->user_id = Auth::user()->id;
         $medical->med_number = $nextMedNumber;
         $medical->med_req_date = date('Y-m-d');
+        $medical->paid_status = 15;
         $medical->med_payment = $request->payment_method;
         $medical->med_total_amount = $request->totalAmountInput;
         $medical->save();
 
-        // Menambahkan titik kembali pada hasil perhitungan
-        // $formattedResult = number_format($result, 2, ',', '.');
-
         // Memproses setiap data yang diinputkan ke tabel Medicals_detail
         foreach ($attachments as $key => $attachment) {
-
-            // // ID Medical details
-            // $lastmdet = Medical_details::orderBy('mdet_id', 'desc')->first();
-            // $nextmdet = ($lastmdet) ? $lastmdet->mdet_id + 1 : 1;
 
             $extension = $attachment->getClientOriginalExtension();
             $filename = $nextId . '_' . $key .  '_' .  Auth::user()->id . '.' . $extension;
@@ -152,57 +140,29 @@ class MedicalController extends Controller
             $meddet->save();
         }
 
+        // $uTA = $approval->approver;
 
-        switch (true) {
-            case ($checkUserDept == 4):
+        $medical_approve = new Medical_approval();
+        $medical_approve->medical_id = $nextId;
+        $medical_approve->RequestTo = $approval->approver;
+        $medical_approve->status = 15;
+        $medical_approve->save();
 
-                foreach ($approvalFinance_GA as $approverGa) {
-                    $userToApprove[] = $approverGa->approver; //[desy,bs,ronny,suryadi]
-                    $userPriority[] = $approverGa->id;
-                }
-                break;
-                // No break statement here, so it will continue to the next case
-            case ($checkUserDept == 2):
-
-                foreach ($approvalService as $approverService) {
-                    $userToApprove[] = $approverService->approver;
-                    $userPriority[] = $approverService->id;
-                }
-                if (!$usersWithPMRole->isEmpty()) {
-                    foreach ($usersWithPMRole as $approverPM) {
-                        $userToApprove[] = $approverPM->approver;
-                        $userPriority[] = $approverPM->id;
-                    }
-                }
-                break;
-            case ($checkUserDept == 3):
-
-                foreach ($approvalHCM as $approverHCM) {
-                    $userToApprove[] = $approverHCM->approver;
-                    $userPriority[] = $approverHCM->id;
-                }
-                break;
-            case ($checkUserDept == 1):
-
-                foreach ($approvalSales as $approverSales) {
-                    $userToApprove[] = $approverSales->approver;
-                    $userPriority[] = $approverSales->id;
-                }
-                break; // Add break statement here to exit the switch block after executing the case
-            default:
-                return redirect()->back()->with('failed', "You haven't assigned to any department! Ask HR Dept to correcting your account details");
-                break;
-        }
-        foreach ($userToApprove as $uTA) {
-            $medical_approve = new Medical_approval();
-            $medical_approve->medical_id = $nextId;
-            $medical_approve->RequestTo = $uTA;
-            $medical_approve->status = 15;
-            $medical_approve->save();
-        }
         return redirect('/medical/history')->with('Success', 'Medical Reimburse Add successfully');
     }
 
+    
+    public function delete_med_all($id)
+    {
+        Medical::findOrFail($id)->delete();
+        Medical_details::where('medical_id', $id)->delete();
+        Medical_approval::where('medical_id', $id)->delete();
+        // dd($id);
+        $user = Auth::user();
+        $med = Medical::where('user_id', $user->id)->get();
+        return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
+    }
+    
     public function edit($id)
     {
         $user_info = User::find(Auth::user()->id);
@@ -226,30 +186,19 @@ class MedicalController extends Controller
             ]
         );
     }
-
-    public function delete_med_all($id)
-    {
-        Medical::findOrFail($id)->delete();
-        Medical_details::where('medical_id', $id)->delete();
-        Medical_approval::where('medical_id', $id)->delete();
-        // dd($id);
-        $user = Auth::user();
-        $med = Medical::where('user_id', $user->id)->get();
-        return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
-    }
-
+    
     public function update_medDetail(Request $request, $mdet_id, $medical_id)
     {
 
         $medDet = Medical_details::where('mdet_id', $medical_id)->first();
         $request->validate([
-            'attach.*' => 'sometimes|mimes:jpeg,png,gif,bmp|image',
+            'attach_edit' => 'sometimes|file',
             'amount.*' => 'sometimes',
             'desc.*' => 'sometimes',
         ]);
 
-        if ($request->hasFile('inputAttach')) {
-            $inputAttach = $request->file('inputAttach');
+        if ($request->hasFile('attach_edit')) {
+            $inputAttach = $request->file('attach_edit');
 
             $extension = $inputAttach->getClientOriginalExtension();
             $filename = $medical_id . 'M' . '_' . $mdet_id .  '_' .  Auth::user()->id . '.' . $extension;
@@ -362,6 +311,9 @@ class MedicalController extends Controller
         $med = Medical::find($id);
         // $medDet = Medical_details::where('medical_id', $med->id)->get();
         $medApp = Medical_approval::where('medical_id', $med->id)->get();
+        
+        $med->med_total_amount = $request->totalAmountInput;
+        $med->save();
 
         foreach($medApp as $mA){
             $mA->status = 15;
@@ -371,19 +323,93 @@ class MedicalController extends Controller
 
         return redirect('/medical/history')->with('success', 'Re-Submit Your Medical Successfully.');
     }
-      
-    // Medical Manage
-    public function index_manage()
-    {
-        $user = User::all();
 
-        $months = [];
-        for ($month = 1; $month <= 12; $month++) {
-            $months[$month] = Carbon::create(null, $month, 1)->format('F');
+// Medical Review By Finance Manager
+    public function review_fm(Request $request)
+    {
+        $medReview = Medical_approval::where('status', 29)->pluck('medical_id')->toArray(); // Get medical_ids that match the condition
+
+        $query = Medical::whereIn('id', $medReview); // Apply the medReview filter first
+
+        // Filter by user_id
+        if ($request->has('user_id') && $request->user_id !== '1') {
+            $query->where('user_id', $request->user_id);
         }
 
+        // Filter by year
+        if ($request->has('year') && $request->year !== '') {
+            $query->whereYear('med_req_date', $request->year);
+        }
+
+
+        $med = $query->get();
+        $user = User::all();
         $currentYear = Carbon::now()->year;
         $years = range($currentYear, $currentYear - 10);
-        return view('medical.medical_manage', ['user' => $user, 'months' => $months,  'years' => $years]);
+        return view('medical.review_medical', ['med' => $med, 'user' => $user, 'years' => $years]);
+    }
+
+// Medical Manage
+    public function index_manage(Request $request)
+    {
+        $query = Emp_medical_balance::query();
+
+        // Filter by user_id
+        if ($request->has('user_id') && $request->user_id !== '1') {
+            $query->where('user_id', $request->user_id);
+        }
+
+        // Filter by year
+        if ($request->has('year') && $request->year !== '') {
+            $query->whereYear('active_periode', $request->year);
+        }
+
+        
+        $medBalance = $query->get();
+        $user = User::all();
+        $currentYear = Carbon::now()->year;
+        $years = range($currentYear, $currentYear - 10);
+
+        return view('medical.medical_manage', ['medBalance' => $medBalance, 'user' => $user, 'years' => $years]);
+    }
+
+
+    public function add_balance(Request $request)
+    {
+        $request->validate([
+            'input_user_id' => 'required',
+            'input_balance' => 'required',
+            'input_active_periode' => 'required',
+        ]);
+
+        $year = date('Y');
+        $ExpirationDate = date($year . '-12-31');
+
+        // Membuat entri baru dalam tabel Medicals
+        $medBalance = new Emp_medical_balance ();
+        $medBalance->user_id = $request->input_user_id;
+        $medBalance->medical_balance = $request->input_balance;
+        $medBalance->medical_deducted = 0;
+        $medBalance->active_periode = $request->input_active_periode;
+        $medBalance->expiration = $ExpirationDate;
+        $medBalance->save();
+
+        return redirect()->back()->with('success', 'Medical Balance Add Success.');
+    }
+    
+    public function edit_balance(Request $request, $id)
+    {
+        $request->validate([
+            'input_edit_balance' => 'required',
+        ]);
+
+        // Membuat entri baru dalam tabel Medicals
+        $medBalance = Emp_medical_balance::where('id', $id)->first();
+        $userName = $medBalance->user->name;
+
+        $medBalance->medical_balance = $request->input_edit_balance;
+        $medBalance->save();
+
+        return redirect()->back()->with('success', "You've Successfully Edited $userName Medical Balance. ");
     }
 }

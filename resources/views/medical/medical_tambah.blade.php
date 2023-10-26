@@ -61,8 +61,21 @@ active
                         </div>
                     </div>
                     <hr>
-                    <div class="row" style="zoom:96%; padding-left:20px">
-                        <h6>Payment Method  :</h6>
+                    <div style="zoom:96%; padding-left:20px">
+                        <fieldset class="form-group row">
+                            <legend class="col-form-label col-sm-2 float-sm-left pt-0">Payment Method  :</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_method" value="Cash"  checked="">
+                                    <span class="form-radio-sign">Cash</span>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_method" value="Transfer" checked="">
+                                    <span class="form-radio-sign">Transfer</span>
+                                </div>
+                            </div>
+                        </fieldset>
+                        {{-- <h6></h6>
                         <label class="col-md-2">
                             <input class="form-radio-input" type="radio" name="payment_method" id="payment_method" value="Transfer" checked="">
                             <span class="form-radio-sign">Transfer</span>
@@ -70,7 +83,7 @@ active
                         <label class="col-md-4">
                             <input class="form-radio-input" type="radio" name="payment_method" id="payment_method" value="Cash"  checked="">
                             <span class="form-radio-sign">Cash</span>
-                        </label>
+                        </label> --}}
                     </div>
                     <br>
                     <div >
@@ -89,8 +102,8 @@ active
                                             <div class="col-md-12" >
                                                 {{-- <div class="row"> --}}
                                                     <div class="form-group">
-                                                        <input type="file" class="custom-file-input" id="attach" name="attach[]" value="" required style="">
-                                                        <label class="custom-file-label" for="file" id="custom-file-label">Input Image</label>
+                                                        <input type="file" class="custom-file-input" id="attach" name="attach[]" value="" required style="" accept=".jpg, .jpeg, .png, .pdf">
+                                                        <label class="custom-file-label" for="file" id="custom-file-label">Input File</label>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -116,7 +129,7 @@ active
                 <br>
                 <hr>
                 <div class="col-md-12">
-                    <small style="color: grey;"><i>*NOTE : Besides uploading files, the original receipt must be given to finance for verification</i></small>
+                    <small style="color: black;"><i>*NOTE : <b>Besides uploading files, the original receipt must be given to finance within 7 days</b></i></small>
                 </div>
                 <div class="text-right">
                     <input hidden id="totalAmountInput" name="totalAmountInput" value="">
@@ -226,8 +239,6 @@ copyButton.addEventListener("click", function (event) {
         // Show the undo button
         undoButton.style.display = "block";
     
-
-
     // Submit the form data to the Laravel controller
     const medForm = document.querySelector("#btn-submit");
         medForm.addEventListener("submit", function(event) {

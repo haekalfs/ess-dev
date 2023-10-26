@@ -22,7 +22,8 @@ Route::get('/',[App\Http\Controllers\HomeController::class, 'index'])->middlewar
 Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
-
+    Route::middleware(['suspicious'])->group(function () {
+        
     Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->name('status.read');
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -39,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/timesheet/{yearSelected?}', 'TimesheetController@index')->name('timesheet');
     Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry');
     Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
+    
     Route::post('/save_entries/holiday', 'TimesheetController@save_entries_on_holiday')->name('entries.store.holiday');
     Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store');
     Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
@@ -213,24 +215,29 @@ Route::middleware(['auth'])->group(function () {
     
     ///Mailer
     Route::get('/kirimemail','MailerController@index');
-    
+
     //medical reimburse
-    Route::get('/medical/history', 'MedicalController@index');
-    Route::get('/medical/entry', 'MedicalController@entry');
-    Route::post('/medical/entry/store', 'MedicalController@store');
-    Route::get('/medical/edit/{id}', 'MedicalController@edit');
-    Route::get('/medical/edit/{id}/download', 'MedicalController@download');
-    Route::get('/medical/edit/{id}/resubmit', 'MedicalController@resubmit');
-    Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all');
-    Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail');
-    Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail');
-    
-    Route::get('/medical/manage', 'MedicalController@index_manage');
+    Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
+    Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
+    Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
+    Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
+    Route::get('/medical/edit/{id}/download', 'MedicalController@download')->middleware('auth');
+    Route::put('/medical/edit/{id}/resubmit', 'MedicalController@resubmit')->middleware('auth');
+    Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
+    Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
+    Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail')->middleware('auth');
+
+    Route::get('/medical/manage', 'MedicalController@index_manage')->middleware('auth');
+    Route::get('/medical/review', 'MedicalController@review_fm')->middleware('auth');
+    Route::post('/medical/manage/add_balance', 'MedicalController@add_balance')->middleware('auth');
+    Route::put('/medical/manage/edit_balance/{id}', 'MedicalController@edit_balance')->middleware('auth');
+
     //medical approval
-    Route::get('/medical/approval/{id}', 'ApprovalController@approval_edit');
-    Route::put('/medical/approval/{id}M/update/{mdet_id}', 'ApprovalController@update_approval');
-    Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical');
-    Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical');
+    Route::get('/medical/approval/{id}', 'ApprovalController@approval_edit')->middleware('auth');
+    Route::put('/medical/approval/{id}M/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
+    Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
+    Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')->middleware('auth');
+
     
     Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history');
     Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req');
@@ -257,4 +264,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/vendor-list/new-entry', 'VendorController@new_entry')->name('add_vendor');
     Route::get('/vendor-list/item/delete/{id}', 'VendorController@delete');
         
+    }); 
 });

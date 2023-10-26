@@ -89,11 +89,6 @@ active
                         <th>Payment Method</th>
                         <td style="text-align: start; font-weight:500">: {{$med->med_payment}}</td>
                     </tr>
-                    {{-- <tr>
-                        <th>Status</th>
-                        <td style="text-align: start; font-weight:500">: {{$med->med_status}}</td>
-                    </tr> --}}
-                  </tr>
               </table>
             </div>
         </div>
@@ -104,28 +99,24 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Approval Information</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Detail Information</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                     <tr>
-                      <tr>
-                          <th>Approval By</th>
-                          <td style="text-align: start; font-weight:500">: @if ($medAppUpdate){{ $medAppUpdate->user->name }}@else @endif</td>
-                      </tr>
-                      <tr>
-                          <th>Approval Date</th>
-                          <td style="text-align: start; font-weight:500">: @if ($medAppUpdate){{$medAppUpdate->approval_date}}@else @endif</td>
-                      </tr>
-                      <tr>
-                          <th>Approval Notes</th>
-                          <td style="text-align: start; font-weight:500;"> : @if ($medAppUpdate){{$medAppUpdate->approval_notes}}@else @endif</td>
-                      </tr>
-                      {{-- <tr>
-                          <th>Total Leave Available</th>
-                          <td style="text-align: start; font-weight:500">: </td>
-                      </tr> --}}
+                        <tr>
+                            <th>Medical Balance</th>
+                            <td style="text-align: start; font-weight:500">: {{ $medBalance->medical_balance }}</td>
+                        </tr>
+                          <tr>
+                            <th>Medical Deducted</th>
+                            <td style="text-align: start; font-weight:500">: {{ $medBalance->medical_deducted }}</td>
+                        </tr>
+                          <tr>
+                            <th>No Account Bank</th>
+                            <td style="text-align: start; font-weight:500">: {{ $med->user->users_detail->usr_bank_account }}  An. {{ $med->user->users_detail->usr_bank_account_name }} </td>
+                        </tr>
                     </tr>
                 </table>
             </div>
@@ -175,11 +166,9 @@ active
                                     Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
-                                   @if($medButton->isNotEmpty())
                                     <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
                                         <i class="fas fa-fw fa-edit justify-content-center"></i>Edit
                                     </a>
-                                    @endif
                                     {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
                                 </td>
 							</tr>
@@ -223,7 +212,7 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" class="img-fluid" alt="Attachment">
+                    <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" width="100%" height="500px" alt="Attachment"></iframe>
                 </div>
             </div>
         </div>
@@ -233,14 +222,14 @@ active
     <div class="modal fade" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="myModalLabel">Medical Detail Edit #{{ $md->mdet_id }} </h5>
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title" id="myModalLabel" style="color: white">Medical Detail Edit #{{ $md->mdet_id }} </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered table-sm zoom90">
+                    <table class="table table-sm zoom90">
                         <tbody>
 							<tr>
 								<td>

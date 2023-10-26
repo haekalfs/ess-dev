@@ -8,7 +8,7 @@ active
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Medical Reimburse</h1>
+    <h2 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Reimburse</b></h2>
     {{-- <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Assignment</a> --}}
 </div>
 
@@ -78,7 +78,12 @@ active
                     <tr>
                       <tr>
                           <th width="300px">Medical Balance</th>
-                          <td style="text-align: start; font-weight:500">: </td>
+                            <td style="text-align: start;"> :
+                                <span id="medicalBalance" style="font-weight:700; ">**********</span>
+                                <a href="#" onclick="togglePasswordVisibility()">
+                                    <i id="eyeIcon" class="fa fa-eye"></i>
+                                </a>
+                            </td>
                       </tr>
                       <tr>
                           <th>5 Year Term</th>
@@ -115,8 +120,9 @@ active
                     <tr class="text-center">
                         <th>Request Number</th>
                         <th>Request Date</th>
-                        <th>Payment</th>
-                        <th>Status</th>
+                        <th>Payment Method</th>
+                        <th>Approval Status</th>
+                        <th>Payment Status</th>
                         <th width="120px">Action</th>
                     </tr>
                 </thead>
@@ -126,50 +132,53 @@ active
                         <td>MED_0000{{$q->med_number}}</td>
                         <td>{{$q->med_req_date}}</td>
                         <td>{{$q->med_payment}}</td>
-                        <td>
-                            @php
-                                $approved = false;
-                            @endphp
+                        <td class="text-center">
                             @foreach ($q->medical_approval as $md)
-                                @if ($md->status == 29)
-                                        All Approved <i class="fa fa-check" aria-hidden="true"></i>
-                                    @php
-                                        $approved = true;
-                                        break;
-                                    @endphp
-                                @elseif ($md->status == 404)
-                                        Rejected <i class="fa fa-exclamation" aria-hidden="true"></i>
-                                    @php
-                                        $approved = true;
-                                        break;
-                                    @endphp
-                                @endif
+                                @switch($md->status)
+                                    @case(29)
+                                        <span class="badge  badge-success" style="font-size: 16px">Approved By {{ $md->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
+                                        @break
+                                    @case(15)
+                                        <span class="badge badge-secondary" style="font-size: 14px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                        @break
+                                    @case(404)
+                                        <span class="badge badge-danger" style="font-size: 16px">Rejected By {{ $md->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
+                                        @break
+                                    @default
+                                        <span class="badge badge-info" style="font-size: 14px">Status Tidak Dikenal</span>
+                                @endswitch
                             @endforeach
-                            
-                            @unless ($approved)
-                                Waiting For All Approval <i class="fa fa-spinner" aria-hidden="true"></i>
-                            @endunless
+                        </td>
+                        <td class="text-center">
+                            @switch($q->paid_status)
+                                @case(20)
+                                    <span class="badge badge-pill badge-primary" style="font-size: 16px">Approved <i class="fa fa-check" aria-hidden="true"></i></span>
+                                    @break
+                                @case(15)
+                                    <span class="badge badge-pill badge-secondary" style="font-size: 14px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                    @break
+                                @case(29)
+                                    <span class="badge badge-pill badge-success" style="font-size: 16px">Paid <i class="fa fa-check-circle" aria-hidden="true"></i></span>
+                                    @break
+                                @case(404)
+                                    <span class="badge badge-pill badge-danger" style="font-size: 16px">Rejected <i class="fa fa-exclamation" aria-hidden="true"></i></span>
+                                    @break
+                                @default
+                                    <span class="badge badge-pill badge-info" style="font-size: 16px">Status Tidak Dikenal</span>
+                            @endswitch
                         </td>
                         <td class="row-cols-2 justify-content-betwen text-center">
-                            @php
-                                $approved = false;
-                            @endphp
                             @foreach ($q->medical_approval as $md)
-                                @if ($md->status == 29 || $md->status == 20 || $md->status == 404)
-                                        <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $q->id }}" id="manButton"><i class="fas fa-fw fa-eye fa-sm"></i>View</a>
-                                    @php
-                                        $approved = true;
-                                        break;
-                                    @endphp
+                                @if ($md->status == 29 || $md->status == 404)
+                                    <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $q->id }}" id="manButton">View<i class="fas fa-fw fa-eye fa-sm"></i></a>
+                                @else
+                                    <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                    <i class="fas fa-fw fa-edit justify-content-center"></i>
+                                </a>
+                                    <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
                                 @endif
                             @endforeach
                             
-                            @unless ($approved)
-                                <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                    <i class="fas fa-fw fa-edit justify-content-center"></i>
-                                </a>
-                                <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
-                            @endunless
                         </td>
                     </tr>
                     @endforeach
@@ -201,4 +210,23 @@ active
   </div>
 </div>
 @endforeach
+
+
+<script>
+    function togglePasswordVisibility() {
+    var medicalBalance = document.getElementById('medicalBalance');
+    var eyeIcon = document.getElementById('eyeIcon');
+
+    if (medicalBalance.innerText === '**********') {
+        medicalBalance.innerText = '{{ $emp_medical_balance->medical_balance }}';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        medicalBalance.innerText = '**********';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+
+</script>
 @endsection
