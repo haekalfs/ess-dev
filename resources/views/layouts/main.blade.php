@@ -46,7 +46,7 @@
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav @role('freelancer') bg-gradient-success @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav @role('admin') bg-gradient-primary  @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
@@ -176,7 +176,7 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReimburse"
                     aria-expanded="true" aria-controls="collapseReimburse">
                     <i class="fas fa-fw fa-money-check-alt"></i>
-                    <span>Reimburse</span>
+                    <span>Reimbursement</span>
                 </a>
                 <div id="collapseReimburse" class="collapse" aria-labelledby="headingReimburse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
@@ -187,7 +187,7 @@
                         @endusr_acc
                         @usr_acc(503)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Manage Reimburse</a>
+                        <a class="collapse-item" href="/reimbursement/manage/">Manage</a>
                         @else
                         @endusr_acc
                     </div>
@@ -288,7 +288,7 @@
                         <h6 class="collapse-header">HR Access:</h6>
                         <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
                         <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
-                        <a class="collapse-item" href="/development">A3. Vendor List</a>
+                        <a class="collapse-item" href="/vendor-list">A3. Vendor List</a>
                         <a class="collapse-item" href="/development">A4. News Feed</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
@@ -557,6 +557,8 @@
     <script src="{{ asset('js/demo/datatables-demo.js') }}"></script>
 
     <script src="{{ asset('js/home.js') }}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 </body>
 

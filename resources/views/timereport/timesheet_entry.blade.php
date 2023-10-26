@@ -8,8 +8,15 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Timesheet Entry</h1>
-<p class="mb-4">Timesheet Entry for {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{$year}}</a>. <small style="color: red;"><u><i>This app is still under development. You may find fault on inputs</i></u></small></p>
+
+<!-- Page Heading -->
+<div class="zoom90 d-sm-flex align-items-center justify-content-between">
+    <div>
+        <h1 class="h3 font-weight-bold zoom90 mb-2 text-gray-800"><i class="fas fa-calendar"></i> Timesheet Entry</h1>
+    <p class="mb-4">Timesheet Entry for {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{$year}}</a>.</p>
+    </div>
+    <a type="button" data-toggle="modal" data-target="#guidelines" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-tasks"></i> Guidelines</a>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -38,18 +45,97 @@ active
 </div>
 <div class="row">
     <!-- Area Chart -->
-    <div class="col-xl-6 col-lg-6">
+    <div class="col-xl-12 col-lg-12" id="activityContainer" style="display: none;">
+        <div class="row">
+            <div class="col-xl-12 col-lg-12">
+                <div class="card shadow mb-4">
+                    <!-- Card Header - Accordion -->
+                    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+                        role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                        <h6 class="m-0 font-weight-bold text-primary">Information Details</h6>
+                    </a>
+                    <!-- Card Content - Collapse -->
+                    <div class="collapse show" id="collapseCardExample">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-4">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Mandays :</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="calculations zoom90">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-xl-3 col-lg-3">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>My Leave Days :</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <td>
+                                            @forelse($leaveRequests as $leaves)
+                                                <li>
+                                                    @foreach ($leaves->dateGroups as $key => $group)
+                                                        @if ($key > 0)
+                                                            -
+                                                        @endif
+                                                        {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
+                                                    @endforeach
+                                                </li>
+                                            @empty
+                                                <a><small><i>No Leaves</i></small></a>
+                                            @endforelse
+                                            </td>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-xl-5 col-lg-5">
+                                    <div class="row">
+                                        <div class="col-xl-12 col-lg-12">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>My Assignments :</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <div class="col-xl-12 col-lg-12">
+                                            @forelse($assignment as $assign)
+                                            <li>{{ $assign->project_name }}</li>
+                                            @empty
+                                                <a><small><i>No Project Assigned</i></small></a>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Calendar</h6>
-                {{-- <div class="text-right">
-                    <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Reset">
-                </div> --}}
+                <div class="text-right">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="customSwitch1">
+                        <label class="custom-control-label" for="customSwitch1">Show Details</label>
+                    </div>                    
+                </div>
             </div>
             <!-- Card Body -->
-            <div class="card-body">
-                <table class="table zoom80 table-bordered calendar">
+            <div class="card-body zoom80">
+                <table class="table zoom90 table-bordered calendar" id="calendarTable">
                     <colgroup>
                         @foreach ($calendar[0] as $dayName)
                             <col style="width: {{ 100 / count($calendar[0]) }}%;">
@@ -76,13 +162,16 @@ active
                                                 $status = $day['status'];
                                             @endphp
                                             @if ($status === "red")
-                                                <td data-toggle="modal" class="clickable text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
+                                                <td data-toggle="modal" class="clickable text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div><br></td>
                                             @elseif ($status === 2907)
-                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <a><i class="fas fa-plane-departure fa-sm"></i></a>
+                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    {{-- <a><i class="fas fa-plane-departure fa-sm"></i></a> --}}
                                                 </td>
+                                            @elseif ($status === 404)
+                                            <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div>
+                                            </td>
                                             @else
-                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<br></td>
+                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
                                             @endif
                                         @else
                                             @php
@@ -97,9 +186,9 @@ active
                                             @endif
                                             @if ($isCurrentMonth)
                                                 @if (date('N', strtotime($year.'-'.$month.'-'.$dayValue)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$dayValue)) == 7)
-                                                    <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}</td>
+                                                    <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
                                                 @else
-                                                    <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}</td>
+                                                    <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
                                                 @endif
                                             @else
                                                 <td class="prev-month-day">{{ $dayValue }}</td>
@@ -116,103 +205,8 @@ active
             </div>
         </div>
     </div>
-    <div class="col-xl-6 col-lg-6">
-        <div class="row">
-            <div class="col-xl-12 col-lg-12">
-                <div class="card shadow mb-4">
-                    <!-- Card Header - Dropdown -->
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Information Details</h6>
-                    </div>
-                    <!-- Card Body -->
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-xl-8 col-lg-8">
-                                <table class="zoom80">
-                                    <thead>
-                                        <tr>
-                                            <th>Allowances Calculations :</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="calculations">
-                                    </tbody>
-                                </table><small class="text-danger zoom80"><u><i>For exact calculations, request payslip from Finances Department.</i></u></small>
-                            </div>
-                            <div class="col-xl-4 col-lg-4">
-                                <table class="zoom80">
-                                    <thead>
-                                        <tr>
-                                            <th>My Leave Days :</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <td>
-                                        @forelse($leaveRequests as $leaves)
-                                            <li class="zoom90" style="font-size: 12px;">
-                                                @foreach ($leaves->dateGroups as $key => $group)
-                                                    @if ($key > 0)
-                                                        -
-                                                    @endif
-                                                    {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
-                                                @endforeach
-                                            </li>
-                                        @empty
-                                            <a><small><i>No Leaves</i></small></a>
-                                        @endforelse
-                                        </td>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-12 col-lg-12">
-                <div class="card shadow mb-4">
-                    <!-- Card Header - Dropdown -->
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">MyProjects</h6>
-                    </div>
-                    <!-- Card Body -->
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-xl-12 col-lg-12">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th style="font-size: small;">My Assignments :</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="col-xl-4 col-lg-4">
-                                @forelse($assignment as $assign)
-                                <li class="zoom90" style="font-size: 12px;">{{ $assign->project_name }}</li>
-                                @empty
-                                    <a><small><i>No Project Assigned</i></small></a>
-                                @endforelse
-                            </div>
-                            <div class="col-xl-4 col-lg-4">
-                                @forelse($assignment as $assign)
-                                <li class="zoom90" style="font-size: 12px;">{{ $assign->responsibility }}</li>
-                                @empty
-                                @endforelse
-                            </div>
-                            <div class="col-xl-4 col-lg-4">
-                                @forelse($assignment as $assign)
-                                <li class="zoom90" style="font-size: 12px;">{{ $assign->address }}</li>
-                                @empty
-                                @endforelse
-                            </div>
-                        </div>
-                        {{-- <small class="text-danger zoom80"><u><i>If there's any misassignment, please report to Project Admin.</i></u></small> --}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
@@ -339,14 +333,15 @@ active
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Location :</label>
-                                    <select class="form-control" id="location" name="location" required>
+                                <div class="form-group" id="locationContainer">
+                                    <label for="location">Location :</label>
+                                    <select class="form-control" id="location" name="location" required></select>
+                                    {{-- <select class="form-control" id="location" name="location" required>
                                         @foreach($pLocations as $loc)
                                             <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
                         </div>
@@ -448,14 +443,15 @@ active
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
+                                <div class="form-group" id="locationContainerRed">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="location-red" name="location" required>
+                                    <select class="form-control" id="location-red" name="location" required></select>
+                                    {{-- <select class="form-control" id="location-red" name="location" required>
                                         @foreach($pLocations as $loc)
                                             <option value="{{$loc->location_code}}" {{$loc->location_code == old('location') ? 'selected' : ''}}>{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
                         </div>
@@ -549,14 +545,15 @@ active
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
+                                <div class="form-group" id="updateLocationSelect">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="update_location" name="update_location" required>
+                                    <select class="form-control" id="update_location" name="update_location" required></select>
+                                    {{-- <select class="form-control" id="update_location" name="update_location" required>
                                         @foreach($pLocations as $loc)
                                             <option value="{{$loc->location_code}}">{{ $loc->description }}</option>
                                         @endforeach
                                         <option hidden value="N/a">N/a</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                             </div>
                         </div>
@@ -687,8 +684,49 @@ active
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="guidelines" tabindex="-1" role="dialog" aria-labelledby="modalguidelines" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-1">
+                <h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Timesheet Guidelines</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mr-2" style="text-align: justify;">
+                <p>Here are several rules for filling out the timesheet, namely:</p>
+                <ol>
+                    <li>Fill in by clicking the desired date on the calendar</li>
+                    <li>Filling out daily timesheet can be done repeatedly as long as it does not conflict with other tasks</li>
+                    <li>For holidays, you must attach an assignment letter (can be a WA screenshot, SE/SK, etc.)</li>
+                    <li>To edit a task that has been filled in, you can do this by clicking on the task on the calendar, or going down to the <i>Activities Entry</i> table and clicking on the date in question.</li>
+                    <li>Submitting timesheets can only be done at certain times.</li>
+                    <li>Delete tasks can be done below, in the <i>Activities Entry</i> table.</li>
+                    <li>The location on the project is regulated by the Project Controller.</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+$(document).ready(function() {
+    // Initial state
+    var activityContainer = $('#activityContainer');
+    var switchInput = $('#customSwitch1');
+
+    switchInput.change(function() {
+        if (switchInput.is(':checked')) {
+            activityContainer.show();
+        } else {
+            activityContainer.hide();
+        }
+    });
+});
+
 // document.getElementById("task").addEventListener("change", function() {
 //     if (this.value === "Sick") {
 //         document.getElementById("activity").value = "-";
@@ -785,8 +823,6 @@ function changeFileName(inputId, labelId) {
   label.textContent = input.files[0].name;
 }
 
-var taskSelect = document.getElementById("task");
-var locationSelect = document.getElementById("location");
 
 var taskSelectRed = document.getElementById("task-red");
 var locationSelectRed = document.getElementById("location-red");
@@ -794,98 +830,6 @@ var locationSelectRed = document.getElementById("location-red");
 var taskSelectUpdate = document.getElementById("update_task");
 var locationSelectUpdate = document.getElementById("update_location");
 
-
-///// NEED PERBAIKAN    
-var selectedTask = taskSelect.value;
-locationSelect.value = "HO";
-locationSelect.readOnly = true;
-locationSelect.style.pointerEvents = "none";
-
-taskSelect.addEventListener("change", function() {
-    var selectedTask = taskSelect.value;
-    
-    if (selectedTask === "StandbyLK") {
-        locationSelect.value = "LK";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none"; 
-    } else if (selectedTask === "StandbyLN") {
-        locationSelect.value = "LN";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "HO") {
-        locationSelect.value = "HO";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "Other") {
-        locationSelect.value = "N/a";
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "Sick") {
-        locationSelect.value = "N/a";
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else {
-        document.getElementById("activity").removeAttribute("readonly");
-        document.getElementById("start-time").removeAttribute("readonly");
-        document.getElementById("end-time").removeAttribute("readonly");
-        locationSelect.readOnly = false;
-        locationSelect.style.pointerEvents = "auto";
-        // locationSelect.value = "HO";
-    }
-});
-
-taskSelectRed.addEventListener("change", function() {
-    var selectedTaskRed = taskSelectRed.value;
-
-    if (selectedTaskRed === "StandbyLK") {
-        locationSelectRed.value = "LK";
-        locationSelectRed.readOnly = true;
-        locationSelectRed.style.pointerEvents = "none";
-    } else if (selectedTask === "Other") {
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.value = "N/a";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTask === "Sick") {
-        document.getElementById("activity").value = "-";
-        document.getElementById("start-time").value = "00:00";
-        document.getElementById("end-time").value = "00:00";
-        document.getElementById("activity").setAttribute("readonly", true);
-        document.getElementById("start-time").setAttribute("readonly", true);
-        document.getElementById("end-time").setAttribute("readonly", true);  
-        locationSelect.value = "N/a";
-        locationSelect.readOnly = true;
-        locationSelect.style.pointerEvents = "none";
-    } else if (selectedTaskRed === "StandbyLN") {
-        locationSelectRed.value = "LN";
-        locationSelectRed.readOnly = true;
-        locationSelectRed.style.pointerEvents = "none";
-    } else {
-        document.getElementById("activity").removeAttribute("readonly");
-        document.getElementById("start-time").removeAttribute("readonly");
-        document.getElementById("end-time").removeAttribute("readonly");
-        locationSelectRed.readOnly = false;
-        locationSelectRed.style.pointerEvents = "auto";
-        // locationSelectRed.value = "HO";
-    }
-});
 
 taskSelectUpdate.addEventListener("change", function() {
     var selectedTaskUpdate = taskSelectUpdate.value;
@@ -924,11 +868,24 @@ taskSelectUpdate.addEventListener("change", function() {
     .calendar {
         background: #ffffff;
         border-radius: 4px;
-        height: 501px;
+        height: 701px;
         perspective: 1000;
         transition: .9s;
         transform-style: preserve-3d;
         width: 100%;
+    }
+
+    .round-text-box {/* Border color similar to alert-danger */
+        background-color: #dee6f2; /* Background color similar to alert-danger */
+        color: #464ad9; /* Text color similar to alert-danger */
+        padding: 5px; /* Adjust padding to control the size of the box */
+        border-radius: 10px; /* Border radius for rounded corners */
+        transition: background-color 0.3s; /* Add a smooth transition for the background color */
+    }
+
+    .round-text-box:hover {
+        background-color: #124cdd; /* Change the background color on hover */
+        color: #fff; /* Change the text color on hover */
     }
 </style>
 @endsection

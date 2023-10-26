@@ -9,11 +9,13 @@ active
 <form method="POST" action="/users/update/{{ $user->id }}" enctype="multipart/form-data">
 @csrf
 @method('PUT')
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h4 class="m-0 font-weight-bold text-grey">Edit Employee #{{ $user->users_detail->employee_id }}</h4>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h4 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-user-plus"></i>&nbsp;  Edit Employee #{{ $user->users_detail->employee_id }}</h4>
     <div class="d-sm-flex justify-content-end ">
         <a href="/manage/users" class="btn btn-danger btn-sm mr-2" id="manButton">Kembali</a>
-        <input type="submit" class="btn btn-success btn-sm" value="Simpan">
+        <button type="submit" class="btn btn-success btn-sm">
+            <i class="fas fa-save" style="color: #ffffff;"></i> Simpan
+        </button>
     </div>
 </div>
 @if(isset($success))
@@ -39,7 +41,7 @@ active
   text-align: center;
 }
 </style>
-    <div class="row">
+    <div class="row zoom90">
         <!-- Area Chart -->
         <div class="col-xl-12 col-lg-12">
             <div class="card shadow mb-4">
@@ -229,7 +231,7 @@ active
         </div>
     </div>
 
-    <div class="row">
+    <div class="row zoom90">
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->

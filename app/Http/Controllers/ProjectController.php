@@ -112,8 +112,10 @@ class ProjectController extends Controller
             ->where('project_assignments.id', '=', $assignment_id)
             ->get();
         // var_dump($assignment);
+        $refNum = '';
         foreach ($assignment as $as) {
             $project = Client::where('id', $as->client_id)->first();
+            $refNum = $as->assignment_no;
             if ($as->approval_status == 40) {
                 $status = "Waiting for Approval";
             } elseif ($as->approval_status == 29) {
@@ -129,7 +131,7 @@ class ProjectController extends Controller
         $emp = User::all();
         $roles = Project_role::all();
         $project_member = Project_assignment_user::where('project_assignment_id', $assignment_id)->get();
-        return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'stat' => $status, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
+        return view('projects.assigning_user', ['assignment' => $assignment, 'project' => $project, 'refNum' => $refNum, 'stat' => $status, 'user' => $emp, 'usr_roles' => $roles, 'assignment_id' => $assignment_id, 'project_member' => $project_member]);
     }
 
     public function project_assignment_member_view($assignment_id)
@@ -276,21 +278,29 @@ class ProjectController extends Controller
             'from' => 'required',
             'to' => 'required'
         ]);
-
-        $location = Project_location::find($request->p_location);
+    
+        // Retrieve an array of selected location IDs
+        $selectedLocationIds = $request->input('p_location');
+    
+        // Retrieve the selected locations from the database
+        $selectedLocations = Project_location::whereIn('id', $selectedLocationIds)->get();
+    
+        // Extract the location codes and join them with commas
+        $alias = $selectedLocations->pluck('location_code')->implode(', ');
+    
+        // Create a new Company_project record
         Company_project::create([
-            // 'id' => $uniqueId,
             'project_code' => $request->p_code,
-            'alias' => $location->location_code,
+            'alias' => $alias, // Save the comma-separated location codes
             'project_name' => $request->p_name,
             'address' => $request->address,
             'periode_start' => $request->from,
             'periode_end' => $request->to,
             'client_id' => $request->p_client
         ]);
-
-        return redirect('/project_list')->with('success', 'Project Create successfully');
-    }
+    
+        return redirect('/project_list')->with('success', 'Project created successfully');
+    }    
 
     public function create_new_client(Request $request)
     {
@@ -620,10 +630,16 @@ class ProjectController extends Controller
         }
         $p_loc = $request->input('p_location');
         if ($p_loc == NULL || $p_loc == '') {
-            $p_loc = $cp->alias;
+            $alias = $cp->alias;
         }
+        // Retrieve the selected locations from the database
+        $selectedLocations = Project_location::whereIn('id', $p_loc)->get();
+    
+        // Extract the location codes and join them with commas
+        $alias = $selectedLocations->pluck('location_code')->implode(', ');
+    
         $cp->project_code = $request->input('p_code');
-        $cp->alias = $p_loc;
+        $cp->alias = $alias;
         $cp->project_name = $request->input('p_name');
         $cp->address = $request->input('address');
         $cp->periode_start = $formattedFrom;

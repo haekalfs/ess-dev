@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Requested Assignment #{{ $request->id }}</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Requested Assignment #{{ $request->id }}</h1>
     <a data-toggle="modal" data-target="#addAss" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Create This Assignment</a>
 </div>
 
@@ -33,7 +33,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="row">
+<div class="row zoom90">
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
             <!-- Card Header - Accordion -->

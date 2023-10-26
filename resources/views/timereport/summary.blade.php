@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-2 text-gray-800">Timesheet Summary <small style="color: red;"><i> &nbsp;&nbsp;Administrator</i></small></h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h3 mb-2 text-gray-800 font-weight-bold"><i class="fas fa-calendar"></i> Timesheet Summary <small style="color: red;"><i> &nbsp;&nbsp;Administrator</i></small></h1>
     {{-- <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a> --}}
 </div>
 @if ($message = Session::get('success'))

@@ -17,6 +17,7 @@ use App\Models\Medical_approval;
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
+use App\Models\Reimbursement_approval;
 use App\Models\Surat_penugasan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Timesheet;
@@ -99,7 +100,7 @@ class ApprovalController extends Controller
             $Month = $request->monthOpt;
         }
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 1 && $currentDay <= 31) {
+        if ($currentDay >= 17 && $currentDay <= 31) {
             if (in_array($checkUserPost, [7, 8, 12, 10])) {
                 $Check = Timesheet_detail::select('*')
                     ->whereYear('date_submitted', $Year)
@@ -296,6 +297,8 @@ class ApprovalController extends Controller
         $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
         $entry->importance = 1;
+        $entry->month_periode = $year.$month;
+        $entry->type = 2;
         $entry->save();
 
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();

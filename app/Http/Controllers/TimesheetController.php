@@ -12,6 +12,7 @@ use App\Models\Cutoffdate;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
+use App\Models\Notification_alert;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Project_location;
@@ -23,6 +24,7 @@ use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\Usr_role;
+use App\Models\Vendor_list;
 use Carbon\Carbon;
 use DateInterval;
 use DateTime;
@@ -58,6 +60,12 @@ class TimesheetController extends Controller
         }
         $entries = [];
         foreach (range(1, $currentMonth) as $entry) {
+            $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->where('month_periode', $currentYear.$entry)->first();
+            if($getNotification){
+                $notify = $getNotification->id;
+            } else {
+                $notify = false;
+            }
             $month = date("F", mktime(0, 0, 0, $entry, 1));
             $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $entry)
@@ -91,7 +99,7 @@ class TimesheetController extends Controller
             $encryptYear = Crypt::encrypt($currentYear);
             $encryptMonth = Crypt::encrypt($entry);
             $previewUrl = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
-            $entries[] = compact('month', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
+            $entries[] = compact('month', 'notify', 'lastUpdatedAt', 'status', 'editUrl', 'previewUrl', 'isSubmitted');
         }
         return view('timereport.timesheet', compact('entries', 'yearsBefore', 'yearSelected'));
     }
@@ -104,7 +112,7 @@ class TimesheetController extends Controller
 
         while (!$cachedData && $attempts < $maxAttempts) {
             try {
-                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json");
+                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
                 $array = json_decode($json, true);
                 Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
                 $cachedData = $array;
@@ -142,22 +150,43 @@ class TimesheetController extends Controller
             }
         }
 
+
+        // Get the hired_date
+        $hired_date = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first();
+        $hired_date = new DateTime($hired_date);
+
+        $yearH = $hired_date->format('Y');
+
+        $formattedDatesHired = [];
+        $currentDateH = clone $hired_date;
+
+        while ($currentDateH->format('m') >= "1" && $currentDateH->format('Y') == $yearH) {
+            $formattedDatesHired[] = $currentDateH->format('Ymd');
+            $currentDateH->modify('-1 day');
+        }
+
         // Check tanggal merah berdasarkan libur nasional
-        if (isset($array[$date->format('Ymd')])) {
+        $dateToCheck = $date->format('Y-m-d');
+        // if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true) {
+        //     $description = $array[$dateToCheck]['summary'][0];
+        //     // Use $description as needed.
+        //     return "red";
+        // }
+        if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true) {
             return "red";
         }
         // Check tanggal merah berdasarkan hari minggu
-        elseif ($date->format('D') === "Sun") {
-            return "red";
-        } elseif ($date->format('D') === "Sat") {
+        elseif ($date->format('D') === "Sun" || $date->format('D') === "Sat") {
             return "red";
         }
         // Bukan tanggal merah
         else {
-            $dateToCheck = $date->format('Ymd');
-            if (in_array($dateToCheck, $formattedDates)) {
+            $dateToCheck2 = $date->format('Ymd');
+            if (in_array($dateToCheck2, $formattedDates)) {
                 return 2907;
-            } else {
+            } elseif(in_array($dateToCheck2, $formattedDatesHired)){
+                return 404;
+            }else {
                 return "";
             }
         }
@@ -218,6 +247,7 @@ class TimesheetController extends Controller
         }
         $pLocations = Project_location::all();
 
+        
         $checkUserAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->get();
 
         if ($checkUserAssignment->isEmpty()) {
@@ -371,9 +401,16 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDate;
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->task;
-        $entry->ts_location = $request->location;
-        $entry->ts_from_time = date('H:i', strtotime($request->from));
-        $entry->ts_to_time = date('H:i', strtotime($request->to));
+        if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+            $tsLoc = "-";
+        } else {
+            $tsLoc = $request->location;
+        }        
+        $entry->ts_location = $tsLoc;
+        $entry->ts_from_time = $request->from;
+        $entry->ts_to_time = $request->to;
+        // $entry->ts_from_time = date('H:i', strtotime($request->from));
+        // $entry->ts_to_time = date('H:i', strtotime($request->to));
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = 10;
 
@@ -510,9 +547,14 @@ class TimesheetController extends Controller
         $entry->ts_date = $request->clickedDateRed;
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->task;
-        $entry->ts_location = $request->location;
-        $entry->ts_from_time = date('H:i', strtotime($request->from));
-        $entry->ts_to_time = date('H:i', strtotime($request->to));
+        if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+            $tsLoc = "-";
+        } else {
+            $tsLoc = $request->location;
+        }        
+        $entry->ts_location = $tsLoc;
+        $entry->ts_from_time = $request->from;
+        $entry->ts_to_time = $request->to;
         $entry->ts_activity = $request->activity;
         $entry->ts_status_id = '10';
 
@@ -737,9 +779,14 @@ class TimesheetController extends Controller
                 $entry->ts_date = $startDate->format('Y-m-d');
                 $entry->ts_task = $ts_task_id;
                 $entry->ts_task_id = $request->task;
-                $entry->ts_location = $request->location;
-                $entry->ts_from_time = date('H:i', strtotime($request->from));;
-                $entry->ts_to_time = date('H:i', strtotime($request->to));
+                if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+                    $tsLoc = "-";
+                } else {
+                    $tsLoc = $request->location;
+                }        
+                $entry->ts_location = $tsLoc;
+                $entry->ts_from_time = $request->from;
+                $entry->ts_to_time = $request->to;
                 $entry->ts_activity = $request->activity;
                 $entry->ts_status_id = '10';
                 $entry->allowance = $countAllowances;
@@ -784,9 +831,14 @@ class TimesheetController extends Controller
         }
         $entry->ts_task = $ts_task_id;
         $entry->ts_task_id = $request->update_task;
-        $entry->ts_location = $request->update_location;
-        $entry->ts_from_time = date('H:i', strtotime($inputFromTimeUpdate));
-        $entry->ts_to_time = date('H:i', strtotime($inputToTimeUpdate));
+        if ($ts_task_id == "Other" || $ts_task_id == "Sick") {
+            $tsLoc = "-";
+        } else {
+            $tsLoc = $request->update_location;
+        }        
+        $entry->ts_location = $tsLoc;
+        $entry->ts_from_time = $inputFromTimeUpdate;
+        $entry->ts_to_time = $inputToTimeUpdate;
         $entry->ts_activity = $request->update_activity;
 
         $user = Auth::user();
@@ -1073,32 +1125,32 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
-        $checkisSubmitted = DB::table('timesheet_details')
-            ->select('*')
-            ->whereYear('date_submitted', $year)
-            ->where('user_timesheet', Auth::user()->id)
-            ->whereNotIn('ts_status_id', [10, 404])
-            ->where('month_periode', $year . intval($month))
-            ->whereNotExists(function ($query) use ($year, $month) {
-                $query->select(DB::raw(1))
-                    ->from('timesheet_details')
-                    ->where('month_periode', $year . intval($month))
-                    ->where('ts_status_id', [404]);
-            })
-            ->groupBy('user_timesheet', 'month_periode')
-            ->get();
+        // $checkisSubmitted = DB::table('timesheet_details')
+        //     ->select('*')
+        //     ->whereYear('date_submitted', $year)
+        //     ->where('user_timesheet', Auth::user()->id)
+        //     ->whereNotIn('ts_status_id', [10, 404])
+        //     ->where('month_periode', $year . intval($month))
+        //     ->whereNotExists(function ($query) use ($year, $month) {
+        //         $query->select(DB::raw(1))
+        //             ->from('timesheet_details')
+        //             ->where('month_periode', $year . intval($month))
+        //             ->where('ts_status_id', [404]);
+        //     })
+        //     ->groupBy('user_timesheet', 'month_periode')
+        //     ->get();
 
-        if (!$checkisSubmitted->isEmpty()) {
-            Session::flash('failed', 'Your Timesheet has already been submitted!');
-            return redirect()->back();
-        }
+        // if (!$checkisSubmitted->isEmpty()) {
+        //     Session::flash('failed', 'Your Timesheet has already been submitted!');
+        //     return redirect()->back();
+        // }
 
         // Get the current date
         $currentDate = Carbon::now();
 
-        $dateCut = Cutoffdate::first();
+        $dateCut = Cutoffdate::find(1);
         // Get the cutoff date for submitting timesheets (7th of the next month)
-        $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->date - 1));
+        $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->closed_date - 1));
         // $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-09-31");
 
         // Check if the current date is on or after the cutoff date
@@ -1568,5 +1620,36 @@ class TimesheetController extends Controller
 
         // File not found
         abort(404);
+    }
+
+    public function getLocationProject($task_id)
+    {
+        $itemData = Project_assignment_user::where('project_assignment_id', $task_id)->pluck('company_project_id')->toArray();
+
+            if (empty($itemData)) {
+                $getLoc = Project_location::all(); // Change $getLoc to $getLocations
+            } else {
+                $getLocations = Company_project::whereIn('id', $itemData)->pluck('alias')->toArray();
+
+                // Initialize an array to store distinct locations
+                $distinctLocations = [];
+        
+                // Loop through the locations
+                foreach ($getLocations as $locations) {
+                    // Split the comma-separated values into an array
+                    $locationArray = explode(', ', $locations);
+                    
+                    // Add each distinct location to the result array
+                    $distinctLocations = array_merge($distinctLocations, $locationArray);
+                }
+        
+                // Remove duplicates
+                $distinctLocations = array_unique($distinctLocations);
+        
+                // You now have an array of distinct locations
+                $getLoc = Project_location::whereIn('location_code', $distinctLocations)->get();
+            }
+
+        return response()->json($getLoc);
     }
 }

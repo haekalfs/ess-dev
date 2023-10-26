@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Project Organization</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Project Organization</h1>
     <div>
         <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target=".listProjectRoles" id="pRoles" style="margin-right: 10px;"><i class="fas fa-users-cog fa-sm text-white-50"></i> Project Roles</a>
             <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target=".listLocations" id="listLoc" style="margin-right: 10px;"><i class="fas fa-map-marker-alt fa-sm text-white-50"></i> Locations</a>
@@ -38,7 +38,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Projects Organization</h6>
         <div class="text-right">
@@ -121,9 +121,9 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Location :</label>
-                                    <select class="form-control" id="update_location" name="p_location" required>
+                                    <select class="form-control js-example-basic-multiple" style="width: 100%;" name="p_location[]" multiple="multiple">
                                         @foreach($locations as $location)
-                                        <option value="{{$location->id}}">{{ $location->description}}</option>
+                                            <option value="{{$location->id}}">{{ $location->description}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -402,10 +402,17 @@ active
     width: 200px;
 }
 </style>
+
 <script>
-fetchClients();
+$(document).ready(function() {
+    $('.js-example-basic-multiple').select2({
+        width: 'resolve',
+        dropdownAutoWidth: 'false' // need to override the changed default
+    });
+    fetchClients();
 fetchLocations();
 fetchProjectRoles();
+});
 </script>
 @endsection
 

@@ -2,31 +2,35 @@
 
 namespace App\Jobs;
 
-use App\Mail\ApprovalTimesheet;
-use App\Models\Timesheet_detail;
+use App\Mail\ApprovalLeave;
+use App\Mail\ReimbursementCreation;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class SendTimesheetApprovalNotification implements ShouldQueue
+class NotifyReimbursementCreation implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $user;
+    protected $employee;
+    protected $userName;
 
     /**
      * Create a new job instance.
      *
-     * @param  User  $user
+     * @param  User  $employee
+     * @param  string  $userName
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(User $employee, string $userName)
     {
-        $this->user = $user;
+        $this->employee = $employee;
+        $this->userName = $userName;
     }
 
     /**
@@ -36,14 +40,8 @@ class SendTimesheetApprovalNotification implements ShouldQueue
      */
     public function handle()
     {
-        $monthPeriod = Timesheet_detail::select('id', 'month_periode')
-        ->where('ts_status_id', 20)
-        ->where('RequestTo', $this->user->id)
-        ->groupBy('id', 'month_periode')
-        ->get();
-
-        $notification = new ApprovalTimesheet($this->user, $monthPeriod);
-        Mail::send('mailer.timesheetapproval', $notification->data(), function ($message) use ($notification) {
+        $notification = new ReimbursementCreation($this->employee, $this->userName);
+        Mail::send('mailer.reimburse_approval', $notification->data(), function ($message) use ($notification) {
             $message->to($notification->emailTo())
                     ->subject($notification->emailSubject());
         });

@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">MyProjects</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 text-gray-800 font-weight-bold"><i class="fas fa-network-wired"></i> MyProjects</h1>
     <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Request Assignment</a>
 </div>
 
@@ -33,7 +33,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center bg-primary justify-content-between">
         <h6 class="m-0 font-weight-bold text-light" id="judul">MyProjects List</h6>
         {{-- <div class="text-right">
@@ -59,14 +59,18 @@ active
                     <tr>
                         <td>{{ $record->id }}</td>
                         <td>{{ $record->project_code }}</td>
-                        <td>{{ $record->project_name }}</td>
+                        <td>{{ $record->project_name }}
+                        @if (now()->diffInDays(Carbon\Carbon::parse($record->created_at)) < 3)
+                            <span class="text-danger"><small><i> &#x2728;</i></small></span>
+                        @endif                        
+                        </td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
-                        <td>
+                        <td class="text-center">
                             @if($record->periode_end <= date('Y-m-d'))
-                            <span class="text-danger">Expired</span>
+                            <i class="fas fa-times-circle" style="color: #ff0000;"></i>
                             @else
-                            <span class="text-success">Active</span>
+                            <i class="fas fa-check-circle" style="color: #0050db;"></i>
                             @endif
                         </td>
                         <td class="text-center"><a class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" href="/assignment/view/details/{{$record->project_assignment_id}}"><i class='fas fa-fw fa-eye'></i> View</a></td>
@@ -78,14 +82,14 @@ active
     </div>
 </div>
 
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center bg-dark justify-content-between">
         <h6 class="m-0 font-weight-bold text-light" id="judul">Requested Assignment</h6>
-        {{-- <div class="text-right">
-            <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
-        </div> --}}
+        <a href="#collapseCardExample" class="btn btn-link text-light" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+            <i class="fas fa-chevron-down"></i>
+        </a>
     </div>
-    <div class="card-body">
+    <div class="card-body collapse" id="collapseCardExample">
         <div class="table-responsive">
             <table class="table table-bordered zoom90" id="dataTableRoles" width="100%" cellspacing="0">
                 <thead class="thead-light">
@@ -113,12 +117,12 @@ active
                         </td>
                     </tr>
                     @endforeach
-                    
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="addMem" tabindex="-1" role="dialog" aria-labelledby="modalSign" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered" role="document">
 		<div class="modal-content">

@@ -39,6 +39,12 @@ $(document).ready(function () {
         $('#clickedDate').val(formattedDate);
         $('#clickedDateRed').val(formattedDate);
     });
+
+    // Handle the anchor click event using event delegation
+    $(document).on('click', '.inner-anchor', function (event) {
+        event.stopPropagation(); // Prevent the anchor click event from propagating
+        // Add your specific anchor click event handling here
+    });
 });
 
 //this is my save function 
@@ -62,6 +68,7 @@ $(document).ready(function() {
                     url: '/get-data/' + year + '/' + month + '/' + activityId,
                     type: 'GET',
                     success: function(response) {
+                        fetchLocationProjectUpdate(response.ts_task_id);
                         // Set the values of the form fields with the data received from the server
                         $('#updateModal').find('#update_task').val(response.ts_task_id);
                         $('#updateModal').find('#update_location').val(response.ts_location);
@@ -91,8 +98,14 @@ $(document).ready(function() {
                     url: '/update-entries/' + activityId,
                     data: updateData,
                     success: function(response) {
+                        for (var i = 1; i <= 31; i++) {
+                            var descRemove = $('#desc' + i);
+                            descRemove.empty();
+                        }
                         $('.alert-success-saving').show();
                         $('#update-form')[0].reset();
+                        $('#updateLocationSelect').css('display', 'block');
+                        fetchLocationProjectUpdate(1);
                             setTimeout(function() {
                                 $('.alert-success-saving').fadeOut('slow');
                             }, 3000);
@@ -121,15 +134,19 @@ $(document).ready(function() {
             url: '/activities/' + activityId,
             type: 'DELETE',
             success: function(response) {
+                for (var i = 1; i <= 31; i++) {
+                    var descRemove = $('#desc' + i);
+                    descRemove.empty();
+                }
                 $('.alert-danger').text("Task has been deleted!");
                 $('.alert-danger').show();
                 setTimeout(function() {
                     $('.alert-success-delete').fadeOut('slow');
                 }, 3000);
-                for (var i = 1; i <= 31; i++) {
-                    var taskEntry = $('#task_entry' + i);
-                    taskEntry.removeClass('border-bottom-primary');
-                  }
+                // for (var i = 1; i <= 31; i++) {
+                //     var taskEntry = $('#task_entry' + i);
+                //     taskEntry.removeClass('border-bottom-primary');
+                //   }
                 $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
@@ -153,15 +170,19 @@ $(document).ready(function() {
             url: '/activities/all/' + activityYear + '/' + activityMonth,
             type: 'DELETE',
             success: function(response) {
+                for (var i = 1; i <= 31; i++) {
+                    var descRemove = $('#desc' + i);
+                    descRemove.empty();
+                }
                 $('.alert-danger').text("All tasks has been deleted!");
                 $('.alert-danger').show();
                 setTimeout(function() {
                     $('.alert-success-delete').fadeOut('slow');
                 }, 3000);
-                for (var i = 1; i <= 31; i++) {
-                    var taskEntry = $('#task_entry' + i);
-                    taskEntry.removeClass('border-bottom-primary');
-                  }
+                // for (var i = 1; i <= 31; i++) {
+                //     var taskEntry = $('#task_entry' + i);
+                //     taskEntry.removeClass('border-bottom-primary');
+                //   }
                 $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
@@ -188,6 +209,10 @@ $(document).ready(function() {
             success: function(response) {
                 // Clear the table body
                 $('#activity-table').empty();
+                for (var i = 1; i <= 31; i++) {
+                    var descRemove = $('#desc' + i);
+                    descRemove.empty();
+                }
                 // Check if the response is empty or null
                 if (response.length === 0) {
                     // Display a message to the user
@@ -226,8 +251,13 @@ $(document).ready(function() {
                         counts[activity.ts_location] += 1;
 
                         var day = date.getDate();
-                        var taskEntry = $('#task_entry' + day);
-                        taskEntry.addClass('border-bottom-primary');
+                        // var taskEntry = $('#task_entry' + day);
+                        // taskEntry.addClass('border-bottom-primary');
+
+                        var descTask = $('#desc' + day);
+                        // descTask.append('&#x2022; ' + activity.ts_task);
+                        // descTask.append('<br>');
+                        descTask.append($('<a></a>').addClass('shorter-textbox round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + '&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
                     });
 
                     var rowsPerPageSelect = $('#rowsPerPage');
@@ -353,6 +383,10 @@ $(document).ready(function() {
                 contentType: false, // Set contentType to false, as we are sending FormData
                 processData: false, // Set processData to false, as we are sending FormData
                 success: function(response) {
+                    for (var i = 1; i <= 31; i++) {
+                        var descRemove = $('#desc' + i);
+                        descRemove.empty();
+                    }
                     $('.alert-success-saving').show();
                     document.getElementById("activity").removeAttribute("readonly");
                     document.getElementById("location").removeAttribute("readonly");
@@ -364,6 +398,8 @@ $(document).ready(function() {
                     $('#fileInputIfexistWfh').hide();
                     
                     $('#entry-form')[0].reset();
+                    $('#locationContainer').css('display', 'block');
+                    fetchLocationProject(1);
                     $('#sp-label').text('Choose File');
                     setTimeout(function() {
                         $('.alert-success-saving').fadeOut('slow');
@@ -422,6 +458,9 @@ $(document).ready(function() {
                     document.getElementById("start-time").removeAttribute("readonly");
                     document.getElementById("end-time").removeAttribute("readonly");
                     $('#entry-form-red')[0].reset();
+                    $('#locationContainerRed').css('display', 'block');
+                    fetchLocationProjectRed(1);
+                    $('.validate-red').removeClass('is-invalid');
                     $('#sp-label').text('Choose File');
                     setTimeout(function() {
                         $('.alert-success-saving').fadeOut('slow');
@@ -477,6 +516,8 @@ $(document).ready(function() {
                 document.getElementById("start-time").removeAttribute("readonly");
                 document.getElementById("end-time").removeAttribute("readonly");
                 $('#multiple-entry-form')[0].reset();
+                $('#locationContainer').css('display', 'block');
+                fetchLocationProject(1);
                 $(function() {
                     initializeDateRangePicker();
                   });
@@ -559,3 +600,212 @@ $(function() {
     }
   });
 });
+
+
+function fetchLocationProject(selectedValue) {
+    if (selectedValue) {  // Check if selectedValue is not empty
+        $.ajax({
+            url: '/getLocationProject/' + selectedValue,
+            method: 'GET',
+            success: function(response) {
+                var selectLocation = $('#location'); // Get the <select> element
+
+                // Clear existing options
+                selectLocation.empty();
+
+                // Populate the <select> element with options from the response
+                $.each(response, function(index, location) {
+                    selectLocation.append($('<option>', {
+                        value: location.location_code,
+                        text: location.description
+                    }));
+                });
+
+                var taskSelect = $('#task');
+                var locationSelect = $('#location'); // Store the location element
+            
+                function updateLocation(selectedTask) {
+                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                        $('#locationContainer').css('display', 'block');
+                        locationSelect.val(selectedTask.substr(-2));
+                        locationSelect.prop('readonly', true);
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.css('pointer-events', 'none');
+                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                        $('#locationContainer').css('display', 'none');
+                        $('#activity, #start-time, #end-time').val("-");
+                        $('#activity, #start-time, #end-time').prop('readonly', true);
+                        locationSelect.prop('readonly', true);
+                        locationSelect.css('pointer-events', 'none');
+                    } else {
+                        $('#locationContainer').css('display', 'block');
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.prop('readonly', false);
+                        locationSelect.css('pointer-events', 'auto');
+                    }
+                }
+            
+                taskSelect.on('change', function() {
+                    var selectedTask = taskSelect.val();
+                    updateLocation(selectedTask);
+                });
+                
+                // Initialize based on the initial selected value
+                var initialSelectedTask = taskSelect.val();
+                updateLocation(initialSelectedTask);
+            },
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#task').on('change', function() {
+        var selectedValue = $(this).val();
+        fetchLocationProject(selectedValue);
+    });
+});
+
+fetchLocationProject(1);
+
+function fetchLocationProjectRed(selectedValue) {
+    if (selectedValue) {  // Check if selectedValue is not empty
+        $.ajax({
+            url: '/getLocationProject/' + selectedValue,
+            method: 'GET',
+            success: function(response) {
+                var selectLocation = $('#location-red'); // Get the <select> element
+
+                // Clear existing options
+                selectLocation.empty();
+
+                // Populate the <select> element with options from the response
+                $.each(response, function(index, location) {
+                    selectLocation.append($('<option>', {
+                        value: location.location_code,
+                        text: location.description
+                    }));
+                });
+
+                var taskSelect = $('#task-red');
+                var locationSelect = $('#location-red'); // Store the location element
+            
+                function updateLocation(selectedTask) {
+                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                        $('#locationContainerRed').css('display', 'block');
+                        locationSelect.val(selectedTask.substr(-2));
+                        locationSelect.prop('readonly', true);
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.css('pointer-events', 'none');
+                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                        $('#locationContainerRed').css('display', 'none');
+                        $('#activity, #start-time, #end-time').val("-");
+                        $('#activity, #start-time, #end-time').prop('readonly', true);
+                        locationSelect.prop('readonly', true);
+                        locationSelect.css('pointer-events', 'none');
+                    } else {
+                        $('#locationContainerRed').css('display', 'block');
+                        $('#activity, #start-time, #end-time').prop('readonly', false);
+                        locationSelect.prop('readonly', false);
+                        locationSelect.css('pointer-events', 'auto');
+                    }
+                }
+            
+                taskSelect.on('change', function() {
+                    var selectedTask = taskSelect.val();
+                    updateLocation(selectedTask);
+                });
+                
+                // Initialize based on the initial selected value
+                var initialSelectedTask = taskSelect.val();
+                updateLocation(initialSelectedTask);
+            },
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#task-red').on('change', function() {
+        var selectedValue = $(this).val();
+        fetchLocationProjectRed(selectedValue);
+    });
+});
+
+fetchLocationProjectRed(1);
+
+
+function fetchLocationProjectUpdate(selectedValue) {
+    if (selectedValue) {  // Check if selectedValue is not empty
+        $.ajax({
+            url: '/getLocationProject/' + selectedValue,
+            method: 'GET',
+            success: function(response) {
+                var selectLocation = $('#update_location'); // Get the <select> element
+
+                // Clear existing options
+                selectLocation.empty();
+
+                // Populate the <select> element with options from the response
+                $.each(response, function(index, location) {
+                    selectLocation.append($('<option>', {
+                        value: location.location_code,
+                        text: location.description
+                    }));
+                });
+
+                var taskSelect = $('#update_task');
+                var locationSelect = $('#update_location'); // Store the location element
+            
+                function updateLocation(selectedTask) {
+                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                        $('#updateLocationSelect').css('display', 'block');
+                        locationSelect.val(selectedTask.substr(-2));
+                        locationSelect.prop('readonly', true);
+                        $('#update_activity, #update_from, #update_to').prop('readonly', false);
+                        locationSelect.css('pointer-events', 'none');
+                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                        $('#updateLocationSelect').css('display', 'none');
+                        $('#update_activity, #update_from, #update_to').val("-");
+                        $('#update_activity, #update_from, #update_to').prop('readonly', true);
+                        locationSelect.prop('readonly', true);
+                        locationSelect.css('pointer-events', 'none');
+                    } else {
+                        $('#updateLocationSelect').css('display', 'block');
+                        $('#update_activity, #update_from, #update_to').prop('readonly', false);
+                        locationSelect.prop('readonly', false);
+                        locationSelect.css('pointer-events', 'auto');
+                    }
+                }
+            
+                taskSelect.on('change', function() {
+                    var selectedTask = taskSelect.val();
+                    updateLocation(selectedTask);
+                });
+                
+                // Initialize based on the initial selected value
+                var initialSelectedTask = taskSelect.val();
+                updateLocation(initialSelectedTask);
+            },
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#update_task').on('change', function() {
+        var selectedValue = $(this).val();
+        fetchLocationProjectUpdate(selectedValue);
+    });
+});
+
+fetchLocationProjectUpdate(1);

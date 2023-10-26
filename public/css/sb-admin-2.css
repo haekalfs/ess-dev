@@ -9913,6 +9913,18 @@ a:focus {
   background-size: cover;
 }
 
+.bg-gradient-pink {
+  background-color: #FF1493; /* Pink color */
+  background-image: linear-gradient(180deg, #FF1493 10%, #FF69B4 100%);
+  background-size: cover;
+}
+
+.bg-gradient-purple {
+  background-color: #990099; /* Pink color */
+  background-image: linear-gradient(180deg, #990099 10%, #e600e6 100%);
+  background-size: cover;
+}
+
 .bg-gradient-secondary {
   background-color: #858796;
   background-image: linear-gradient(180deg, #858796 10%, #60616f 100%);
@@ -11313,6 +11325,10 @@ body.sidebar-toggled footer.sticky-footer {
   zoom: 70%;
 }
 
+.zoom50{
+  zoom: 50%;
+}
+
 .long-text {
     display: block;
     overflow: hidden;
@@ -11335,6 +11351,38 @@ body.sidebar-toggled footer.sticky-footer {
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 200px; /* adjust the max-width to fit your table design */
+}
+
+.shorter-textbox {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 240px; /* adjust the max-width to fit your table design */
+}
+
+.shorter-textDiv {
+  height: 100px; /* Set the fixed height for the div */
+  overflow: auto; /* Enable vertical scrolling if content exceeds the height */
+  scrollbar-width: thin; /* Hide the scrollbar for Firefox */
+  -webkit-overflow-scrolling: touch; /* Enable touch-based scrolling for iOS */
+}
+
+/* For Webkit-based browsers (Chrome, Safari) */
+.shorter-textDiv::-webkit-scrollbar {
+  width: 6px; /* Adjust the scrollbar width as needed */
+}
+
+.shorter-textDiv::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Set the scrollbar thumb color */
+}
+
+.shorter-text2 {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100px; /* adjust the max-width to fit your table design */
 }
 
 .timesheet:hover .card {
@@ -11514,4 +11562,20 @@ form .post-image p,
     color: #fff;
     font-size: 22px;
     font-weight: bold;
+}
+
+.dot-checklist {
+  display: flex;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background-color: red; /* Default red color */
+}
+
+.dot.approved {
+  background-color: green; /* Green color for approved items */
 }

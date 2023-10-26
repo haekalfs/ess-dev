@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Requested Assignment</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Requested Assignment</h1>
     {{-- <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Request Assignment</a> --}}
 </div>
 
@@ -33,7 +33,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">Pending Request</h6>
         {{-- <div class="text-right">
@@ -62,13 +62,13 @@ active
                         <td><span class="long-text">{{ $record->company_project->project_name }}</span></td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
-                        <td>
+                        <td class="text-center">
                             @if($record->status == 0)
-                            <a style='font-size: small;'><i class='fas fa-fw fa-spinner'></i></a>
+                            <i class="fas fa-spinner fa-spin" style="color: #808080;"></i>
                             @elseif ($record->status == 404)
-                            <a style='font-size: small;'><i class='fas fa-fw fa-ban'></i></a>
+                            <i class="fas fa-times-circle" style="color: #ff0000;"></i>
                             @else
-                            <a style='font-size: small;'><i class='fas fa-fw fa-check'></i></a>
+                            <i class="fas fa-check-circle" style="color: #0050db;"></i>
                             @endif
                         </td>
                         <td class="action text-center">

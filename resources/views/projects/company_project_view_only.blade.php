@@ -8,8 +8,8 @@ active
 
 @section('content')
 
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Project Organization #{{ $project_id }}</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Project Organization #{{ $project_id }}</h1>
     <div>
         <a href="#" onclick="deleteProject(event, {{$project_id}})" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
             <i class="fas fa-trash-alt fa-sm text-white-50"></i> Delete Project
@@ -37,7 +37,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="row">
+<div class="row zoom90">
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
@@ -63,8 +63,8 @@ active
                                         <td>: {{ $project->client->client_name }}</td>
                                     </tr>
                                     <tr class="table-sm">
-                                        <td style="width: 150px;">Address</td>
-                                        <td>: {{ $project->address }}</td>
+                                        <td style="width: 150px;">Locations</td>
+                                        <td>: {{ $project->alias }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -116,7 +116,7 @@ active
                         </thead>
                         <tbody>
                             @php
-                                $row_number = 1;
+                                $row_number = 1; 
                             @endphp
                             @foreach ($project_member as $usr)
                                 <tr>
@@ -148,7 +148,7 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="/project_list/update" method="post" id="editForm">
+			<form method="post" id="editForm">
                 @csrf
                 <input type="hidden" name="project_id" id="project_id" value="">
 				<div class="modal-body" style="">
@@ -185,11 +185,10 @@ active
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="p_location">Location :</label>
-                                    <select class="form-control" id="p_location" name="p_location" required>
-                                        <option disabled selected>Select to update...</option>
-                                        @foreach($locations as $key => $location)
-                                            <option value="{{$location->location_code}}">{{ $location->description }}</option>
+                                    <label for="password">Location :</label>
+                                    <select class="form-control js-example-basic-multiple" style="width: 100%;" name="p_location[]" multiple="multiple">
+                                        @foreach($locations as $location)
+                                            <option value="{{$location->id}}">{{ $location->description}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -281,5 +280,13 @@ active
 @endsection
 
 @section('javascript')
+<script>
+    $(document).ready(function() {
+        $('.js-example-basic-multiple').select2({
+            width: 'resolve',
+            dropdownAutoWidth: 'false' // need to override the changed default
+        });
+    });
+</script>
 <script src="{{ asset('js/project.js') }}"></script>
 @endsection

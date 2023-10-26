@@ -7,7 +7,6 @@ active
 @endsection
 
 @section('content')
-
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -21,29 +20,20 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-
-@if ($message = Session::get('warning'))
-<div class="alert alert-warning alert-block">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>{{ $message }}</strong>
-</div>
-@endif
-<!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Manage Users</h1>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
-        <a class="btn btn-success btn-sm shadow-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Position & Department</a>
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-users"></i> Manage Users</h1>
+        <p class="mb-4">Manage Users Account.</p>
     </div>
+    <a class="btn btn-success btn-sm shadow-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Position & Department</a>
 </div>
-<div class="card shadow mb-4">
-    <!-- Card Header - Dropdown -->
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Users List</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Manage Department</h6>
         <div class="text-right">
             <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" href="/users/tambah" ><i class="fas fa-plus fa-sm text-white-50"></i> Add User</a>
         </div>
     </div>
-    <!-- Card Body -->
     <div class="card-body">
         <table class="table table-bordered zoom90 table-hover" id="dataTableUser">
             <thead>
@@ -64,11 +54,17 @@ active
                     <td>{{$p->users_detail->employee_id}}</td>
                     <td>{{$p->id }}</td>
                     <td>{{$p->name}}</td>
-                    <td>{{$p->users_detail->status_active}}</td>
+                    <td class="text-center">
+                        @if ($p->users_detail->status_active == "Active")
+                            <i class="fas fa-user-check" style="color: #0053fa;"></i>
+                        @else
+                            <i class="fas fa-user-times" style="color: #ff0000;"></i>
+                        @endif
+                    </td>
                     <td>{{$p->users_detail->employee_status}}</td>
                     <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
                     <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
-                    <td class="row-cols-2 justify-content-betwen ">
+                    <td class="row-cols-2 justify-content-between">
                         <a href="/users/edit/{{ $p->id }}" title="Edit" class="btn btn-primary btn-sm" >
                             <i class="fas fa-fw fa-edit justify-content-center"></i>
                         </a>
@@ -80,5 +76,4 @@ active
         </table>
     </div>
 </div>
-
 @endsection

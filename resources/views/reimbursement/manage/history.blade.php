@@ -1,15 +1,15 @@
 @extends('layouts.main')
 
-@section('title', 'Review by Finance Manager - ESS')
+@section('title', 'Reimbursement Review - ESS')
 
-@section('active-page-timesheet')
+@section('active-page-reimburse')
 active
 @endsection
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h3 font-weight-bold zoom90 mb-2 text-gray-800"><i class="fas fa-calendar"></i> Timesheet Review <small style="color: red;"><i> &nbsp;&nbsp;Finance Manager</i></small></h1>
+<div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+    <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Manage Reimbursement <small style="color: red;"><i> &nbsp;&nbsp;Finance Department</i></small></h1>
     {{-- <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a> --}}
 </div>
 @if ($message = Session::get('success'))
@@ -39,7 +39,7 @@ active
             <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" onclick="confirmPassword()"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All (XLS)</a>
         </div>
     </div>
-    <form method="GET" action="/timesheet/review/fm">
+    <form method="GET" action="/reimbursement/manage">
         @csrf
         <div class="card-body">
             <div class="col-md-12 zoom90">
@@ -87,17 +87,14 @@ active
                                     <tr>
                                         <th>Emp ID</th>
                                         <th>Name</th>
-                                        <th>Project</th>
-                                        <th>Location</th>
-                                        <th>Role</th>
-                                        <th>Mandays</th>
+                                        <th>Reimbursement Type</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if ($approvals->isEmpty())
                                         <tr style="border-bottom: 1px solid #dee2e6;">
-                                            <td colspan="7" class="text-center"><a><i>No Data Available</i></a></td>
+                                            <td colspan="4" class="text-center"><a><i>No Data Available</i></a></td>
                                         </tr>
                                     @else
                                         @foreach($approvals as $index => $approval)
@@ -105,27 +102,21 @@ active
                                             @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
                                             <td style="border-bottom: none; border-top: none;"></td>
                                             <td style="border-bottom: none; border-top: none;"></td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->ts_location }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
+                                            <td style="border-bottom: none; border-top: none;">{{ $approval->f_type }}</td>
                                             <td style="border-bottom: none; border-top: none;"></td>
                                             @else
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->user->users_detail->employee_id }}</td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->user->name }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->ts_task }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->ts_location }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->roleAs }}</td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->ts_mandays }}</td>
+                                            <td style="border-bottom: none; border-top: none;">{{ $approval->f_type }}</td>
                                             <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                                <a href="/timesheet/review/fm/review/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> View</a>
+                                                <a data-toggle="modal" data-target="#editAmountModal" data-item-id="" class="btn btn-primary btn-sm btn-edit"><i class="fas fa-hand-pointer"></i> View</a>
                                             </td>
                                             @endif
                                         </tr>
                                         @endforeach
                                     @endif
                                     <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
+                                        <td colspan="4" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -142,7 +133,7 @@ function confirmPassword() {
     var password = prompt('Please enter your password:');
     if (password !== null) {
         // Send the plain password to the server
-        var url = "/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}?password=" + encodeURIComponent(password);
+        var url = "/reimbursement/export/all/{{ $Month }}/{{ $Year }}?password=" + encodeURIComponent(password);
         window.location.href = url;
     }
 }
