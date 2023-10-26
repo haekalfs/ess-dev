@@ -22,7 +22,8 @@ Route::get('/',[App\Http\Controllers\HomeController::class, 'index'])->middlewar
 Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
-
+    Route::middleware(['suspicious'])->group(function () {
+        
     Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->name('status.read');
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -39,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/timesheet/{yearSelected?}', 'TimesheetController@index')->name('timesheet');
     Route::get('/timesheet/entry/{year}/{month}', 'TimesheetController@timesheet_entry');
     Route::post('/entries', 'TimesheetController@save_entries')->name('entries.store');
+    
     Route::post('/save_entries/holiday', 'TimesheetController@save_entries_on_holiday')->name('entries.store.holiday');
     Route::post('/multiple_entries', 'TimesheetController@save_multiple_entries')->name('multiple.entries.store');
     Route::get('/get-activities/{year}/{month}', 'TimesheetController@getActivities')->name('activities.get-activities');
@@ -262,4 +264,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/vendor-list/new-entry', 'VendorController@new_entry')->name('add_vendor');
     Route::get('/vendor-list/item/delete/{id}', 'VendorController@delete');
         
+    }); 
 });
