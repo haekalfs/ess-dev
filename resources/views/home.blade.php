@@ -104,22 +104,15 @@ active
             <!-- Card Body -->
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         <div class="lc-block position-relative">
                             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                                 <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/news2023.jpg') }}"
-                                            alt="First slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/ESS.png') }}"
-                                            alt="Second slide">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset('img/news2023.jpg') }}"
-                                            alt="Third slide">
-                                    </div>
+                                    @foreach($headline as $index => $hl)
+                                        <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
+                                            <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset($hl->filepath) }}" alt="Slide {{ $index + 1 }}">
+                                        </div>
+                                    @endforeach
                                 </div>
                                 <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -132,10 +125,17 @@ active
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5">
-                        <div style="height:400px; overflow:auto">
-                            <div class="card-body">
-                              <h5 class="card-title">Peraturan Perusahaan 2023 - PT Konsulindo Informatika Perdana</h5>
+                    <div class="col-md-6">
+                        <div style="height:350px;" class="transparent-scroll2">
+                            <div class="card-body transparent-scroll">
+                                @foreach($newsFeed as $feed)
+                                    <h5 class="card-title font-weight-bold">{{ $feed->title }}</h5>
+                                    {!! $feed->content !!}
+                                    <div class="mb-4">
+                                        <a class="btn btn-sm btn-primary mt-0" data-id="{{ $feed->id }}" class="card-link">Read more</a>
+                                    </div>
+                                @endforeach
+                                 {{-- <h5 class="card-title">Peraturan Perusahaan 2023 - PT Konsulindo Informatika Perdana</h5>
                               <p class="card-text">Dear All,<br>
                                 The following is a link regarding the company regulation in Perdana Consulting 
                                 Thank you for your attention.
@@ -150,7 +150,8 @@ active
                                   Thank you for your attention.
                                   <br>Sincerely,<br><br>
                                   Perdana Consulting</p>
-                                <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_office365_perdana_co_id/ET8qcmGYOk9LtyebhqZmJroB2_6CQ1EGsEpGH0b5tmtZYQ?e=5ddh4u" class="card-link">Read more</a>
+                                <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_office365_perdana_co_id/ET8qcmGYOk9LtyebhqZmJroB2_6CQ1EGsEpGH0b5tmtZYQ?e=5ddh4u" class="card-link">Read more</a> --}}
+                            
                             </div>
                         </div>
                     </div>

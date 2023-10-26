@@ -56,30 +56,6 @@
                 <div class="sidebar-brand-text mx-3"></div>
             </a>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item @yield('active-page-db')">
-                <a class="nav-link" href="/home">
-                    <i class="fas fa-fw fa-home"></i>
-                    <span>Home</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Main Menu
-            </div>
-
-            <li class="nav-item @yield('active-page-myprofile')">
-                <a class="nav-link" href="/myprofile">
-                    <i class="fas fa-fw fa-user-circle"></i>
-                    <span>My Profile</span>
-                </a>
-            </li>
             @usr_acc(101)
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item @yield('active-page-timesheet')">
@@ -246,13 +222,6 @@
             </li>
             @else
             @endusr_acc
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Add-On
-            </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
             @usr_acc(901)
@@ -299,13 +268,7 @@
             </li>
             @else
             @endusr_acc
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>{{ __('Logout') }}</span>
-                </a>
-            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 

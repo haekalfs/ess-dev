@@ -11377,6 +11377,55 @@ body.sidebar-toggled footer.sticky-footer {
   background-color: transparent; /* Set the scrollbar thumb color */
 }
 
+.transparent-scroll { /* Set the fixed height for the div */
+  overflow: auto; /* Enable vertical scrolling if content exceeds the height */
+  scrollbar-width: thin; /* Hide the scrollbar for Firefox */
+  -webkit-overflow-scrolling: touch; /* Enable touch-based scrolling for iOS */
+}
+
+/* For Webkit-based browsers (Chrome, Safari) */
+.transparent-scroll::-webkit-scrollbar {
+  width: 6px; /* Adjust the scrollbar width as needed */
+}
+
+.transparent-scroll::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Set the scrollbar thumb color */
+}
+
+.transparent-scroll2 {
+  height: 350px; /* Set the fixed height for the div */
+  overflow: auto; /* Enable vertical scrolling if content exceeds the height */
+  scrollbar-width: thin; /* Hide the scrollbar for Firefox */
+  -webkit-overflow-scrolling: touch; /* Enable touch-based scrolling for iOS */
+}
+
+/* Set the default scrollbar color and width */
+.transparent-scroll2::-webkit-scrollbar {
+  width: 6px; /* Adjust the scrollbar width as needed */
+  background-color: transparent; /* Make the scrollbar background transparent */
+}
+
+.transparent-scroll2::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Make the scrollbar thumb (drag handle) transparent */
+}
+
+/* Hide the scrollbar when not scrolling */
+.transparent-scroll2::-webkit-scrollbar-thumb:horizontal {
+  background-color: transparent;
+  transition: background-color 0.3s ease; /* Add a smooth transition effect */
+}
+
+.transparent-scroll2::-webkit-scrollbar-thumb:vertical {
+  background-color: transparent;
+  transition: background-color 0.3s ease; /* Add a smooth transition effect */
+}
+
+.transparent-scroll2:hover::-webkit-scrollbar-thumb:horizontal,
+.transparent-scroll2:hover::-webkit-scrollbar-thumb:vertical {
+  background-color: #4e73df; /* Set the scrollbar thumb color on hover */
+}
+
+
 .shorter-text2 {
   display: block;
   overflow: hidden;

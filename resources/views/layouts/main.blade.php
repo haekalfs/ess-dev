@@ -19,6 +19,9 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <!-- Place the first <script> tag in your HTML's <head> -->
+    <script src="https://cdn.tiny.cloud/1/7151mpnl7wa2vt6edvg8mqikfi69pmviecvx90uiq1uy20bc/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -289,7 +292,7 @@
                         <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
                         <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
                         <a class="collapse-item" href="/vendor-list">A3. Vendor List</a>
-                        <a class="collapse-item" href="/development">A4. News Feed</a>
+                        <a class="collapse-item" href="/news-feed/manage">A4. News Feed</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>

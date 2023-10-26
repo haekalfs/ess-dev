@@ -23,7 +23,7 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['suspicious'])->group(function () {
-        
+
     Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->name('status.read');
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -153,8 +153,8 @@ Route::middleware(['auth'])->group(function () {
     
     //manage users
     Route::get('/manage/users', 'UserController@index')->middleware(['checkRole:admin,manager']);
-    Route::get('/users/tambah', 'UserController@tambah');
-    Route::post('/users/store', 'UserController@store');
+    Route::get('/users/tambah', 'UserController@tambah')->middleware(['checkRole:admin,manager']);
+    Route::post('/users/store', 'UserController@store')->middleware(['checkRole:admin,manager']);
     Route::get('/users/edit/{id}', 'UserController@edit');
     Route::put('/users/update/{id}', 'UserController@update');
     Route::get('/users/hapus/{id}', 'UserController@delete');
@@ -263,6 +263,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vendor-list', 'VendorController@index')->name('index-vendor');
     Route::post('/vendor-list/new-entry', 'VendorController@new_entry')->name('add_vendor');
     Route::get('/vendor-list/item/delete/{id}', 'VendorController@delete');
-        
-    }); 
+       
+    
+    //News Feed
+    Route::get('/news-feed/manage', 'NewsController@index')->name('manage-news');
+    Route::get('/news-feed/manage/create', 'NewsController@create')->name('create-news');
+    Route::post('/news-feed/store', 'NewsController@store')->name('news-feed.store');
+    Route::get('/news-feed/get-id-pic/{id}', 'NewsController@get_id_headline')->name('get_id_headline');
+    Route::post('/news-feed/update-headline/{id}', 'NewsController@updateHeadlineData');
+    
+    Route::get('/news-feed/manage/edit-post/{id}', 'NewsController@edit_post')->name('edit_post');
+    Route::post('/news-feed/manage/update-post/{id}', 'NewsController@update_post')->name('news-feed.update');
+    Route::get('/news-feed/manage/delete-post/{id}', 'NewsController@delete_post')->name('delete_post');
+    });
 });

@@ -66,9 +66,9 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_B_HOST', '127.0.0.1'),
             'port' => env('DB_B_PORT', '3306'),
-            'database' => env('DB_B_DATABASE', 'po_controller'),
-            'username' => env('DB_B_USERNAME', 'haekals'),
-            'password' => env('DB_B_PASSWORD', 'Perdana@2022'),
+            'database' => env('DB_B_DATABASE', 'e-ticket'),
+            'username' => env('DB_B_USERNAME', 'root'),
+            'password' => env('DB_B_PASSWORD', 'password'),
         ],
 
         'pgsql' => [

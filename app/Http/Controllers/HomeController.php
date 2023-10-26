@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Emp_leave_quota;
+use App\Models\Headline;
+use App\Models\News_feed;
 use App\Models\Notification_alert;
 use Session;
 use Illuminate\Http\Request;
@@ -27,6 +29,8 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $newsFeed = News_feed::orderBy('created_at', 'desc')->get();
+
         try {
             $roles = Auth::user()->role_id()->pluck('role_name')->toArray();
             if (!session()->has('allowed_roles')) {
@@ -52,7 +56,8 @@ class HomeController extends Controller
         if($empLeaveQuotaFiveYearTerm == NULL){
             $empLeaveQuotaFiveYearTerm = "-";
         }
-       return view('home', compact('empLeaveQuotaAnnual', 'empLeaveQuotaWeekendReplacement', 'empLeaveQuotaFiveYearTerm', 'totalQuota'));
+        $headline = Headline::all();
+       return view('home', compact('empLeaveQuotaAnnual', 'empLeaveQuotaWeekendReplacement', 'headline', 'newsFeed','empLeaveQuotaFiveYearTerm', 'totalQuota'));
     }
 
     public function notification_indev()
