@@ -39,9 +39,17 @@ active
     <span class="error-message"></span>
 </div>
 
-
 <div class="alert alert-danger-delete" role="alert" style="display: none;">
     An error occurred while deleting your entry. Please try again.
+</div>
+
+<div class="overlay overlay-mid" style="display: none;"></div>
+
+<div class="alert alert-danger alert-success-delete-mid" role="alert" style="display: none;">
+</div>
+
+<div class="alert alert-success alert-success-saving-mid" role="alert" style="display: none;">
+    Your entry has been saved successfully.
 </div>
 <div class="row">
     <!-- Area Chart -->
@@ -371,7 +379,7 @@ active
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" id="save-entry" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                    <button type="submit" id="save-entry" class="btn btn-primary" data-dismiss="modal"><i class="far fa-save"></i> Save changes</button>
                   </div>
 			</form>
 		</div>
@@ -481,7 +489,7 @@ active
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" id="save-entry-red" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                    <button type="submit" id="save-entry-red" class="btn btn-primary" data-dismiss="modal"><i class="far fa-save"></i> Save changes</button>
                   </div>
 			</form>
 		</div>
@@ -583,8 +591,8 @@ active
                 </div>
 				<div class="modal-footer">
                     {{-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> --}}
-                    <a class="btn btn-danger delete-btn-update" data-dismiss="modal" id="deleteBtn">Reset</a>
-                    <button type="submit" id="update-entry" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+                    <a class="btn btn-danger delete-btn-update" data-dismiss="modal" id="deleteBtn"><i class="fas fa-trash-alt"></i> Reset</a>
+                    <button type="submit" id="update-entry" class="btn btn-primary" data-dismiss="modal"><i class="far fa-save"></i> Save changes</button>
                   </div>
 			</form>
 		</div>

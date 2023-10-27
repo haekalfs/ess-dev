@@ -127,13 +127,35 @@ $(document).ready(function() {
     $(document).on('click', '.delete-btn', function(event) {
         var activityId = $(event.target).data('id');
         deleteActivity(activityId);
+        showDeletedMessage();
     });
 
     $(document).on('click', '.delete-btn-update', function(event) {
         event.preventDefault();
         var activityId = $(this).data('id');
         deleteActivity(activityId);
+        showDeletedMessage();
     });
+
+function showDeletedMessage(){
+    $('.alert-success-delete-mid').show();
+    $('.overlay-mid').show();
+    $('.alert-success-delete-mid').text("Task has been deleted!");
+    setTimeout(function() {
+        $('.alert-success-delete-mid').fadeOut('slow');
+        $('.overlay-mid').fadeOut('slow');
+    }, 1000);
+}
+
+function showSuccessMessage(){
+    $('.alert-success-saving-mid').show();
+    $('.overlay-mid').show();
+    $('.alert-success-saving-mid').text("Your entry has been saved successfully.!");
+    setTimeout(function() {
+        $('.alert-success-saving-mid').fadeOut('slow');
+        $('.overlay-mid').fadeOut('slow');
+    }, 1000);
+}
 
     function deleteActivity(activityId) {
         $.ajax({
@@ -144,11 +166,6 @@ $(document).ready(function() {
                     var descRemove = $('#desc' + i);
                     descRemove.empty();
                 }
-                $('.alert-danger').text("Task has been deleted!");
-                $('.alert-danger').show();
-                setTimeout(function() {
-                    $('.alert-success-delete').fadeOut('slow');
-                }, 3000);
                 // for (var i = 1; i <= 31; i++) {
                 //     var taskEntry = $('#task_entry' + i);
                 //     taskEntry.removeClass('border-bottom-primary');
@@ -180,15 +197,9 @@ $(document).ready(function() {
                     var descRemove = $('#desc' + i);
                     descRemove.empty();
                 }
-                $('.alert-danger').text("All tasks has been deleted!");
-                $('.alert-danger').show();
-                setTimeout(function() {
-                    $('.alert-success-delete').fadeOut('slow');
-                }, 3000);
-                // for (var i = 1; i <= 31; i++) {
-                //     var taskEntry = $('#task_entry' + i);
-                //     taskEntry.removeClass('border-bottom-primary');
-                //   }
+                $('.alert-success-delete-mid').text("All tasks has been deleted!");
+                showDeletedMessage();
+                
                 $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
@@ -393,7 +404,6 @@ $(document).ready(function() {
                         var descRemove = $('#desc' + i);
                         descRemove.empty();
                     }
-                    $('.alert-success-saving').show();
                     document.getElementById("activity").removeAttribute("readonly");
                     document.getElementById("location").removeAttribute("readonly");
                     document.getElementById("location").readOnly = false;
@@ -407,9 +417,7 @@ $(document).ready(function() {
                     $('#locationContainer').css('display', 'block');
                     fetchLocationProject(1);
                     $('#sp-label').text('Choose File');
-                    setTimeout(function() {
-                        $('.alert-success-saving').fadeOut('slow');
-                    }, 3000);
+                    showSuccessMessage();
                     // Fetch the updated list of activities
                     fetchActivities(yearput, monthput);
                 },
@@ -458,7 +466,6 @@ $(document).ready(function() {
                 processData: false, // Set processData to false, as we are sending FormData
                 success: function(response) {
                     console.log(response);
-                    $('.alert-success-saving').show();
                     document.getElementById("activity").removeAttribute("readonly");
                     document.getElementById("location").removeAttribute("readonly");
                     document.getElementById("start-time").removeAttribute("readonly");
@@ -468,9 +475,7 @@ $(document).ready(function() {
                     fetchLocationProjectRed(1);
                     $('.validate-red').removeClass('is-invalid');
                     $('#sp-label').text('Choose File');
-                    setTimeout(function() {
-                        $('.alert-success-saving').fadeOut('slow');
-                    }, 3000);
+                    showSuccessMessage();
                     // Fetch the updated list of activities
                     fetchActivities(yearput, monthput);
                 },
@@ -516,7 +521,6 @@ $(document).ready(function() {
             url: '/multiple_entries',
             data: formData,
             success: function(response) {
-                $('.alert-success-saving').show();
                 document.getElementById("activity").removeAttribute("readonly");
                 document.getElementById("location").removeAttribute("readonly");
                 document.getElementById("start-time").removeAttribute("readonly");
@@ -527,9 +531,7 @@ $(document).ready(function() {
                 $(function() {
                     initializeDateRangePicker();
                   });
-                setTimeout(function() {
-                $('.alert-success-saving').fadeOut('slow');
-                }, 3000);
+                  showSuccessMessage();
                 // Fetch the updated list of activities
                 fetchActivities(yearput, monthput);
             },
