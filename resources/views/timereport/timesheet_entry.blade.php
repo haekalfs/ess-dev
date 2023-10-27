@@ -582,7 +582,8 @@ active
 				    </div>
                 </div>
 				<div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    {{-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> --}}
+                    <a class="btn btn-danger delete-btn-update" data-dismiss="modal" id="deleteBtn">Reset</a>
                     <button type="submit" id="update-entry" class="btn btn-primary" data-dismiss="modal">Save changes</button>
                   </div>
 			</form>

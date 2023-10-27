@@ -75,14 +75,14 @@ $(document).ready(function() {
                         $('#updateModal').find('#update_activity').val(response.ts_activity);
                         $('#updateModal').find('#update_from').val(response.ts_from_time);
                         $('#updateModal').find('#update_to').val(response.ts_to_time);
-            
                     },
                     error: function(response, jqXHR, textStatus, errorThrown) {
                         console.log(response);
                     }
                 });
                 
-                $('#update-entry').data('id', activityId); // Store the activityId as data attribute
+                $('#update-entry').data('id', activityId);
+                $('#deleteBtn').data('id', activityId); // Store the activityId as data attribute
                 $('#entry-date-update').text(formattedDateStr); 
             });
             
@@ -126,6 +126,12 @@ $(document).ready(function() {
     
     $(document).on('click', '.delete-btn', function(event) {
         var activityId = $(event.target).data('id');
+        deleteActivity(activityId);
+    });
+
+    $(document).on('click', '.delete-btn-update', function(event) {
+        event.preventDefault();
+        var activityId = $(this).data('id');
         deleteActivity(activityId);
     });
 

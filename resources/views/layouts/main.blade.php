@@ -293,6 +293,7 @@
                         <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
                         <a class="collapse-item" href="/vendor-list">A3. Vendor List</a>
                         <a class="collapse-item" href="/news-feed/manage">A4. News Feed</a>
+                        <a class="collapse-item" href="/news-feed/manage">A5. Timesheet Integration</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>
