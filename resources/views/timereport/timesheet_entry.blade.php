@@ -704,6 +704,7 @@ active
                     <li>Submitting timesheets can only be done at certain times.</li>
                     <li>Delete tasks can be done below, in the <i>Activities Entry</i> table.</li>
                     <li>The location on the project is regulated by the Project Controller.</li>
+                    <li class="text-danger font-weight-bold">If there's a faulty or an error, CLEAR YOUR CACHE [Image Cache Only, Dont Clear Your browse or cookie history].</li>
                 </ol>
             </div>
             <div class="modal-footer">
