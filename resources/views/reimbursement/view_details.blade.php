@@ -285,8 +285,8 @@ active
                 <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
                     <thead class="thead-light">
                         <tr>
-                            <th>No.</th>
                             <th>Request To</th>
+                            <th>Status</th>
                             <th>Notes</th>
                         </tr>
                     </thead>
@@ -409,7 +409,7 @@ active
                     $.each(response, function(index, activity) {
                         var row = $('<tr></tr>').attr('data-id', activity.id);
                         row.append($('<td></td>').text(activity.RequestTo));
-                        row.append($('<td></td>').text(activity.status));
+                        row.append($('<td></td>').html(activity.status));
                         row.append($('<td></td>').text(activity.notes));
                         $('#ApproverList').append(row);
                         $('#approval_notes').val(activity.notes);

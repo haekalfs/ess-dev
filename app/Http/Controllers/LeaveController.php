@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class LeaveController extends Controller
@@ -489,6 +490,11 @@ class LeaveController extends Controller
             'expiration' => 'required',
             'quota_left' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            Session::flash('failed',"Error Database has Occured! Failed to create request! You need to fill all the required fields");
+            return redirect()->back();
+        }
 
         $row = Emp_leave_quota::find($id);
         $row->active_periode = $request->active_periode;

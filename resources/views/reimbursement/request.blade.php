@@ -7,6 +7,26 @@ active
 @endsection
 
 @section('content')
+@if ($message = Session::get('success'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('failed'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
+@if ($message = Session::get('warning'))
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
 <form method="post" action="/reimbursement/create/submit" enctype="multipart/form-data" id="myForm">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
@@ -17,113 +37,100 @@ active
         {{ csrf_field() }}
     
     
-        <div class="row zoom90">
-            <!-- Area Chart -->
-            <div class="col-xl-6 col-lg-6">
-                <div class="card shadow mb-4">
-                    <!-- Card Header - Dropdown -->
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Reimbursement Detail</h6>
-                    </div>
-                    <!-- Card Body -->
-                <div class="card-body">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <label>Type of Reimbursement :</label><br />
-                                <label class="col-md-6">
-                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="Project" checked="">
-                                    <span class="form-radio-sign">Project</span>
-                                </label>
-                                <label class="col-md-5">
-                                    <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="Others">
-                                    <span class="form-radio-sign">Others</span>
-                                </label>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group" id="projectSelect">
-                                    <select class="form-control" id="project" name="project">
-                                        <option value="0" disabled selected>Select a project</option>
-                                        @foreach($projects as $project)
-                                        <option value="{{$project->id}}">{{ $project->project_name}}</option>
-                                        @endforeach
-                                    </select>
-                                    <select class="form-control" id="reimbursementType" name="reimbursementType" style="display: none;">
-                                        <option value="0" disabled selected>Select a type</option>
-                                        <option value="Travel Reimbursement">Travel Reimbursement</option>
-                                        <option value="Expense Reimbursement">Expense Reimbursement</option>
-                                        <option value="Healthcare Reimbursement">Healthcare Reimbursement</option>
-                                        <option value="Tuition Reimbursement">Tuition Reimbursement</option>
-                                        <option value="Mileage Reimbursement">Mileage Reimbursement</option>
-                                        <option value="Cell Phone Reimbursement">Cell Phone Reimbursement</option>
-                                        <option value="Business Meal Reimbursement">Business Meal Reimbursement</option>
-                                        <option value="Relocation Reimbursement">Relocation Reimbursement</option>
-                                        <option value="Vendor or Supplier Reimbursement">Vendor or Supplier Reimbursement</option>
-                                        <option value="Petty Cash Reimbursement">Petty Cash Reimbursement</option>
-                                        <option value="Others Reimbursement">Others</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <label>Payment Method :</label><br />
-                                <label class="col-md-5">
-                                    <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
-                                    <span class="form-radio-sign">Cash</span>
-                                </label>
-                                <label class="col-md-6">
-                                    <input class="form-radio-input" type="radio" name="payment_method" value="Transfer Bank">
-                                    <span class="form-radio-sign">Transfer Bank</span>
-                                </label>
-                            </div>
-                            <div class="col-md-12" id="accountNumberField" style="display: none;">
-                                <div class="row">
-                                    <div class="col-md-12"><br>
-                                        <h6 class="m-0 font-weight-bold text-primary" id="judul">Your Account Number : {{ Auth::user()->users_detail->usr_bank_account }} ({{ Auth::user()->users_detail->usr_bank_name }})</h6>
-                                        {{-- <div class="form-group">
-                                            <label for="email">Account Number :</label>
-                                            <input type="text" class="form-control" name="account_no" id="accountNo" value="{{ Auth::user()->users_detail->usr_bank_name }} : {{ Auth::user()->users_detail->usr_bank_account }}" readonly>
-                                        </div> --}}
-                                    </div>
-                                    {{-- <div class="col-md-2 d-flex align-items-end">
-                                        <div class="form-group">
-                                            <button type="button" id="editButton" class="btn btn-primary">Edit</button>
-                                        </div>
-                                    </div>--}}
-                                </div>
-                            </div>                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    
+    <div class="row zoom90">
         <!-- Area Chart -->
-        <div class="col-xl-6 col-lg-6">
+        <div class="col-xl-12 col-lg-12">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Additional Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Reimbursement Detail</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="password">Request Approval To :</label>
-                                    <select class="form-control" id="approver" name="approver" required>
-                                        @foreach($approver as $app)
-                                        <option value="{{$app->id}}">{{ $app->department_name}}</option>
-                                        @endforeach
-                                    </select>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Type of Reimbursement :</label><br />
+                                    <label class="col-md-6">
+                                        <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="Project" checked="">
+                                        <span class="form-radio-sign">Project</span>
+                                    </label>
+                                    <label class="col-md-5">
+                                        <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="Others">
+                                        <span class="form-radio-sign">Others</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group" id="projectSelect">
+                                        <select class="form-control" name="project" required>
+                                            <option value="Others" disabled selected>Select a type</option>
+                                            <optgroup label="Projects" id="project">
+                                                @foreach($projects as $project)
+                                                <option value="{{$project->id}}">{{ $project->project_name}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                            <optgroup label="Others" style="display: none;" id="reimbursementType">
+                                                <option value="Travel Reimbursement">Travel Reimbursement</option>
+                                                <option value="Expense Reimbursement">Expense Reimbursement</option>
+                                                <option value="Healthcare Reimbursement">Healthcare Reimbursement</option>
+                                                <option value="Tuition Reimbursement">Tuition Reimbursement</option>
+                                                <option value="Mileage Reimbursement">Mileage Reimbursement</option>
+                                                <option value="Cell Phone Reimbursement">Cell Phone Reimbursement</option>
+                                                <option value="Business Meal Reimbursement">Business Meal Reimbursement</option>
+                                                <option value="Relocation Reimbursement">Relocation Reimbursement</option>
+                                                <option value="Vendor or Supplier Reimbursement">Vendor or Supplier Reimbursement</option>
+                                                <option value="Petty Cash Reimbursement">Petty Cash Reimbursement</option>
+                                                <option value="Others Reimbursement">Others</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Payment Method :</label><br />
+                                    <label class="col-md-5">
+                                        <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
+                                        <span class="form-radio-sign">Cash</span>
+                                    </label>
+                                    <label class="col-md-6">
+                                        <input class="form-radio-input" type="radio" name="payment_method" value="Transfer Bank">
+                                        <span class="form-radio-sign">Transfer Bank</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-12" id="accountNumberField" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-12"><br>
+                                            <h6 class="m-0 font-weight-bold text-primary" id="judul">Your Account Number : {{ Auth::user()->users_detail->usr_bank_account }} ({{ Auth::user()->users_detail->usr_bank_name }})</h6>
+                                            {{-- <div class="form-group">
+                                                <label for="email">Account Number :</label>
+                                                <input type="text" class="form-control" name="account_no" id="accountNo" value="{{ Auth::user()->users_detail->usr_bank_name }} : {{ Auth::user()->users_detail->usr_bank_account }}" readonly>
+                                            </div> --}}
+                                        </div>
+                                        {{-- <div class="col-md-2 d-flex align-items-end">
+                                            <div class="form-group">
+                                                <button type="button" id="editButton" class="btn btn-primary">Edit</button>
+                                            </div>
+                                        </div>--}}
+                                    </div>
+                                </div>                            
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="comment">Notes :</label>
-                            <textarea class="form-control" id="comment" rows="1" name="notes" required></textarea>
+                        <div class="col-md-6">
+                            <div class="form-group" style="display: none;" id="reqApproval">
+                                <label for="password">Request Approval To :</label>
+                                <select class="form-control" id="approver" name="approver">
+                                    <option value="" disabled selected>Select Division...</option>
+                                    @foreach($approver as $app)
+                                    <option value="{{$app->id}}">{{ $app->department_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="comment">Notes :</label>
+                                <textarea class="form-control" id="comment" rows="2" name="notes" required></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +152,6 @@ active
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
-                        
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-5 justify-content-between flex-row">

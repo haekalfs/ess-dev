@@ -241,7 +241,6 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history');
     Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req');
-    Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission');
     Route::get('/reimbursement/view/{id}', 'ReimburseController@view_details')->name('reimburse-view-req');
     Route::get('/retrieveReimburseData/{id}', 'ReimburseController@retrieveReimburseData');
     Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
@@ -275,5 +274,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/news-feed/manage/edit-post/{id}', 'NewsController@edit_post')->name('edit_post');
     Route::post('/news-feed/manage/update-post/{id}', 'NewsController@update_post')->name('news-feed.update');
     Route::get('/news-feed/manage/delete-post/{id}', 'NewsController@delete_post')->name('delete_post');
+
+
+
+    Route::post('/reimbursement/manage/disbursed/all', 'ReimburseController@disbursed_all');
+    Route::get('/reimbursement/manage/view/{id}', 'ReimburseController@manage_view_details');
     });
+    //Non
+    Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission');
 });

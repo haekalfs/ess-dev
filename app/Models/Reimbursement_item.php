@@ -17,8 +17,7 @@ class Reimbursement_item extends Model
         ->withDefault();
     }
 
-    public function approval()
-    {
+    public function approval(){
         return $this->hasMany('App\Models\Reimbursement_approval', 'reimb_item_id', 'id');
     }
 

@@ -64,12 +64,15 @@ active
                         <td>{{ $reimb->f_id }}</td>
                         <td>{{ $reimb->created_at }}</td>
                         <td><span class="long-text">{{ $reimb->f_type }}</span></td>
-                        <td>@if($reimb->status_id == 20)
-                            <span class="m-0 font-weight-bold text-danger">Waiting for Approval</span>
+                        <td>
+                            @if($reimb->status_id == 20)
+                            <span class="m-0 font-weight-bold text-secondary"><i class="fas fa-spinner fa-spin"></i> Waiting for Approval</span>
                             @elseif($reimb->status_id == 29) 
-                            <span class="m-0 font-weight-bold text-primary">Approved</span>
+                            <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Approved</span>
+                            @elseif($reimb->status_id == 2002) 
+                            <span class="m-0 font-weight-bold text-success"><i class="fas fa-check-circle" style="color: #01e476;"></i> Paid</span>
                             @else 
-                            <span class="m-0 font-weight-bold text-danger">Rejected</span>
+                            <span class="m-0 font-weight-bold text-danger"><i class="fas fa-times-circle" style="color: #ff0000;"></i> Rejected</span>
                             @endif
                         </td>
                         {{-- <td class="text-center">

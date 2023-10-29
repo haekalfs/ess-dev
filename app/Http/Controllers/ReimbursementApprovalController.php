@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyReimbursementApproved;
+use App\Jobs\NotifyReimbursementRejected;
+use App\Models\Notification_alert;
 use App\Models\Reimbursement;
 use App\Models\Reimbursement_approval;
 use App\Models\Reimbursement_item;
@@ -24,45 +27,45 @@ class ReimbursementApprovalController extends Controller
         $checkUserPost = Auth::user()->users_detail->position->id;
 
         //code above is to check if those with id 40,45,55,60 are able to approve or not
-        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,15])->pluck('approver')->toArray();
+        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
                 if (in_array($checkUserPost, [7, 8, 12, 10, 6, 22])) {
                     $Check = DB::table('reimbursement_approval')
-                        ->select('reimbursement_id')
-                        ->whereNotIn('RequestTo', $ts_approver)
-                        ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 30 THEN 1 WHEN status = 404 THEN 0 ELSE 0 END)')
-                        ->groupBy('reimbursement_id', 'RequestTo')
-                        ->pluck('reimbursement_id')
-                        ->toArray();
-                        if (!empty($Check)) {
-                            $approvals = Reimbursement_approval::select('*')
-                            // ->whereYear('date_submitted', $currentYear)
-                            ->where('RequestTo', Auth::user()->id)
-                            ->whereNotIn('status', [29, 404])
-                            ->whereIn('reimbursement_id', $Check)
-                            ->groupBy('reimbursement_id')
+                    ->select('reimb_item_id')
+                    ->whereNotIn('RequestTo', $ts_approver)
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 30 THEN 1 WHEN status = 404 THEN 0 ELSE 0 END)')
+                    ->groupBy('reimb_item_id')
+                    ->pluck('reimb_item_id')
+                    ->toArray();
+                    if (!empty($Check)) {
+                        $approvals = Reimbursement_approval::select('*')
+                        // ->whereYear('date_submitted', $currentYear)
+                        ->where('RequestTo', Auth::user()->id)
+                        ->whereNotIn('status', [29, 30, 404])
+                        ->whereIn('reimb_item_id', $Check)
+                        ->groupBy('reimbursement_id')
+                        ->get();
+                    } else {
+                        $approvals = DB::table('reimbursement_approval')
+                            ->select('*')
+                            ->where('RequestTo', 'xxhaekalsastraxx')
                             ->get();
-                        } else {
-                            $approvals = DB::table('reimbursement_approval')
-                                ->select('*')
-                                ->where('RequestTo', 'xxhaekalsastraxx')
-                                ->get();
-                        }
+                    }
                 } else {
                     $Check = DB::table('reimbursement_approval')
-                        ->select('reimbursement_id')
+                        ->select('reimb_item_id')
                         ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
-                        ->groupBy('reimbursement_id', 'RequestTo')
-                        ->pluck('reimbursement_id')
+                        ->groupBy('reimb_item_id')
+                        ->pluck('reimb_item_id')
                         ->toArray();
                     if (!empty($Check)) {
                         $approvals = reimbursement_approval::select('*')
                         // ->whereYear('date_submitted', $currentYear)
                         ->where('RequestTo', Auth::user()->id)
-                        ->whereNotIn('status', [29, 404])
-                        ->whereIn('reimbursement_id', $Check)
+                        ->whereNotIn('status', [29, 30, 404])
+                        ->whereIn('reimb_item_id', $Check)
                         ->groupBy('reimbursement_id')
                         ->get();
                     } else {
@@ -84,16 +87,13 @@ class ReimbursementApprovalController extends Controller
         $reimbursement = Reimbursement::where('id', $id)->get();
 
         foreach ($reimbursement as $as) {
-            if ($as->status_id == (40||20)) {
-                $btnApprove = '<div class="col-auto">
-                    <a href="/approval/project/assignment/approve/' . $id . '" class="btn btn-primary btn-sm">
-                        <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Submit
-                    </a>
-                </div>';
+            if ($as->status_id == 20) {
                 $status = "Waiting for Approval";
             } elseif ($as->status_id == 29) {
                 $btnApprove = "";
                 $status = "Approved";
+            } elseif ($as->status_id == 2002) {
+                $status = "Paid";
             } elseif ($as->status_id == 404) {
                 $btnApprove = "";
                 $status = "Rejected";
@@ -110,13 +110,36 @@ class ReimbursementApprovalController extends Controller
         $reimbursement_items = Reimbursement_approval::where('reimbursement_id', $id)->where('RequestTo', Auth::id())->groupBy('reimb_item_id')->get();
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
-        return view('approval.reimbursement.view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'btnApprove' => $btnApprove, 'stat' => $status, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('approval.reimbursement.view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'stat' => $status, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function listApprover($id)
     {
         $approverList = Reimbursement_approval::where('reimb_item_id', $id)->groupBy('RequestTo')->get();
-        return response()->json($approverList);
+
+        $array = [];
+
+        foreach ($approverList as $as) {
+            switch ($as->status){
+                case 404:
+                    $status = '<i class="fas fa-times-circle" style="color: #ff0000;"></i> Rejected';
+                    break;
+                case 30:
+                    $status = '<i class="fas fa-check-circle" style="color: #005eff;"></i> Approved';
+                    break;
+                default:
+                    $status = '<i class="fas fa-spinner fa-spin"></i> Waiting for Approval';
+                break;
+            }
+            $data = [
+                'RequestTo' => $as->user->name,
+                'status' => $status,
+                'notes' => $as->notes,
+            ];
+            $array[] = $data;
+        }
+
+        return response()->json($array);
     }
 
     public function approve(Request $request, $item_id)
@@ -131,11 +154,11 @@ class ReimbursementApprovalController extends Controller
             return response()->json(['error' => $validator->errors()]);
         }
 
-        $financeManager = Timesheet_approver::find(15);
         $item = Reimbursement_item::find($item_id);
         $statNum = 30;
+        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
 
-        if(Auth::id() == $financeManager->approver){
+        if(in_array(Auth::id(), $ts_approver)){
             $statNum = 29;
             if (!empty($request->approved_amount)) {
                 //formatting amount
@@ -150,6 +173,23 @@ class ReimbursementApprovalController extends Controller
             $reimb_req = Reimbursement::find($item->reimbursement_id);
             $reimb_req->status_id = 29;
             $reimb_req->save();
+
+            $entry = new Notification_alert();
+            $entry->user_id = $reimb_req->f_req_by;
+            $entry->message = "-";
+            $entry->importance = 1;
+            list($year, $month) = explode('-', substr($reimb_req->created_at, 0, 7));
+            $yearAndMonth = $year . intval($month);
+            $entry->month_periode = $yearAndMonth;
+            $entry->type = 5;
+            $entry->save();
+            
+            $employees = User::where('id', $reimb_req->f_req_by)->get();
+            $userName = Auth::user()->name;
+
+            foreach ($employees as $employee) {
+                dispatch(new NotifyReimbursementApproved($employee, $userName));
+            }
         }
         $item->save();
 
@@ -176,6 +216,17 @@ class ReimbursementApprovalController extends Controller
                         ->where('RequestTo', Auth::user()->id)
                         ->update(['status' => '404', 'notes' => $request->approval_notes]);
 
+        $reimbItem = Reimbursement_item::find($item_id);
+        $reimbReq = Reimbursement::find($reimbItem->reimbursement_id);
+        $reimbReq->status_id = 404;
+        $reimbReq->save();
+        $employees = User::where('id',$reimbReq->f_req_by)->get();
+        $reimbId = $reimbReq->id;
+
+        foreach($employees as $employee){
+            dispatch(new NotifyReimbursementRejected($employee, $reimbId));
+        }
+        
         return response()->json(['success' => 'Items rejected successfully.']);
     }
 }

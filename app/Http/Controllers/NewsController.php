@@ -7,6 +7,7 @@ use App\Models\News_feed;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use NewsFeed;
 
@@ -131,7 +132,8 @@ class NewsController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()]);
+            Session::flash('failed',"Error Database has Occured! Failed to create request! You need to fill all the required fields");
+            return redirect()->back();
         }
 
         try {

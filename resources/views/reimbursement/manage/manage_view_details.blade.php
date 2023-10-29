@@ -13,7 +13,7 @@ active
         <p class="mb-4 text-danger"><i>{{ $stat }}</i></p>
     </div>
     <div class="col-auto">
-        <a href="/approval/reimburse/" class="btn btn-primary btn-sm">
+        <a href="/reimbursement/manage" class="btn btn-primary btn-sm">
             <i class="fas fa-backward"></i>&nbsp; Go Back
         </a>
     </div>
@@ -134,7 +134,6 @@ active
                                 <th>Expense</th>
                                 <th>Payout</th>
                                 <th>Status</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -154,14 +153,6 @@ active
                                             <i class="far fa-times-circle"></i>
                                         @else
                                             <a><i class="far fa-check-circle fa-spin"></i></a>
-                                        @endif
-                                    </td>
-                                    <td class="action text-center">
-                                        @if($usr->status == 20)
-                                        <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->item->id }}" class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-edit"></i> Action</a>
-                                        @else
-                                            <small style="color: grey;"><i>Action already applied.</i></small>
-                                            {{-- <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->item->id }}" class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-edit"></i> Action</a> --}}
                                         @endif
                                     </td>
                                 </tr>

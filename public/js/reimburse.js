@@ -66,25 +66,29 @@ cashRadio.addEventListener('change', function () {
     }
 });
 
-
-projectRadio.addEventListener('change', function () {
-    if (this.checked) {
-        // Enable the "project" select element and set it as required
-        projectSelect.style.display = 'block';
-        projectSelect.required = true;
-        reimbursementTypeSelect.required = false;
-        reimbursementTypeSelect.style.display = 'none';
-    }
-});
-
-othersRadio.addEventListener('change', function () {
-    if (this.checked) {
-        // Disable the "project" select element and set reimbursementType as required
-        projectSelect.style.display = 'none';
-        projectSelect.required = false;
-        reimbursementTypeSelect.style.display = 'block';
-        reimbursementTypeSelect.required = true;
-    }
+$(document).ready(function() {
+    var reqApprovalContainer = $('#reqApproval');
+    projectRadio.addEventListener('change', function () {
+        if (this.checked) {
+            // Enable the "project" select element and set it as required
+            reqApprovalContainer.hide();
+            projectSelect.style.display = 'block';
+            projectSelect.required = true;
+            reimbursementTypeSelect.required = false;
+            reimbursementTypeSelect.style.display = 'none';
+        }
+    });
+    
+    othersRadio.addEventListener('change', function () {
+        if (this.checked) {
+            // Disable the "project" select element and set reimbursementType as required
+            reqApprovalContainer.show();
+            projectSelect.style.display = 'none';
+            projectSelect.required = false;
+            reimbursementTypeSelect.style.display = 'block';
+            reimbursementTypeSelect.required = true;
+        }
+    });
 });
 
     const originalForm = document.querySelector("#originalForm");

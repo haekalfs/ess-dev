@@ -26,4 +26,9 @@ class Reimbursement_approval extends Model
     	return $this->belongsTo('App\Models\User', 'RequestTo', 'id')
         ->withDefault();
     }
+
+    public function approval_status(){
+    	return $this->belongsTo('App\Models\Approval_status', 'status', 'approval_status_id')
+        ->withDefault();
+    }
 }
