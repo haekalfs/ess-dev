@@ -119,7 +119,7 @@ active
                                 <tbody>
                                     @if ($approvals->isEmpty())
                                         <tr style="border-bottom: 1px solid #dee2e6;">
-                                            <td colspan="4" class="text-center"><a><i>No Data Available</i></a></td>
+                                            <td colspan="6" class="text-center"><a><i>No Data Available</i></a></td>
                                         </tr>
                                     @else
                                     @php $no = 1; @endphp
