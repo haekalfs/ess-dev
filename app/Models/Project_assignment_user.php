@@ -15,7 +15,7 @@ class Project_assignment_user extends Model
     protected $fillable = ['user_id', 'role', 'responsibility', 'periode_start', 'periode_end', 'project_assignment_id', 'company_project_id'];
 
     public function assigned(){
-    	return $this->belongsTo('App\Models\Project_assignment', 'project_assignment_id', 'id');
+    	return $this->belongsTo('App\Models\Project_assignment', 'project_assignment_id', 'id')->withDefault();
     }
 
     public function timesheet_detail(){

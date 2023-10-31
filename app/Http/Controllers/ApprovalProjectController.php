@@ -71,7 +71,7 @@ class ApprovalProjectController extends Controller
         
         $userNotify = [];
         foreach($assignment as $as){
-            $entry = new Notification_alert();
+            $entry = new Notification_alert;
             $entry->user_id = $as->user_id;
             $cp = $as->company_project->project_name;
             $entry->message = "You have assigned to an assignment of $cp!";
