@@ -476,7 +476,8 @@ class ProjectController extends Controller
     public function requested_assignment_view($id)
     {
         $request = Requested_assignment::find($id);
-        return view('projects.requested_assignment_view', ['request' => $request]);
+        $assignment = Project_assignment_user::where('user_id', $request->req_by)->orderBy('periode_end', 'desc')->get();
+        return view('projects.requested_assignment_view', ['request' => $request, 'assignment' => $assignment]);
     }
 
     public function requested_assignment_approve($id)
