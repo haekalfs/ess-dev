@@ -94,7 +94,7 @@ active
                             <div class="form-group">
                                 <label for="password">User ID :</label>
                                 <input class="form-control flex" id="usr_id" name="usr_id" placeholder="User ID..."/>
-                                <h6 style="color:red; font-size: 13px; font-style: italic" id="user-id-error"></h6>
+                                <span style="color:red; font-size: 13px; font-style: italic" id="user-id-error"></span>
                             </div>
                         </div>
                     </div>
@@ -549,10 +549,11 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.exists) {
-                    $('#user-id-error').text('User ID sudah digunakan');
+                    $('#user-id-error').text('User ID Sudah Digunakan').css('color', 'red');
                 } else {
-                    $('#user-id-error').text('User ID Tersedia');
+                    $('#user-id-error').text('User ID Dapat Digunakan').css('color', 'lightgreen');
                 }
+
             },
             error: function() {
                 $('#user-id-error').text('Terjadi kesalahan saat memeriksa User ID');

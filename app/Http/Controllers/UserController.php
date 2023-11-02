@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\Position;
 use App\Models\Department;
+use App\Models\Emp_leave_quota;
+use App\Models\Emp_medical_balance;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -116,6 +118,21 @@ class UserController extends Controller
             'profile_pic' => $nama_file_profile,
             'cv' => $nama_file_cv,
         ]);
+
+        $emp_leave = new Emp_leave_quota();
+        $emp_leave->user_id = $request->usr_id;
+        $emp_leave->leave_id = 10;
+        $emp_leave->quota_used = 0;
+        $emp_leave->quota_left = 0;
+        $emp_leave->save();
+
+        $med_balance = new Emp_medical_balance();
+        $med_balance->user_id = $request->usr_id;
+        $med_balance->medical_balance = 0;
+        $med_balance->medical_deducted = 0;
+        $med_balance->save();
+
+
 
     	return redirect('/manage/users')->with('success', 'User Create successfully');
     }

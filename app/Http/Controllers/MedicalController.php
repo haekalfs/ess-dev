@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyMedicalCreation;
+use App\Jobs\NotifyMedicalPaid;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -76,7 +78,7 @@ class MedicalController extends Controller
     {
 
         $request->validate([
-            'attach.*' => 'required|file',
+            'attach.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'amount.*' => 'required',
             'desc.*' => 'required',
         ]);
@@ -140,13 +142,20 @@ class MedicalController extends Controller
             $meddet->save();
         }
 
-        // $uTA = $approval->approver;
+        $userToApprove = $approval->approver;
 
         $medical_approve = new Medical_approval();
         $medical_approve->medical_id = $nextId;
-        $medical_approve->RequestTo = $approval->approver;
+        $medical_approve->RequestTo = $userToApprove;
         $medical_approve->status = 15;
         $medical_approve->save();
+        
+        $employees = User::where('id', $userToApprove)->get();
+        $userName = Auth::user()->name;
+
+        foreach ($employees as $employee) {
+            dispatch(new NotifyMedicalCreation($employee, $userName));
+        }
 
         return redirect('/medical/history')->with('Success', 'Medical Reimburse Add successfully');
     }
@@ -192,7 +201,7 @@ class MedicalController extends Controller
 
         $medDet = Medical_details::where('mdet_id', $medical_id)->first();
         $request->validate([
-            'attach_edit' => 'sometimes|file',
+            'attach_edit' => 'sometimes|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'amount.*' => 'sometimes',
             'desc.*' => 'sometimes',
         ]);
@@ -329,8 +338,8 @@ class MedicalController extends Controller
     {
         $medReview = Medical_approval::where('status', 29)->pluck('medical_id')->toArray(); // Get medical_ids that match the condition
 
-        $query = Medical::whereIn('id', $medReview); // Apply the medReview filter first
-
+        $query = Medical::whereIn('id', $medReview)->whereNotIn('paid_status', [29]); // Apply the medReview filter first
+// dd($query);
         // Filter by user_id
         if ($request->has('user_id') && $request->user_id !== '1') {
             $query->where('user_id', $request->user_id);
@@ -341,12 +350,39 @@ class MedicalController extends Controller
             $query->whereYear('med_req_date', $request->year);
         }
 
+        // Filter by month
+        if ($request->has('month') && $request->month !== '') {
+            $query->whereMonth('med_req_date', $request->month);
+        }
 
         $med = $query->get();
         $user = User::all();
         $currentYear = Carbon::now()->year;
+        $month = Carbon::now()->month;
+        $currentMonth = date('m');
         $years = range($currentYear, $currentYear - 10);
-        return view('medical.review_medical', ['med' => $med, 'user' => $user, 'years' => $years]);
+        return view('medical.review_medical', ['med' => $med, 'user' => $user, 'years' => $years, 'month' => $month, 'currentMonth' => $currentMonth]);
+
+    }
+
+    public function paid($id)
+    {
+        $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
+        $userId = $user_med->user_id;
+        $MedId = $user_med->med_number;
+        $employees = User::where('id', $userId)->get();
+        $userName = Auth::user()->name;
+        foreach ($employees as $employee) {
+            dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
+        }
+        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+
+        $med = Medical::where('id', $id)->first();
+        $med->paid_status = 29;
+        $med->save();
+
+        
+        return redirect('/medical/review')->with('success', "You Have Paid $userName Medical Reimbursement ");
     }
 
 // Medical Manage

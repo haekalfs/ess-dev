@@ -94,9 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/approval/project/assignment/preview/{id}', 'ApprovalProjectController@preview_assignment')->name('preview.project.assignment');
     Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectController@approve_assignment')->name('approve.project.assignment');
     Route::get('/approval/project/assignment/reject/{id}', 'ApprovalProjectController@reject_assignment')->name('reject.project.assignment');
-    
-    // Approval Medical
-    
+
     //myprofile
     Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
     
@@ -219,22 +217,26 @@ Route::middleware(['auth'])->group(function () {
     //medical reimburse
     Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
     Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
-    Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
+    
     Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
     Route::get('/medical/edit/{id}/download', 'MedicalController@download')->middleware('auth');
     Route::put('/medical/edit/{id}/resubmit', 'MedicalController@resubmit')->middleware('auth');
     Route::get('/medical/delete/{id}', 'MedicalController@delete_med_all')->middleware('auth');
     Route::put('/medical/edit/{id}/update/{mdet_id}', 'MedicalController@update_medDetail')->middleware('auth');
     Route::get('/medical/edit/{id}/delete/{mdet_id}', 'MedicalController@delete_medDetail')->middleware('auth');
-
+    
+    //medical manage
     Route::get('/medical/manage', 'MedicalController@index_manage')->middleware('auth');
-    Route::get('/medical/review', 'MedicalController@review_fm')->middleware('auth');
     Route::post('/medical/manage/add_balance', 'MedicalController@add_balance')->middleware('auth');
     Route::put('/medical/manage/edit_balance/{id}', 'MedicalController@edit_balance')->middleware('auth');
 
+    // medical review FM
+    Route::get('/medical/review', 'MedicalController@review_fm')->middleware('auth');
+    Route::put('/medical/review/{id}', 'MedicalController@paid')->middleware('auth');
+
     //medical approval
     Route::get('/medical/approval/{id}', 'ApprovalController@approval_edit')->middleware('auth');
-    Route::put('/medical/approval/{id}M/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
+    Route::put('/medical/approval/{id}/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
     Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
     Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')->middleware('auth');
 
@@ -281,5 +283,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reimbursement/manage/view/{id}', 'ReimburseController@manage_view_details');
     });
     //Non
+    Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
     Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission');
 });
