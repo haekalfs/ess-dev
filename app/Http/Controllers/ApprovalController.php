@@ -105,7 +105,7 @@ class ApprovalController extends Controller
             $Month = $request->monthOpt;
         }
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 17 && $currentDay <= 31) {
+        if ($currentDay >= 1 && $currentDay <= 31) {
             if (in_array($checkUserPost, [7, 8, 12])) {
                 $Check = Timesheet_detail::select('*')
                     ->whereYear('date_submitted', $Year)
@@ -382,6 +382,8 @@ class ApprovalController extends Controller
         $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been rejected!";
         $entry->importance = 404;
+        $entry->month_periode = $year.$month;
+        $entry->type = 2;
         $entry->save();
 
         return redirect('/approval/timesheet/p')->with('failed', "You rejected $user_timesheet timereport!");

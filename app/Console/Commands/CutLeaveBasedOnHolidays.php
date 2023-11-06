@@ -9,6 +9,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 
 class CutLeaveBasedOnHolidays extends Command
 {
@@ -44,8 +45,34 @@ class CutLeaveBasedOnHolidays extends Command
     public function handle()
     {
         date_default_timezone_set("Asia/Jakarta");
-        $json = file_get_contents("https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json");
-        $array = json_decode($json, true);
+
+        $cachedData = Cache::get('holiday_data');
+        $maxAttempts = 15;
+        $attempts = 0;
+
+        while (!$cachedData && $attempts < $maxAttempts) {
+            try {
+                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                $array = json_decode($json, true);
+                Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+                $cachedData = $array;
+            } catch (Exception $e) {
+                // Handle exception or log error
+                sleep(5); // Wait for 5 seconds before retrying
+                $attempts++;
+            }
+        }
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
+        } else {
+            $array = $cachedData;
+            // Use the cached data
+        }
+
+        // $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+        // $array = json_decode($json, true);
 
         $year = date('Y'); // Specify the year you want to retrieve data for
         $holidayKeyword = "Cuti Bersama"; // Specify the keyword you want to filter
@@ -53,7 +80,7 @@ class CutLeaveBasedOnHolidays extends Command
         $totalHolidays = 0;
 
         foreach ($array as $date => $holiday) {
-            if (substr($date, 0, 4) === $year && isset($holiday['deskripsi']) && strpos($holiday['deskripsi'], $holidayKeyword) !== false) {
+            if (substr($date, 0, 4) === $year && isset($holiday['summary'][0]) && strpos($holiday['summary'][0], $holidayKeyword) !== false) {
                 $totalHolidays++;
             }
         }
