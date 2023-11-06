@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Requested Assignment</h1>
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Requested Assignment by User</h1>
     {{-- <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Request Assignment</a> --}}
 </div>
 
@@ -47,9 +47,8 @@ active
                     <tr>
                         <th>Request Date</th>
                         <th>Requestor</th>
-                        <th>Project</th>
-                        <th>Periode Start</th>
-                        <th>Periode End</th>
+                        <th>For Project</th>
+                        <th>Requested Periode</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -60,8 +59,7 @@ active
                         <td>{{ $record->req_date }}</td>
                         <td>{{ $record->user->name }}</td>
                         <td><span class="long-text">{{ $record->company_project->project_name }}</span></td>
-                        <td>{{ $record->periode_start }}</td>
-                        <td>{{ $record->periode_end }}</td>
+                        <td>{{ \Carbon\Carbon::parse($record->periode_start)->format('d-M-Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($record->periode_end)->format('d-M-Y') }}</td>
                         <td class="text-center">
                             @if($record->status == 0)
                             <i class="fas fa-spinner fa-spin" style="color: #808080;"></i>

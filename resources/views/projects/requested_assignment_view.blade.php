@@ -109,19 +109,19 @@ active
                         <table class="table table-borderless">
                             <tbody>
                                 <tr class="table-sm">
-                                    <td style="width: 150px;">Project</td>
+                                    <td style="width: 180px;">Project</td>
                                     <td>: {{ $request->company_project->project_name }}</td>
                                 </tr>
                                 <tr class="table-sm">
-                                    <td style="width: 150px;">Client</td>
-                                    <td>: {{ $request->company_project->client->client_name }}</td>
+                                    <td style="width: 180px;">Requested Periode</td>
+                                    <td>: {{ \Carbon\Carbon::parse($request->periode_start)->format('d-M-Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($request->periode_end)->format('d-M-Y') }}</td>
                                 </tr>
                                 <tr class="table-sm">
-                                    <td style="width: 150px;">Requested Role</td>
+                                    <td style="width: 180px;">Requested Role</td>
                                     <td>: {{ $request->role }}</td>
                                 </tr>
                                 <tr class="table-sm">
-                                    <td style="width: 150px;">Responsibility</td>
+                                    <td style="width: 180px;">Responsibility</td>
                                     <td>: {{ $request->responsibility }}</td>
                                 </tr>
                             </tbody>
@@ -154,6 +154,16 @@ active
                 </thead>
                 <tbody>
                     @foreach($assignment as $assign)
+                    @php
+                        $assignStart = \Carbon\Carbon::parse($assign->periode_start);
+                        $assignEnd = \Carbon\Carbon::parse($assign->periode_end);
+
+                        $requestStart = \Carbon\Carbon::parse($request->periode_start);
+                        $requestEnd = \Carbon\Carbon::parse($request->periode_end);
+
+                        // Check if the two date ranges intersect
+                        $intersect = $assignStart <= $requestEnd && $assignEnd >= $requestStart;
+                    @endphp
                     <tr>
                         <td>{{ $assign->responsibility }}</td>
                         <td>{{ $assign->assigned->assignment_no }}</td>
@@ -161,10 +171,10 @@ active
                         <td>{{ \Carbon\Carbon::parse($assign->periode_start)->format('d-M-Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($assign->periode_end)->format('d-M-Y') }}</td>
                         <td class="text-center">
-                            @if($assign->periode_end <= date('Y-m-d'))
-                            <i class="fas fa-times-circle" style="color: #ff0000;"></i>
+                            @if($intersect)
+                                <span><i class="fas fa-times-circle" style="color: #ff0000;"></i> Requested Period Intersected</span>
                             @else
-                            <i class="fas fa-check-circle" style="color: #0050db;"></i>
+                                <span><i class="fas fa-check-circle" style="color: #0050db;"></i> Not Intersected</span>
                             @endif
                         </td>
                     </tr>
