@@ -60,6 +60,18 @@ active
                                 </select>
                             </div>
                         </div> 
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="password">Month :</label>
+                                <select class="form-control" name="month">
+                                    @foreach (range(1, 12) as $month)
+                                        <option value="{{ $month }}" @if ($month == $currentMonth) selected @endif {{ request('month') == $month ? 'selected' : '' }} >
+                                            {{ date("F", mktime(0, 0, 0, $month, 1)) }} 
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-md-2">  
                             <div class="form-group">
                                 <label for="status">Year:</label>

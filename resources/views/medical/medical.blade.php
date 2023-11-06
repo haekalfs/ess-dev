@@ -136,13 +136,13 @@ active
                             @foreach ($q->medical_approval as $md)
                                 @switch($md->status)
                                     @case(29)
-                                        <span class="badge  badge-success" style="font-size: 16px">Approved By {{ $md->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
+                                        <span class="badge  badge-success" style="font-size: 14px">Approved By {{ $md->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
                                         @break
                                     @case(15)
                                         <span class="badge badge-secondary" style="font-size: 14px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
                                         @break
                                     @case(404)
-                                        <span class="badge badge-danger" style="font-size: 16px">Rejected By {{ $md->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
+                                        <span class="badge badge-danger" style="font-size: 14px">Rejected By {{ $md->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
                                         @break
                                     @default
                                         <span class="badge badge-info" style="font-size: 14px">Status Tidak Dikenal</span>
@@ -152,7 +152,7 @@ active
                         <td class="text-center">
                             @switch($q->paid_status)
                                 @case(20)
-                                    <span class="badge badge-pill badge-primary" style="font-size: 16px">Approved <i class="fa fa-check" aria-hidden="true"></i></span>
+                                    <span class="badge badge-pill badge-primary" style="font-size: 14px">Waiting For Payment <i class="fa fa-check" aria-hidden="true"></i></span>
                                     @break
                                 @case(15)
                                     <span class="badge badge-pill badge-secondary" style="font-size: 14px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
