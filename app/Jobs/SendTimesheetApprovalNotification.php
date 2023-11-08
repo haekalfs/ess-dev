@@ -36,10 +36,10 @@ class SendTimesheetApprovalNotification implements ShouldQueue
      */
     public function handle()
     {
-        $monthPeriod = Timesheet_detail::select('id', 'month_periode')
+        $monthPeriod = Timesheet_detail::select('month_periode')
         ->where('ts_status_id', 20)
         ->where('RequestTo', $this->user->id)
-        ->groupBy('id', 'month_periode')
+        ->groupBy('month_periode')
         ->get();
 
         $notification = new ApprovalTimesheet($this->user, $monthPeriod);
