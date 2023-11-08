@@ -27,4 +27,9 @@ class Timesheet_detail extends Model
     public function project_assignment_user(){
     	return $this->belongsTo('App\Models\Project_assignment_user');
     }
+
+    public function approval_status(){
+    	return $this->belongsTo('App\Models\Approval_status', 'ts_status_id', 'approval_status_id')
+        ->withDefault();
+    }
 }

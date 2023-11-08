@@ -101,7 +101,7 @@ active
                                         </tr>
                                     @else
                                         @foreach($approvals as $index => $approval)
-                                        <tr>
+                                        <tr style="border-bottom: 1px solid #dee2e6;">
                                             @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
                                             <td style="border-bottom: none; border-top: none;"></td>
                                             <td style="border-bottom: none; border-top: none;"></td>

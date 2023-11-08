@@ -52,7 +52,14 @@ active
                     @foreach ($entries as $entry)
                     <tr>
                         <td>{{ $entry['month'] }}</td>
-                        <td>{{ $entry['lastUpdatedAt'] }}</td>
+                        <td>
+                            @if ($entry['lastUpdatedAt'] !== 'None')
+                                {{ \Carbon\Carbon::parse($entry['lastUpdatedAt'])->format('j F Y') }} at {{ \Carbon\Carbon::parse($entry['lastUpdatedAt'])->format('H:i') }}
+                            @else
+                                None
+                            @endif
+                        </td>
+                        
                         <td>{{ $entry['status'] }}</td>
                         <td class="action text-center">
                             @if (!$entry['isSubmitted'])
