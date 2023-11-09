@@ -1469,6 +1469,9 @@ class TimesheetController extends Controller
         ->get()
         ->count();
 
+        //delete previous data
+        Timesheet_detail::where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->whereNotIn('ts_status_id', [10, 15])->delete();
+
         foreach ($empApproval as $test) {
             Timesheet_detail::updateOrCreate([
                 'user_id' => Auth::user()->id,

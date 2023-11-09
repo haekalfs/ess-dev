@@ -34,7 +34,7 @@ active
 @endif
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Timesheets</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Reimbursement</h6>
         <div class="text-right">
             <form method="POST" action="/reimbursement/manage/disbursed/all">
                 @csrf
