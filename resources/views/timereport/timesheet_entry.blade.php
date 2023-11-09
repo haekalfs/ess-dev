@@ -322,7 +322,7 @@ active
                                         <optgroup label="Others">
                                             <option value="StandbyLK">Standby (LK)</option>
                                             <option value="StandbyLN">Standby (LN)</option>
-                                            <option value="Lembur">Lembur</option>
+                                            {{-- <option value="Lembur">Lembur</option> --}}
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
                                         </optgroup>
@@ -432,7 +432,7 @@ active
                                         <optgroup label="Others">
                                             <option value="StandbyLK">Standby (LK)</option>
                                             <option value="StandbyLN">Standby (LN)</option>
-                                            <option value="Lembur">Lembur</option>
+                                            {{-- <option value="Lembur">Lembur</option> --}}
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
                                         </optgroup>
@@ -534,7 +534,7 @@ active
                                         <optgroup label="Others">
                                             <option value="StandbyLK">Standby (LK)</option>
                                             <option value="StandbyLN">Standby (LN)</option>
-                                            <option value="Lembur">Lembur</option>
+                                            {{-- <option value="Lembur">Lembur</option> --}}
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
                                         </optgroup>
@@ -631,7 +631,7 @@ active
                                         <optgroup label="Others">
                                             <option value="StandbyLK">Standby (LK)</option>
                                             <option value="StandbyLN">Standby (LN)</option>
-                                            <option value="Lembur">Lembur</option>
+                                            {{-- <option value="Lembur">Lembur</option> --}}
                                             <option value="Sick">Sick</option>
                                             <option value="Other">Other</option>
                                         </optgroup>
