@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Module Security</h1>
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-lock"></i> Module Security</h1>
     <div>
         {{-- <a class="btn btn-primary btn-sm" href="/management/security_&_roles/manage/access" style="margin-right: 10px;">Manage Access</a> --}}
         <a class="btn btn-danger btn-sm" href="{{ url()->previous() }}"><i class="fas fa-redo-alt fa-sm text-white-50"></i> Back</a>

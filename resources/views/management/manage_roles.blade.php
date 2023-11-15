@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800">Manage Roles</h1>
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-users-cog"></i> Manage Roles</h1>
     <a href="{{ url()->previous() }}" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-redo-alt fa-sm text-white-50"></i> Back</a>
 </div>
 @if ($message = Session::get('success'))

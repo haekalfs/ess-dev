@@ -103,7 +103,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leave/request/entry', 'LeaveController@leave_request_entry')->name('leave.entry');
     Route::get('/leave/request/details/{id}', 'LeaveController@leave_request_details')->name('leave_req_details')->where('id', '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}');
     Route::get('/leave/history/cancel/{id}', 'LeaveController@cancel_request')->name('cancel_leave');
-    
+    Route::get('/leave/request/manage/all', 'LeaveController@manage_request')->name('manage_leave_requests');
+    Route::get('/leave/request/manage/id/{id}/{month}/{year}', 'LeaveController@emp_leave_request')->name('emp_requests');
+
     Route::get('/leave/manage/all', 'LeaveController@manage')->name('manage_leave');
     Route::get('/leave/manage/{id}', 'LeaveController@manage_leave_emp')->name('manage_leave_user');
     Route::get('/leave/manage/edit/{id}', 'LeaveController@get_leave_emp');

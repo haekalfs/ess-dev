@@ -154,13 +154,13 @@
                         <a class="collapse-item" href="/leave/history">History</a>
                         @else
                         @endusr_acc
-                        @usr_acc(303)
-                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/development">Leave Report</a>
-                        @else
-                        @endusr_acc
                         @usr_acc(304)
                         <a class="collapse-item" href="/leave/manage/all">Manage</a>
+                        @else
+                        @endusr_acc
+                        @usr_acc(303)
+                        <h6 class="collapse-header text-danger">Restricted Access:</h6>
+                        <a class="collapse-item" href="/leave/request/manage/all">Emp. Leave Requests</a>
                         @else
                         @endusr_acc
                         @usr_acc(305)

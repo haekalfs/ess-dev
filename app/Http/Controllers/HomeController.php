@@ -68,13 +68,25 @@ class HomeController extends Controller
 
     public function changeStatus($id)
     {
-        // Retrieve the notification
-        $notification = Notification_alert::findOrFail($id);
+        try {
+            // Retrieve the notification
+            $notification = Notification_alert::findOrFail($id);
 
-        // Update the status
-        $notification->read_stat = true;
-        $notification->save();
-        
-        return response()->json(['success'=>'Client created successfully.']);
+            // Update the status
+            $notification->update(['read_stat' => true]);
+
+            if ($notification->type) {
+                // Update other rows with the same type and month_periode
+                Notification_alert::where('type', $notification->type)
+                    ->where('month_periode', $notification->month_periode)
+                    ->where('id', '!=', $id)
+                    ->update(['read_stat' => true]);
+            }
+
+            return response()->json(['success' => 'read.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+
 }

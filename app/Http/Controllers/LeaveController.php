@@ -325,7 +325,7 @@ class LeaveController extends Controller
             dispatch(new NotifyLeaveApproval($employee, $userName));
         }
 
-        Leave_request::where('RequestTo', Auth::user()->id)->delete();
+        Leave_request_approval::where('RequestTo', Auth::user()->id)->delete();
 
         return redirect("/leave/history")->with('success', "Leave Request Submitted Successfully");
     }
@@ -505,29 +505,29 @@ class LeaveController extends Controller
         return response()->json(['success' => 'Employee Leave updated successfully.']);
     }
 
-    public function edit_leave_emp($usrId, $id)
-	{
-        $user_info = User::find($usrId);
-        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', $user_info->id)
-            ->where('leave_id', 10)
-            ->where('expiration', '>=', date('Y-m-d'))
-            ->sum('quota_left');
-        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', $user_info->id)
-            ->where('leave_id', 100)
-            ->where('expiration', '>=', date('Y-m-d'))
-            ->sum('quota_left');
-        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
-            ->where('user_id', $user_info->id)
-            ->where('leave_id', 20)
-            ->sum('quota_left');
-        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
-        if($empLeaveQuotaFiveYearTerm == NULL){
-            $empLeaveQuotaFiveYearTerm = "-";
-        }
+    // public function edit_leave_emp($usrId, $id)
+	// {
+    //     $user_info = User::find($usrId);
+    //     $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', $user_info->id)
+    //         ->where('leave_id', 10)
+    //         ->where('expiration', '>=', date('Y-m-d'))
+    //         ->sum('quota_left');
+    //     $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', $user_info->id)
+    //         ->where('leave_id', 100)
+    //         ->where('expiration', '>=', date('Y-m-d'))
+    //         ->sum('quota_left');
+    //     $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+    //         ->where('user_id', $user_info->id)
+    //         ->where('leave_id', 20)
+    //         ->sum('quota_left');
+    //     $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
+    //     if($empLeaveQuotaFiveYearTerm == NULL){
+    //         $empLeaveQuotaFiveYearTerm = "-";
+    //     }
 
-        $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
-		return view('leave.edit_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
-	}
+    //     $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
+	// 	return view('leave.edit_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
+	// }
 
     public function add_leave_quota(Request $request, $emp){
         date_default_timezone_set("Asia/Jakarta");
@@ -562,4 +562,112 @@ class LeaveController extends Controller
 
         return redirect()->back()->with('success', "Leave Quota has been added!");
     }
+
+    public function manage_request(Request $request)
+    {
+        $Month = date('m');
+        $Year = date('Y');
+
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
+        $employees = User::with('users_detail')
+		->whereHas('users_detail', function ($query) {
+			$query->whereNull('resignation_date');
+		})->get();
+
+        $validator = Validator::make($request->all(), [
+            'showOpt' => 'required',
+            'yearOpt' => 'required',
+            'monthOpt' => 'required'
+        ]);
+
+        $approvals = Leave_request::orderBy('req_by', 'asc')->orderBy('req_date', 'asc');
+
+        if ($validator->passes()) {
+            $Year = $request->yearOpt;
+            $Month = $request->monthOpt;
+            $approvals->whereYear('req_date', $Year);
+            $approvals->whereMonth('req_date', intval($Month));
+        } else {
+            $approvals->whereYear('req_date', $Year);
+            $approvals->whereMonth('req_date', intval($Month));
+        }
+
+        $approvals = $approvals->get();
+        // dd($approvals);
+        return view('leave.manage_request', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
+    }
+
+    public function emp_leave_request($id, $month, $year)
+	{
+        $user_info = User::find($id);
+        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 10)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 100)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+            ->where('user_id', $user_info->id)
+            ->where('leave_id', 20)
+            ->sum('quota_left');
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
+        if($empLeaveQuotaFiveYearTerm == NULL){
+            $empLeaveQuotaFiveYearTerm = "-";
+        }
+
+        $leaveType = Leave::all();
+        $leaveRequests = Leave_request::where('req_by', $user_info->id)->whereMonth('req_date', $month)->whereYear('req_date', $year)->get();
+        foreach ($leaveRequests as $lr) {
+            $dates = explode(',', $lr->leave_dates);
+            $currentMonth = null;
+            $dateGroups = [];
+            $group = [];
+            
+            foreach ($dates as $date) {
+                $formattedDate = date('d', strtotime($date));
+                $monthYear = date('F Y', strtotime($date));
+                
+                if ($currentMonth !== $monthYear) {
+                    if (!empty($group)) {
+                        $dateGroups[] = $group;
+                        $group = [];
+                    }
+                    $group['monthYear'] = $monthYear;
+                    $group['dates'] = [$formattedDate];
+                    $currentMonth = $monthYear;
+                } else {
+                    $group['dates'][] = $formattedDate;
+                }
+            }
+            
+            if (!empty($group)) {
+                $dateGroups[] = $group;
+            }
+            
+            $lr->dateGroups = $dateGroups;
+            
+            $approved = false;
+            
+            foreach ($lr->leave_request_approval as $stat) {
+                if ($stat->status == 29) {
+                    $lr->approvalStatus = "<span class='m-0 text-primary'>Approved</span>";
+                    $approved = true;
+                    break;
+                } elseif($stat->status == 404) {
+                    $lr->approvalStatus = "<span class='m-0 text-danger'>Rejected</span>";
+                    $approved = true;
+                    break;
+                }
+            }
+            
+            if (!$approved) {
+                $lr->approvalStatus = "<span class='m-0 text-secondary'>Waiting for Approval</span>";
+            }
+        }
+		return view('leave.emp_leave_request', compact('empLeaveQuotaAnnual', 'leaveType', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'leaveRequests'));
+	}
 }
