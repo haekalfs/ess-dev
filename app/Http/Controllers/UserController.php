@@ -12,6 +12,7 @@ use App\Models\Position;
 use App\Models\Department;
 use App\Models\Emp_leave_quota;
 use App\Models\Emp_medical_balance;
+use App\Jobs\NotifyUserCreation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -133,6 +134,10 @@ class UserController extends Controller
         $med_balance->save();
 
 
+        $emailUser = $request->email;
+        $userName = $request->name;
+
+        dispatch(new NotifyUserCreation($emailUser, $userName));
 
     	return redirect('/manage/users')->with('success', 'User Create successfully');
     }

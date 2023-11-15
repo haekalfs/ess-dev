@@ -115,7 +115,9 @@ active
                                     <td>{{ $m->med_req_date }}</td>
                                     <td>{{ $m->med_payment }}</td>
                                     <td>{{ $m->total_amount_approved }}</td>
-                                    <td class="text-center"><button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $m->id }}"><i class="fa fa-eye" aria-hidden="true"></i> View</button></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $m->id }}"><i class="fa fa-eye" aria-hidden="true"></i> View</button>
+                                    </td>
                                 </tr>
                                 @endforeach
                                 </tbody>
