@@ -2,7 +2,7 @@
 
 @section('title', 'Exit Clearance - ESS')
 
-@section('active-page-hr')
+@section('active-page-HR')
 active
 @endsection
 
@@ -29,58 +29,60 @@ active
 </div>
 @endif
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+<div class="d-sm-flex align-items-center zoom80 justify-content-between mb-4">
     <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-running"></i> Exit Clearance</h1>
 </div>
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <!-- Card Header - Dropdown -->
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Users Resign List</h6>
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary">
+        <h6 class="m-0 font-weight-bold text-white">Users Resign List</h6>
         <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addModal"><i class="fas fa-plus fa-sm text-white-50"></i> Add Resign User</a>
+            <a class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#addModal"><i class="fas fa-plus fa-sm text-white-50"></i> Add Resign User</a>
         </div>
     </div>
     <!-- Card Body -->
-    <div class="card-body">
-        <table class="table table-bordered zoom90 table-hover" id="dataTableUser">
-            <thead>
-                <tr style="font-size: 13px">
-                    <th>Emp ID</th>
-                    <th>User ID</th>
-                    <th>Nama</th>
-                    <th>Status Active</th>
-                    <th>Position</th>
-                    <th>Hired Date</th>
-                    <th>Resign Date</th>
-                    <th width="80px">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data as $p)
-                <tr>
-                    <td>{{$p->users_detail->employee_id}}</td>
-                    <td>{{$p->id }}</td>
-                    <td>{{$p->name}}</td>
-                    <td class="text-center">
-                        @if ($p->users_detail->status_active == "Active")
-                            <i class="fas fa-user-check" style="color: #0053fa;"></i>
-                        @else
-                            <i class="fas fa-user-times" style="color: #ff0000;"></i>
-                        @endif
-                    </td>
-                    <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
-                    <td>{{$p->users_detail->hired_date}}</td>
-                    <td>{{$p->users_detail->resignation_date}}</td>
-                    <td>
-                        <a href="/hr/exit_clearance/print/{{ $p->id }}" target="_blank" title="Print" class="btn btn-primary btn-sm ml-3" >
-                            <i class="fas fa-fw fa-print "></i>
-                            Print
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <div class="card-body zoom90">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="dataTableUser">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Emp ID</th>
+                        <th>User ID</th>
+                        <th>Nama</th>
+                        <th>Status Active</th>
+                        <th>Position</th>
+                        <th>Hired Date</th>
+                        <th>Resign Date</th>
+                        <th width="80px">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $p)
+                    <tr>
+                        <td>{{$p->users_detail->employee_id}}</td>
+                        <td>{{$p->id }}</td>
+                        <td>{{$p->name}}</td>
+                        <td class="text-center">
+                            @if ($p->users_detail->status_active == "Active")
+                                <i class="fas fa-user-check" style="color: #0053fa;"></i>
+                            @else
+                                <i class="fas fa-user-times" style="color: #ff0000;"></i>
+                            @endif
+                        </td>
+                        <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
+                        <td>{{$p->users_detail->hired_date}}</td>
+                        <td>{{$p->users_detail->resignation_date}}</td>
+                        <td>
+                            <a href="/hr/exit_clearance/print/{{ $p->id }}" target="_blank" title="Print" class="btn btn-primary btn-sm ml-3" >
+                                <i class="fas fa-fw fa-print "></i>
+                                Print
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- Modal -->

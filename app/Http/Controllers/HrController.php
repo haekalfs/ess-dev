@@ -11,6 +11,7 @@ use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\API_key;
+use App\Models\Users_fingerprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
@@ -22,7 +23,8 @@ use Exception;
 
 class HrController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 		//Cutoff Date Timesheet Submission
 		$Cutoffdate = Cutoffdate::find(1);
 		$CutoffdateTimesheetApproval = Cutoffdate::find(2);
@@ -53,13 +55,16 @@ class HrController extends Controller
 		$Default_Approve1 = Timesheet_approver::where('id', 29)->first();
 		$Default_Approve2 = Timesheet_approver::where('id', 28)->first();
 
-		return view('hr.compliance.main', 
-		['cutoffDate' => $Cutoffdate, 
-		'tsCutoffdate' => $CutoffdateTimesheetApproval, 
-		'leaveCutoffdate' => $leaveApprovalCutoffdate, 
-		'reimburseCutoffdate' => $reimburseApprovalCutoffdate, 
-		'approver' => $approvers, 
-		'user' => $users, 
+        $usersFingerprint = Users_fingerprint::all();
+        $users = User::all();
+
+		return view('hr.compliance.main',
+		['cutoffDate' => $Cutoffdate,
+		'tsCutoffdate' => $CutoffdateTimesheetApproval,
+		'leaveCutoffdate' => $leaveApprovalCutoffdate,
+		'reimburseCutoffdate' => $reimburseApprovalCutoffdate,
+		'approver' => $approvers,
+		'user' => $users,
 		'FGA1' => $FGA_Approve1,
 		'FGA2' => $FGA_Approve2,
 		'Finance' => $FGA_Approve3,
@@ -71,12 +76,14 @@ class HrController extends Controller
 		'Service2' => $Service_Approve2,
 		'Default1' => $Default_Approve1,
 		'Default2' => $Default_Approve2,
+        'usersFingerprint' => $usersFingerprint,
+        'users' => $users
 
-		]); 
+		]);
 	}
 
 	public function update_regulation(Request $request){
-	
+
 		$request->validate([
 			'FGA_FA' => 'sometimes',
 			'FGA_PA' => 'sometimes',
@@ -127,7 +134,7 @@ class HrController extends Controller
 			$input_FGA_Approve3 = Timesheet_approver::where('id', 15)->first();
 			$input_FGA_Approve3->approver = $request->Finance_approver;
 			$input_FGA_Approve3->save();
-			
+
 			//Technology And HCM
 			$input_THC_Approve1 = Timesheet_approver::where('id', 25)->first();
 			$input_THC_Approve1->approver = $request->THM_FA;
@@ -189,7 +196,7 @@ class HrController extends Controller
 		$templatePath = public_path('exitclearance_temp.docx');
 		$key = API_key::where('id', 1)->first();
 
-		
+
 		$positionName = $user->users_detail->position->position_name ?? '';
 		$bulan = date('F');
 
@@ -232,7 +239,7 @@ class HrController extends Controller
 
 		// Delete the temporary file
 		unlink($outputPath);
-		
+
 		return response()->download($outputPathPDF)->deleteFileAfterSend(true);
 	}
 
@@ -266,4 +273,25 @@ class HrController extends Controller
 		}
 	}
 
+    public function add_user_fingerprint(Request $request)
+    {
+        $request->validate([
+            'user_name' => 'required',
+            'f_id' => 'required',
+        ]);
+
+        // Check if a record already exists for the user_id
+        $validation = Users_fingerprint::where('user_id', $request->user_name)->exists();
+
+        if (!$validation) {
+            Users_fingerprint::create([
+                'user_id' => $request->user_name,
+                'fingerprint_id' => $request->f_id
+            ]);
+
+            return response()->json(['success' => 'Fingerprint data has been added!']);
+        }
+
+        return response()->json(['error' => 'Fingerprint data already exists for this user.']);
+    }
 }

@@ -19,7 +19,7 @@ class NewsController extends Controller
         $headline = Headline::all();
         return view('news-feed.index', ['newsFeed' => $newsFeed, 'headline' => $headline]);
     }
-    
+
     public function create()
     {
         return view('news-feed.create');

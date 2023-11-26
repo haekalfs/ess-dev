@@ -2,10 +2,10 @@
 $(function() {
     $('#myModal').on('show.bs.modal', function (event) {
         var date = $(event.relatedTarget).data('date');
-        var formattedDate = new Date(date).toLocaleDateString('en-US', { 
-            day: 'numeric', 
-            month: 'short', 
-            year: 'numeric' 
+        var formattedDate = new Date(date).toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
         }).replace(',', '').split(' ');
         var month = formattedDate[0];
         var day = formattedDate[1];
@@ -17,10 +17,10 @@ $(function() {
 $(function() {
     $('#redModal').on('show.bs.modal', function (event) {
         var date = $(event.relatedTarget).data('date');
-        var formattedDate = new Date(date).toLocaleDateString('en-US', { 
-            day: 'numeric', 
-            month: 'short', 
-            year: 'numeric' 
+        var formattedDate = new Date(date).toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
         }).replace(',', '').split(' ');
         var month = formattedDate[0];
         var day = formattedDate[1];
@@ -47,7 +47,7 @@ $(document).ready(function () {
     });
 });
 
-//this is my save function 
+//this is my save function
 $(document).ready(function() {
     $(function() {
         $(function() {
@@ -55,10 +55,10 @@ $(document).ready(function() {
                 var button = $(event.relatedTarget);
                 var activityId = button.data('id');
                 var date = button.data('date');
-                var formattedDate = new Date(date).toLocaleDateString('en-US', { 
-                    day: 'numeric', 
-                    month: 'short', 
-                    year: 'numeric' 
+                var formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
                 }).replace(',', '').split(' ');
                 var month = formattedDate[0];
                 var day = formattedDate[1];
@@ -80,19 +80,19 @@ $(document).ready(function() {
                         console.log(response);
                     }
                 });
-                
+
                 $('#update-entry').data('id', activityId);
                 $('#deleteBtn').data('id', activityId); // Store the activityId as data attribute
-                $('#entry-date-update').text(formattedDateStr); 
+                $('#entry-date-update').text(formattedDateStr);
             });
-            
+
             $('#update-entry').click(function(e) {
                 e.preventDefault();
                 var activityId = $(this).data('id'); // Retrieve the activityId from the data attribute
-                
+
                 // Serialize the form data
                 var updateData = $('#update-form').serialize();
-                
+
                 $.ajax({
                     type: 'POST',
                     url: '/update-entries/' + activityId,
@@ -123,7 +123,7 @@ $(document).ready(function() {
             });
         });
     });
-    
+
     $(document).on('click', '.delete-btn', function(event) {
         var activityId = $(event.target).data('id');
         deleteActivity(activityId);
@@ -199,7 +199,7 @@ function showSuccessMessage(){
                 }
                 $('.alert-success-delete-mid').text("All tasks has been deleted!");
                 showDeletedMessage();
-                
+
                 $('#sp-label').text('Choose File');
                 fetchActivities(yearput, monthput);
             },
@@ -263,7 +263,7 @@ function showSuccessMessage(){
                         row.append(actions);
 
                         $('#activity-table').append(row);
-                        
+
                         // Increment the count for the location of this activity
                         counts[activity.ts_location] += 1;
 
@@ -274,7 +274,7 @@ function showSuccessMessage(){
                         var descTask = $('#desc' + day);
                         // descTask.append('&#x2022; ' + activity.ts_task);
                         // descTask.append('<br>');
-                        descTask.append($('<a></a>').addClass('shorter-textbox round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + '&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
+                        descTask.append($('<span></span>').addClass('shorter-textbox round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + '&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
                     });
 
                     var rowsPerPageSelect = $('#rowsPerPage');
@@ -302,7 +302,7 @@ function showSuccessMessage(){
                     });
                     // Add click handlers for the edit and delete buttons
                     $('.delete-btn').click(deleteActivity);
-                    
+
                     // Create a lookup table of rates for each location
                     var rates = {
                         'HO': 70000,
@@ -374,9 +374,9 @@ function showSuccessMessage(){
 
     $('#save-entry').click(function(e) {
         e.preventDefault();
-        
+
         var isValid = true;
-    
+
         // Check if any field with the class "validate" is empty
         $('.validate').each(function() {
             if ($(this).val() === '') {
@@ -386,7 +386,7 @@ function showSuccessMessage(){
                 $(this).removeClass('is-invalid'); // Remove "is-invalid" class if the field is filled
             }
         });
-    
+
         if (isValid) {
             // Create a FormData object to send the form data including the file
             var formData = new FormData($('#entry-form')[0]);
@@ -412,7 +412,7 @@ function showSuccessMessage(){
                     document.getElementById("end-time").removeAttribute("readonly");
                     fileInput.removeClass('validate');
                     $('#fileInputIfexistWfh').hide();
-                    
+
                     $('#entry-form')[0].reset();
                     $('#locationContainer').css('display', 'block');
                     fetchLocationProject(1);
@@ -439,9 +439,9 @@ function showSuccessMessage(){
 
     $('#save-entry-red').click(function(e) {
         e.preventDefault();
-        
+
         var isValid = true;
-    
+
         // Check if any field with the class "validate" is empty
         $('.validate-red').each(function() {
             if ($(this).val() === '') {
@@ -451,11 +451,11 @@ function showSuccessMessage(){
                 $(this).removeClass('is-invalid'); // Remove "is-invalid" class if the field is filled
             }
         });
-    
+
         if (isValid) {
             // Create a FormData object to send the form data including the file
             var formData = new FormData($('#entry-form-red')[0]);
-    
+
             // Send an AJAX request to the entries.store route
             $.ajax({
                 type: 'POST',
@@ -495,7 +495,7 @@ function showSuccessMessage(){
             alert('Please fill in all the required fields.');
         }
     });
-  
+
 
     $('#multiple-entries').click(function(e) {
         e.preventDefault();
@@ -555,7 +555,7 @@ function initializeDateRangePicker() {
     var month = $('#monthSel').val();
     var startDate = moment().year(year).month(month - 1).startOf('month');
     var endDate = moment().year(year).month(month - 1).endOf('month');
-  
+
     $('input[name="daterange"]').daterangepicker({
       "startDate": startDate,
       "endDate": endDate,
@@ -570,7 +570,7 @@ function initializeDateRangePicker() {
       console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
     });
 }
-  
+
 $(function() {
 initializeDateRangePicker();
 });
@@ -631,7 +631,7 @@ function fetchLocationProject(selectedValue) {
 
                 var taskSelect = $('#task');
                 var locationSelect = $('#location'); // Store the location element
-            
+
                 function updateLocation(selectedTask) {
                     if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
                         $('#locationContainer').css('display', 'block');
@@ -652,12 +652,12 @@ function fetchLocationProject(selectedValue) {
                         locationSelect.css('pointer-events', 'auto');
                     }
                 }
-            
+
                 taskSelect.on('change', function() {
                     var selectedTask = taskSelect.val();
                     updateLocation(selectedTask);
                 });
-                
+
                 // Initialize based on the initial selected value
                 var initialSelectedTask = taskSelect.val();
                 updateLocation(initialSelectedTask);
@@ -700,7 +700,7 @@ function fetchLocationProjectRed(selectedValue) {
 
                 var taskSelect = $('#task-red');
                 var locationSelect = $('#location-red'); // Store the location element
-            
+
                 function updateLocation(selectedTask) {
                     if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
                         $('#locationContainerRed').css('display', 'block');
@@ -721,12 +721,12 @@ function fetchLocationProjectRed(selectedValue) {
                         locationSelect.css('pointer-events', 'auto');
                     }
                 }
-            
+
                 taskSelect.on('change', function() {
                     var selectedTask = taskSelect.val();
                     updateLocation(selectedTask);
                 });
-                
+
                 // Initialize based on the initial selected value
                 var initialSelectedTask = taskSelect.val();
                 updateLocation(initialSelectedTask);
@@ -770,7 +770,7 @@ function fetchLocationProjectUpdate(selectedValue) {
 
                 var taskSelect = $('#update_task');
                 var locationSelect = $('#update_location'); // Store the location element
-            
+
                 function updateLocation(selectedTask) {
                     if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
                         $('#updateLocationSelect').css('display', 'block');
@@ -791,12 +791,12 @@ function fetchLocationProjectUpdate(selectedValue) {
                         locationSelect.css('pointer-events', 'auto');
                     }
                 }
-            
+
                 taskSelect.on('change', function() {
                     var selectedTask = taskSelect.val();
                     updateLocation(selectedTask);
                 });
-                
+
                 // Initialize based on the initial selected value
                 var initialSelectedTask = taskSelect.val();
                 updateLocation(initialSelectedTask);

@@ -31,6 +31,13 @@ active
 </div>
 @endif
 
+@if ($message = Session::get('timesheet-cutoffdate'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
 <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
     Your entry has been saved successfully.
 </div>
@@ -138,12 +145,12 @@ active
                     <div class="custom-control custom-switch">
                         <input type="checkbox" class="custom-control-input" id="customSwitch1">
                         <label class="custom-control-label" for="customSwitch1">Show Details</label>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <!-- Card Body -->
             <div class="card-body zoom80">
-                <table class="table zoom90 table-bordered calendar" id="calendarTable">
+                <table class="table zoom90 table-bordered calendar" id="calendarTable" style="font-size: 18px;">
                     <colgroup>
                         @foreach ($calendar[0] as $dayName)
                             <col style="width: {{ 100 / count($calendar[0]) }}%;">
@@ -209,7 +216,7 @@ active
                             </tr>
                         @endforeach
                     </tbody>
-                </table>                 
+                </table>
             </div>
         </div>
     </div>
@@ -229,7 +236,7 @@ active
             <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
                 <span class="error-message"></span>
             </div>
-            
+
             <div class="alert alert-danger-delete" role="alert" style="display: none;">
                 An error occurred while deleting your entry. Please try again.
             </div>
@@ -755,7 +762,7 @@ $(document).ready(function() {
 //         document.getElementById("activity").setAttribute("readonly", true);
 //         document.getElementById("location").setAttribute("readonly", true);
 //         document.getElementById("start-time").setAttribute("readonly", true);
-//         document.getElementById("end-time").setAttribute("readonly", true);  
+//         document.getElementById("end-time").setAttribute("readonly", true);
 //     } else {
 //         document.getElementById("activity").removeAttribute("readonly");
 //         document.getElementById("location").removeAttribute("readonly");
@@ -843,7 +850,7 @@ var locationSelectUpdate = document.getElementById("update_location");
 
 taskSelectUpdate.addEventListener("change", function() {
     var selectedTaskUpdate = taskSelectUpdate.value;
-    
+
     if (selectedTaskUpdate === "StandbyLK") {
         locationSelectUpdate.value = "LK";
         locationSelectUpdate.readOnly = true;
@@ -894,7 +901,7 @@ taskSelectUpdate.addEventListener("change", function() {
     }
 
     .round-text-box:hover {
-        background-color: #124cdd; /* Change the background color on hover */
+        background-color: #5886fa; /* Change the background color on hover */
         color: #fff; /* Change the text color on hover */
     }
 </style>

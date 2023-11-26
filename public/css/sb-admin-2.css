@@ -11354,6 +11354,7 @@ body.sidebar-toggled footer.sticky-footer {
 }
 
 .shorter-textbox {
+  font-size: 19px;
   display: block;
   overflow: hidden;
   white-space: nowrap;
@@ -11374,7 +11375,7 @@ body.sidebar-toggled footer.sticky-footer {
 }
 
 .shorter-textDiv::-webkit-scrollbar-thumb {
-  background-color: transparent; /* Set the scrollbar thumb color */
+  background-color: grey; /* Set the scrollbar thumb color */
 }
 
 .transparent-scroll { /* Set the fixed height for the div */

@@ -1,6 +1,8 @@
 @extends('layouts.main')
 
-@section('active-page-users')
+@section('title', 'Edit User - ESS')
+
+@section('active-page-system_management')
 active
 @endsection
 
@@ -33,7 +35,7 @@ active
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px; 
+  width: 100px;
   height: 100px;
 }
 

@@ -41,7 +41,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
 </head>
@@ -254,7 +254,7 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Add-On
+                System & Data
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
@@ -263,16 +263,16 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSystem"
                     aria-expanded="true" aria-controls="collapseSystem">
                     <i class="fas fa-fw fa-user-cog"></i>
-                    <span>System Management</span>
+                    <span>Administration</span>
                 </a>
                 <div id="collapseSystem" class="collapse" aria-labelledby="headingSystem" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Administrator Access:</h6>
-                        <a class="collapse-item" href="/manage/users">Manage Users</a>
-                        <a class="collapse-item" href="/manage/api_key">API Key Setting</a>
-                        <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>User Access Controller (UAC)</i></a>
-                        <h6 class="collapse-header">Master Data:</h6>
-                        <a class="collapse-item" href="/manage/list/employees">Employees Database</a>
+                        <h6 class="collapse-header">Account Administration:</h6>
+                        <a class="collapse-item" href="/manage/users">A1. Manage Users</a>
+                        <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>A2. User Access C. (UAC)</i></a>
+                        <h6 class="collapse-header" style="font-size: 9px;">Employement Administration:</h6>
+                        <a class="collapse-item" href="/manage/list/employees">A3. Employees Database</a>
+                        <a class="collapse-item" href="/hr/exit_clearance/">A4. Exit Clearance</a>
                     </div>
                 </div>
             </li>
@@ -284,16 +284,16 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHRSystem"
                     aria-expanded="true" aria-controls="collapseHRSystem">
                     <i class="fas fa-fw fa-tools"></i>
-                    <span>Company Regulation</span>
+                    <span>System Management</span>
                 </a>
                 <div id="collapseHRSystem" class="collapse" aria-labelledby="headingHRSystem" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">HR Access:</h6>
-                        <a class="collapse-item" href="/hr/compliance/">A1. Compliance</a>
-                        <a class="collapse-item" href="/hr/exit_clearance/">A2. Exit Clearance</a>
-                        <a class="collapse-item" href="/vendor-list">A3. Vendor List</a>
-                        <a class="collapse-item" href="/news-feed/manage">A4. News Feed</a>
-                        <a class="collapse-item" href="/news-feed/manage">A5. Timesheet Integration</a>
+                        <a class="collapse-item" href="/hr/compliance/">B1. Compliance</a>
+                        <a class="collapse-item" href="/manage/api_key">B2. API Key Setting</a>
+                        <a class="collapse-item" href="/vendor-list">B3. Vendor List</a>
+                        <a class="collapse-item" href="/news-feed/manage">B4. News Feed</a>
+                        <a class="collapse-item" href="/company-regulation/commands">B5. Commands</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>
@@ -326,7 +326,7 @@
                     <span>Contact Administrator</span></a>
             </li>
 
-            <li class="nav-item @yield('active-page-system_management')">
+            <li class="nav-item @yield('active-page-apps')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseApps"
                     aria-expanded="true" aria-controls="collapseApps">
                     <i class="fas fa-fw fa-user-cog"></i>

@@ -7,285 +7,267 @@ active
 @endsection
 
 @section('content')
-<form action="/hr/compliance/update/regulations" method="POST" onsubmit="return validatePassword();">
-@method('PUT')
-@csrf
-    <!-- Page Heading -->
-    <div class="row align-items-center zoom90">
-        <div class="col">
-            <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-tasks"></i> Compliance Settings</h1>
-            <p class="mb-4 text-danger"><i>Restricted Access</i></p>
-        </div>
+<!-- Page Heading -->
+<div class="row align-items-center zoom90">
+    <div class="col">
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-tasks"></i> Compliance Settings</h1>
+        <p class="mb-4 text-danger"><i>Restricted Access</i></p>
     </div>
+</div>
 
-    @if ($message = Session::get('success'))
-    <div class="alert alert-success alert-block">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>{{ $message }}</strong>
-    </div>
-    @endif
+@if ($message = Session::get('success'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
 
-    @if ($message = Session::get('failed'))
-    <div class="alert alert-danger alert-block">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>{{ $message }}</strong>
-    </div>
-    @endif
+@if ($message = Session::get('failed'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
 
-    @if ($message = Session::get('warning'))
-    <div class="alert alert-warning alert-block">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>{{ $message }}</strong>
-    </div>
-    @endif
-    <div class="row zoom90">
-        <!-- Area Chart -->
-        <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Cutoff Date</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="email">Timesheet Submission :</label>
-                                    <input type="number" class="form-control" name="ts_submit_date" value="{{ $cutoffDate->closed_date }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">Timesheet Approval :</label>
-                                    <input type="text" class="form-control" name="ts_approve_date" value="{{ $tsCutoffdate->closed_date }}">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">Leave Approval :</label>
-                                    <input type="number" class="form-control" name="leave_approve_date" value="{{ $leaveCutoffdate->closed_date }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="password">Reimburse & Med Approval :</label>
-                                    <input type="number" class="form-control" name="reimburse_approve_date" value="{{ $reimburseCutoffdate->closed_date }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+@if ($message = Session::get('warning'))
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+<div class="row zoom90">
+    <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex flex-row align-items-center justify-content-between bg-primary">
+                <h6 class="m-0 font-weight-bold text-white mt-2 mb-2">System Configuration</h6>
             </div>
-        </div>
-
-        <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Password</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="col-md-12">
-                        <div class="row">
+            <ul class="nav nav-tabs" id="pageTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="page1-tab" data-toggle="tab" href="#page1" role="tab" aria-controls="page1" aria-selected="true"><i class="fas fa-calendar-day"></i> Submission & Approval</a>
+                </li>
+                {{-- <li class="nav-item">
+                    <a class="nav-link" id="page2-tab" data-toggle="tab" href="#page2" role="tab" aria-controls="page2" aria-selected="false"><i class="fas fa-plane-departure"></i> Submission</a>
+                </li> --}}
+                <li class="nav-item">
+                    <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-calendar-week" style="color: #ff0000;"></i> Integration</a>
+                </li>
+            </ul>
+            <div class="card-body">
+                <div class="tab-content" id="pageTabContent">
+                    <div class="tab-pane fade show active" id="page1" role="tabpanel" aria-labelledby="page1-tab">
+                        <form action="/hr/compliance/update/regulations" method="POST" onsubmit="return validatePassword();">
+                            @method('PUT')
+                            @csrf
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="comment">New Financial Password :</label>
-                                    <input type="password" class="form-control" id="password" name="password" value="">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Finance & General Affair</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">First Approver :</label>
+                                                                    <select class="form-control" name="FGA_FA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $FGA1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Prior Approver :</label>
+                                                                    <select class="form-control" name="FGA_PA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $FGA2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="email">Staff Finance Approver :</label>
+                                                                <select class="form-control" name="Finance_approver" >
+                                                                    <option selected disabled>Choose...</option>
+                                                                    @foreach($user as $us)
+                                                                    <option value="{{ $us->id }}" @if( $us->id == $Finance->approver ) selected @endif >{{ $us->name }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Technology & Human Capital</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">First Approver :</label>
+                                                                    <select class="form-control" name="THM_FA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $THC1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Prior Approver :</label>
+                                                                    <select class="form-control" name="THM_PA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $THC2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Sales & Marketing</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">First Approver :</label>
+                                                                    <select class="form-control" name="SM_FA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $SM1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Prior Approver :</label>
+                                                                    <select class="form-control" name="SM_PA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $SM2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Services</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">First Approver :</label>
+                                                                    <select class="form-control" name="Service_FA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $Service1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Prior Approver :</label>
+                                                                    <select class="form-control" name="Service_PA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $Service2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-secondary @endrole h6" colspan="2">Default Approvers</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">First Approver :</label>
+                                                                    <select class="form-control" name="Default_FA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $Default1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Prior Approver :</label>
+                                                                    <select class="form-control" name="Default_PA" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $Default2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="comment">Reconfirm Password :</label>
-                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="">
-                                </div>
-                                <span id="passwordError" style="color: red;"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-12 col-lg-12">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Approvers</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <table class="table table-borderless">
-                                    <thead>
-                                        <tr>
-                                            <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Finance & General Affair</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-sm">
-                                            <td>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="email">First Approver :</label>
-                                                            <select class="form-control" name="FGA_FA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $FGA1->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="password">Prior Approver :</label>
-                                                            <select class="form-control" name="FGA_PA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $FGA2->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="email">Staff Finance Approver :</label>
-                                                        <select class="form-control" name="Finance_approver" >
-                                                            <option selected disabled>Choose...</option>
-                                                            @foreach($user as $us)
-                                                            <option value="{{ $us->id }}" @if( $us->id == $Finance->approver ) selected @endif >{{ $us->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <table class="table table-borderless">
-                                    <thead>
-                                        <tr>
-                                            <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Technology & Human Capital</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-sm">
-                                            <td>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="email">First Approver :</label>
-                                                            <select class="form-control" name="THM_FA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $THC1->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="password">Prior Approver :</label>
-                                                            <select class="form-control" name="THM_PA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $THC2->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <table class="table table-borderless">
-                                    <thead>
-                                        <tr>
-                                            <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Sales & Marketing</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-sm">
-                                            <td>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="email">First Approver :</label>
-                                                            <select class="form-control" name="SM_FA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $SM1->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="password">Prior Approver :</label>
-                                                            <select class="form-control" name="SM_PA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $SM2->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <table class="table table-borderless">
-                                    <thead>
-                                        <tr>
-                                            <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Services</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="table-sm">
-                                            <td>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="email">First Approver :</label>
-                                                            <select class="form-control" name="Service_FA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $Service1->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="password">Prior Approver :</label>
-                                                            <select class="form-control" name="Service_PA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $Service2->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
                             </div>
                             <div class="col-md-12">
                                 <table class="table table-borderless">
@@ -298,27 +280,42 @@ active
                                         <tr class="table-sm">
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for="email">First Approver :</label>
-                                                            <select class="form-control" name="Default_FA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $Default1->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <label for="email">Timesheet Submission :</label>
+                                                            <input type="number" class="form-control" name="ts_submit_date" value="{{ $cutoffDate->closed_date }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for="password">Prior Approver :</label>
-                                                            <select class="form-control" name="Default_PA" >
-                                                                <option selected disabled>Choose...</option>
-                                                                @foreach($user as $us)
-                                                                <option value="{{ $us->id }}" @if( $us->id == $Default2->approver ) selected @endif >{{ $us->name }}</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <label for="password">Timesheet Approval :</label>
+                                                            <input type="text" class="form-control" name="ts_approve_date" value="{{ $tsCutoffdate->closed_date }}">
                                                         </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="password">Leave Approval :</label>
+                                                            <input type="number" class="form-control" name="leave_approve_date" value="{{ $leaveCutoffdate->closed_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="password">Reimburse & Med Approval :</label>
+                                                            <input type="number" class="form-control" name="reimburse_approve_date" value="{{ $reimburseCutoffdate->closed_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="comment">New Financial Password :</label>
+                                                            <input type="password" class="form-control" id="password" name="password" value="">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="comment">Reconfirm Password :</label>
+                                                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="">
+                                                        </div>
+                                                        <span id="passwordError" style="color: red;"></span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -326,19 +323,84 @@ active
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                            <button class="br-icon"></button>
+                        </form>
+                    </div>
+                    {{-- <div class="tab-pane fade" id="page2" role="tabpanel" aria-labelledby="page2-tab">
+
+                    </div> --}}
+                    <div class="tab-pane fade" id="page3" role="tabpanel" aria-labelledby="page3-tab">
+                        <form id="f_form" method="post">
+                            @csrf
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="email">User Name :</label>
+                                            <select class="form-control" id="user_name" name="user_name" required>
+                                                @foreach($users as $employees)
+                                                <option value="{{$employees->id}}">{{ $employees->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="password">Fingerprint ID :</label>
+                                            <input type="number" class="form-control" name="f_id">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex justify-content-center align-items-end">
+                                        <div class="form-group">
+                                            <button type="submit" id="insert-data-fingerprint" class="btn btn-primary">Insert</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12"><br>
+                                        <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
+                                            Your entry has been saved successfully.
+                                        </div>
+                                        <div class="alert alert-danger" role="alert" style="display: none;">
+                                            An error occurred while saving your entry. Please try again.
+                                        </div>
+                                        <div class="alert alert-danger alert-success-delete" role="alert" style="display: none;">
+                                            Client has been deleted successfully.
+                                        </div>
+                                        <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
+                                            An error occurred while saving your entry. Please try again.
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered zoom90" width="100%" id="dataTableRoles" cellspacing="0">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Fingerprint ID</th>
+                                                        <th width="80px">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($usersFingerprint as $uf)
+                                                        <tr>
+                                                            <td>{{ $uf->user->name }}</td>
+                                                            <td>{{ $uf->fingerprint_id }}</td>
+                                                            <td>
+                                                            <a href="/manage/roles/delete/" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <button class="br-icon"></button>
-</form>
+</div>
 <style type="text/css">
-    body
-    {
-        background-color: #d4d2d2;
-    }
     .br-icon
     {
         position: fixed;
@@ -381,5 +443,33 @@ active
             return true;
         }
     }
+
+    $(document).ready(function () {
+        $('#insert-data-fingerprint').click(function(e) {
+            e.preventDefault();
+            // Serialize the form data
+            var formData = $('#f_form').serialize();
+            // Send an AJAX request to the entries.store route
+            $.ajax({
+            type: 'POST',
+            url: '/post-data/to/fingerprint/machine',
+            data: formData,
+            success: function(response) {
+                $('.alert-success-saving').show();
+                $('#f_form')[0].reset();
+                setTimeout(function() {
+                    $('.alert-success-saving').fadeOut('slow');
+                    window.location.reload();
+                }, 3000);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                    $('.alert-danger').show();
+                    setTimeout(function() {
+                        $('.alert-danger').fadeOut('slow');
+                    }, 3000);
+                }
+            });
+        });
+    });
 </script>
 @endsection

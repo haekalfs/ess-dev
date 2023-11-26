@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\NotifyLeaveApproval;
 use App\Mail\ApprovalLeave;
+use App\Models\Approval_status;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave;
 use App\Models\Leave_request;
@@ -66,11 +67,11 @@ class LeaveController extends Controller
             $currentMonth = null;
             $dateGroups = [];
             $group = [];
-            
+
             foreach ($dates as $date) {
                 $formattedDate = date('d', strtotime($date));
                 $monthYear = date('F Y', strtotime($date));
-                
+
                 if ($currentMonth !== $monthYear) {
                     if (!empty($group)) {
                         $dateGroups[] = $group;
@@ -83,15 +84,15 @@ class LeaveController extends Controller
                     $group['dates'][] = $formattedDate;
                 }
             }
-            
+
             if (!empty($group)) {
                 $dateGroups[] = $group;
             }
-            
+
             $lr->dateGroups = $dateGroups;
-            
+
             $approved = false;
-            
+
             foreach ($lr->leave_request_approval as $stat) {
                 if ($stat->status == 29) {
                     $lr->approvalStatus = "<span class='m-0 text-primary'>Approved</span>";
@@ -103,7 +104,7 @@ class LeaveController extends Controller
                     break;
                 }
             }
-            
+
             if (!$approved) {
                 $lr->approvalStatus = "<span class='m-0 text-secondary'>Waiting for Approval</span>";
             }
@@ -144,7 +145,6 @@ class LeaveController extends Controller
 
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::whereIn('project_assignment_id', $findAssignment)->where('role', 'PM')->get();
-        
         // Retrieve the relevant Emp_leave_quota rows ordered by active_periode in ascending order
         $checkQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->where('leave_id', $request->quota_used)
@@ -214,7 +214,7 @@ class LeaveController extends Controller
                                 'RequestTo' => $approverService->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverService->approver; 
+                            $userToApprove[] = $approverService->approver;
                         }
                         if(!$usersWithPMRole->isEmpty()){
                             foreach($usersWithPMRole as $approverPM){
@@ -223,7 +223,7 @@ class LeaveController extends Controller
                                     'RequestTo' => $approverPM->approver,
                                     'leave_request_id' => $uniqueId
                                 ]);
-                                $userToApprove[] = $approverPM->approver; 
+                                $userToApprove[] = $approverPM->approver;
                             }
                         }
                         break;
@@ -244,7 +244,7 @@ class LeaveController extends Controller
                                 'RequestTo' => $approverHCM->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverHCM->approver; 
+                            $userToApprove[] = $approverHCM->approver;
                         }
                         break;
                     case ($checkUserDept == 1):
@@ -264,7 +264,7 @@ class LeaveController extends Controller
                                 'RequestTo' => $approverSales->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverSales->approver; 
+                            $userToApprove[] = $approverSales->approver;
                         }
                         break; // Add break statement here to exit the switch block after executing the case
                     default:
@@ -325,7 +325,7 @@ class LeaveController extends Controller
             dispatch(new NotifyLeaveApproval($employee, $userName));
         }
 
-        Leave_request_approval::where('RequestTo', Auth::user()->id)->delete();
+        Leave_request_approval::where('RequestTo', Auth::user()->id)->where('leave_request_id', $uniqueId)->delete();
 
         return redirect("/leave/history")->with('success', "Leave Request Submitted Successfully");
     }
@@ -333,7 +333,7 @@ class LeaveController extends Controller
     public function leave_request_details($id)
     {
         $leaveRequest = Leave_request_approval::where('leave_request_id', $id)->orderBy('updated_at', 'desc')->get();
-        
+
         // Initialize an empty array to store the data
         $data = [];
 
@@ -426,7 +426,7 @@ class LeaveController extends Controller
 
         $limitShown = ["All",10,20,30];
         $employees = User::all();
-        
+
         $validator = Validator::make($request->all(), [
             'showOpt' => 'sometimes',
             'yearOpt' => 'required',
@@ -479,7 +479,7 @@ class LeaveController extends Controller
 	{
         $data = Emp_leave_quota::find($id);
         // Return the data as a JSON response
-        return response()->json($data);    
+        return response()->json($data);
     }
 
     public function update_leave_emp(Request $request, $id)
@@ -626,11 +626,11 @@ class LeaveController extends Controller
             $currentMonth = null;
             $dateGroups = [];
             $group = [];
-            
+
             foreach ($dates as $date) {
                 $formattedDate = date('d', strtotime($date));
                 $monthYear = date('F Y', strtotime($date));
-                
+
                 if ($currentMonth !== $monthYear) {
                     if (!empty($group)) {
                         $dateGroups[] = $group;
@@ -643,15 +643,15 @@ class LeaveController extends Controller
                     $group['dates'][] = $formattedDate;
                 }
             }
-            
+
             if (!empty($group)) {
                 $dateGroups[] = $group;
             }
-            
+
             $lr->dateGroups = $dateGroups;
-            
+
             $approved = false;
-            
+
             foreach ($lr->leave_request_approval as $stat) {
                 if ($stat->status == 29) {
                     $lr->approvalStatus = "<span class='m-0 text-primary'>Approved</span>";
@@ -663,11 +663,141 @@ class LeaveController extends Controller
                     break;
                 }
             }
-            
+
             if (!$approved) {
                 $lr->approvalStatus = "<span class='m-0 text-secondary'>Waiting for Approval</span>";
             }
         }
-		return view('leave.emp_leave_request', compact('empLeaveQuotaAnnual', 'leaveType', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'leaveRequests'));
+		return view('leave.emp_leave_request', compact('empLeaveQuotaAnnual', 'month','year', 'leaveType', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'leaveRequests'));
 	}
+
+    public function get_leave_request_data($usrid, $month, $year, $id)
+    {
+        $user_info = User::find($usrid);
+        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 10)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', $user_info->id)
+            ->where('leave_id', 100)
+            ->where('expiration', '>=', date('Y-m-d'))
+            ->sum('quota_left');
+        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
+            ->where('user_id', $user_info->id)
+            ->where('leave_id', 20)
+            ->sum('quota_left');
+        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
+        if($empLeaveQuotaFiveYearTerm == NULL){
+            $empLeaveQuotaFiveYearTerm = "-";
+        }
+
+        $leaveType = Leave::all();
+        $leaveRequests = Leave_request::find($id);
+        $usersList = User::all();
+        $statusDesc = Approval_status::all();
+
+		return view('leave.emp_leave_request_edit', compact('id','empLeaveQuotaAnnual', 'statusDesc','usersList', 'month','year', 'leaveType', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'leaveRequests'));
+	}
+
+    public function approve_by_admin($usrId, $month, $year, $id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        //update stat
+        Leave_request_approval::where('leave_request_id', $id)->update(['status' => 20, 'notes' => 'Approved by Administrator']);
+
+        $getLeaveReq = Leave_request::find($id);
+
+        switch($getLeaveReq->leave_id){
+            case 10:
+            case 20:
+
+                break;
+            default:
+                Emp_leave_quota::updateOrCreate([
+                    'user_id' => $getLeaveReq->req_by,
+                    'leave_id' => $getLeaveReq->leave_id
+                ], [
+                    'once_in_service_years' => TRUE
+                ]);
+            break;
+        }
+
+        //create 29 stat by admin
+        Leave_request_approval::create([
+            'status' => 29,
+            'RequestTo' => "Administrator",
+            'leave_request_id' => $id
+        ]);
+
+        $entry = new Notification_alert();
+        $entry->user_id = $getLeaveReq->req_by;
+        $entry->message = "Your Leave Request has been Approved by Administrator!";
+        $entry->importance = 1;
+        $entry->save();
+
+        return redirect()->back()->with('success',"You approved the leave request!");
+    }
+
+    public function reject_by_admin($usrId, $month, $year, $id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        //update stat
+        Leave_request_approval::where('leave_request_id', $id)->update(['status' => 404, 'notes' => 'Rejected by Administrator']);
+
+        $getLeaveReq = Leave_request::find($id);
+
+        switch($getLeaveReq->leave_id){
+            case 10:
+            case 20:
+
+                break;
+            default:
+                Emp_leave_quota::updateOrCreate([
+                    'user_id' => $getLeaveReq->req_by,
+                    'leave_id' => $getLeaveReq->leave_id
+                ], [
+                    'once_in_service_years' => TRUE
+                ]);
+            break;
+        }
+
+        //create 29 stat by admin
+        Leave_request_approval::create([
+            'status' => 404,
+            'RequestTo' => "Administrator",
+            'notes' => "Rejected by Administrator",
+            'leave_request_id' => $id
+        ]);
+
+        $entry = new Notification_alert();
+        $entry->user_id = $getLeaveReq->req_by;
+        $entry->message = "Your Leave Request has been Rejected by Administrator!";
+        $entry->importance = 1;
+        $entry->save();
+
+        return redirect()->back()->with('failed',"You Rejected the leave request!");
+    }
+
+    public function delete_by_admin($id)
+    {
+        Leave_request_approval::where('id', $id)->delete();
+
+        return redirect()->back()->with('failed',"You Deleted the leave request approval!");
+    }
+
+    public function update_by_admin(Request $request, $id)
+    {
+        foreach ($request->input('items') as $itemId => $itemData) {
+            $approver = $itemData['approver'];
+            $status = $itemData['status'];
+            // Do something with $description and $quantity
+            // You can use the $itemId to find the corresponding PoItem object
+            $poItem = Leave_request_approval::find($itemId);
+            $poItem->RequestTo = $approver;
+            $poItem->status = $status;
+            $poItem->save();
+        }
+
+        return redirect()->back()->with('success',"You Updated the Leave Request Approver!");
+    }
 }

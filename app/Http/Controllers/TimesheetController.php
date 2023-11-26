@@ -7,6 +7,7 @@ use App\Mail\EssMailer;
 use App\Mail\TimesheetReminderEmployee;
 use App\Models\Additional_fare;
 use App\Models\Approval_status;
+use App\Models\Checkinout;
 use App\Models\Company_project;
 use App\Models\Cutoffdate;
 use App\Models\Emp_leave_quota;
@@ -247,7 +248,7 @@ class TimesheetController extends Controller
         }
         $pLocations = Project_location::all();
 
-        
+
         $checkUserAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->get();
 
         if ($checkUserAssignment->isEmpty()) {
@@ -337,12 +338,14 @@ class TimesheetController extends Controller
                 $encryptYear = Crypt::encrypt($year);
                 $encryptMonth = Crypt::encrypt($month);
                 $previewButton = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
+                Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available untill the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
                 return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
             }
         } else {
             $encryptYear = Crypt::encrypt($year);
             $encryptMonth = Crypt::encrypt($month);
             $previewButton = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
+            Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available untill the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
             return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
         }
         // // Return the calendar view with the calendar data
@@ -405,7 +408,7 @@ class TimesheetController extends Controller
             $tsLoc = "-";
         } else {
             $tsLoc = $request->location;
-        }        
+        }
         $entry->ts_location = $tsLoc;
         $entry->ts_from_time = $request->from;
         $entry->ts_to_time = $request->to;
@@ -464,11 +467,11 @@ class TimesheetController extends Controller
         if (!$findTaskOnSameDay->isEmpty()) {
             $newTaskStartTime = date('H:i', strtotime($request->from));
             $newTaskEndTime = date('H:i', strtotime($request->to));
-        
+
             foreach ($findTaskOnSameDay as $existingTask) {
                 $existingTaskStartTime = $existingTask->ts_from_time;
                 $existingTaskEndTime = $existingTask->ts_to_time;
-        
+
                 if (($newTaskStartTime >= $existingTaskEndTime)) {
                     $entry->ts_from_time = date('H:i', strtotime($request->from));
                     $entry->ts_to_time = date('H:i', strtotime($request->to));
@@ -551,7 +554,7 @@ class TimesheetController extends Controller
             $tsLoc = "-";
         } else {
             $tsLoc = $request->location;
-        }        
+        }
         $entry->ts_location = $tsLoc;
         $entry->ts_from_time = $request->from;
         $entry->ts_to_time = $request->to;
@@ -604,15 +607,15 @@ class TimesheetController extends Controller
 
         $entry->allowance = $countAllowances;
         $entry->incentive = $totalIncentive;
-        
+
         if (!$findTaskOnSameDay->isEmpty()) {
             $newTaskStartTime = date('H:i', strtotime($request->from));
             $newTaskEndTime = date('H:i', strtotime($request->to));
-        
+
             foreach ($findTaskOnSameDay as $existingTask) {
                 $existingTaskStartTime = $existingTask->ts_from_time;
                 $existingTaskEndTime = $existingTask->ts_to_time;
-        
+
                 if (($newTaskStartTime >= $existingTaskEndTime)) {
                     $entry->ts_from_time = date('H:i', strtotime($request->from));
                     $entry->ts_to_time = date('H:i', strtotime($request->to));
@@ -783,7 +786,7 @@ class TimesheetController extends Controller
                     $tsLoc = "-";
                 } else {
                     $tsLoc = $request->location;
-                }        
+                }
                 $entry->ts_location = $tsLoc;
                 $entry->ts_from_time = $request->from;
                 $entry->ts_to_time = $request->to;
@@ -835,7 +838,7 @@ class TimesheetController extends Controller
             $tsLoc = "-";
         } else {
             $tsLoc = $request->update_location;
-        }        
+        }
         $entry->ts_location = $tsLoc;
         $entry->ts_from_time = $inputFromTimeUpdate;
         $entry->ts_to_time = $inputToTimeUpdate;
@@ -1636,23 +1639,50 @@ class TimesheetController extends Controller
 
                 // Initialize an array to store distinct locations
                 $distinctLocations = [];
-        
+
                 // Loop through the locations
                 foreach ($getLocations as $locations) {
                     // Split the comma-separated values into an array
                     $locationArray = explode(', ', $locations);
-                    
+
                     // Add each distinct location to the result array
                     $distinctLocations = array_merge($distinctLocations, $locationArray);
                 }
-        
+
                 // Remove duplicates
                 $distinctLocations = array_unique($distinctLocations);
-        
+
                 // You now have an array of distinct locations
                 $getLoc = Project_location::whereIn('location_code', $distinctLocations)->get();
             }
 
         return response()->json($getLoc);
+    }
+
+    public function sendData()
+    {
+        $getData = Checkinout::all();
+
+        $usersData = Checkinout::select('user_id', 'date', DB::raw('MIN(time) as earliest_time'), DB::raw('MAX(time) as latest_time'))
+        ->groupBy('user_id', 'date')
+        ->get();
+
+        foreach($usersData as $data){
+            $entry = new Timesheet;
+            $entry->ts_user_id = $data->fingerId->user_id;
+            $entry->ts_id_date = str_replace('-', '', $data->date);
+            $entry->ts_date = $data->date;
+            $entry->ts_task = "HO";
+            $entry->ts_task_id = "HO";
+            $entry->ts_location = "HO";
+            $entry->ts_activity = "HO Activities";
+            $entry->ts_from_time = Carbon::createFromFormat('H:i:s', $data->earliest_time)->format('H:i');
+            $entry->ts_to_time = Carbon::createFromFormat('H:i:s', $data->latest_time)->format('H:i');
+            $entry->allowance = 70000;
+            $entry->incentive = 0;
+            $entry->ts_type = 1;
+            $entry->ts_status_id = 10;
+            $entry->save();
+        }
     }
 }

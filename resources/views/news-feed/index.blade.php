@@ -29,10 +29,10 @@ active
     <div class="col-xl-12 col-md-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary">
+                <h6 class="m-0 font-weight-bold text-light">News Information</h6>
                 <div class="text-right">
-                    <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" type="button" id="headlineButton"><i class="fas fa-plus fa-sm text-white-50"></i> Set Headline</button>
+                    <button class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" type="button" id="headlineButton"><i class="fas fa-plus fa-sm text-white-50"></i> Set Headline</button>
                 </div>
             </div>
             <!-- Card Body -->
@@ -103,15 +103,15 @@ active
         </div>
 
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary" id="judul">News Feed History</h6>
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary">
+                <h6 class="m-0 font-weight-bold text-light" id="judul">News Feed History</h6>
                 <div class="text-right">
-                    <a href="/news-feed/manage/create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add News</a>
+                    <a href="/news-feed/manage/create" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add News</a>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
+                    <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
                         <thead class="thead-light">
                             <tr>
                                 <th>News ID</th>

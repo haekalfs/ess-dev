@@ -2,7 +2,7 @@
 
 @section('title', 'Manage Users - ESS')
 
-@section('active-page-users')
+@section('active-page-system_management')
 active
 @endsection
 
@@ -35,45 +35,47 @@ active
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-bordered zoom90 table-hover" id="dataTableUser">
-            <thead>
-                <tr style="font-size: 13px">
-                    <th>Emp ID</th>
-                    <th>User ID</th>
-                    <th>Nama</th>
-                    <th>Status Active</th>
-                    <th>Employee Status</th>
-                    <th>Position</th>
-                    <th>Department</th>
-                    <th>Option</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data as $p)
-                <tr>
-                    <td>{{$p->users_detail->employee_id}}</td>
-                    <td>{{$p->id }}</td>
-                    <td>{{$p->name}}</td>
-                    <td class="text-center">
-                        @if ($p->users_detail->status_active == "Active")
-                            <i class="fas fa-user-check" style="color: #0053fa;"></i>
-                        @else
-                            <i class="fas fa-user-times" style="color: #ff0000;"></i>
-                        @endif
-                    </td>
-                    <td>{{$p->users_detail->employee_status}}</td>
-                    <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
-                    <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
-                    <td class="row-cols-2 justify-content-between">
-                        <a href="/users/edit/{{ $p->id }}" title="Edit" class="btn btn-primary btn-sm" >
-                            <i class="fas fa-fw fa-edit justify-content-center"></i>
-                        </a>
-                        <a href="/users/hapus/{{ $p->id }}" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered zoom90 table-hover" width="100%" id="dataTableUser" cellspacing="0">
+                <thead>
+                    <tr style="font-size: 13px">
+                        <th>Emp ID</th>
+                        <th>User ID</th>
+                        <th>Nama</th>
+                        <th>Status Active</th>
+                        <th>Employee Status</th>
+                        <th>Position</th>
+                        <th>Department</th>
+                        <th>Option</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data as $p)
+                    <tr>
+                        <td>{{$p->users_detail->employee_id}}</td>
+                        <td>{{$p->id }}</td>
+                        <td>{{$p->name}}</td>
+                        <td class="text-center">
+                            @if ($p->users_detail->status_active == "Active")
+                                <i class="fas fa-user-check" style="color: #0053fa;"></i>
+                            @else
+                                <i class="fas fa-user-times" style="color: #ff0000;"></i>
+                            @endif
+                        </td>
+                        <td>{{$p->users_detail->employee_status}}</td>
+                        <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
+                        <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
+                        <td class="row-cols-2 justify-content-between">
+                            <a href="/users/edit/{{ $p->id }}" title="Edit" class="btn btn-primary btn-sm" >
+                                <i class="fas fa-fw fa-edit justify-content-center"></i>
+                            </a>
+                            <a href="/users/hapus/{{ $p->id }}" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 @endsection

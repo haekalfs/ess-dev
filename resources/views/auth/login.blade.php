@@ -35,7 +35,13 @@
     <div class="col-md-6 col-xl-5">
         <div class="lc-block mb-3">
             <div editable="rich">
-                <h5 class="fw-bolder display-5"><strong>ESS - Employee Self Service</strong> <i class="fas fa-fw fa-cogs"></i></h5>
+                {{-- <h5 class="fw-bolder display-5"><strong>ESS - Employee Self Service</strong> <i class="fas fa-fw fa-cogs"></i></h5> --}}
+                <div class="zoom90 align-items-center justify-content-between">
+                    <div>
+                        <h1 class="h3 font-weight-bold text-gray-800"><i class="fas fa-fw fa-cogs"></i> ESS </h1>
+                        <p>Employees Self-Services in Perdana Consulting</a>.</p>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="lc-block mb-4">
@@ -48,7 +54,7 @@
         </div>
     </div>
 </div>
-{{-- 
+{{--
 <div class="lc-block position-relative">
     <div id="carouselExampleControls2" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">

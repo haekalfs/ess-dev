@@ -153,7 +153,7 @@ active
                                 @php
                                     $approved = false;
                                 @endphp
-                                
+
                                 @foreach ($lr->leave_request_approval as $stat)
                                     @if ($stat->status == 29 || $stat->status == 20 || $stat->status == 404)
                                         <a class="btn btn-secondary btn-sm" data-toggle="modal" and data-target="#leaveRequestDetailModal" data-id="{{ $lr->id }}">
@@ -165,7 +165,7 @@ active
                                         @endphp
                                     @endif
                                 @endforeach
-                                
+
                                 @unless ($approved)
                                     <a class="btn btn-secondary btn-sm" data-toggle="modal" and data-target="#leaveRequestDetailModal" data-id="{{ $lr->id }}">
                                         <i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Details
