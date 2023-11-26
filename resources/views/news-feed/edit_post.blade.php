@@ -43,8 +43,8 @@ active
                             <div class="form-group">
                                 <label for="comment">Title :</label>
                                 <input type="text" id="title" value="{{ $newsFeed->title }}" name="title" style="border: none; background: none; font-size: 24px; width: 100%; outline: none; border-bottom: 0.25px solid rgb(215, 215, 215);">
-                            </div>                            
-                        </div>    
+                            </div>
+                        </div>
                         <div class="col-md-12">
                             <textarea id="editor" name="content">{{ $newsFeed->content }}</textarea>
                         </div>
@@ -57,9 +57,9 @@ active
 <script>
     tinymce.init({
     selector: 'textarea',
-    plugins: 'ai tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography',
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-    tinycomments_mode: 'embedded',
+    // tinycomments_mode: 'embedded',
     tinycomments_author: 'Author name',
     mergetags_list: [
       { value: 'First.Name', title: 'First Name' },
