@@ -206,6 +206,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hrtools/manage/edit/{id}', 'ManagementController@delete');
     Route::get('/hr/compliance/', 'HrController@index');
     Route::post('/post-data/to/fingerprint/machine', 'HrController@add_user_fingerprint');
+    Route::get('/hr/compliance/integration/delete/{id}', 'HrController@delete_user_fingerprint');
 
     Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet');
     Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save');
@@ -295,7 +296,8 @@ Route::middleware(['auth'])->group(function () {
 
     //Execution
     Route::get('/company-regulation/commands', 'CommandsController@index')->name('commands');
-    Route::get('/send-data/timesheet-absence', 'TimesheetController@sendData')->name('sendData');
+    Route::get('/get-data/timesheet-absence', 'AttendanceController@downloadLogData')->name('getData');
+    Route::get('/send-data/timesheet-absence', 'AttendanceController@sendData')->name('sendData');
     });
     //Non
     Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');

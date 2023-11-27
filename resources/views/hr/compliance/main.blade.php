@@ -273,7 +273,7 @@ active
                                 <table class="table table-borderless">
                                     <thead>
                                         <tr>
-                                            <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-secondary @endrole h6" colspan="2">Default Approvers</th>
+                                            <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-danger @endrole h6" colspan="2">Submission Cutt Off Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -374,7 +374,7 @@ active
                                                     <tr>
                                                         <th>Name</th>
                                                         <th>Fingerprint ID</th>
-                                                        <th width="80px">Action</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -382,8 +382,8 @@ active
                                                         <tr>
                                                             <td>{{ $uf->user->name }}</td>
                                                             <td>{{ $uf->fingerprint_id }}</td>
-                                                            <td>
-                                                            <a href="/manage/roles/delete/" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                                            <td class="text-center" width="50px">
+                                                            <a href="/hr/compliance/integration/delete/{{$uf->id}}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach

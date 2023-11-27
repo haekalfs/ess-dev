@@ -10,7 +10,7 @@ active
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
     <h1 class="h4 mb-0 text-gray-800 font-weight-bold"><i class="fas fa-list"></i> Commands</h1>
-    <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-list"></i> Execute</a>
+    {{-- <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-list"></i> Execute</a> --}}
 </div>
 
 @if ($message = Session::get('success'))
@@ -55,7 +55,7 @@ active
                 <tbody>
                     @foreach ($data as $d)
                     <tr>
-                        <td class="text-center" style="border-bottom: none; border-top: none;">
+                        <td class="text-center">
                             <div class="form-check form-check-inline larger-checkbox">
                                 <input class="form-check-input data-checkbox" type="checkbox" value="option1">
                             </div>
@@ -63,7 +63,7 @@ active
                         <td>{{ $d->commands_name }}</td>
                         <td>{{ $d->command_desc }}</td>
                         <td>{{ $d->url }}</td>
-                        <td class="text-center"><a class="btn btn-sm btn-danger">View Details</a></td>
+                        <td class="text-center"><a href="{{ $d->url }}" class="btn btn-sm btn-danger">Execute</a></td>
                     </tr>
                     @endforeach
                 </tbody>

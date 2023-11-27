@@ -577,6 +577,7 @@ active
                                 <div class="form-group">
                                     <label for="email">From :</label>
                                     <input type="text" class="form-control time-input" required autocomplete="off" name="update_from" id="update_from">
+                                    <input type="hidden" class="form-control" required autocomplete="off" name="ts_type" id="ts_type">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -744,33 +745,6 @@ $(document).ready(function() {
     });
 });
 
-// document.getElementById("task").addEventListener("change", function() {
-//     if (this.value === "Sick") {
-//         document.getElementById("activity").value = "-";
-//         document.getElementById("location").value = "N/a";
-//         document.getElementById("start-time").value = "00:00";
-//         document.getElementById("end-time").value = "00:00";
-//         document.getElementById("activity").setAttribute("readonly", true);
-//         document.getElementById("location").setAttribute("readonly", true);
-//         document.getElementById("start-time").setAttribute("readonly", true);
-//         document.getElementById("end-time").setAttribute("readonly", true);
-//     } else if(this.value === "Other") {
-//         document.getElementById("activity").value = "-";
-//         document.getElementById("location").value = "N/a";
-//         document.getElementById("start-time").value = "00:00";
-//         document.getElementById("end-time").value = "00:00";
-//         document.getElementById("activity").setAttribute("readonly", true);
-//         document.getElementById("location").setAttribute("readonly", true);
-//         document.getElementById("start-time").setAttribute("readonly", true);
-//         document.getElementById("end-time").setAttribute("readonly", true);
-//     } else {
-//         document.getElementById("activity").removeAttribute("readonly");
-//         document.getElementById("location").removeAttribute("readonly");
-//         document.getElementById("start-time").removeAttribute("readonly");
-//         document.getElementById("end-time").removeAttribute("readonly");
-//     }
-// });
-
 function setupTimeInputs() {
     $('.time-input').datetimepicker({
       format: 'HH:mm'
@@ -839,32 +813,6 @@ function changeFileName(inputId, labelId) {
   var label = document.getElementById(labelId);
   label.textContent = input.files[0].name;
 }
-
-
-var taskSelectRed = document.getElementById("task-red");
-var locationSelectRed = document.getElementById("location-red");
-
-var taskSelectUpdate = document.getElementById("update_task");
-var locationSelectUpdate = document.getElementById("update_location");
-
-
-taskSelectUpdate.addEventListener("change", function() {
-    var selectedTaskUpdate = taskSelectUpdate.value;
-
-    if (selectedTaskUpdate === "StandbyLK") {
-        locationSelectUpdate.value = "LK";
-        locationSelectUpdate.readOnly = true;
-        locationSelectUpdate.style.pointerEvents = "none";
-    } else if (selectedTaskUpdate === "StandbyLN") {
-        locationSelectUpdate.value = "LN";
-        locationSelectUpdate.readOnly = true;
-        locationSelectUpdate.style.pointerEvents = "none";
-    } else {
-        locationSelectUpdate.readOnly = false;
-        locationSelectUpdate.style.pointerEvents = "auto";
-        // locationSelectUpdate.value = "HO";
-    }
-});
 </script>
 <style>
     .row-toolbar {

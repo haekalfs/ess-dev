@@ -1658,31 +1658,4 @@ class TimesheetController extends Controller
 
         return response()->json($getLoc);
     }
-
-    public function sendData()
-    {
-        $getData = Checkinout::all();
-
-        $usersData = Checkinout::select('user_id', 'date', DB::raw('MIN(time) as earliest_time'), DB::raw('MAX(time) as latest_time'))
-        ->groupBy('user_id', 'date')
-        ->get();
-
-        foreach($usersData as $data){
-            $entry = new Timesheet;
-            $entry->ts_user_id = $data->fingerId->user_id;
-            $entry->ts_id_date = str_replace('-', '', $data->date);
-            $entry->ts_date = $data->date;
-            $entry->ts_task = "HO";
-            $entry->ts_task_id = "HO";
-            $entry->ts_location = "HO";
-            $entry->ts_activity = "HO Activities";
-            $entry->ts_from_time = Carbon::createFromFormat('H:i:s', $data->earliest_time)->format('H:i');
-            $entry->ts_to_time = Carbon::createFromFormat('H:i:s', $data->latest_time)->format('H:i');
-            $entry->allowance = 70000;
-            $entry->incentive = 0;
-            $entry->ts_type = 1;
-            $entry->ts_status_id = 10;
-            $entry->save();
-        }
-    }
 }

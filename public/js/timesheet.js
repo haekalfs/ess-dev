@@ -75,6 +75,7 @@ $(document).ready(function() {
                         $('#updateModal').find('#update_activity').val(response.ts_activity);
                         $('#updateModal').find('#update_from').val(response.ts_from_time);
                         $('#updateModal').find('#update_to').val(response.ts_to_time);
+                        $('#updateModal').find('#ts_type').val(response.ts_type);
                     },
                     error: function(response, jqXHR, textStatus, errorThrown) {
                         console.log(response);
@@ -259,7 +260,11 @@ function showSuccessMessage(){
                         row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_from_time));
                         row.append($('<td data-toggle="modal" data-target="#updateModal" class="clickable" ></td>').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id).text(activity.ts_to_time));
                         var actions = $('<td></td>');
-                        actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
+                        if(!activity.ts_type){
+                            actions.append($('<a></a>').addClass('btn-sm btn btn-danger delete-btn').text('Reset').attr('data-id', activity.ts_id));
+                        } else {
+                            actions.append($('<span></span>').addClass('font-italic text-danger').text('Disabled').attr('data-id', activity.ts_id));
+                        }
                         row.append(actions);
 
                         $('#activity-table').append(row);
@@ -770,13 +775,26 @@ function fetchLocationProjectUpdate(selectedValue) {
 
                 var taskSelect = $('#update_task');
                 var locationSelect = $('#update_location'); // Store the location element
+                var ts_type = $('#ts_type').val();
+
 
                 function updateLocation(selectedTask) {
                     if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
                         $('#updateLocationSelect').css('display', 'block');
                         locationSelect.val(selectedTask.substr(-2));
                         locationSelect.prop('readonly', true);
-                        $('#update_activity, #update_from, #update_to').prop('readonly', false);
+                        $('#update_activity').prop('readonly', false);
+                        if (ts_type) {
+                            $('#update_from, #update_to').prop('readonly', true);
+                            $('#deleteBtn').css('display', 'none');
+                            taskSelect.prop('readonly', true);
+                            taskSelect.css('pointer-events', 'none');
+                        } else {
+                            $('#update_from, #update_to').prop('readonly', false);
+                            $('#deleteBtn').css('display', 'block');
+                            taskSelect.prop('readonly', false);
+                            taskSelect.css('pointer-events', 'auto');
+                        }
                         locationSelect.css('pointer-events', 'none');
                     } else if (selectedTask === "Other" || selectedTask === "Sick") {
                         $('#updateLocationSelect').css('display', 'none');
@@ -784,11 +802,15 @@ function fetchLocationProjectUpdate(selectedValue) {
                         $('#update_activity, #update_from, #update_to').prop('readonly', true);
                         locationSelect.prop('readonly', true);
                         locationSelect.css('pointer-events', 'none');
+                        taskSelect.prop('readonly', false);
+                        taskSelect.css('pointer-events', 'auto');
                     } else {
                         $('#updateLocationSelect').css('display', 'block');
                         $('#update_activity, #update_from, #update_to').prop('readonly', false);
                         locationSelect.prop('readonly', false);
                         locationSelect.css('pointer-events', 'auto');
+                        taskSelect.prop('readonly', false);
+                        taskSelect.css('pointer-events', 'auto');
                     }
                 }
 

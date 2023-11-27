@@ -1,0 +1,79 @@
+<?php
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use App\Models\Checkinout;
+use Log;
+
+include_once(app_path('Helper.php'));
+class ProcessAttendanceData implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function __construct()
+    {
+        //
+    }
+
+    public function handle()
+    {
+        $IP = "192.168.1.113";
+        $Key = "2907";
+
+        if ($IP) {
+            $Connect = fsockopen($IP, "80", $errno, $errstr, 1);
+            if ($Connect) {
+                $soap_request = "<GetAttLog><ArgComKey xsi:type=\"xsd:integer\">" . $Key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">All</PIN></Arg></GetAttLog>";
+                $newLine = "\r\n";
+                fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+                fputs($Connect, "Content-Type: text/xml" . $newLine);
+                fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+                fputs($Connect, $soap_request . $newLine);
+                $buffer = "";
+                while ($Response = fgets($Connect, 1024)) {
+                    $buffer .= $Response;
+                }
+            } else {
+                return;
+            }
+
+            $buffer = Parse_Data($buffer, "<GetAttLogResponse>", "</GetAttLogResponse>");
+            $buffer = explode("\r\n", $buffer);
+
+            $currentDate = date("Y-m-d");
+
+            foreach ($buffer as $dataRow) {
+                $data = Parse_Data($dataRow, "<Row>", "</Row>");
+                $PIN = Parse_Data($data, "<PIN>", "</PIN>");
+                $DateTime = Parse_Data($data, "<DateTime>", "</DateTime>");
+                $Verified = Parse_Data($data, "<Verified>", "</Verified>");
+                $Status = Parse_Data($data, "<Status>", "</Status>");
+
+                $dateTimeParts = explode(" ", $DateTime);
+                $date = $dateTimeParts[0];
+                $time = isset($dateTimeParts[1]) ? $dateTimeParts[1] : null;
+
+                if ($date === $currentDate) {
+                    $checkinout = new Checkinout();
+                    $checkinout->user_id = $PIN;
+                    $checkinout->date = $date;
+                    $checkinout->time = $time;
+                    $checkinout->verify = $Verified;
+                    $checkinout->status = $Status;
+
+                    if ($checkinout->save()) {
+                        // Assuming you want to log success in Laravel logs instead of echoing
+                        \Log::info("New record created successfully");
+                    } else {
+                        // Log any errors in saving to the database
+                        \Log::error("Error saving the record");
+                    }
+                }
+            }
+        }
+    }
+}

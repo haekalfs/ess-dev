@@ -294,4 +294,16 @@ class HrController extends Controller
 
         return response()->json(['error' => 'Fingerprint data already exists for this user.']);
     }
+
+    public function delete_user_fingerprint($id)
+    {
+        $userFingerprint = Users_fingerprint::find($id);
+        $usersName = $userFingerprint->user->name;
+
+        if ($userFingerprint) {
+            $userFingerprint->delete();
+            return redirect()->back()->with('success', "$usersName Fingerprint has been successfully deleted!");
+        }
+        return redirect()->back()->with('error', "$usersName Fingerprint not found or already deleted!");
+    }
 }
