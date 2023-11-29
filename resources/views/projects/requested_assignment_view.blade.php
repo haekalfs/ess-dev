@@ -57,20 +57,20 @@ active
                                 </tr>
                                 <tr class="table-sm">
                                     <td style="width: 150px;">Service Year</td>
-                                    <td>: <?php 
+                                    <td>: <?php
                                         $hired_date = $request->user->users_detail->hired_date; // assuming $hired_date is in Y-m-d format
                                         $current_date = date('Y-m-d'); // get the current date
-    
+
                                         // create DateTime objects from the hired_date and current_date values
                                         $hired_date_obj = new DateTime($hired_date);
                                         $current_date_obj = new DateTime($current_date);
-    
+
                                         // calculate the difference between the hired_date and current_date
                                         $diff = $current_date_obj->diff($hired_date_obj);
-    
+
                                         // get the total number of years from the difference object
                                         $total_years_of_service = $diff->y;
-    
+
                                         // output the total years of service
                                         echo $total_years_of_service.' Years';
                                         ?>
@@ -153,16 +153,22 @@ active
                     </tr>
                 </thead>
                 <tbody>
+                    @php $project = ""; @endphp
                     @foreach($assignment as $assign)
                     @php
-                        $assignStart = \Carbon\Carbon::parse($assign->periode_start);
-                        $assignEnd = \Carbon\Carbon::parse($assign->periode_end);
+                        if($assign->company_project->project_name == $project){
+                            $assignStart = \Carbon\Carbon::parse($assign->periode_start);
+                            $assignEnd = \Carbon\Carbon::parse($assign->periode_end);
 
-                        $requestStart = \Carbon\Carbon::parse($request->periode_start);
-                        $requestEnd = \Carbon\Carbon::parse($request->periode_end);
+                            $requestStart = \Carbon\Carbon::parse($request->periode_start);
+                            $requestEnd = \Carbon\Carbon::parse($request->periode_end);
 
-                        // Check if the two date ranges intersect
-                        $intersect = $assignStart <= $requestEnd && $assignEnd >= $requestStart;
+                            // Check if the two date ranges intersect
+                            $intersect = $assignStart <= $requestEnd && $assignEnd >= $requestStart;
+                            $project = $assign->company_project->project_name;
+                        } else {
+                            $intersect = false;
+                        }
                     @endphp
                     <tr>
                         <td>{{ $assign->responsibility }}</td>
