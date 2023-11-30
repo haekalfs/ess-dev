@@ -45,6 +45,7 @@ class ProcessAttendanceData implements ShouldQueue
             $buffer = explode("\r\n", $buffer);
 
             $currentDate = date("Y-m-d");
+            $yesterdayDate = date("Y-m-d", strtotime("-1 day"));
 
             foreach ($buffer as $dataRow) {
                 $data = Parse_Data($dataRow, "<Row>", "</Row>");
@@ -57,7 +58,8 @@ class ProcessAttendanceData implements ShouldQueue
                 $date = $dateTimeParts[0];
                 $time = isset($dateTimeParts[1]) ? $dateTimeParts[1] : null;
 
-                if ($date === $currentDate) {
+                // Check if the date matches today or yesterday
+                if ($date === $currentDate || $date === $yesterdayDate) {
                     $checkinout = new Checkinout();
                     $checkinout->user_id = $PIN;
                     $checkinout->date = $date;
@@ -66,7 +68,7 @@ class ProcessAttendanceData implements ShouldQueue
                     $checkinout->status = $Status;
 
                     if ($checkinout->save()) {
-                        // Assuming you want to log success in Laravel logs instead of echoing
+                        // Log success in Laravel logs
                         \Log::info("New record created successfully");
                     } else {
                         // Log any errors in saving to the database
