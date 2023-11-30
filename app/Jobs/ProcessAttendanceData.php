@@ -7,6 +7,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Models\Checkinout;
+use Exception;
 use Log;
 
 include_once(app_path('Helper.php'));
@@ -24,21 +25,32 @@ class ProcessAttendanceData implements ShouldQueue
         $IP = "192.168.1.113";
         $Key = "2907";
 
+        $maxAttempts = 10;
+        $attempts = 0;
+
         if ($IP) {
-            $Connect = fsockopen($IP, "80", $errno, $errstr, 1);
-            if ($Connect) {
-                $soap_request = "<GetAttLog><ArgComKey xsi:type=\"xsd:integer\">" . $Key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">All</PIN></Arg></GetAttLog>";
-                $newLine = "\r\n";
-                fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
-                fputs($Connect, "Content-Type: text/xml" . $newLine);
-                fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
-                fputs($Connect, $soap_request . $newLine);
-                $buffer = "";
-                while ($Response = fgets($Connect, 1024)) {
-                    $buffer .= $Response;
+            while ($attempts < $maxAttempts) {
+                try {
+                    $Connect = fsockopen($IP, "80", $errno, $errstr, 1);
+                    if ($Connect) {
+                        $soap_request = "<GetAttLog><ArgComKey xsi:type=\"xsd:integer\">" . $Key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">All</PIN></Arg></GetAttLog>";
+                        $newLine = "\r\n";
+                        fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+                        fputs($Connect, "Content-Type: text/xml" . $newLine);
+                        fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+                        fputs($Connect, $soap_request . $newLine);
+                        $buffer = "";
+                        while ($Response = fgets($Connect, 1024)) {
+                            $buffer .= $Response;
+                        }
+                    } else {
+                        return;
+                    }
+                } catch (Exception $e) {
+                    // Handle exception or log error
+                    sleep(5); // Wait for 5 seconds before retrying
+                    $attempts++;
                 }
-            } else {
-                return;
             }
 
             $buffer = Parse_Data($buffer, "<GetAttLogResponse>", "</GetAttLogResponse>");
