@@ -8,11 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Models\Checkinout;
 use Exception;
-use Log;
 
 include_once(app_path('Helper.php'));
 class ProcessAttendanceData implements ShouldQueue
 {
+    public $timeout = 1200;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct()
@@ -27,9 +27,10 @@ class ProcessAttendanceData implements ShouldQueue
 
         $maxAttempts = 10;
         $attempts = 0;
+        $validation = false;
 
         if ($IP) {
-            while ($attempts < $maxAttempts) {
+            while (!$validation && $attempts < $maxAttempts) {
                 try {
                     $Connect = fsockopen($IP, "80", $errno, $errstr, 1);
                     if ($Connect) {
@@ -42,9 +43,10 @@ class ProcessAttendanceData implements ShouldQueue
                         $buffer = "";
                         while ($Response = fgets($Connect, 1024)) {
                             $buffer .= $Response;
+                            $validation = true;
                         }
                     } else {
-                        return;
+                        $validation = false; // Set validation explicitly to false
                     }
                 } catch (Exception $e) {
                     // Handle exception or log error
@@ -81,10 +83,10 @@ class ProcessAttendanceData implements ShouldQueue
 
                     if ($checkinout->save()) {
                         // Log success in Laravel logs
-                        \Log::info("New record created successfully");
+                        // \Log::info("New record created successfully");
                     } else {
                         // Log any errors in saving to the database
-                        \Log::error("Error saving the record");
+                        // \Log::error("Error saving the record");
                     }
                 }
             }
