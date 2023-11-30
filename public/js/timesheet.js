@@ -68,7 +68,7 @@ $(document).ready(function() {
                     url: '/get-data/' + year + '/' + month + '/' + activityId,
                     type: 'GET',
                     success: function(response) {
-                        fetchLocationProjectUpdate(response.ts_task_id);
+                        fetchLocationProjectUpdate(response.ts_task_id,response.ts_location);
                         // Set the values of the form fields with the data received from the server
                         $('#updateModal').find('#update_task').val(response.ts_task_id);
                         $('#updateModal').find('#update_location').val(response.ts_location);
@@ -106,7 +106,7 @@ $(document).ready(function() {
                         $('.alert-success-saving').show();
                         $('#update-form')[0].reset();
                         $('#updateLocationSelect').css('display', 'block');
-                        fetchLocationProjectUpdate(1);
+                        fetchLocationProjectUpdate(1, "HO");
                             setTimeout(function() {
                                 $('.alert-success-saving').fadeOut('slow');
                             }, 3000);
@@ -754,7 +754,7 @@ $(document).ready(function() {
 fetchLocationProjectRed(1);
 
 
-function fetchLocationProjectUpdate(selectedValue) {
+function fetchLocationProjectUpdate(selectedValue,secondValue) {
     if (selectedValue) {  // Check if selectedValue is not empty
         $.ajax({
             url: '/getLocationProject/' + selectedValue,
@@ -767,10 +767,16 @@ function fetchLocationProjectUpdate(selectedValue) {
 
                 // Populate the <select> element with options from the response
                 $.each(response, function(index, location) {
-                    selectLocation.append($('<option>', {
+                    var option = $('<option>', {
                         value: location.location_code,
                         text: location.description
-                    }));
+                    });
+
+                    if (location.location_code === secondValue) {
+                        option.attr('selected', 'selected');
+                    }
+
+                    selectLocation.append(option);
                 });
 
                 var taskSelect = $('#update_task');
@@ -834,8 +840,8 @@ function fetchLocationProjectUpdate(selectedValue) {
 $(document).ready(function() {
     $('#update_task').on('change', function() {
         var selectedValue = $(this).val();
-        fetchLocationProjectUpdate(selectedValue);
+        fetchLocationProjectUpdate(selectedValue,"HO");
     });
 });
 
-fetchLocationProjectUpdate(1);
+fetchLocationProjectUpdate(1,"HO");
