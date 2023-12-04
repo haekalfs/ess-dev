@@ -103,22 +103,26 @@ class HrController extends Controller
 		// Cutoff Date
 			// Cutoff Date Submit TS
 			$Cutoffdate_input = Cutoffdate::where('id', 1)->first();
-			$Cutoffdate_input->closed_date = $request->ts_submit_date;
+			$Cutoffdate_input->start_date = $request->ts_submit_start_date;
+			$Cutoffdate_input->closed_date = $request->ts_submit_closed_date;
 			$Cutoffdate_input->save();
 
 			// Cutoff Date Approve TS
 			$CutoffdateTimesheetApproval_input = Cutoffdate::where('id', 2)->first();
-			$CutoffdateTimesheetApproval_input->closed_date = $request->ts_approve_date;
+			$CutoffdateTimesheetApproval_input->start_date = $request->ts_approve_start_date;
+			$CutoffdateTimesheetApproval_input->closed_date = $request->ts_approve_closed_date;
 			$CutoffdateTimesheetApproval_input->save();
 
 			// Cutoff Date Approve Leave
 			$leaveApprovalCutoffdate_input = Cutoffdate::where('id', 3)->first();
-			$leaveApprovalCutoffdate_input->closed_date = $request->leave_approve_date;
+			$leaveApprovalCutoffdate_input->start_date = $request->leave_approve_start_date;
+			$leaveApprovalCutoffdate_input->closed_date = $request->leave_approve_closed_date;
 			$leaveApprovalCutoffdate_input->save();
 
 			// Cutoff Date Approve Reimburse
 			$reimburseApprovalCutoffdate_input = Cutoffdate::where('id', 4)->first();
-			$reimburseApprovalCutoffdate_input->closed_date = $request->reimburse_approve_date;
+			$reimburseApprovalCutoffdate_input->start_date = $request->reimburse_approve_start_date;
+			$reimburseApprovalCutoffdate_input->closed_date = $request->reimburse_approve_closed_date;
 			$reimburseApprovalCutoffdate_input->save();
 
 		// Approver

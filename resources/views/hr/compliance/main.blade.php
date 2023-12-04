@@ -280,37 +280,61 @@ active
                                         <tr class="table-sm">
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="email">Timesheet Submission :</label>
-                                                            <input type="number" class="form-control" name="ts_submit_date" value="{{ $cutoffDate->closed_date }}">
+                                                            <label for="email">Timesheet Submission Start Date :</label>
+                                                            <input type="number" class="form-control" name="ts_submit_start_date" value="{{ $cutoffDate->start_date }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="password">Timesheet Approval :</label>
-                                                            <input type="text" class="form-control" name="ts_approve_date" value="{{ $tsCutoffdate->closed_date }}">
+                                                            <label for="email">Timesheet Submission Closed Date :</label>
+                                                            <input type="number" class="form-control" name="ts_submit_closed_date" value="{{ $cutoffDate->closed_date }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="password">Leave Approval :</label>
-                                                            <input type="number" class="form-control" name="leave_approve_date" value="{{ $leaveCutoffdate->closed_date }}">
+                                                            <label for="password">Timesheet Approval Start Date :</label>
+                                                            <input type="text" class="form-control" name="ts_approve_start_date" value="{{ $tsCutoffdate->start_date }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="password">Reimburse & Med Approval :</label>
-                                                            <input type="number" class="form-control" name="reimburse_approve_date" value="{{ $reimburseCutoffdate->closed_date }}">
+                                                            <label for="password">Timesheet Approval Closed Date :</label>
+                                                            <input type="text" class="form-control" name="ts_approve_closed_date" value="{{ $tsCutoffdate->closed_date }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="password">Leave Approval Start Date :</label>
+                                                            <input type="number" class="form-control" name="leave_approve_start_date" value="{{ $leaveCutoffdate->start_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="password">Leave Approval Closed Date :</label>
+                                                            <input type="number" class="form-control" name="leave_approve_closed_date" value="{{ $leaveCutoffdate->closed_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="password">Reimburse & Med Approval Start Date :</label>
+                                                            <input type="number" class="form-control" name="reimburse_approve_start_date" value="{{ $reimburseCutoffdate->start_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="password">Reimburse & Med Approval Closed date :</label>
+                                                            <input type="number" class="form-control" name="reimburse_approve_closed_date" value="{{ $reimburseCutoffdate->start_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="comment">New Financial Password :</label>
                                                             <input type="password" class="form-control" id="password" name="password" value="">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="comment">Reconfirm Password :</label>
                                                             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="">
