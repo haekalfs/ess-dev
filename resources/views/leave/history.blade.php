@@ -294,8 +294,8 @@ active
                                                 @foreach ($leaveQuotaAnnual as $lqa)
                                                     <tr>
                                                         <td>{{ $lqa->leave->description }}</td>
-                                                        <td>{{ $lqa->active_periode }}</td>
-                                                        <td>{{ $lqa->expiration }}</td>
+                                                        <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqa->active_periode)->format('d-M-Y') }}</td>
+                                                        <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqa->expiration)->format('d-M-Y') }}</td>
                                                         <td><?php
                                                         if($lqa->expiration < date('Y-m-d')){
                                                             echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
@@ -323,27 +323,27 @@ active
                                         <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Request Date</th>
-                                                    <th>Quota Type</th>
-                                                    <th>Total Days Requested</th>
+                                                    <th>Date Created</th>
                                                     <th>Quota Used</th>
+                                                    <th>Total Days</th>
+                                                    <th>Deducted Quota</th>
                                                     <th>Quota Left</th>
                                                     <th>Description</th>
-                                                    <th>Quota Active Periode</th>
-                                                    <th>Quota Expiration</th>
+                                                    {{-- <th>Active Periode</th>
+                                                    <th>Expiration</th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($leaveQuotaUsage as $lqu)
                                                     <tr>
-                                                        <td>{{ $lqu->req_date }}</td>
+                                                        <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->req_date)->format('d-M-Y') }}</td>
                                                         <td>{{ $lqu->leave->description }}</td>
                                                         <td>{{ $lqu->requested_days }}</td>
                                                         <td>- {{ $lqu->quota_used }}</td>
                                                         <td>{{ $lqu->quota_left }}</td>
                                                         <td>{{ $lqu->description }}</td>
-                                                        <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
-                                                        <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
+                                                        {{-- <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
+                                                        <td>{{ $lqu->emp_leave_quota->expiration }}</td> --}}
                                                     </tr>
                                                 @endforeach
                                             </tbody>

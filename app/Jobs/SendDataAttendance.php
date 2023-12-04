@@ -28,6 +28,18 @@ class SendDataAttendance implements ShouldQueue
 
         foreach ($usersData as $data) {
             if ($data->fingerId->user_id && $data->date && ($data->earliest_time || $data->latest_time)) {
+                $earliestTime = $data->earliest_time ? Carbon::createFromFormat('H:i:s', $data->earliest_time) : null;
+                $latestTime = $data->latest_time ? Carbon::createFromFormat('H:i:s', $data->latest_time) : null;
+
+                // Validation for earliest time
+                if ($earliestTime && $earliestTime->lessThan(Carbon::createFromTime(7, 0, 0))) {
+                    $earliestTime = Carbon::createFromTime(7, 0, 0); // Set it to 08:00 AM if it's earlier
+                }
+
+                // Validation for latest time
+                if ($latestTime && $latestTime->greaterThan(Carbon::createFromTime(18, 0, 0))) {
+                    $latestTime = Carbon::createFromTime(18, 0, 0); // Set it to 18:00 PM if it's later
+                }
                 Timesheet::updateOrCreate(
                     [
                         'ts_id_date' => str_replace('-', '', $data->date),
@@ -39,8 +51,8 @@ class SendDataAttendance implements ShouldQueue
                         'ts_task_id' => 'HO',
                         'ts_location' => 'HO',
                         'ts_activity' => 'HO Activities',
-                        'ts_from_time' => $data->earliest_time ? Carbon::createFromFormat('H:i:s', $data->earliest_time)->format('H:i') : null,
-                        'ts_to_time' => $data->latest_time ? Carbon::createFromFormat('H:i:s', $data->latest_time)->format('H:i') : null,
+                        'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
+                        'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
                         'allowance' => 70000,
                         'incentive' => 0,
                         'ts_type' => 1,
