@@ -41,7 +41,7 @@ class ProjectController extends Controller
         $roles = Project_role::all();
         $project = Company_project::all();
 
-        $myRequest = Requested_assignment::where('req_by', Auth::user()->id)->where('status', '0')->get();
+        $myRequest = Requested_assignment::where('req_by', Auth::user()->id)->get();
         return view('projects.myproject', ['records' => $records, 'usr_roles' => $roles, 'project' => $project, 'myRequest' => $myRequest]);
     }
 
@@ -278,16 +278,16 @@ class ProjectController extends Controller
             'from' => 'required',
             'to' => 'required'
         ]);
-    
+
         // Retrieve an array of selected location IDs
         $selectedLocationIds = $request->input('p_location');
-    
+
         // Retrieve the selected locations from the database
         $selectedLocations = Project_location::whereIn('id', $selectedLocationIds)->get();
-    
+
         // Extract the location codes and join them with commas
         $alias = $selectedLocations->pluck('location_code')->implode(', ');
-    
+
         // Create a new Company_project record
         Company_project::create([
             'project_code' => $request->p_code,
@@ -298,9 +298,9 @@ class ProjectController extends Controller
             'periode_end' => $request->to,
             'client_id' => $request->p_client
         ]);
-    
+
         return redirect('/project_list')->with('success', 'Project created successfully');
-    }    
+    }
 
     public function create_new_client(Request $request)
     {
@@ -529,7 +529,7 @@ class ProjectController extends Controller
         }
 
         $idAss = $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc);
-        
+
         Project_assignment::create([
             'id' => $uniqueIdP . preg_replace("/[^0-9]/", "", $request->no_doc),
             'assignment_no' => $request->no_doc,
@@ -635,10 +635,10 @@ class ProjectController extends Controller
         }
         // Retrieve the selected locations from the database
         $selectedLocations = Project_location::whereIn('id', $p_loc)->get();
-    
+
         // Extract the location codes and join them with commas
         $alias = $selectedLocations->pluck('location_code')->implode(', ');
-    
+
         $cp->project_code = $request->input('p_code');
         $cp->alias = $alias;
         $cp->project_name = $request->input('p_name');

@@ -7,9 +7,10 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Leave Approval</h1>
-<p class="mb-4">Approval Page.</p>
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-plane-departure"></i> Leave Approval</h1>
+    {{-- <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a> --}}
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -31,7 +32,7 @@ active
 </div>
 @endif
 
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Approval History</h6>
         <div class="text-right">
@@ -66,7 +67,7 @@ active
                                 foreach ($dates as $date) {
                                     $formattedDate = date('d', strtotime($date));
                                     $monthYear = date('F Y', strtotime($date));
-                                    
+
                                     if ($currentMonth !== $monthYear) {
                                         if (!empty($group)) {
                                             $dateGroups[] = $group;
@@ -83,7 +84,7 @@ active
                                     $dateGroups[] = $group;
                                 }
                             @endphp
-                        
+
                             @foreach ($dateGroups as $key => $group)
                                 @if ($key > 0)
                                     -
@@ -121,7 +122,7 @@ active
                                     </form>
                                 </div>
                             </div>
-                            
+
                             <div class="btn-group">
                                 <button class="btn btn-danger btn-sm dropdown-toggle" style="margin-right: 5px;" type="button" id="rejectDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject

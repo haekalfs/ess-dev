@@ -31,7 +31,7 @@ class ReimbursementApprovalController extends Controller
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
-                if (in_array($checkUserPost, [7, 8, 12, 10, 6, 22])) {
+                if (in_array($checkUserPost, [7, 8, 12, 6, 22])) {
                     $Check = DB::table('reimbursement_approval')
                     ->select('reimb_item_id')
                     ->whereNotIn('RequestTo', $ts_approver)
@@ -103,7 +103,7 @@ class ReimbursementApprovalController extends Controller
             }
             $f_id = $as->f_id;
         }
-        
+
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
 
@@ -125,6 +125,7 @@ class ReimbursementApprovalController extends Controller
                     $status = '<i class="fas fa-times-circle" style="color: #ff0000;"></i> Rejected';
                     break;
                 case 30:
+                case 29:
                     $status = '<i class="fas fa-check-circle" style="color: #005eff;"></i> Approved';
                     break;
                 default:
@@ -183,7 +184,7 @@ class ReimbursementApprovalController extends Controller
             $entry->month_periode = $yearAndMonth;
             $entry->type = 5;
             $entry->save();
-            
+
             $employees = User::where('id', $reimb_req->f_req_by)->get();
             $userName = Auth::user()->name;
 
@@ -226,7 +227,7 @@ class ReimbursementApprovalController extends Controller
         foreach($employees as $employee){
             dispatch(new NotifyReimbursementRejected($employee, $reimbId));
         }
-        
+
         return response()->json(['success' => 'Items rejected successfully.']);
     }
 }

@@ -57,7 +57,7 @@
                         <td>{{ $timesheets->ts_from_time }}</td>
                         <td>{{ $timesheets->ts_to_time }}</td>
                         <td>
-                            <?php 
+                            <?php
                                 $start_time = strtotime($timesheets->ts_from_time);
                                 $end_time = strtotime($timesheets->ts_to_time);
                                 $time_diff_seconds = $end_time - $start_time;
@@ -78,7 +78,7 @@
                         <td>{{ $timesheets->ts_from_time }}</td>
                         <td>{{ $timesheets->ts_to_time }}</td>
                         <td>
-                            <?php 
+                            <?php
                                 $start_time = strtotime($timesheets->ts_from_time);
                                 $end_time = strtotime($timesheets->ts_to_time);
                                 $time_diff_seconds = $end_time - $start_time;
@@ -92,16 +92,16 @@
                 @php $prev_date = $timesheets->ts_date; @endphp
             @endforeach
         </tbody>
-                        
+
 	</table>
     <table class="table table-bordered">
         <tbody>
             <tr class="table-sm">
-                <td class="m-0 font-weight-bold text-danger" width="600px">Total Workhours</td>
+                <td class="m-0 font-weight-bold text-danger" width="600px">Total Workhours (Exclude Break Time)</td>
                 <td class="text-center"><?php echo intval($total_work_hours); ?> Hours</td>
             </tr>
         </tbody>
     </table>
- 
+
 </body>
 </html>

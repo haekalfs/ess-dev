@@ -769,6 +769,19 @@ class LeaveController extends Controller
             'leave_request_id' => $id
         ]);
 
+        $getIdLeaveReq = Leave_request_approval::where('leave_request_id', $id)->pluck('leave_request_id')->first();
+        $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
+
+        $addQuota = Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->get();
+        foreach ($addQuota as $aq) {
+            $returnQuota = Emp_leave_quota::find($aq->emp_leave_quota_id);
+            $totalQuotaUsed = $aq->quota_used;
+
+            $returnQuota->quota_used -= $totalQuotaUsed;
+            $returnQuota->quota_left += $totalQuotaUsed;
+            $returnQuota->save();
+        }
+
         $entry = new Notification_alert();
         $entry->user_id = $getLeaveReq->req_by;
         $entry->message = "Your Leave Request has been Rejected by Administrator!";

@@ -90,7 +90,7 @@ active
                                 </tr>
                                 <tr class="table-sm">
                                     <td>Service year</td>
-                                    <td>: <?php 
+                                    <td>: <?php
                                     $hired_date = $user_info->users_detail->hired_date; // assuming $hired_date is in Y-m-d format
                                     $current_date = date('Y-m-d'); // get the current date
 
@@ -263,37 +263,33 @@ active
                                     -
                                 @else
                                 <?php
-                                    $work_hours = 0;
-                                    $start_time = PHP_INT_MAX;
-                                    $end_time = 0;
+                                        $work_hours = 0;
+                                        $start_time = PHP_INT_MAX;
+                                        $end_time = 0;
 
-                                    foreach ($activities as $timesheet) {
-                                        if ($timesheet->ts_date == $date->format('Y-m-d')) {
-                                            $current_start_time = strtotime($timesheet->ts_from_time);
-                                            $current_end_time = strtotime($timesheet->ts_to_time);
+                                        foreach ($activities as $timesheet) {
+                                            if ($timesheet->ts_date == $date->format('Y-m-d')) {
+                                                $current_start_time = strtotime($timesheet->ts_from_time);
+                                                $current_end_time = strtotime($timesheet->ts_to_time);
 
-                                            if ($current_start_time < $start_time) {
-                                                $start_time = $current_start_time;
-                                            }
+                                                if ($current_start_time < $start_time) {
+                                                    $start_time = $current_start_time;
+                                                }
 
-                                            if ($current_end_time > $end_time) {
-                                                $end_time = $current_end_time;
+                                                if ($current_end_time > $end_time) {
+                                                    $end_time = $current_end_time;
+                                                }
                                             }
                                         }
-                                    }
 
-                                    if ($end_time > $start_time) {
-                                        $time_diff_seconds = $end_time - $start_time;
-                                        $time_diff_hours = gmdate('H', $time_diff_seconds);
-                                        $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-                                        $work_hours = $time_diff_hours + ($time_diff_minutes / 60);
-                                    }
+                                        if ($end_time > $start_time) {
 
-                                    $total_work_hours += $work_hours;
-                                    if ($work_hours > 0) {
-                                        echo intval($work_hours - 1)." Hours";
-                                    }
-                                ?>
+                                            $time_diff_seconds = $end_time - $start_time;
+                                            $time_diff_hours = gmdate('H', $time_diff_seconds);
+                                            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+                                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes." Hours";
+                                        }
+                                    ?>
                                 @endif
                             </td>
                         </tr>
@@ -305,11 +301,35 @@ active
             <table class="table table-borderless">
                 <tbody>
                     <tr class="table-sm">
-                        <td class="m-0 font-weight-bold text-danger" width="1000px"></td>
+                        <td class="m-0 font-weight-bold text-danger" width="900px"></td>
                         @if($total_work_hours < $totalHours)
-                        <td class="text-center text-danger font-weight-bold" title="Should be above {{ $totalHours }} Hours"><i>Total Workhours : <?php echo intval($total_work_hours) - $getTotalDays; ?> Hours <?php $percentage = ((intval($total_work_hours) - $getTotalDays) / $totalHours) * 100; echo "(".$percentage."%)";?></i></td>
+                            <td class="text-center text-danger font-weight-bold" title="Should be above {{ $totalHours }} Hours">
+                                <i>
+                                    Total :
+                                    <?php
+                                        $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
+                                        $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
+                                        echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
+                                        $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
+                                        echo "(".intval($percentage)."%)";
+                                    ?>
+                                    <br><small>NB : Each Day is Deducted (1 Hour) for Break Time</small>
+                                </i>
+                            </td>
                         @else
-                        <td class="text-center text-success font-weight-bold"><i>Total Workhours : <?php echo intval($total_work_hours) - $getTotalDays; ?> Hours <?php $percentage = ((intval($total_work_hours) - $getTotalDays) / $totalHours) * 100; echo "(".$total_work_hours."%)";?></i></td>
+                            <td class="text-center text-success font-weight-bold">
+                                <i>
+                                    Total :
+                                    <?php
+                                        $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
+                                        $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
+                                        echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
+                                        $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
+                                        echo "(".intval($percentage)."%)";
+                                    ?>
+                                    <br><small>NB : Each Day is Deducted (1 Hour) for Break Time</small>
+                                </i>
+                            </td>
                         @endif
                     </tr>
                 </tbody>
