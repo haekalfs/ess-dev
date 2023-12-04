@@ -625,7 +625,7 @@ class ApprovalController extends Controller
         $total = $balanceAmount - $AmountApproved;
         $formattedTotal = number_format($total, 0, ',', '.');
 
-        $medBalance->medical_balance = $formattedTotal;
+        $medBalance->medical_remaining = $formattedTotal;
         $medBalance->save();
 
         $deducted = $medBalance->medical_deducted;

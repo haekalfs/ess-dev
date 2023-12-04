@@ -4,9 +4,9 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Leaves Information</h6>
-        {{-- <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a>
-        </div> --}}
+        <div class="text-right">
+            <a class="d-none d-sm-inline-block btn btn-primary btn-sm shadow-sm" type="button" data-toggle="modal" data-target="#addLeaveModal" ><i class="fas fa-fw fa-plus fa-sm text-white-50"></i> Add Leave</a>
+        </div>
     </div>
     <div class="card-body">
     <form method="GET" action="/leave/manage/all">
@@ -103,4 +103,92 @@
     </form>
     </div>
 </div>
+
+{{-- Modal Add Leave --}}
+<form action="/medical/edit/" enctype="multipart/form-data" method="POST">
+@csrf
+@method('PUT')
+    <div class="modal fade" id="addLeaveModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Add Leave To Employee</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12" >
+                        <div class="form-group">
+                            <label for="email">Employee Name :</label>
+                            <select class="form-control" name="input_emp_id" required>
+                                <option selected disabled>Choose</option>
+                                @foreach ($employees as $emp)
+                                    <option value="{{ $emp->id }}" @if ($emp->id == $showName) selected @endif>{{ $emp->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Leave ID :</label>
+                            <select class="form-control" name="input_leave_id" required>
+                                <option selected disabled>Choose</option>
+                                <option value="10">Annual Leave</option>
+                                <option value="20">5 Year Term</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Quota Used :</label>
+                                    <input class="form-control flex" type="number" name="input_quota_used" placeholder="Quota Used..." value="0"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Quota Left :</label>
+                                    <input class="form-control flex" type="number" name="input_quota_left" placeholder="Quota Left..." value="0"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Active Periode :</label>
+                                    <input class="form-control" type="date"  name="input_active_periode" id="active_periode" value="" required/>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">Expiration :</label>
+                                    <input class="form-control" type="date"  name="input_expiration" id="expiration" value="" required/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-sm btn-danger" data-dismiss="modal" aria-label="Close">Cancel</button>
+                    <button class="btn-sm btn-success">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+// Mendapatkan elemen input tanggal
+var inputExpiration = document.getElementById('expiration');
+
+// Mendapatkan tanggal saat ini
+var currentDate = new Date();
+
+// Menentukan tanggal 1 bulan April tahun selanjutnya
+var nextYear = currentDate.getFullYear() + 1;
+var nextApril = new Date(nextYear, 3, 1); // April memiliki index bulan 3 (dimulai dari 0)
+
+// Mengatur nilai input tanggal menjadi tanggal 1 bulan April tahun berikutnya
+var formattedDate = nextApril.getFullYear() + '-' + ('0' + (nextApril.getMonth() + 1)).slice(-2) + '-' + ('0' + nextApril.getDate()).slice(-2);
+inputExpiration.value = formattedDate;
+
+</script>
 @endsection

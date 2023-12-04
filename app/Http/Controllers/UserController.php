@@ -125,6 +125,8 @@ class UserController extends Controller
         $emp_leave->leave_id = 10;
         $emp_leave->quota_used = 0;
         $emp_leave->quota_left = 0;
+        $emp_leave->active_periode = $request->hired_date;
+        $emp_leave->expiration = 0;
         $emp_leave->save();
 
         $med_balance = new Emp_medical_balance();

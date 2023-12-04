@@ -268,7 +268,7 @@ active
     </div>
 </div>
 
-<div class="row">
+{{-- <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
@@ -276,7 +276,7 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Workflow</h6>
                 <div class="text-right">
-                    {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a> --}}
+                    <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -313,16 +313,16 @@ active
                                     <td>{{$workflow->approval_notes}}</td>
                                 </tr>
                             @endforeach
-                            {{-- <tr style="border-bottom: 1px solid #dee2e6;">
+                            <tr style="border-bottom: 1px solid #dee2e6;">
                                 <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
-                            </tr> --}}
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 {{-- Modal Resubmit --}}
 <form action="/medical/edit/{{ $med->id }}/resubmit" enctype="multipart/form-data"  method="POST">

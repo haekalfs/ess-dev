@@ -38,32 +38,10 @@ class MedicalController extends Controller
         $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)
         ->first();
 
-        // dd($emp_medical_balance);
-        $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
-        ->where('leave_id', 10)
-        ->where('expiration', '>=', date('Y-m-d'))
-        ->sum('quota_left');
-        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
-        ->where('leave_id', 100)
-        ->where('expiration', '>=', date('Y-m-d'))
-        ->sum('quota_left');
-        $empLeaveQuotaFiveYearTerm = Emp_leave_quota::where('expiration', '>=', date('Y-m-d'))
-        ->where('user_id', Auth::user()->id)
-        ->where('leave_id', 20)
-        ->sum('quota_left');
-        $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
-        if ($empLeaveQuotaFiveYearTerm == NULL) {
-            $empLeaveQuotaFiveYearTerm = "-";
-        }
-
         return view('medical.medical', 
         [
             'med' => $med,
-            'emp_medical_balance' => $emp_medical_balance,
-            'empLeaveQuotaAnnual' => $empLeaveQuotaAnnual,
-            'empLeaveQuotaWeekendReplacement' => $empLeaveQuotaWeekendReplacement,
-            'empLeaveQuotaFiveYearTerm' => $empLeaveQuotaFiveYearTerm,
-            'totalQuota' => $totalQuota 
+            'emp_medical_balance' => $emp_medical_balance
         ]);
     }
     public function entry()
@@ -425,6 +403,7 @@ class MedicalController extends Controller
         $medBalance = new Emp_medical_balance ();
         $medBalance->user_id = $request->input_user_id;
         $medBalance->medical_balance = $request->input_balance;
+        $medBalance->medical_remaining = $request->input_balance;
         $medBalance->medical_deducted = 0;
         $medBalance->active_periode = $request->input_active_periode;
         $medBalance->expiration = $ExpirationDate;

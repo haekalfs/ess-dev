@@ -76,27 +76,27 @@ active
             <div class="card-body">
                 <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                     <tr>
-                      <tr>
-                          <th width="300px">Medical Balance</th>
+                        <tr>
+                          <th width="300px">Balance</th>
                             <td style="text-align: start;"> :
                                 <span id="medicalBalance" style="font-weight:700; ">**********</span>
                                 <a href="#" onclick="togglePasswordVisibility()">
                                     <i id="eyeIcon" class="fa fa-eye"></i>
                                 </a>
                             </td>
-                      </tr>
-                      <tr>
-                          <th>5 Year Term</th>
-                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
-                      </tr>
-                      <tr>
-                          <th>Weekend Replacement</th>
-                          <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaWeekendReplacement }}</td>
-                      </tr>
-                      <tr>
-                          <th>Total Leave Available</th>
-                          <td style="text-align: start; font-weight:500">: {{ $totalQuota }}</td>
-                      </tr>
+                        </tr>
+                        <tr>
+                          <th>Balance Remaining</th>
+                          <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->medical_remaining }}</td>
+                        </tr>
+                        <tr>
+                            <th>Balance Deducted</th>
+                            <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->medical_deducted }}</td>
+                        </tr>
+                        <tr>
+                          <th>Active Periode</th>
+                          <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->active_periode }}</td>
+                        </tr>
                     </tr>
                 </table>
             </div>
@@ -188,7 +188,7 @@ active
 </div>
 
 @foreach($med as $q)
-<!-- Modal -->
+<!-- Modal Deelete -->
 <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -204,7 +204,7 @@ active
       </div>
       <div class="modal-footer justify-content-center">
         <button type="button" class="btn-sm btn-primary" data-dismiss="modal">Cancel</button>
-        <a href="/medical/delete/{{ $q->id }}" title="Hapus" class="btn btn-danger btn-sm" >Yes Im Sure</a>
+        <a href="/medical/delete/{{ $q->id }}" title="Delete" class="btn btn-danger btn-sm" >Yes Im Sure</a>
       </div>
     </div>
   </div>
