@@ -338,14 +338,14 @@ class TimesheetController extends Controller
                 $encryptYear = Crypt::encrypt($year);
                 $encryptMonth = Crypt::encrypt($month);
                 $previewButton = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
-                Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available untill the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
+                Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available until the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
                 return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
             }
         } else {
             $encryptYear = Crypt::encrypt($year);
             $encryptMonth = Crypt::encrypt($month);
             $previewButton = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
-            Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available untill the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
+            Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available until the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
             return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
         }
         // // Return the calendar view with the calendar data
