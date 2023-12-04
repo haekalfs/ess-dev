@@ -1148,133 +1148,103 @@ class TimesheetController extends Controller
         //     return redirect()->back();
         // }
 
-        // Get the current date
         $currentDate = Carbon::now();
 
         $dateCut = Cutoffdate::find(1);
+
         // Get the cutoff date for submitting timesheets (7th of the next month)
         $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->closed_date - 1));
-        // $cutoffDate = Carbon::createFromFormat('Y-m-d', "2023-09-31");
 
-        // Check if the current date is on or after the cutoff date
-        if ($currentDate->gte($cutoffDate)) {
-            Session::flash('failed', 'Timesheet submission is closed for this month.');
-            return redirect()->back();
-        }
+        // Get the start date for timesheets
+        $startDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->start_date - 1));
 
-        // Get the start and end dates for the selected month
-        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
-        $endDate = Carbon::create($year, $month)->endOfMonth();
+        // Check if the current date is on or after the start date AND on or before the cutoff date
+        if ($currentDate->gte($startDate) && $currentDate->lte($cutoffDate)) {
+            // Allow access to the page
+            // Get the start and end dates for the selected month
+            $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+            $endDate = Carbon::create($year, $month)->endOfMonth();
 
-        // Get the Timesheet records between the start and end dates
-        $tsOfTheMonth = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_id_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
+            // Get the Timesheet records between the start and end dates
+            $tsOfTheMonth = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_id_date', 'asc')->where('ts_user_id', Auth::user()->id)->get();
 
-        if ($tsOfTheMonth->isEmpty()) {
-            Session::flash('failed', "You have to fill your timesheet first!");
-            return redirect(url()->previous());
-        }
+            if ($tsOfTheMonth->isEmpty()) {
+                Session::flash('failed', "You have to fill your timesheet first!");
+                return redirect(url()->previous());
+            }
 
-        $userId = Auth::user()->id;
+            $userId = Auth::user()->id;
 
-        $subquery = DB::table('timesheet')
-            ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(incentive AS DECIMAL(10, 2)) AS incentive'), 'ts_task_id', 'ts_id_date', 'allowance')
-            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(incentive AS DECIMAL(10, 2)) DESC) AS rn')
-            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->where('ts_user_id', $userId)
-            ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id');
+            $subquery = DB::table('timesheet')
+                ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(incentive AS DECIMAL(10, 2)) AS incentive'), 'ts_task_id', 'ts_id_date', 'allowance')
+                ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(incentive AS DECIMAL(10, 2)) DESC) AS rn')
+                ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->where('ts_user_id', $userId)
+                ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id');
 
-        $sql = '(' . $subquery->toSql() . ') as subquery';
+            $sql = '(' . $subquery->toSql() . ') as subquery';
 
-        $results = DB::table(DB::raw($sql))
-            ->mergeBindings($subquery)
-            ->select('ts_task', 'ts_location', 'ts_user_id', 'incentive as incentive', 'ts_task_id', 'allowance as max_allowance', DB::raw('COUNT(*) as total_rows'))
-            ->where('rn', 1)
-            ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id')
-            ->get();
+            $results = DB::table(DB::raw($sql))
+                ->mergeBindings($subquery)
+                ->select('ts_task', 'ts_location', 'ts_user_id', 'incentive as incentive', 'ts_task_id', 'allowance as max_allowance', DB::raw('COUNT(*) as total_rows'))
+                ->where('rn', 1)
+                ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id')
+                ->get();
 
-        // echo "Total days: " . $totalDays;
-        $checkUserDept = Auth::user()->users_detail->department->id;
+            // echo "Total days: " . $totalDays;
+            $checkUserDept = Auth::user()->users_detail->department->id;
 
-        $approvalGA = Timesheet_approver::whereIn('id', [10, 45])->get();
-        $approvalFinance = Timesheet_approver::whereIn('id', [15, 45])->get();
-        $approvalSales = Timesheet_approver::whereIn('id', [50, 55])->get();
-        $approvalHCM = Timesheet_approver::whereIn('id', [10, 60])->get();
-        $approvalService = Timesheet_approver::whereIn('id', [20, 40])->get();
+            $approvalGA = Timesheet_approver::whereIn('id', [10, 45])->get();
+            $approvalFinance = Timesheet_approver::whereIn('id', [15, 45])->get();
+            $approvalSales = Timesheet_approver::whereIn('id', [50, 55])->get();
+            $approvalHCM = Timesheet_approver::whereIn('id', [10, 60])->get();
+            $approvalService = Timesheet_approver::whereIn('id', [20, 40])->get();
 
-        $checkUserRole = Usr_role::where('user_id', Auth::user()->id)->pluck('role_name')->toArray();
-        $serviceDirOnly = ["pc"];
-        $gaDirOnly = ["hr"]; //1
+            $checkUserRole = Usr_role::where('user_id', Auth::user()->id)->pluck('role_name')->toArray();
+            $serviceDirOnly = ["pc"];
+            $gaDirOnly = ["hr"]; //1
 
-        Timesheet_detail::updateOrCreate([
-            'user_id' => Auth::user()->id,
-            'activity' => 'Submitted',
-            'month_periode' => $year . $month,
-        ], [
-            'ts_status_id' => 15,
-            'date_submitted' => date('Y-m-d'),
-            'workhours' => '-',
-            'note' => '',
-            'ts_task' => '-',
-            'RequestTo' => '-',
-            'user_timesheet' => Auth::user()->id
-        ]);
-        $empApproval = [];
-        $totalIncentive = 0;
-        // var_dump($countRows);
-        foreach ($results as $row) {
-            $test = Project_assignment::where('id', $row->ts_task_id)->pluck('company_project_id')->first();
-            $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
-            $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
-            $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
+            Timesheet_detail::updateOrCreate([
+                'user_id' => Auth::user()->id,
+                'activity' => 'Submitted',
+                'month_periode' => $year . $month,
+            ], [
+                'ts_status_id' => 15,
+                'date_submitted' => date('Y-m-d'),
+                'workhours' => '-',
+                'note' => '',
+                'ts_task' => '-',
+                'RequestTo' => '-',
+                'user_timesheet' => Auth::user()->id
+            ]);
+            $empApproval = [];
+            $totalIncentive = 0;
+            // var_dump($countRows);
+            foreach ($results as $row) {
+                $test = Project_assignment::where('id', $row->ts_task_id)->pluck('company_project_id')->first();
+                $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
+                $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
+                $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
 
-            $countIncentive = $row->total_rows * $row->incentive;
+                $countIncentive = $row->total_rows * $row->incentive;
 
-            $countAllowance = $row->total_rows * $row->max_allowance;
+                $countAllowance = $row->total_rows * $row->max_allowance;
 
-            $totalIncentive = $countIncentive;
-            $totalAllowances = $countAllowance;
-            switch ($row->ts_task) {
-                case "HO":
-                case "Sick":
-                case "StandbyLK":
-                case "StandbyLN":
-                case "Other":
-                case "Absent":
-                    switch ($checkUserDept) {
-                        case 4:
-                            if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray())) {
-                                foreach ($approvalFinance as $approverFinance) {
-                                    $newArrayFm = [
-                                        'name' => $approverFinance->approver,
-                                        'task' => $row->ts_task,
-                                        'location' => $row->ts_location,
-                                        'mandays' => $row->total_rows,
-                                        'role' => $checkRole,
-                                        'task_id' => $row->ts_task_id,
-                                        'total_incentive' => $totalIncentive,
-                                        'total_allowance' => $totalAllowances,
-                                        'priority' => 1,
-                                    ];
-                                    $empApproval[] = $newArrayFm;
-                                }
-                            } else {
-                                if (!empty(array_intersect($gaDirOnly, $checkUserRole))) {
-                                    $newArrayS = [
-                                        'name' => Timesheet_approver::where('id', 45)->pluck('approver')->first(),
-                                        'task' => $row->ts_task,
-                                        'location' => $row->ts_location,
-                                        'mandays' => $row->total_rows,
-                                        'role' => $checkRole,
-                                        'task_id' => $row->ts_task_id,
-                                        'total_incentive' => $totalIncentive,
-                                        'total_allowance' => $totalAllowances,
-                                        'priority' => 1,
-                                    ];
-                                    $empApproval[] = $newArrayS;
-                                } else {
-                                    foreach ($approvalGA as $approverGa) {
-                                        $newArrayHO = [
-                                            'name' => $approverGa->approver,
+                $totalIncentive = $countIncentive;
+                $totalAllowances = $countAllowance;
+                switch ($row->ts_task) {
+                    case "HO":
+                    case "Sick":
+                    case "StandbyLK":
+                    case "StandbyLN":
+                    case "Other":
+                    case "Absent":
+                        switch ($checkUserDept) {
+                            case 4:
+                                if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray())) {
+                                    foreach ($approvalFinance as $approverFinance) {
+                                        $newArrayFm = [
+                                            'name' => $approverFinance->approver,
                                             'task' => $row->ts_task,
                                             'location' => $row->ts_location,
                                             'mandays' => $row->total_rows,
@@ -1284,28 +1254,128 @@ class TimesheetController extends Controller
                                             'total_allowance' => $totalAllowances,
                                             'priority' => 1,
                                         ];
-                                        $empApproval[] = $newArrayHO;
+                                        $empApproval[] = $newArrayFm;
+                                    }
+                                } else {
+                                    if (!empty(array_intersect($gaDirOnly, $checkUserRole))) {
+                                        $newArrayS = [
+                                            'name' => Timesheet_approver::where('id', 45)->pluck('approver')->first(),
+                                            'task' => $row->ts_task,
+                                            'location' => $row->ts_location,
+                                            'mandays' => $row->total_rows,
+                                            'role' => $checkRole,
+                                            'task_id' => $row->ts_task_id,
+                                            'total_incentive' => $totalIncentive,
+                                            'total_allowance' => $totalAllowances,
+                                            'priority' => 1,
+                                        ];
+                                        $empApproval[] = $newArrayS;
+                                    } else {
+                                        foreach ($approvalGA as $approverGa) {
+                                            $newArrayHO = [
+                                                'name' => $approverGa->approver,
+                                                'task' => $row->ts_task,
+                                                'location' => $row->ts_location,
+                                                'mandays' => $row->total_rows,
+                                                'role' => $checkRole,
+                                                'task_id' => $row->ts_task_id,
+                                                'total_incentive' => $totalIncentive,
+                                                'total_allowance' => $totalAllowances,
+                                                'priority' => 1,
+                                            ];
+                                            $empApproval[] = $newArrayHO;
+                                        }
                                     }
                                 }
-                            }
-                            break;
-                        case 2:
-                            foreach ($approvalService as $approverService) {
-                                $newArrayService = [
-                                    'name' => $approverService->approver,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                    'priority' => 1,
-                                ];
-                                $empApproval[] = $newArrayService;
-                            }
-                            break;
-                        case 3:
+                                break;
+                            case 2:
+                                foreach ($approvalService as $approverService) {
+                                    $newArrayService = [
+                                        'name' => $approverService->approver,
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
+                                    ];
+                                    $empApproval[] = $newArrayService;
+                                }
+                                break;
+                            case 3:
+                                foreach ($approvalGA as $approverGa) {
+                                    $newArrayHO = [
+                                        'name' => $approverGa->approver,
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
+                                    ];
+                                    $empApproval[] = $newArrayHO;
+                                }
+                                break;
+                            case 1:
+                                foreach ($approvalSales as $approverSales) {
+                                    $newArrayHO = [
+                                        'name' => $approverSales->approver,
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
+                                    ];
+                                    $empApproval[] = $newArrayHO;
+                                }
+                                break;
+                        }
+                        break;
+                    case "Training":
+                    case "Absent":
+                    case "Absent":
+                        foreach ($approvalHCM as $approverHCM) {
+                            $newArrayHO = [
+                                'name' => $approverHCM->approver,
+                                'task' => $row->ts_task,
+                                'location' => $row->ts_location,
+                                'mandays' => $row->total_rows,
+                                'role' => $checkRole,
+                                'task_id' => $row->ts_task_id,
+                                'total_incentive' => $totalIncentive,
+                                'total_allowance' => $totalAllowances,
+                                'priority' => 1,
+                            ];
+                            $empApproval[] = $newArrayHO;
+                        }
+                        break;
+                    case "Trainer":
+                    case "Presales":
+                        foreach ($approvalSales as $approverSales) {
+                            $newArrayPresales = [
+                                'name' => $approverSales->approver,
+                                'task' => $row->ts_task,
+                                'location' => $row->ts_location,
+                                'mandays' => $row->total_rows,
+                                'role' => $checkRole,
+                                'task_id' => $row->ts_task_id,
+                                'total_incentive' => $totalIncentive,
+                                'total_allowance' => $totalAllowances,
+                                'priority' => 1,
+                            ];
+                            $empApproval[] = $newArrayPresales;
+                        }
+                        break;
+                    default:
+                        $tsExceptProject = Project_assignment::where('id', $row->ts_task_id)->get();
+                        if ($tsExceptProject->isEmpty()) {
                             foreach ($approvalGA as $approverGa) {
                                 $newArrayHO = [
                                     'name' => $approverGa->approver,
@@ -1320,234 +1390,167 @@ class TimesheetController extends Controller
                                 ];
                                 $empApproval[] = $newArrayHO;
                             }
-                            break;
-                        case 1:
-                            foreach ($approvalSales as $approverSales) {
-                                $newArrayHO = [
-                                    'name' => $approverSales->approver,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                    'priority' => 1,
-                                ];
-                                $empApproval[] = $newArrayHO;
+                        } else {
+                            switch (true) {
+                                case (array_intersect($serviceDirOnly, $checkUserRole)):
+                                    $newArrayS = [
+                                        'name' => Timesheet_approver::where('id', 40)->pluck('approver')->first(),
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
+                                    ];
+                                    $empApproval[] = $newArrayS;
+                                break;
+                                default:
+                                if(!$test2 == NULL){
+                                    $newArrayPM = [
+                                        'name' => $test2,
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 3,
+                                    ];
+                                    $empApproval[] = $newArrayPM;
+                                }
+                                if(!$pa == NULL){
+                                    $newArrayPA = [
+                                        'name' => $pa,
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 4,
+                                    ];
+                                    $empApproval[] = $newArrayPA;
+                                }
+                                foreach($approvalService as $approverService){
+                                    $newArrayS = [
+                                        'name' => $approverService->approver,
+                                        'task' => $row->ts_task,
+                                        'location' => $row->ts_location,
+                                        'mandays' => $row->total_rows,
+                                        'role' => $checkRole,
+                                        'task_id' => $row->ts_task_id,
+                                        'total_incentive' => $totalIncentive,
+                                        'total_allowance' => $totalAllowances,
+                                        'priority' => 1,
+                                    ];
+                                    $empApproval[] = $newArrayS;
+                                }
+                                break;
                             }
-                            break;
-                    }
-                    break;
-                case "Training":
-                case "Absent":
-                case "Absent":
-                    foreach ($approvalHCM as $approverHCM) {
-                        $newArrayHO = [
-                            'name' => $approverHCM->approver,
-                            'task' => $row->ts_task,
-                            'location' => $row->ts_location,
-                            'mandays' => $row->total_rows,
-                            'role' => $checkRole,
-                            'task_id' => $row->ts_task_id,
-                            'total_incentive' => $totalIncentive,
-                            'total_allowance' => $totalAllowances,
-                            'priority' => 1,
-                        ];
-                        $empApproval[] = $newArrayHO;
-                    }
-                    break;
-                case "Trainer":
-                case "Presales":
-                    foreach ($approvalSales as $approverSales) {
-                        $newArrayPresales = [
-                            'name' => $approverSales->approver,
-                            'task' => $row->ts_task,
-                            'location' => $row->ts_location,
-                            'mandays' => $row->total_rows,
-                            'role' => $checkRole,
-                            'task_id' => $row->ts_task_id,
-                            'total_incentive' => $totalIncentive,
-                            'total_allowance' => $totalAllowances,
-                            'priority' => 1,
-                        ];
-                        $empApproval[] = $newArrayPresales;
-                    }
-                    break;
-                default:
-                    $tsExceptProject = Project_assignment::where('id', $row->ts_task_id)->get();
-                    if ($tsExceptProject->isEmpty()) {
-                        foreach ($approvalGA as $approverGa) {
-                            $newArrayHO = [
-                                'name' => $approverGa->approver,
-                                'task' => $row->ts_task,
-                                'location' => $row->ts_location,
-                                'mandays' => $row->total_rows,
-                                'role' => $checkRole,
-                                'task_id' => $row->ts_task_id,
-                                'total_incentive' => $totalIncentive,
-                                'total_allowance' => $totalAllowances,
-                                'priority' => 1,
-                            ];
-                            $empApproval[] = $newArrayHO;
                         }
-                    } else {
-                        switch (true) {
-                            case (array_intersect($serviceDirOnly, $checkUserRole)):
-                                $newArrayS = [
-                                    'name' => Timesheet_approver::where('id', 40)->pluck('approver')->first(),
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                    'priority' => 1,
-                                ];
-                                $empApproval[] = $newArrayS;
-                            break;
-                            default:
-                            if(!$test2 == NULL){
-                                $newArrayPM = [
-                                    'name' => $test2,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                    'priority' => 3,
-                                ];
-                                $empApproval[] = $newArrayPM;
-                            }
-                            if(!$pa == NULL){
-                                $newArrayPA = [
-                                    'name' => $pa,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                    'priority' => 4,
-                                ];
-                                $empApproval[] = $newArrayPA;
-                            }
-                            foreach($approvalService as $approverService){
-                                $newArrayS = [
-                                    'name' => $approverService->approver,
-                                    'task' => $row->ts_task,
-                                    'location' => $row->ts_location,
-                                    'mandays' => $row->total_rows,
-                                    'role' => $checkRole,
-                                    'task_id' => $row->ts_task_id,
-                                    'total_incentive' => $totalIncentive,
-                                    'total_allowance' => $totalAllowances,
-                                    'priority' => 1,
-                                ];
-                                $empApproval[] = $newArrayS;
-                            }
-                            break;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->where('ts_user_id', Auth::user()->id)
-        ->groupBy('ts_date')
-        ->get()
-        ->count();
-
-        //delete previous data
-        Timesheet_detail::where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->whereNotIn('ts_status_id', [10, 15])->delete();
-        $work_hours = 0;
-        $start_time = PHP_INT_MAX;
-        $end_time = 0;
-        $total_work_hours = 0;
-
-        // Create a DateTime object for the first day of the selected month
-        $dateToCount = new DateTime("$year-$month-01");
-
-        // Get the last day of the selected month
-        $lastDay = $dateToCount->format('t');
-
-        // Initialize a counter for weekdays
-        $totalWeekdays = 0;
-
-        // Loop through each day of the month and count weekdays
-        for ($day = 1; $day <= $lastDay; $day++) {
-            // Set the day of the month
-            $dateToCount->setDate($year, $month, $day);
-
-            // Check if the day is a weekday (Monday to Friday)
-            if ($dateToCount->format('N') <= 5) {
-                $totalWeekdays++;
-            }
-        }
-
-        $totalHours = $totalWeekdays * 8;
-        foreach ($tsOfTheMonth as $timesheet) {
-            $current_start_time = strtotime($timesheet->ts_from_time);
-            $current_end_time = strtotime($timesheet->ts_to_time);
-
-            if ($current_start_time < $start_time) {
-                $start_time = $current_start_time;
+                        break;
+                }
             }
 
-            if ($current_end_time > $end_time) {
-                $end_time = $current_end_time;
+            $getTotalDays = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->where('ts_user_id', Auth::user()->id)
+            ->groupBy('ts_date')
+            ->get()
+            ->count();
+
+            //delete previous data
+            Timesheet_detail::where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->whereNotIn('ts_status_id', [10, 15])->delete();
+            $work_hours = 0;
+            $start_time = PHP_INT_MAX;
+            $end_time = 0;
+            $total_work_hours = 0;
+
+            // Create a DateTime object for the first day of the selected month
+            $dateToCount = new DateTime("$year-$month-01");
+
+            // Get the last day of the selected month
+            $lastDay = $dateToCount->format('t');
+
+            // Initialize a counter for weekdays
+            $totalWeekdays = 0;
+
+            // Loop through each day of the month and count weekdays
+            for ($day = 1; $day <= $lastDay; $day++) {
+                // Set the day of the month
+                $dateToCount->setDate($year, $month, $day);
+
+                // Check if the day is a weekday (Monday to Friday)
+                if ($dateToCount->format('N') <= 5) {
+                    $totalWeekdays++;
+                }
             }
+
+            $totalHours = $totalWeekdays * 8;
+            foreach ($tsOfTheMonth as $timesheet) {
+                $current_start_time = strtotime($timesheet->ts_from_time);
+                $current_end_time = strtotime($timesheet->ts_to_time);
+
+                if ($current_start_time < $start_time) {
+                    $start_time = $current_start_time;
+                }
+
+                if ($current_end_time > $end_time) {
+                    $end_time = $current_end_time;
+                }
+            }
+
+            if ($end_time > $start_time) {
+
+                $time_diff_seconds = $end_time - $start_time;
+                $time_diff_hours = gmdate('H', $time_diff_seconds);
+                $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+                $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+            }
+            $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
+            $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
+            echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
+            $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
+            echo "(".intval($percentage)."%)";
+            $final = $totalHoursWithoutDays." Hours ". "(".intval($percentage)."%)";
+
+            foreach ($empApproval as $test) {
+                Timesheet_detail::updateOrCreate([
+                    'user_id' => Auth::user()->id,
+                    'month_periode' => $year.$month,
+                    'RequestTo' => $test['name'],
+                    'ts_task' => $test['task'],
+                    'ts_location' => $test['location']
+                ], [
+                    'workhours' => $final,
+                    'ts_mandays' => $test['mandays'],
+                    'activity' => 'Waiting for Approval',
+                    'roleAs' => $test['role'],
+                    'date_submitted' => date('Y-m-d'),
+                    'ts_status_id' => 20,
+                    'total_incentive' => $test['total_incentive'],
+                    'total_allowance' => $test['total_allowance'],
+                    'note' => '',
+                    'ts_task_id' => $test['task_id'],
+                    'user_timesheet' => Auth::user()->id,
+                    'priority' => $test['priority']
+                ]);
+            }
+            Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year . $month)->where('user_timesheet', Auth::user()->id)->delete();
+            // Update Timesheet records between the start and end dates
+            Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '15']);
+
+            $ts_date_desc = date("F", mktime(0, 0, 0, $month, 1)) . ' ' . $year;
+            // return response()->json($activities);
+            Session::flash('success', "Your Timereport $ts_date_desc has been submitted!");
+            return redirect()->back();
+        } else {
+            Session::flash('failed', '403 - Timesheet submission is not allowed for this date or closed for this month');
+            return redirect()->back();
         }
-
-        if ($end_time > $start_time) {
-
-            $time_diff_seconds = $end_time - $start_time;
-            $time_diff_hours = gmdate('H', $time_diff_seconds);
-            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
-        }
-        $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
-        $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
-        echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
-        $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
-        echo "(".intval($percentage)."%)";
-        $final = $totalHoursWithoutDays." Hours ". "(".intval($percentage)."%)";
-
-        foreach ($empApproval as $test) {
-            Timesheet_detail::updateOrCreate([
-                'user_id' => Auth::user()->id,
-                'month_periode' => $year.$month,
-                'RequestTo' => $test['name'],
-                'ts_task' => $test['task'],
-                'ts_location' => $test['location']
-            ], [
-                'workhours' => $final,
-                'ts_mandays' => $test['mandays'],
-                'activity' => 'Waiting for Approval',
-                'roleAs' => $test['role'],
-                'date_submitted' => date('Y-m-d'),
-                'ts_status_id' => 20,
-                'total_incentive' => $test['total_incentive'],
-                'total_allowance' => $test['total_allowance'],
-                'note' => '',
-                'ts_task_id' => $test['task_id'],
-                'user_timesheet' => Auth::user()->id,
-                'priority' => $test['priority']
-            ]);
-        }
-        Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year . $month)->where('user_timesheet', Auth::user()->id)->delete();
-        // Update Timesheet records between the start and end dates
-        Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '15']);
-
-        $ts_date_desc = date("F", mktime(0, 0, 0, $month, 1)) . ' ' . $year;
-        // return response()->json($activities);
-        Session::flash('success', "Your Timereport $ts_date_desc has been submitted!");
-        return redirect()->back();
     }
 
     public function cancel_submit_timesheet($year, $month)
