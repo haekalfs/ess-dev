@@ -41,7 +41,7 @@ class ExportTimesheet extends Controller
             $templatePath = public_path('template_fm.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
-    
+
             $month_periode = $Year.intval($Month);
             $result = DB::table('timesheet_details as td')
             ->join('users as u', 'td.user_timesheet', '=', 'u.id')
@@ -58,7 +58,7 @@ class ExportTimesheet extends Controller
             ->groupBy('td.user_timesheet', 'td.ts_task', 'td.ts_location')
             ->select('td.*', 'u.name', 'ud.employee_id')
             ->get();
-            
+
             $getTotalMandays = DB::table('timesheet_details')
                 ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
                 ->whereIn('created_at', function ($query) use ($Year, $Month) {
@@ -75,7 +75,7 @@ class ExportTimesheet extends Controller
                 ->groupBy('user_timesheet')
                 ->get();
 
-    
+
            // Set up the starting row and column for the data
             $startRow = 8;
             $startCol = 2;
@@ -96,27 +96,27 @@ class ExportTimesheet extends Controller
             for ($day = 1; $day <= $lastDay; $day++) {
                 // Set the day of the month
                 $dateToCount->setDate($Year, $Month, $day);
-                
+
                 // Check if the day is a weekday (Monday to Friday)
                 if ($dateToCount->format('N') <= 5) {
                     $totalWeekdays++;
                 }
             }
 
-            $totalHours = $totalWeekdays * 8; 
-    
+            $totalHours = $totalWeekdays * 8;
+
             // Initialize the last printed user name
             $lastUser = '';
             $lastWorkhours = '';
             $firstRow = true; // Flag to check if it's the first row for each user
             $totalSum = 0;
             $total = [];
-    
+
             foreach ($result as $row) {
                 $mandays = $row->ts_mandays;
                 $totalSum += $mandays;
             }
-    
+
             foreach ($result as $index => $row) {
                 // Calculate the total mandays for each user
                 if ($row->user_timesheet !== $lastUser) {
@@ -130,17 +130,17 @@ class ExportTimesheet extends Controller
                     }
                     $firstRow = true; // Reset the firstRow flag for a new user
                 }
-                
-    
+
+
                 // Print the user name if it is different from the last printed user name
                 if ($row->user_timesheet !== $lastUser) {
                     $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->name);
                     $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $totalMandays);
                     $sheet->setCellValueByColumnAndRow(1, $startRow, $row->employee_id);
-    
+
                     $checkUser = User::find($row->user_timesheet);
                     $checkDepartment = $checkUser->users_detail->department->id;
-                    
+
                     $countTotalRowsEachUser = Timesheet_detail::where('month_periode', $Year.intval($Month))
                     ->where('ts_status_id', 29);
                     $countUserRows = $countTotalRowsEachUser->where('user_timesheet', $row->user_timesheet)->count();
@@ -149,8 +149,8 @@ class ExportTimesheet extends Controller
                     $total = [];
                     $lastUser = $row->user_timesheet;
                 }
-                
-    
+
+
                 if($row->ts_task_id == "HO"){
                     $sheet->setCellValueByColumnAndRow($startCol + 7, $startRow, $row->total_allowance);
                 } else {
@@ -177,36 +177,34 @@ class ExportTimesheet extends Controller
                 $sheet->setCellValueByColumnAndRow($startCol + 1, $startRow, $row->ts_task);
                 $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->ts_location);
                 $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->ts_mandays);
-                
+
                 if ($row->workhours !== $lastWorkhours) {
-                    $percentage = (intval($row->workhours) / $totalHours) * 100;
-                    $percentage = intval($percentage);
-                    $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours.' Hours '."($percentage%)");
+                    $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->workhours);
                     $lastWorkhours = $row->workhours;
                 }
-    
-                
+
+
                 $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->roleAs);
 
                 $startRow++;
                 $firstRow = false; // Set the firstRow flag to false after the first row for each user
-            
+
                 if ($index === count($result) - 1 || $row->user_timesheet !== $result[$index + 1]->user_timesheet) {
                     // Print the totalBanget value in the last row for each user
                     $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow - 1, array_sum($total));
                 } // Set the firstRow flag to false after the first row for each user
             }
-    
-    
+
+
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save(storage_path('app/public/output.xlsx'));
             // Download the file
             $filePath = storage_path('app/public/output.xlsx');
-    
+
             $headers = [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ];
-            
+
             // Create a DateTime object using the year and month value
             $dateTime = DateTime::createFromFormat('m', $Month);
 
@@ -215,7 +213,7 @@ class ExportTimesheet extends Controller
             return response()->download($filePath, "$monthName-$Year.xlsx", $headers);
         } else {
             abort(403, 'Unauthorized');
-        }        
+        }
         ///////////////////////////////////
         // $fare = Project_location::where('location_code', $row->ts_location)->pluck('fare')->first();
         // $countAllowances = $row->ts_mandays * $fare;
@@ -227,7 +225,7 @@ class ExportTimesheet extends Controller
         // } else {
         //     $sheet->setCellValueByColumnAndRow($startCol + 7,   $startRow, $countAllowances);
         // }
-        
+
         // $countIncentive[] = $row->incentive;
         // $totalAllowances += $countAllowances;
         // $totalIncentive = array_sum($countIncentive);

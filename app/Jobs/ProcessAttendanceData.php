@@ -59,7 +59,7 @@ class ProcessAttendanceData implements ShouldQueue
             $buffer = explode("\r\n", $buffer);
 
             $currentDate = date("Y-m-d");
-            $yesterdayDate = date("Y-m-d", strtotime("-1 day"));
+            $yesterdayDate = date("Y-m-d", strtotime("-7 day"));
 
             foreach ($buffer as $dataRow) {
                 $data = Parse_Data($dataRow, "<Row>", "</Row>");
@@ -73,7 +73,7 @@ class ProcessAttendanceData implements ShouldQueue
                 $time = isset($dateTimeParts[1]) ? $dateTimeParts[1] : null;
 
                 // Check if the date matches today or yesterday
-                if ($date === $currentDate || $date === $yesterdayDate) {
+                if ($date) {
                     $checkinout = new Checkinout();
                     $checkinout->user_id = $PIN;
                     $checkinout->date = $date;

@@ -49,8 +49,8 @@ class ReimburseController extends Controller
         $approver = Department::all();
 
         $existingID = Reimbursement::whereNull('deleted_at')->orderBy('f_id', 'desc')->pluck('f_id')->first();
-        $nextID = $existingID + 1; 
-        
+        $nextID = $existingID + 1;
+
         return view('reimbursement.request', compact('projects', 'approver', 'nextID'));
     }
 
@@ -83,7 +83,7 @@ class ReimburseController extends Controller
             ->get();
         $approvalService = Timesheet_approver::whereIn('id', [20, 40])
             ->get();
-            
+
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::where('company_project_id', $typeOfReimbursement)
         ->whereIn('project_assignment_id', $findAssignment)
@@ -98,7 +98,7 @@ class ReimburseController extends Controller
 
         $existingID = Reimbursement::whereNull('deleted_at')->orderBy('f_id', 'desc')->pluck('f_id')->first();
         if($existingID){
-            $nextID = $existingID + 1; 
+            $nextID = $existingID + 1;
         } else {
             $nextID = 440000000;
         }
@@ -143,7 +143,7 @@ class ReimburseController extends Controller
 
                 // Move the uploaded file to the storage folder
                 $file->move($upload_folder, $fileName);
-                
+
                 // Add the generated file name to the array
                 $uploadedFileNames[] = $fileName;
                 $filePathArray[] = $filePath;
@@ -177,7 +177,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverGa->approver; 
+                            $userToApprove[] = $approverGa->approver;
                         }
                         break;
                         // No break statement here, so it will continue to the next case
@@ -189,7 +189,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverService->approver; 
+                            $userToApprove[] = $approverService->approver;
                         }
                         if(!$usersWithPMRole->isEmpty()){
                             foreach($usersWithPMRole as $approverPM){
@@ -199,7 +199,7 @@ class ReimburseController extends Controller
                                     'reimb_item_id' => $itemId,
                                     'reimbursement_id' => $uniqueId
                                 ]);
-                                $userToApprove[] = $approverPM->approver; 
+                                $userToApprove[] = $approverPM->approver;
                             }
                         }
                         break;
@@ -211,7 +211,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverHCM->approver; 
+                            $userToApprove[] = $approverHCM->approver;
                         }
                         break;
                     case ($RequestTo == 1):
@@ -222,7 +222,7 @@ class ReimburseController extends Controller
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverSales->approver; 
+                            $userToApprove[] = $approverSales->approver;
                         }
                         break; // Add break statement here to exit the switch block after executing the case
                     default:
@@ -241,7 +241,7 @@ class ReimburseController extends Controller
                 // ]);
                 // $userToApprove[] = $fm->approver;
             }
-        
+
             $employees = User::whereIn('id', $userToApprove)->get();
             $userName = Auth::user()->name;
 
@@ -253,9 +253,9 @@ class ReimburseController extends Controller
         } else {
             Session::flash('failed',"Error Database has Occured! Failed to create request!");
             return redirect('/reimbursement/history');
-        }    
+        }
     }
-    
+
     public function view_details($id)
     {
         $reimbursement = Reimbursement::where('id', $id)->get();
@@ -274,7 +274,7 @@ class ReimburseController extends Controller
             }
             $f_id = $as->f_id;
         }
-        
+
         $emp = User::all();
 
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
@@ -417,7 +417,7 @@ class ReimburseController extends Controller
         }
 
         $getNotification = Notification_alert::where('type', 5)->whereNull('read_stat')->first();
-        if($getNotification){ 
+        if($getNotification){
             $notifyMonth = substr($getNotification->month_periode, 4);
             $notify = $getNotification->id;
         } else {
@@ -436,7 +436,7 @@ class ReimburseController extends Controller
                 ->where('month_periode', $month_periode)
                 ->update(['read_stat' => 1]);
         }
-        
+
         return view('reimbursement.manage.history', compact('approvals', 'notify', 'notifyMonth', 'yearsBefore', 'Month', 'Year', 'employees'));
     }
 
@@ -451,7 +451,7 @@ class ReimburseController extends Controller
             Session::flash('failed',"Error Database has Occured! Failed to create request! You need to fill all the required fields");
             return redirect()->back();
         }
-        
+
         // Extract and convert the comma-delimited values into an array
         $usersName = explode(',', $request->input('usersName'));
         $usersName = array_filter($usersName);
@@ -473,7 +473,7 @@ class ReimburseController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', "All Reimbursement has been marked to Paid! and system begin to sent notification to each users");
+        return redirect()->back()->with('success', "Reimbursement has been marked to Paid! and system begin to sent notification to each users");
     }
 
     public function export_excel(Request $request, $Month, $Year)
@@ -512,7 +512,7 @@ class ReimburseController extends Controller
                 if ($row->request->f_req_by !== $lastUser) {
                     $firstRow = true; // Reset the firstRow flag for a new user
                 }
-                
+
                 // Define the URL (you can change this to any URL or route you want)
                 $attachedFileUrl = url($row->file_path);
 
@@ -538,7 +538,7 @@ class ReimburseController extends Controller
                 if ($row->request->f_req_by !== $lastUser) {
                     $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->request->user->name);
                     $sheet->setCellValueByColumnAndRow(1, $startRow, $row->request->user->users_detail->employee_id);
-                    
+
                     $total = [];
                     $lastUser = $row->request->f_req_by;
                 }
@@ -562,11 +562,11 @@ class ReimburseController extends Controller
             $writer->save(storage_path('app/public/output.xlsx'));
             // Download the file
             $filePath = storage_path('app/public/output.xlsx');
-    
+
             $headers = [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ];
-            
+
             // Create a DateTime object using the year and month value
             $dateTime = DateTime::createFromFormat('m', $Month);
 
@@ -575,7 +575,7 @@ class ReimburseController extends Controller
             return response()->download($filePath, "$monthName-$Year.xlsx", $headers);
         } else {
             abort(403, 'Unauthorized');
-        }        
+        }
     }
 
     public function manage_view_details($id)
@@ -599,11 +599,11 @@ class ReimburseController extends Controller
             }
             $f_id = $as->f_id;
         }
-        
+
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
 
-        $reimbursement_items = Reimbursement_approval::where('reimbursement_id', $id)->where('RequestTo', Auth::id())->groupBy('reimb_item_id')->get();
+        $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
         return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'stat' => $status, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);

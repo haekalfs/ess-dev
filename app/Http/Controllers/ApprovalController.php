@@ -64,7 +64,7 @@ class ApprovalController extends Controller
                 $query->where('RequestTo', Auth::user()->id);
             })
             ->count();
-        
+
         $reimbCount = Reimbursement_approval::whereNotIn('status', ['30', '29', '404'])->groupBy('reimbursement_id')
             ->where(function ($query) {
                 $query->where('RequestTo', Auth::user()->id);
@@ -195,7 +195,28 @@ class ApprovalController extends Controller
                         ->get();
                 }
             }
-            return view('approval.timesheet_approval', ['approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'Month' => $Month, 'Year' => $Year, 'employees' => $employees]);
+
+            $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->first();
+            if($getNotification){
+                $notifyMonth = substr($getNotification->month_periode, 4);
+                $notify = $getNotification->id;
+            } else {
+                $notifyMonth = false;
+                $notify = false;
+            }
+
+            $setToRead = Notification_alert::where('type', 2)
+                ->whereNull('read_stat')
+                ->where('month_periode', $Year . intval($Month))
+                ->get();
+
+            if ($setToRead->count() > 0) {
+                Notification_alert::where('type', 2)
+                    ->whereNull('read_stat')
+                    ->where('month_periode', $Year . intval($Month))
+                    ->update(['read_stat' => 1]);
+            }
+            return view('approval.timesheet_approval', ['notify' => $notify,'notifyMonth' => $notifyMonth, 'approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'Month' => $Month, 'Year' => $Year, 'employees' => $employees]);
         } else {
             // Handle the case when the date is not within the range
             return redirect()->back()->with('failed', 'This page can only be accessed between the 5th - 8th of each month.');

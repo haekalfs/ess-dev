@@ -105,13 +105,13 @@ class CutLeaveBasedOnHolidays extends Command
                     $quota->quota_used += $deductedQuota;
                     $quota->quota_left -= $deductedQuota;
                     $quota->save();
-                    
+
                     $history = New Leave_request_history;
                     $history->req_date = date('Y-m-d');
                     $history->req_by = $user->id;
                     $history->quota_used = $deductedQuota;
                     $history->quota_left = $quota->quota_left;
-                    $history->description = "Joint Holidays";
+                    $history->description = "Joint Holidays [Deducted by System]";
                     $history->leave_id = $quota->leave_id;
                     $history->emp_leave_quota_id = $quota->id;
                     $history->requested_days = $totalHolidays;

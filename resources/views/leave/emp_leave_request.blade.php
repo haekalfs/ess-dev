@@ -107,6 +107,9 @@
                                 @if ($key > 0)
                                     -
                                 @endif
+                                @php
+                                    asort($group['dates']);
+                                @endphp
                                 {{ implode(',', $group['dates']) }} {{ $group['monthYear'] }}
                             @endforeach
                         </td>

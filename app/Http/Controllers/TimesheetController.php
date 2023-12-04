@@ -1173,16 +1173,7 @@ class TimesheetController extends Controller
             Session::flash('failed', "You have to fill your timesheet first!");
             return redirect(url()->previous());
         }
-        $total_work_hours = 0;
-        foreach ($tsOfTheMonth as $sum) {
-            $start_time = strtotime($sum->ts_from_time);
-            $end_time = strtotime($sum->ts_to_time);
-            $time_diff_seconds = $end_time - $start_time;
-            $time_diff_hours = gmdate('H', $time_diff_seconds);
-            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
-            echo $time_diff_hours . ':' . $time_diff_minutes;
-        }
+
         $userId = Auth::user()->id;
 
         $subquery = DB::table('timesheet')
@@ -1221,7 +1212,7 @@ class TimesheetController extends Controller
         ], [
             'ts_status_id' => 15,
             'date_submitted' => date('Y-m-d'),
-            'workhours' => intval($total_work_hours),
+            'workhours' => '-',
             'note' => '',
             'ts_task' => '-',
             'RequestTo' => '-',
@@ -1474,6 +1465,58 @@ class TimesheetController extends Controller
 
         //delete previous data
         Timesheet_detail::where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->whereNotIn('ts_status_id', [10, 15])->delete();
+        $work_hours = 0;
+        $start_time = PHP_INT_MAX;
+        $end_time = 0;
+        $total_work_hours = 0;
+
+        // Create a DateTime object for the first day of the selected month
+        $dateToCount = new DateTime("$year-$month-01");
+
+        // Get the last day of the selected month
+        $lastDay = $dateToCount->format('t');
+
+        // Initialize a counter for weekdays
+        $totalWeekdays = 0;
+
+        // Loop through each day of the month and count weekdays
+        for ($day = 1; $day <= $lastDay; $day++) {
+            // Set the day of the month
+            $dateToCount->setDate($year, $month, $day);
+
+            // Check if the day is a weekday (Monday to Friday)
+            if ($dateToCount->format('N') <= 5) {
+                $totalWeekdays++;
+            }
+        }
+
+        $totalHours = $totalWeekdays * 8;
+        foreach ($tsOfTheMonth as $timesheet) {
+            $current_start_time = strtotime($timesheet->ts_from_time);
+            $current_end_time = strtotime($timesheet->ts_to_time);
+
+            if ($current_start_time < $start_time) {
+                $start_time = $current_start_time;
+            }
+
+            if ($current_end_time > $end_time) {
+                $end_time = $current_end_time;
+            }
+        }
+
+        if ($end_time > $start_time) {
+
+            $time_diff_seconds = $end_time - $start_time;
+            $time_diff_hours = gmdate('H', $time_diff_seconds);
+            $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+        }
+        $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
+        $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
+        echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
+        $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
+        echo "(".intval($percentage)."%)";
+        $final = $totalHoursWithoutDays." Hours ". "(".intval($percentage)."%)";
 
         foreach ($empApproval as $test) {
             Timesheet_detail::updateOrCreate([
@@ -1483,7 +1526,7 @@ class TimesheetController extends Controller
                 'ts_task' => $test['task'],
                 'ts_location' => $test['location']
             ], [
-                'workhours' => intval($total_work_hours) - $getTotalDays,
+                'workhours' => $final,
                 'ts_mandays' => $test['mandays'],
                 'activity' => 'Waiting for Approval',
                 'roleAs' => $test['role'],

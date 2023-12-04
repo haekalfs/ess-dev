@@ -46,7 +46,7 @@ active
                 <thead class="thead-light">
                     <tr>
                         <th>No</th>
-                        <th>Project Code</th>
+                        <th>Assignment No.</th>
                         <th>Project Name</th>
                         <th>Project Start</th>
                         <th>Project End</th>
@@ -58,11 +58,11 @@ active
                     @foreach ($records as $record)
                     <tr>
                         <td>{{ $record->id }}</td>
-                        <td>{{ $record->project_code }}</td>
+                        <td>{{ $record->assignment_no }}</td>
                         <td>{{ $record->project_name }}
                         @if (now()->diffInDays(Carbon\Carbon::parse($record->created_at)) < 3)
                             <span class="text-danger"><small><i> &#x2728;</i></small></span>
-                        @endif                        
+                        @endif
                         </td>
                         <td>{{ $record->periode_start }}</td>
                         <td>{{ $record->periode_end }}</td>
@@ -83,42 +83,44 @@ active
 </div>
 
 <div class="card shadow mb-4 zoom90">
-    <div class="card-header py-3 d-flex flex-row align-items-center bg-dark justify-content-between">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block bg-dark card-header py-3" data-toggle="collapse"
+        role="button" aria-expanded="false" aria-controls="collapseCardExample">
         <h6 class="m-0 font-weight-bold text-light" id="judul">Requested Assignment</h6>
-        <a href="#collapseCardExample" class="btn btn-link text-light" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-            <i class="fas fa-chevron-down"></i>
-        </a>
-    </div>
-    <div class="card-body collapse" id="collapseCardExample">
-        <div class="table-responsive">
-            <table class="table table-bordered zoom90" id="dataTableRoles" width="100%" cellspacing="0">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Request Date</th>
-                        <th>Project</th>
-                        <th>Periode Start</th>
-                        <th>Periode End</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($myRequest as $record)
-                    <tr>
-                        <td>{{ $record->req_date }}</td>
-                        <td>{{ $record->company_project->project_name }}</td>
-                        <td>{{ $record->periode_start }}</td>
-                        <td>{{ $record->periode_end }}</td>
-                        <td>
-                            @if($record->status == 0)
-                            <a style='font-size: small;'><i class='fas fa-fw fa-spinner'></i></a>
-                            @else
-                            <a style='font-size: small;'><i class='fas fa-fw fa-check'></i></a>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse" id="collapseCardExample">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered zoom90" id="dataTableRoles" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Request Date</th>
+                            <th>Project</th>
+                            <th>Periode Start</th>
+                            <th>Periode End</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($myRequest as $record)
+                        <tr>
+                            <td>{{ $record->req_date }}</td>
+                            <td>{{ $record->company_project->project_name }}</td>
+                            <td>{{ $record->periode_start }}</td>
+                            <td>{{ $record->periode_end }}</td>
+                            <td>
+                                @if($record->status == 0)
+                                <a style='font-size: small;'><i class='fas fa-fw fa-spinner'></i></a>
+                                @else
+                                <a style='font-size: small;'><i class='fas fa-fw fa-check'></i></a>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

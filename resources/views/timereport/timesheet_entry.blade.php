@@ -302,12 +302,12 @@ active
                                     <label for="email" style="margin-bottom: 0;">
                                         <span class="text-danger"><i>Surat Penugasan :</i></span>
                                     </label>
-                                    <div class="ml-auto">
+                                    {{-- <div class="ml-auto">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckWfh">
                                             <label class="form-check-label" for="flexCheckWfh">Skip</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="form-group">
                                     <div class="custom-file">
@@ -412,12 +412,12 @@ active
                                     <label for="email" style="margin-bottom: 0;">
                                         <span class="text-danger"><i>Surat Penugasan :</i></span>
                                     </label>
-                                    <div class="ml-auto">
+                                    {{-- <div class="ml-auto">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                                             <label class="form-check-label" for="flexCheckDefault">Skip</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="form-group">
                                     <div class="custom-file">

@@ -209,14 +209,14 @@ active
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="to">Payout :</label>
-                                            <input type="text" class="form-control" name="approved_amount" @if(Auth::id() == $fm->approver) @else readonly @endif oninput="formatAmountPrefix(this)" id="approved_amount">
+                                            <input type="text" class="form-control" name="approved_amount" oninput="formatAmountPrefix(this)" id="approved_amount">
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="approval_notes">Notes :</label>
                                             <textarea type="text" class="form-control" name="approval_notes" id="approval_notes"></textarea>
-                                        </div>    
+                                        </div>
                                     </div>
                                     <div class="col-md-12">
                                         <small style="color: red;"><i>NOTE : Only financial managers or those at the same level are allowed to define the payout amount.</i></small>
@@ -246,7 +246,7 @@ active
                     </a>
                     <a href="#" class="btn btn-danger btn-sm" id="rejectButton" style="margin-right: 5px;">
                         <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject
-                    </a>                                        
+                    </a>
                 </div>
 			</form>
 		</div>
@@ -300,12 +300,12 @@ active
         // Click event handler for the Approve button
         $('#approveButton').on('click', function(e) {
             e.preventDefault(); // Prevent the default navigation behavior
-            
+
             var test = document.getElementById('item_id').value;
 
             // Assuming you want to submit the form with ID "editItemForm"
             var formData = $('#approvalItemForm').serialize(); // Serialize the form data
-            
+
             // Perform an AJAX POST request to the controller
             $.ajax({
                 url: '/approval/reimburse/view/approve/' + test, // Replace with your controller URL
@@ -325,12 +325,12 @@ active
         // Click event handler for the Reject button
         $('#rejectButton').on('click', function(e) {
             e.preventDefault(); // Prevent the default navigation behavior
-            
+
             var test = document.getElementById('item_id').value;
 
             // Assuming you want to submit the form with ID "editItemForm"
             var formData = $('#approvalItemForm').serialize(); // Serialize the form data
-            
+
             // Perform an AJAX POST request to the controller
             $.ajax({
                 url: '/approval/reimburse/view/reject/' + test, // Replace with your controller URL
