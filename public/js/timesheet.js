@@ -103,13 +103,10 @@ $(document).ready(function() {
                             var descRemove = $('#desc' + i);
                             descRemove.empty();
                         }
-                        $('.alert-success-saving').show();
                         $('#update-form')[0].reset();
                         $('#updateLocationSelect').css('display', 'block');
                         fetchLocationProjectUpdate(1, "HO");
-                            setTimeout(function() {
-                                $('.alert-success-saving').fadeOut('slow');
-                            }, 3000);
+                        showSuccessMessage();
                         // Fetch the updated list of activities
                         fetchActivities(yearput, monthput);
                     },
@@ -782,7 +779,7 @@ function fetchLocationProjectUpdate(selectedValue,secondValue) {
                 var taskSelect = $('#update_task');
                 var locationSelect = $('#update_location'); // Store the location element
                 var ts_type = $('#ts_type').val();
-
+                var userAllowed = $('#usersAllowed').val();
 
                 function updateLocation(selectedTask) {
                     if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
@@ -791,10 +788,19 @@ function fetchLocationProjectUpdate(selectedValue,secondValue) {
                         locationSelect.prop('readonly', true);
                         $('#update_activity').prop('readonly', false);
                         if (ts_type) {
-                            $('#update_from, #update_to').prop('readonly', true);
-                            $('#deleteBtn').css('display', 'none');
-                            taskSelect.prop('readonly', true);
-                            taskSelect.css('pointer-events', 'none');
+                            if (['murdi', 'haekals', 'dio'].includes(userAllowed)) {
+                                // User is allowed
+                                $('#update_from, #update_to').prop('readonly', false);
+                                $('#deleteBtn').css('display', 'block');
+                                taskSelect.prop('readonly', false);
+                                taskSelect.css('pointer-events', 'auto');
+                            } else {
+                                // User is not allowed
+                                $('#update_from, #update_to').prop('readonly', true);
+                                $('#deleteBtn').css('display', 'none');
+                                taskSelect.prop('readonly', true);
+                                taskSelect.css('pointer-events', 'none');
+                            }
                         } else {
                             $('#update_from, #update_to').prop('readonly', false);
                             $('#deleteBtn').css('display', 'block');

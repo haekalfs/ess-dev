@@ -729,7 +729,7 @@ active
         </div>
     </div>
 </div>
-
+<input type="hidden" id="usersAllowed" name="usersAllowed" value="{{Auth::id()}}">
 <script>
 $(document).ready(function() {
     // Initial state
