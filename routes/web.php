@@ -111,6 +111,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/leave/manage/edit/{id}', 'LeaveController@get_leave_emp');
     Route::post('/leave/manage/update/{id}', 'LeaveController@update_leave_emp');
     Route::post('/leave/manage/add_quota/{id}', 'LeaveController@add_leave_quota')->name('addLeaveEmp');
+    Route::post('/leave/manage/add_employee', 'LeaveController@add_leave_employee')->name('addLeaveEmployee');
+
 
 
     Route::get('/leave/request/manage/id/{id}/{month}/{year}/{idLeave}/approve', 'LeaveController@approve_by_admin');

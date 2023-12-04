@@ -105,9 +105,8 @@
 </div>
 
 {{-- Modal Add Leave --}}
-<form action="/medical/edit/" enctype="multipart/form-data" method="POST">
+<form action="/leave/manage/add_employee" enctype="multipart/form-data" method="POST">
 @csrf
-@method('PUT')
     <div class="modal fade" id="addLeaveModal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content">

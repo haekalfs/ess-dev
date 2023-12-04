@@ -813,4 +813,27 @@ class LeaveController extends Controller
 
         return redirect()->back()->with('success',"You Updated the Leave Request Approver!");
     }
+
+    public function add_leave_employee (Request $request)
+    {
+        $this->validate($request, [
+            'input_emp_id' => 'required',    
+            'input_leave_id' => 'required',
+            'input_quota_used' => 'required',
+            'input_quota_left' => 'required',
+            'input_active_periode' => 'required',
+            'input_expiration' => 'required',
+        ]);
+
+        $leaveAdd = new Emp_leave_quota();
+        $leaveAdd->user_id = $request->input_emp_id;
+        $leaveAdd->leave_id = $request->input_leave_id;
+        $leaveAdd->quota_used = $request->input_quota_used;
+        $leaveAdd->quota_left = $request->input_quota_left;
+        $leaveAdd->active_periode = $request->input_active_periode;
+        $leaveAdd->expiration = $request->input_expiration;
+        $leaveAdd->save();
+
+        return redirect()->back()->with('success', "You Add New Leave For Employee");
+    }
 }
