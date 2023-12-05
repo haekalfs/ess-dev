@@ -1,6 +1,11 @@
 @extends('leave.manage_leave_layout')
 
 @section('manage-leave-table')
+
+@section('active-page-leave')
+active
+@endsection
+
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Leaves Information</h6>
@@ -55,7 +60,7 @@
                 </div>
                 <div class="col-md-12"><br>
                     <div class="table-responsive">
-                        <table class="table table-bordered zoom90" cellspacing="0">
+                        <table class="table table-bordered zoom90" cellspacing="0" id="dataLeave">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Emp ID</th>

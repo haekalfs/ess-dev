@@ -115,3 +115,11 @@ $(document).ready(function() {
     "pageLength": 5
   } );
 } );
+
+$(document).ready(function() {
+  $('#dataLeave').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 5
+  } );
+} );
