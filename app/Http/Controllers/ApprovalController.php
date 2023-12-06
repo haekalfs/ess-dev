@@ -17,6 +17,7 @@ use App\Models\Medical_details;
 use App\Models\Medical_approval;
 use App\Jobs\NotifyMedicalRejected;
 use App\Jobs\NotifyMedicalApproved;
+use App\Models\Cutoffdate;
 //medical
 use App\Models\Notification_alert;
 use App\Models\Project_assignment;
@@ -108,8 +109,10 @@ class ApprovalController extends Controller
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
         }
+        $dateCut = Cutoffdate::find(2);
+
         // Check if the current day is within the range 5-8
-        if ($currentDay >= 1 && $currentDay <= 31) {
+        if ($currentDay >= $dateCut->start_date && $currentDay <= $dateCut->closed_date) {
             if (in_array($checkUserPost, [7, 8, 12])) {
                 $Check = Timesheet_detail::select('*')
                     ->whereYear('date_submitted', $Year)
@@ -300,25 +303,25 @@ class ApprovalController extends Controller
             }
             $currentYear = date('Y');
 
-            $Check = DB::table('timesheet_details')
-                ->select('*')
-                ->whereYear('date_submitted', $currentYear)
-                ->whereNotIn('ts_status_id', [10, 15])
-                ->whereNotIn('RequestTo', [Auth::user()->id])
-                ->groupBy('user_timesheet', 'month_periode')
-                ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 0 ELSE 1 END)')
-                ->pluck('user_timesheet')
-                ->toArray();
+            // $Check = DB::table('timesheet_details')
+            //     ->select('*')
+            //     ->whereYear('date_submitted', $currentYear)
+            //     ->whereNotIn('ts_status_id', [10, 15])
+            //     ->whereNotIn('RequestTo', [Auth::user()->id])
+            //     ->groupBy('user_timesheet', 'month_periode')
+            //     ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 30 THEN 0 ELSE 1 END)')
+            //     ->pluck('user_timesheet')
+            //     ->toArray();
 
-            if (!empty($Check)) {
-                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
-                    ->where('ts_user_id', $user_timesheet)
-                    ->update(['ts_status_id' => $tsStatusId]);
-            } else {
-                Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
-                    ->where('ts_user_id', $user_timesheet)
-                    ->update(['ts_status_id' => $tsStatusId]);
-            }
+            // if (!empty($Check)) {
+            //     Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
+            //         ->where('ts_user_id', $user_timesheet)
+            //         ->update(['ts_status_id' => $tsStatusId]);
+            // } else {
+            //     Timesheet::whereYear('ts_date', $year)->whereMonth('ts_date', $month)
+            //         ->where('ts_user_id', $user_timesheet)
+            //         ->update(['ts_status_id' => $tsStatusId]);
+            // }
         }
 
         $approverName = Auth::user()->name;

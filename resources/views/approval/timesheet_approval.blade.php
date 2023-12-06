@@ -7,9 +7,8 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-<h1 class="h3 mb-2 text-gray-800">Timesheet Approval</h1>
-<p class="mb-4">Approval Page.</p>
+<h1 class="h3 mb-2 zoom90 font-weight-bold text-gray-800"><i class="fas fa-calendar"></i> Timesheet Approval</h1>
+<p class="zoom90 mb-4">Approval Page.</p>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Approval_status;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
+use App\Models\Notification_alert;
 use App\Models\Surat_penugasan;
 use App\Models\Timesheet;
 use App\Models\Timesheet_approver;
@@ -74,7 +75,7 @@ class ReviewController extends Controller
             ->whereIn('RequestTo', $priorApproval)
             ->havingRaw('COUNT(*) = SUM(CASE WHEN ts_status_id = 29 THEN 1 ELSE 0 END)')
             ->groupBy('user_timesheet')->get();
-            
+
             $approvals->joinSub(function ($query) use ($month_periode) {
                 $query->select('user_timesheet', DB::raw('MAX(created_at) AS latest_created_at'))
                     ->from('timesheet_details')
@@ -99,7 +100,27 @@ class ReviewController extends Controller
             ->select('timesheet_details.*', 'u.name', 'ud.employee_id')
             ->get();
 
-        return view('review.finance', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
+        $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->first();
+        if($getNotification){
+            $notifyMonth = substr($getNotification->month_periode, 4);
+            $notify = $getNotification->id;
+        } else {
+            $notifyMonth = false;
+            $notify = false;
+        }
+
+        $setToRead = Notification_alert::where('type', 2)
+            ->whereNull('read_stat')
+            ->where('month_periode', $Year . intval($Month))
+            ->get();
+
+        if ($setToRead->count() > 0) {
+            Notification_alert::where('type', 2)
+                ->whereNull('read_stat')
+                ->where('month_periode', $Year . intval($Month))
+                ->update(['read_stat' => 1]);
+        }
+        return view('review.finance', compact('notify','notifyMonth','approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
     }
 
     public function ts_preview($user_id, $year, $month)
@@ -122,14 +143,14 @@ class ReviewController extends Controller
         for ($day = 1; $day <= $lastDay; $day++) {
             // Set the day of the month
             $dateToCount->setDate($year, $month, $day);
-            
+
             // Check if the day is a weekday (Monday to Friday)
             if ($dateToCount->format('N') <= 5) {
                 $totalWeekdays++;
             }
         }
 
-        $totalHours = $totalWeekdays * 8; 
+        $totalHours = $totalWeekdays * 8;
 
         // Get the start and end dates for the selected month
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
@@ -140,7 +161,7 @@ class ReviewController extends Controller
 
         $user_info = User::find($user_id);
 
-        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year.intval($month))->get(); 
+        $workflow = Timesheet_detail::where('user_timesheet', $user_id)->where('month_periode', $year.intval($month))->get();
 
         $assignment = DB::table('project_assignment_users')
             ->join('company_projects', 'project_assignment_users.company_project_id', '=', 'company_projects.id')
@@ -152,7 +173,7 @@ class ReviewController extends Controller
             ->whereYear('project_assignment_users.periode_start', $year)
             ->whereYear('project_assignment_users.periode_end', $year)
             ->where('project_assignments.approval_status', 29)
-            ->get(); 
+            ->get();
 
         $leaveApproved = [];
         $checkLeaveApproval = Leave_request::where('req_by', $user_id)->pluck('id');
@@ -229,7 +250,7 @@ class ReviewController extends Controller
         $user_info_emp_id = $user_info_details->employee_id;
         // Get the Timesheet records between the start and end dates
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', $user_timesheet)->orderBy('ts_date', 'asc')->get();
- 
+
     	$pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'),['timesheet' => $activities,  'user_info' => $user_info,]);
     	return $pdf->download('timesheet #'.$user_timesheet . '-' . $year . $month.'.pdf');
     }

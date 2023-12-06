@@ -298,9 +298,15 @@ active
                                         if ($end_time > $start_time) {
 
                                             $time_diff_seconds = $end_time - $start_time;
+                                            if($time_diff_seconds > 3600){
+                                                $time_diff_seconds -= 3600;
+                                            } else {
+                                                $time_diff_seconds -= $time_diff_seconds;
+                                            }
                                             $time_diff_hours = gmdate('H', $time_diff_seconds);
                                             $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-                                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes." Hours";
+                                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+                                            echo $time_diff_hours.':'.$time_diff_minutes." Hours";
                                         }
                                     ?>
                                 @endif
@@ -320,11 +326,11 @@ active
                                 <i>
                                     Total :
                                     <?php
-                                        $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
+                                        $totalHoursWithoutDays = intval($total_work_hours);
                                         $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
                                         echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
                                         $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
-                                        echo "(".intval($percentage)."%)";
+                                        // echo "(".intval($percentage)."%)";
                                     ?>
                                     <br><small>NB : Each Day is Deducted (1 Hour) for Break Time</small>
                                 </i>
@@ -334,11 +340,11 @@ active
                                 <i>
                                     Total :
                                     <?php
-                                        $totalHoursWithoutDays = intval($total_work_hours)- $getTotalDays;
+                                        $totalHoursWithoutDays = intval($total_work_hours);
                                         $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
                                         echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
                                         $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
-                                        echo "(".intval($percentage)."%)";
+                                        // echo "(".intval($percentage)."%)";
                                     ?>
                                     <br><small>NB : Each Day is Deducted (1 Hour) for Break Time</small>
                                 </i>

@@ -70,14 +70,23 @@ active
                             <label for="password">Month :</label>
                             <select class="form-control" name="monthOpt" required>
                                 @foreach (range(1, 12) as $month)
-                                    <option value="{{ $month }}" @if ($month == $Month) selected @endif>{{ date("F", mktime(0, 0, 0, $month, 1)) }}</option>
+                                    <option value="{{ $month }}" @if ($month == $Month) selected @endif>
+                                        {{ date("F", mktime(0, 0, 0, $month, 1)) }} @if ($notifyMonth == $month) &#x2757; @endif
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="col-md-1 d-flex justify-content-center align-items-end">
                         <div class="form-group">
-                            <input type="submit" class="btn btn-primary" value="Display">
+                            @if ($notify)
+                                <button type="submit" class="btn btn-primary position-relative">
+                                    Display
+                                    <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">!</span>
+                                </button>
+                            @else
+                                <input type="submit" class="btn btn-primary" value="Display">
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-12"><br>
@@ -129,7 +138,7 @@ active
                                     </tr>
                                 </tbody>
                             </table>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -147,7 +156,7 @@ function confirmPassword() {
     }
 }
 </script>
-    
+
 <style>
 .action{
     width: 190px;

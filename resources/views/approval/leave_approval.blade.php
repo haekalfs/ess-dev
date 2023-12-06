@@ -7,10 +7,8 @@ active
 @endsection
 
 @section('content')
-<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-plane-departure"></i> Leave Approval</h1>
-    {{-- <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Export All (XLS)</a> --}}
-</div>
+<h1 class="h3 mb-2 zoom90 font-weight-bold text-gray-800"><i class="fas fa-plane-departure"></i> Leave Approval</h1>
+<p class="zoom90 mb-4">Approval Page.</p>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>

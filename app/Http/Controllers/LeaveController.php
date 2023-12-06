@@ -723,11 +723,16 @@ class LeaveController extends Controller
         }
 
         //create 29 stat by admin
-        Leave_request_approval::create([
-            'status' => 29,
-            'RequestTo' => "Administrator",
-            'leave_request_id' => $id
-        ]);
+        Leave_request_approval::updateOrCreate(
+            [
+                'leave_request_id' => $id,
+                'RequestTo' => "admin"
+            ],
+            [
+                'status' => 29,
+                'notes' => "Approved by Administrator"
+            ]
+        );
 
         $entry = new Notification_alert();
         $entry->user_id = $getLeaveReq->req_by;
@@ -762,12 +767,16 @@ class LeaveController extends Controller
         }
 
         //create 29 stat by admin
-        Leave_request_approval::create([
-            'status' => 404,
-            'RequestTo' => "Administrator",
-            'notes' => "Rejected by Administrator",
-            'leave_request_id' => $id
-        ]);
+        Leave_request_approval::updateOrCreate(
+            [
+                'leave_request_id' => $id,
+                'RequestTo' => "admin"
+            ],
+            [
+                'status' => 404,
+                'notes' => "Rejected by Administrator"
+            ]
+        );
 
         $getIdLeaveReq = Leave_request_approval::where('leave_request_id', $id)->pluck('leave_request_id')->first();
         $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
@@ -817,7 +826,7 @@ class LeaveController extends Controller
     public function add_leave_employee (Request $request)
     {
         $this->validate($request, [
-            'input_emp_id' => 'required',    
+            'input_emp_id' => 'required',
             'input_leave_id' => 'required',
             'input_quota_used' => 'required',
             'input_quota_left' => 'required',

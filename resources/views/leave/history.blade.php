@@ -70,7 +70,7 @@ active
                     </tr>
                     <tr>
                         <th>Hired Date</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->hired_date}}</td>
+                        <td style="text-align: start; font-weight:500">: {{ \Carbon\Carbon::createFromFormat('Y-m-d', Auth::user()->users_detail->hired_date)->format('d-M-Y') }}</td>
                     </tr>
                   </tr>
               </table>
@@ -136,7 +136,7 @@ active
                 <tbody>
                     @foreach ($leaveRequests as $lr)
                         <tr>
-                            <td>{{ $lr->req_date }}</td>
+                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lr->req_date)->format('d-M-Y') }}</td>
                             <td>{{ $lr->leave->description }}</td>
                             <td>
                                 @foreach ($lr->dateGroups as $key => $group)
@@ -414,7 +414,7 @@ active
           </button>
         </div>
             <div class="modal-body zoom90" style="height: 400px; overflow-y: auto;">
-                <h6 class="h5 mb-2 text-gray-800">Waiting For Approval : <span class="text-primary" id="approver"></span></i></h6>
+                <h6 class="h5 mb-2 text-gray-800">Approval Status : <span class="text-primary" id="approver"></span></i></h6>
                 <div class="table-responsive">
                     <div class="col-md-12">
                         <div class="row">

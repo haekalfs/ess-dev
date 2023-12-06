@@ -1128,29 +1128,22 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
-        // $checkisSubmitted = DB::table('timesheet_details')
-        //     ->select('*')
-        //     ->whereYear('date_submitted', $year)
-        //     ->where('user_timesheet', Auth::user()->id)
-        //     ->whereNotIn('ts_status_id', [10, 404])
-        //     ->where('month_periode', $year . intval($month))
-        //     ->whereNotExists(function ($query) use ($year, $month) {
-        //         $query->select(DB::raw(1))
-        //             ->from('timesheet_details')
-        //             ->where('month_periode', $year . intval($month))
-        //             ->where('ts_status_id', [404]);
-        //     })
-        //     ->groupBy('user_timesheet', 'month_periode')
-        //     ->get();
+        $checkisSubmitted = Timesheet_detail::whereYear('date_submitted', $year)
+            ->where('user_timesheet', Auth::user()->id)
+            ->where('ts_status_id', 15)
+            ->where('month_periode', $year . intval($month))
+            ->groupBy('user_timesheet', 'month_periode')
+            ->get();
 
-        // if (!$checkisSubmitted->isEmpty()) {
-        //     Session::flash('failed', 'Your Timesheet has already been submitted!');
-        //     return redirect()->back();
-        // }
+        if (!$checkisSubmitted->isEmpty()) {
+            Session::flash('failed', 'Your Timesheet has already been submitted!');
+            return redirect()->back();
+        }
 
         $currentDate = Carbon::now();
 
         $dateCut = Cutoffdate::find(1);
+        $currentDay = date('j');
 
         // Get the cutoff date for submitting timesheets (7th of the next month)
         $cutoffDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->closed_date - 1));
@@ -1159,7 +1152,8 @@ class TimesheetController extends Controller
         $startDate = Carbon::create($year, $month)->addMonths(1)->startOfMonth()->addDays(($dateCut->start_date - 1));
 
         // Check if the current date is on or after the start date AND on or before the cutoff date
-        if ($currentDate->gte($startDate) && $currentDate->lte($cutoffDate)) {
+        // if ($currentDate->gte($startDate) && $currentDate->lte($cutoffDate)) {
+        if ($currentDay >= $dateCut->start_date && $currentDay <= $dateCut->closed_date) {
             // Allow access to the page
             // Get the start and end dates for the selected month
             $startDate = Carbon::create($year, $month, 1)->startOfMonth();

@@ -56,7 +56,7 @@ class SendTimesheetApprovalReminder extends Command
     public function schedule(Schedule $schedule)
     {
         $schedule->command('timesheet:send-reminder')
-            ->twiceMonthly(5, 10)
+            ->twiceMonthly(1, 10)
             ->daily();
     }
 }
