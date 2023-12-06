@@ -1128,17 +1128,17 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
-        $checkisSubmitted = Timesheet_detail::whereYear('date_submitted', $year)
-            ->where('user_timesheet', Auth::user()->id)
-            ->where('ts_status_id', 15)
-            ->where('month_periode', $year . intval($month))
-            ->groupBy('user_timesheet', 'month_periode')
-            ->get();
+        // $checkisSubmitted = Timesheet_detail::whereYear('date_submitted', $year)
+        //     ->where('user_timesheet', Auth::user()->id)
+        //     ->where('ts_status_id', 15)
+        //     ->where('month_periode', $year . intval($month))
+        //     ->groupBy('user_timesheet', 'month_periode')
+        //     ->get();
 
-        if (!$checkisSubmitted->isEmpty()) {
-            Session::flash('failed', 'Your Timesheet has already been submitted!');
-            return redirect()->back();
-        }
+        // if (!$checkisSubmitted->isEmpty()) {
+        //     Session::flash('failed', 'Your Timesheet has already been submitted!');
+        //     return redirect()->back();
+        // }
 
         $currentDate = Carbon::now();
 
