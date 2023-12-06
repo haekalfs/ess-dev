@@ -16,7 +16,7 @@ use App\Jobs\NotifyUserCreation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
-
+use Carbon\Carbon;
 
 
 class UserController extends Controller
@@ -120,13 +120,23 @@ class UserController extends Controller
             'cv' => $nama_file_cv,
         ]);
 
+
+        // Mendapatkan tanggal dari request
+        $hiredDate = $request->hired_date;
+
+        // Mengubah tanggal menjadi objek Carbon
+        $carbonDate = Carbon::parse($hiredDate);
+
+        // Menambahkan 1 tahun ke tanggal
+        $newDate = $carbonDate->addYear();
+
         $emp_leave = new Emp_leave_quota();
         $emp_leave->user_id = $request->usr_id;
         $emp_leave->leave_id = 10;
         $emp_leave->quota_used = 0;
         $emp_leave->quota_left = 0;
         $emp_leave->active_periode = $request->hired_date;
-        $emp_leave->expiration = 0;
+        $emp_leave->expiration = $newDate->format('Y-m-d');
         $emp_leave->save();
 
         $med_balance = new Emp_medical_balance();
@@ -147,7 +157,9 @@ class UserController extends Controller
     public function delete($id)
     {
         $data = DB::table('users')->where('id', $id)->delete();
-        $data = DB::table('users_details')->where('user_id', $id)->delete();
+        $data2 = DB::table('users_details')->where('user_id', $id)->delete();
+        $leave = Emp_leave_quota::where('user_id', $id)->delete();
+        $med = Emp_medical_balance::where('user_id', $id)->delete();
         return redirect()->back()->with('success', 'User delete successfully');
     }
     
