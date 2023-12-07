@@ -24,7 +24,7 @@ class User extends Authenticatable
         'password',
         'id',
         'user_id',
-        
+
     ];
 
     /**
@@ -47,7 +47,7 @@ class User extends Authenticatable
     ];
 
     public function users_detail(){
-    	return $this->hasOne('App\Models\Users_detail');
+    	return $this->hasOne('App\Models\Users_detail')->withDefault();
     }
 
     public function role_id(){
@@ -66,7 +66,7 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Medical_approval');
     }
-    
+
     public function timesheet_detail(){
     	return $this->hasMany('App\Models\Timesheet_detail');
     }
@@ -86,7 +86,7 @@ class User extends Authenticatable
     public function leave_request(){
     	return $this->hasMany('App\Models\Leave_request');
     }
-    
+
     public function approver()
     {
         return $this->hasOne('App\Models\Timesheet_approver');
