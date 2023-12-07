@@ -15,7 +15,10 @@ class Emp_leave_quota extends Model
     	return $this->belongsTo('App\Models\User')
         ->withDefault();
     }
-
+    public function users_detail()
+    {
+        return $this->belongsTo('App\Models\Users_detail','user_id', 'user_id')->withDefault();
+    }
     public function leave(){
     	return $this->belongsTo('App\Models\Leave')
         ->withDefault();
