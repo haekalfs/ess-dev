@@ -16,6 +16,7 @@ use App\Models\Project_assignment_user;
 use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
+use App\Models\Users_detail;
 use App\Models\Usr_role;
 use Carbon\Carbon;
 use DateTime;
@@ -426,14 +427,18 @@ class LeaveController extends Controller
 
         $limitShown = ["All",10,20,30];
         $employees = User::all();
-
         $validator = Validator::make($request->all(), [
             'showOpt' => 'sometimes',
             'yearOpt' => 'required',
             'limitOpt' => 'required'
         ]);
 
-        $emp_leave_quota = Emp_leave_quota::orderBy('user_id', 'asc');
+        $emp_leave_quota = Emp_leave_quota::with('users_detail')
+        ->whereHas('users_detail', function ($query) {
+            $query->where('status_active', 'Active');
+        })
+        ->orderBy('user_id', 'asc');
+        
         $limit = intval($request->limitOpt);
         $showName = $request->showOpt;
         if ($validator->passes()) {

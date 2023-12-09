@@ -130,6 +130,13 @@ class UserController extends Controller
         // Menambahkan 1 tahun ke tanggal
         $newDate = $carbonDate->addYear();
 
+        // Mendapatkan tanggal 31 Maret setelah 1 tahun
+        $newDate->month = 3;
+        $newDate->day = 31;
+
+        // Mendapatkan tahun setelah 1 tahun
+        $newYear = $newDate->year;
+        
         $emp_leave = new Emp_leave_quota();
         $emp_leave->user_id = $request->usr_id;
         $emp_leave->leave_id = 10;

@@ -31,5 +31,8 @@ class Users_detail extends Model
     {
         return $this->belongsTo('App\Models\Position');
     }
-
+    public function emp_leave_quota()
+    {
+        return $this->hasOne('App\Models\Emp_leave_quota');
+    }
 }
