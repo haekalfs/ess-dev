@@ -69,6 +69,38 @@ active
                 </tbody>
             </table>
         </div>
+        @if(!$attendanceData->isEmpty())
+        <br><hr><br>
+        <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+            <h1 class="h5 mb-0 text-gray-800 font-weight-bold"><i class="fas fa-fingerprint"></i> Attendances Data</h1>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Employees Name</th>
+                        <th>Date</th>
+                        <th>Tap In</th>
+                        <th>Tap Out</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $no = 1; @endphp
+                    @foreach ($attendanceData as $data)
+                    <tr>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $data->fingerId->user->name }}</td>
+                        <td>{{ $data->date }}</td>
+                        <td>{{ $data->earliest_time }}</td>
+                        <td>{{ $data->latest_time }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @else
+        @endif
     </div>
 </div>
 @endsection
