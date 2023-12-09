@@ -69,7 +69,10 @@ active
                             <select class="form-control" name="monthOpt" required>
                                 @foreach (range(1, 12) as $month)
                                     <option value="{{ $month }}" @if ($month == $Month) selected @endif>
-                                        {{ date("F", mktime(0, 0, 0, $month, 1)) }} @if ($notifyMonth == $month) &#x2757; @endif
+                                        {{ date("F", mktime(0, 0, 0, $month, 1)) }}
+                                        @if(in_array($month, $notifyMonth))
+                                            &#x2757; <!-- Display the warning icon if $month is in $notifyMonth -->
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>

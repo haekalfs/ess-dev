@@ -38,7 +38,7 @@ class HomeController extends Controller
             }
         } catch (\Exception $e) {
             // Do nothing
-        }        
+        }
 
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
@@ -79,6 +79,7 @@ class HomeController extends Controller
                 // Update other rows with the same type and month_periode
                 Notification_alert::where('type', $notification->type)
                     ->where('month_periode', $notification->month_periode)
+                    ->where('user_id', Auth::id())
                     ->where('id', '!=', $id)
                     ->update(['read_stat' => true]);
             }

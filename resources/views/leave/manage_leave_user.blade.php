@@ -91,7 +91,7 @@
                 <th>Quota Used</th>
                 <th>Action</th>
             </tr>
-        </thead> 
+        </thead>
         <tbody><?php $no = 1; ?>
             @foreach($empLeaves as $empLeave)
             <tr>
@@ -157,7 +157,7 @@
 				    </div>
                 </div>
 				<div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
                     <button type="submit" id="update-leave-btn" class="btn btn-primary" data-dismiss="modal">Save changes</button>
                   </div>
 			</form>

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SendReimbursementReminderFinance;
 use App\Models\Reimbursement_approval;
 use App\Models\User;
+use App\Models\Users_detail;
 use App\Models\Usr_role;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
@@ -45,9 +46,8 @@ class SendReimbursementReminderFin extends Command
     {
         // $users = User::where('id', 'haekals')->get();
         $userToApprove = [];
-        $data = [
-            'haekals' // Assuming this is a user ID (e.g., 'haekals' should be a numeric user ID)
-        ];
+        $data = Users_detail::whereIn('position_id', [21,22,23])->pluck('user_id')->toArray();
+
         $userToApprove = $data;
         $users = User::whereIn('id', $userToApprove)->get();
 

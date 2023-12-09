@@ -61,7 +61,7 @@ class TimesheetController extends Controller
         }
         $entries = [];
         foreach (range(1, $currentMonth) as $entry) {
-            $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->where('month_periode', $currentYear.$entry)->first();
+            $getNotification = Notification_alert::where('type', "2A")->where('user_id', Auth::id())->whereNull('read_stat')->where('month_periode', $currentYear.$entry)->first();
             if($getNotification){
                 $notify = $getNotification->id;
             } else {

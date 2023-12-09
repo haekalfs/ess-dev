@@ -199,23 +199,27 @@ class ApprovalController extends Controller
                 }
             }
 
-            $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->first();
-            if($getNotification){
-                $notifyMonth = substr($getNotification->month_periode, 4);
-                $notify = $getNotification->id;
-            } else {
-                $notifyMonth = false;
-                $notify = false;
+            //Notification untuk Timesheet Approval adalah 2 sedangkan untuk status di tiap user 2A
+            $notifyMonth = [];
+            $notify = false;
+            $getNotification = Notification_alert::where('type', 2)->where('user_id', Auth::id())->whereNull('read_stat')->get();
+            foreach($getNotification as $getNotification){
+                if($getNotification){
+                    $notifyMonth[] = substr($getNotification->month_periode, 4);
+                    $notify = $getNotification->id;
+                }
             }
 
             $setToRead = Notification_alert::where('type', 2)
                 ->whereNull('read_stat')
+                ->where('user_id', Auth::id())
                 ->where('month_periode', $Year . intval($Month))
                 ->get();
 
             if ($setToRead->count() > 0) {
                 Notification_alert::where('type', 2)
                     ->whereNull('read_stat')
+                    ->where('user_id', Auth::id())
                     ->where('month_periode', $Year . intval($Month))
                     ->update(['read_stat' => 1]);
             }
@@ -331,7 +335,7 @@ class ApprovalController extends Controller
         $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
         $entry->importance = 1;
         $entry->month_periode = $year.$month;
-        $entry->type = 2;
+        $entry->type = "2A";
         $entry->save();
 
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
@@ -411,7 +415,7 @@ class ApprovalController extends Controller
         $entry->message = "Your Timesheet of $ts_name has been rejected!";
         $entry->importance = 404;
         $entry->month_periode = $year.$month;
-        $entry->type = 2;
+        $entry->type = "2A";
         $entry->save();
 
         return redirect('/approval/timesheet/p')->with('failed', "You rejected $user_timesheet timereport!");

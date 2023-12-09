@@ -25,7 +25,7 @@ class GenerateLeaveAnnually extends Command
      *
      * @var string
      */
-    protected $description = 'Generate annual and 5 year terms leave';
+    protected $description = 'Generate annual and 5 year terms leave// running tiap 1 jan';
 
     /**
      * Create a new command instance.
@@ -80,14 +80,49 @@ class GenerateLeaveAnnually extends Command
                         $totalMonths = 12;
                     }
 
+                    $lastQuotaExpiration = Carbon::createFromFormat('Y-m-d', $checkUsersQuotaAnnual->expiration); //validation for creating so it does not multiplies
+                    if ($lastQuotaExpiration->isCurrentYear() || $lastQuotaExpiration->isNextYear()) {
+                        $empLeave = new Emp_leave_quota;
+                        $empLeave->user_id = $user->id;
+                        $empLeave->quota_used = 0;
+                        $empLeave->leave_id = 10;
+                        $empLeave->once_in_service_years = 0;
+                        $empLeave->active_periode = $startDate->format('Y-m-d');
+                        $empLeave->expiration = $endDate->format('Y-m-d');
+                        $empLeave->quota_left = $totalMonths;
+                        $empLeave->save();
+                    }
+                }
+
+                $checkUsersQuotaFiveYearTerm = Emp_leave_quota::where('leave_id', 20)
+                    ->where('user_id', $user->id)
+                    ->orderBy('active_periode', 'desc')
+                    ->first();
+
+                // Check if the hired date is exactly 5 years ago from now
+                if ($hiredDate->diffInYears(Carbon::now()) >= 5) {
+                    // Calculate start and end dates for the new leave quota
+                    if ($checkUsersQuotaFiveYearTerm) {
+                        $lastQuota5 = Carbon::createFromFormat('Y-m-d', $checkUsersQuotaFiveYearTerm->active_periode);
+                        $lastQuota5Year = $lastQuota5->year;
+
+                        $lastQuotaDate = Carbon::createFromDate($lastQuota5Year, 1, 1)->startOfDay();
+                    } else {
+                        $lastQuotaDate = $hiredDate->copy()->subYear()->addYear(1)->startOfDay()->month(1)->day(1);
+                    }
+
+                    $startDate = $lastQuotaDate->copy()->addYear(5)->startOfDay();
+                    $endDate = Carbon::create($startDate->year + 2, $endMonth, 31)->startOfDay(); // End period
+                    $endDate->endOfMonth(); // Set it to the end of the month
+
                     $empLeave = new Emp_leave_quota;
                     $empLeave->user_id = $user->id;
                     $empLeave->quota_used = 0;
-                    $empLeave->leave_id = 10;
+                    $empLeave->leave_id = 20;
                     $empLeave->once_in_service_years = 0;
                     $empLeave->active_periode = $startDate->format('Y-m-d');
                     $empLeave->expiration = $endDate->format('Y-m-d');
-                    $empLeave->quota_left = $totalMonths;
+                    $empLeave->quota_left = 22;
                     $empLeave->save();
                 }
             }

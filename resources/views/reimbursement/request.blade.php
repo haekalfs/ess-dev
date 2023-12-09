@@ -33,10 +33,10 @@ active
         <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> New Reimbursement Request #{{ $nextID }}</h1>
         <button class="btn btn-md btn-primary shadow-sm" id="showConfirmation" type="button">+ Submit Request</button>
     </div>
-    
+
         {{ csrf_field() }}
-    
-    
+
+
     <div class="row zoom90">
         <!-- Area Chart -->
         <div class="col-xl-12 col-lg-12">
@@ -114,7 +114,7 @@ active
                                             </div>
                                         </div>--}}
                                     </div>
-                                </div>                            
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -136,7 +136,7 @@ active
                 </div>
             </div>
         </div>
-    
+
         <!-- Area Chart -->
             <div class="col-xl-12 col-lg-12">
                 <div class="card shadow mb-4">
@@ -148,7 +148,7 @@ active
                                 <button class="btn btn-danger btn-sm" type="button" id="undoButton" style="display: none; margin-right: 10px;"><i class="fas fa-fw fa-trash-alt"></i></button>
                                 <input class="btn btn-primary btn-sm" type="button" id="copyButton" value="Add New Item">
                                 </div>
-                        </div>                        
+                        </div>
                     </div>
                     <!-- Card Body -->
                     <div class="card-body">
@@ -169,30 +169,40 @@ active
                             <div class="col-lg-12">
                                 <div class="row" id="targetContainer">
                                     <div class="col-md-4" id="originalForm">
-                                        
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <input type="file" class="file-input" id="receipt" name="receipt[]" multiple required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <label for="password">Description :</label>
-                                                        <input type="text" class="form-control" name="description[]" id="description" value="" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <div class="input-group mb-2">
-                                                            <div class="input-group-prepend">
-                                                                <div class="input-group-text">Rp.</div>
-                                                            </div>
-                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
-                                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    {{-- <input type="file" class="file-input" > --}}
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="receipt" name="receipt[]" multiple required>
+                                                        <label class="custom-file-label" id="sp-label-wfh">Choose file</label>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="password">Receipt Date :</label>
+                                                    <input type="date" class="form-control" name="description[]" id="description" value="{{ date('Y-m-d') }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="password">Description :</label>
+                                                    <input type="text" class="form-control" name="description[]" id="description" value="" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <div class="input-group mb-2">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text">Rp.</div>
+                                                        </div>
+                                                        <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

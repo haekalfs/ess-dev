@@ -791,6 +791,9 @@ class LeaveController extends Controller
             $returnQuota->save();
         }
 
+        //delete
+        Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->delete();
+
         $entry = new Notification_alert();
         $entry->user_id = $getLeaveReq->req_by;
         $entry->message = "Your Leave Request has been Rejected by Administrator!";
