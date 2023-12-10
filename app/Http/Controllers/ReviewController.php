@@ -212,6 +212,7 @@ class ReviewController extends Controller
         $lastUpdate = DB::table('timesheet')
                 ->whereMonth('ts_date', $month)
                 ->whereYear('ts_date', $year)
+                ->whereNull('ts_type')
                 ->orderBy('updated_at', 'desc')
                 ->where('ts_user_id', $user_id)
                 ->first();

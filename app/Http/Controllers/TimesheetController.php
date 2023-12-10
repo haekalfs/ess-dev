@@ -72,6 +72,7 @@ class TimesheetController extends Controller
                 ->whereMonth('ts_date', $entry)
                 ->whereYear('ts_date', $currentYear)
                 ->orderBy('updated_at', 'desc')
+                ->whereNull('ts_type')
                 ->where('ts_user_id', Auth::user()->id)
                 ->first();
             if ($lastUpdate) {
@@ -200,6 +201,7 @@ class TimesheetController extends Controller
         $lastUpdate = DB::table('timesheet')
             ->whereMonth('ts_date', $month)
             ->whereYear('ts_date', $year)
+            ->whereNull('ts_type')
             ->orderBy('updated_at', 'desc')
             ->where('ts_user_id', Auth::user()->id)
             ->first();
@@ -1100,6 +1102,7 @@ class TimesheetController extends Controller
         $lastUpdate = DB::table('timesheet')
             ->whereMonth('ts_date', $month)
             ->whereYear('ts_date', $year)
+            ->whereNull('ts_type')
             ->orderBy('updated_at', 'desc')
             ->where('ts_user_id', Auth::user()->id)
             ->first();

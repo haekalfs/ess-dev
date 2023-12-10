@@ -509,6 +509,7 @@ class ApprovalController extends Controller
         $info = [];
         $lastUpdate = DB::table('timesheet')
             ->whereMonth('ts_date', $month)
+            ->whereNull('ts_type')
             ->whereYear('ts_date', $year)
             ->orderBy('updated_at', 'desc')
             ->where('ts_user_id', $user_id)
