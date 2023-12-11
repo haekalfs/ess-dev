@@ -476,16 +476,12 @@ class ReimburseController extends Controller
         return redirect()->back()->with('success', "Reimbursement has been marked to Paid! and system begin to sent notification to each users");
     }
 
-    public function export_excel(Request $request, $Month, $Year)
+    public function export_excel($Month, $Year)
 	{
-        // Retrieve the hashed password from the query parameters
-        $password = $request->query('password');
-
-        $getPassword = Financial_password::find(1);
-        $storedHashedPassword = $getPassword->password;
+        $checkUserPost = Auth::user()->users_detail->position->id;
 
         // Compare the hashed passwords
-        if (Hash::check($password, $storedHashedPassword)) {
+        if (in_array($checkUserPost, [22])) {
             $templatePath = public_path('template_reimbursement.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
