@@ -382,7 +382,7 @@ class TimesheetController extends Controller
             'from' => 'required',
             'to' => 'required',
             'activity' => 'required',
-            'surat_penugasan_wfh' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:500',
+            'surat_penugasan_wfh' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:5000',
         ]);
 
         if ($validator->fails()) {
@@ -528,7 +528,7 @@ class TimesheetController extends Controller
             'from' => 'required',
             'to' => 'required',
             'activity' => 'required',
-            'surat_penugasan' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:500',
+            'surat_penugasan' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:5000',
         ]);
 
         if ($validator->fails()) {

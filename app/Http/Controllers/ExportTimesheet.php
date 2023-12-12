@@ -30,6 +30,9 @@ class ExportTimesheet extends Controller
 {
     public function export_excel($Month, $Year)
 	{
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+
         $checkUserPost = Auth::user()->users_detail->position->id;
 
         // Compare the hashed passwords
@@ -75,9 +78,6 @@ class ExportTimesheet extends Controller
            // Set up the starting row and column for the data
             $startRow = 8;
             $startCol = 2;
-
-            // Set the default time zone to Jakarta
-            date_default_timezone_set("Asia/Jakarta");
 
             // Create a DateTime object for the first day of the selected month
             $dateToCount = new DateTime("$Year-$Month-01");

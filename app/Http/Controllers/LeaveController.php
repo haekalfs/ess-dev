@@ -328,6 +328,19 @@ class LeaveController extends Controller
 
         Leave_request_approval::where('RequestTo', Auth::user()->id)->where('leave_request_id', $uniqueId)->delete();
 
+        $checkUserPost = Auth::user()->users_detail->position->id;
+
+        if (in_array($checkUserPost, [7, 8, 12])) {
+            //truncate
+            Leave_request_approval::where('leave_request_id', $uniqueId)->delete();
+            //recreate
+            Leave_request_approval::create([
+                'status' => 29,
+                'RequestTo' => Auth::id(),
+                'leave_request_id' => $uniqueId
+            ]);
+        }
+
         return redirect("/leave/history")->with('success', "Leave Request Submitted Successfully");
     }
 
@@ -438,7 +451,7 @@ class LeaveController extends Controller
             $query->where('status_active', 'Active');
         })
         ->orderBy('user_id', 'asc');
-        
+
         $limit = intval($request->limitOpt);
         $showName = $request->showOpt;
         if ($validator->passes()) {

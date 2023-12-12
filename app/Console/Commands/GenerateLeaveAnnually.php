@@ -115,15 +115,15 @@ class GenerateLeaveAnnually extends Command
                     $endDate = Carbon::create($startDate->year + 2, $endMonth, 31)->startOfDay(); // End period
                     $endDate->endOfMonth(); // Set it to the end of the month
 
-                    $empLeave = new Emp_leave_quota;
-                    $empLeave->user_id = $user->id;
-                    $empLeave->quota_used = 0;
-                    $empLeave->leave_id = 20;
-                    $empLeave->once_in_service_years = 0;
-                    $empLeave->active_periode = $startDate->format('Y-m-d');
-                    $empLeave->expiration = $endDate->format('Y-m-d');
-                    $empLeave->quota_left = 22;
-                    $empLeave->save();
+                    // $empLeave = new Emp_leave_quota;
+                    // $empLeave->user_id = $user->id;
+                    // $empLeave->quota_used = 0;
+                    // $empLeave->leave_id = 20;
+                    // $empLeave->once_in_service_years = 0;
+                    // $empLeave->active_periode = $startDate->format('Y-m-d');
+                    // $empLeave->expiration = $endDate->format('Y-m-d');
+                    // $empLeave->quota_left = 22;
+                    // $empLeave->save();
                 }
             }
         }

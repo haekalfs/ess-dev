@@ -499,7 +499,8 @@ var startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
 
 $('.date').datepicker({
     multidate: true,
-    startDate: startDate
+    startDate: startDate,
+    daysOfWeekDisabled: "0,6"
 });
 function calculateTotalDays() {
         var dateInput = document.getElementById('datepickLeave');

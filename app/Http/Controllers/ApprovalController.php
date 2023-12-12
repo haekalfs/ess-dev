@@ -338,6 +338,7 @@ class ApprovalController extends Controller
         $entry->type = "2A";
         $entry->save();
 
+        //perlu dirombak karena jika reject salah satu, quota ini harus di deduct
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
         $countWeekendReplacement = Emp_leave_quota::where('user_id', $user_timesheet)
             ->where('leave_id', 100)
@@ -352,9 +353,9 @@ class ApprovalController extends Controller
                 'user_id' => Auth::user()->id,
                 'leave_id' => 100,
             ], [
-                'quota_left' => 1,
+                'quota_left' => 0,
                 'active_periode' => date('Y-m-d'),
-                'expiration' => "$expirationYear-04-1", //this should be change to dynamic
+                'expiration' => "$expirationYear-03-31", //this should be change to dynamic
                 'once_in_service_years' => false
             ]);
         } else {

@@ -14,15 +14,15 @@ class AccessController extends Controller
             ->join('roles', 'user_access.role_id', '=', 'roles.id')
             ->pluck('roles.role')
             ->toArray();
-            
+
         $allowedRolesInSession = session('allowed_roles');
-        
+
         $intersection = array_intersect($allowedRole, $allowedRolesInSession);
-        
+
         if (empty($intersection)) {
-            abort(403, 'Unauthorized');
+            abort(403, "YOU'RE NOT AUTHORIZED TO ACCESS THIS PAGE!");
         }
-        
+
         return $intersection;
     }
 }

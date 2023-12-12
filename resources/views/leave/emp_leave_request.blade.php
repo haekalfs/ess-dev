@@ -116,9 +116,25 @@
                         <td>{{ $lr->total_days }} Days</td>
                         <td>{{ $lr->reason }}</td>
                         <td class="text-center" width="380px">
-                            <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}/approve" class="btn btn-primary btn-sm mr-2"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve</a>
-                            <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}/reject" class="btn btn-danger btn-sm mr-2"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Reject</a>
-                            <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}" class="btn btn-success btn-sm"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Manage Approval</a>
+                            @php
+                                $approved = false;
+                            @endphp
+
+                            @foreach ($lr->leave_request_approval as $stat)
+                                @if ($stat->status == 29 || $stat->status == 20 || $stat->status == 404)
+                                <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}" class="btn btn-success btn-sm"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Manage Approval</a>
+                                    @php
+                                        $approved = true;
+                                        break;
+                                    @endphp
+                                @endif
+                            @endforeach
+
+                            @unless ($approved)
+                                <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}/approve" class="btn btn-primary btn-sm mr-2"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Approve</a>
+                                <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}/reject" class="btn btn-danger btn-sm mr-2"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Reject</a>
+                                <a href="/leave/request/manage/id/{{$lr->req_by}}/{{ $month }}/{{$year}}/{{$lr->id}}" class="btn btn-success btn-sm"><i class="fas fa-fw fa-edit fa-sm text-white-50"></i> Manage Approval</a>
+                            @endunless
                         </td>
                     </tr>
                 @endforeach

@@ -10,7 +10,7 @@ active
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
     <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Manage Reimbursement <small style="color: red;"><i> &nbsp;&nbsp;Finance Department</i></small></h1>
-    <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" onclick="confirmPassword()"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All (XLS)</a>
+    <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/reimbursement/export/all/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All (XLS)</a>
 </div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -144,11 +144,11 @@ active
                                             </td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->f_type }}</td>
                                             <td style="border-bottom: none; border-top: none;">
-                                                @if($approval->status_id == 29) 
+                                                @if($approval->status_id == 29)
                                                 <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Approved</span>
-                                                @elseif($approval->status_id == 2002) 
+                                                @elseif($approval->status_id == 2002)
                                                 <span class="m-0 font-weight-bold text-success"><i class="fas fa-check-circle" style="color: #01e476;"></i> Paid</span>
-                                                @else 
+                                                @else
                                                 <span class="m-0 font-weight-bold text-danger"><i class="fas fa-times-circle" style="color: #ff0000;"></i> Unknown</span>
                                                 @endif
                                             </td>
@@ -164,7 +164,7 @@ active
                                     </tr>
                                 </tbody>
                             </table>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -173,15 +173,6 @@ active
     </form>
 </div>
 <script>
-function confirmPassword() {
-    var password = prompt('Please enter your password:');
-    if (password !== null) {
-        // Send the plain password to the server
-        var url = "/reimbursement/export/all/{{ $Month }}/{{ $Year }}?password=" + encodeURIComponent(password);
-        window.location.href = url;
-    }
-}
-
 function toggleCheckboxes() {
     var checkboxes = document.getElementsByClassName('data-checkbox');
     var checkAllCheckbox = document.getElementById('checkAll');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyLeaveApproved;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
@@ -94,7 +95,7 @@ class LeaveApprovalController extends Controller
 
         $tsStatusId = '20';
         $activity = 'Approved';
-    
+
         switch (true) {
             case in_array(Auth::user()->id, $checkUserDir):
                 $tsStatusId = '29';
@@ -120,7 +121,7 @@ class LeaveApprovalController extends Controller
         switch($getLeaveReq->leave_id){
             case 10:
             case 20:
-                
+
                 break;
             default:
                 Emp_leave_quota::updateOrCreate([
@@ -137,7 +138,14 @@ class LeaveApprovalController extends Controller
         $entry->message = "Your Leave Request has been Approved!";
         $entry->importance = 1;
         $entry->save();
-        
+
+        $employees = User::whereIn('id', $getLeaveReq->req_by)->get();
+        $userName = Auth::user()->name;
+
+        foreach ($employees as $employee) {
+            dispatch(new NotifyLeaveApproved($employee, $userName));
+        }
+
         return redirect('/approval/leave')->with('success',"You approved the leave request!");
     }
 
@@ -152,7 +160,7 @@ class LeaveApprovalController extends Controller
         $tsStatusId = '404';
 
         $approve = Leave_request_approval::where('id', $id);
-        
+
         if ($validator->passes()) {
             $notes = $request->reject_notes;
             $approve->update(['status' => $tsStatusId, 'notes' => $notes]);
@@ -175,7 +183,7 @@ class LeaveApprovalController extends Controller
 
         //delete
         Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->delete();
-        
+
         // $employees = User::where('id', $user_timesheet)->get();
 
         // //add notes to reject notification email
