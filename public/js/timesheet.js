@@ -788,7 +788,7 @@ function fetchLocationProjectUpdate(selectedValue,secondValue) {
                         locationSelect.prop('readonly', true);
                         $('#update_activity').prop('readonly', false);
                         if (ts_type) {
-                            if (['murdi', 'haekals', 'dio'].includes(userAllowed)) {
+                            if (['murdim', 'haekals', 'dio'].includes(userAllowed)) {
                                 // User is allowed
                                 $('#update_from, #update_to').prop('readonly', false);
                                 $('#deleteBtn').css('display', 'block');

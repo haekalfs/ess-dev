@@ -48,7 +48,7 @@ active
                     </tr>
                     <tr>
                         <th>Position</th>
-                        <td style="text-align: start; font-weight:500">: 
+                        <td style="text-align: start; font-weight:500">:
                         @if(Auth::user()->users_detail->position)
                             {{ Auth::user()->users_detail->position->position_name }}</td>
                         @endif
@@ -137,7 +137,7 @@ active
                                 @endforeach
                                  {{-- <h5 class="card-title">Peraturan Perusahaan 2023 - PT Konsulindo Informatika Perdana</h5>
                               <p class="card-text">Dear All,<br>
-                                The following is a link regarding the company regulation in Perdana Consulting 
+                                The following is a link regarding the company regulation in Perdana Consulting
                                 Thank you for your attention.
                                 <br>Sincerely,<br><br>
                                 Perdana Consulting</p>
@@ -146,12 +146,12 @@ active
                             <div class="card-body">
                                 <h5 class="card-title">Peraturan Perusahaan 2021 - PT Konsulindo Informatika Perdana</h5>
                                 <p class="card-text">Dear All,<br>
-                                  The following is a link regarding the company regulation in Perdana Consulting 
+                                  The following is a link regarding the company regulation in Perdana Consulting
                                   Thank you for your attention.
                                   <br>Sincerely,<br><br>
                                   Perdana Consulting</p>
                                 <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_office365_perdana_co_id/ET8qcmGYOk9LtyebhqZmJroB2_6CQ1EGsEpGH0b5tmtZYQ?e=5ddh4u" class="card-link">Read more</a> --}}
-                            
+
                             </div>
                         </div>
                     </div>

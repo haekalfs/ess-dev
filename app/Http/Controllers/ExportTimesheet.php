@@ -36,10 +36,71 @@ class ExportTimesheet extends Controller
         $checkUserPost = Auth::user()->users_detail->position->id;
 
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [22])) {
+        if (in_array($checkUserPost, [10])) {
             $templatePath = public_path('template_fm.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
-            $sheet = $spreadsheet->getActiveSheet();
+            $sheet = $spreadsheet->getSheet(0);
+            // Set up the starting row and column for the data
+            $startRowData = 8;
+            $startRow = 8;
+            $startCol = 2;
+
+            $timesheetSheet = $spreadsheet->getSheet(1);
+
+            // Get the start and end dates for the selected month
+            $startDate = Carbon::create($Year, $Month, 1)->startOfMonth();
+            $endDate = Carbon::create($Year, $Month)->endOfMonth();
+
+            // Get the Timesheet records between the start and end dates
+            $empActivities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_user_id', 'asc')->orderBy('ts_date', 'asc')->get();
+            $lastUserData = '';
+
+            foreach($empActivities as $data){
+                if ($data->user->name !== $lastUserData) {
+                    $timesheetSheet->setCellValueByColumnAndRow($startCol, $startRowData, $data->user->name);
+                    $lastUserData = $data->user->name;
+                }
+
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 3, $startRowData, $data->ts_task);
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 1, $startRowData, Carbon::createFromFormat('Y-m-d', $data->ts_date)->format('l'));
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 2, $startRowData, Carbon::createFromFormat('Y-m-d', $data->ts_date)->format('d-M-Y'));
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 4, $startRowData, $data->ts_location);
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 6, $startRowData, $data->ts_from_time);
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 7, $startRowData, $data->ts_to_time);
+                $timesheetSheet->setCellValueByColumnAndRow($startCol + 5, $startRowData, $data->ts_activity);
+                $work_hours = 0;
+                $start_time = PHP_INT_MAX;
+                $end_time = 0;
+                $total_work_hours = 0;
+
+                $current_start_time = strtotime($data->ts_from_time);
+                $current_end_time = strtotime($data->ts_to_time);
+
+                if ($current_start_time < $start_time) {
+                    $start_time = $current_start_time;
+                }
+
+                if ($current_end_time > $end_time) {
+                    $end_time = $current_end_time;
+                }
+
+                if ($end_time > $start_time) {
+
+                    $time_diff_seconds = $end_time - $start_time;
+                    if($time_diff_seconds > 3600){
+                        $time_diff_seconds -= 3600;
+                    } else {
+                        $time_diff_seconds -= $time_diff_seconds;
+                    }
+                    $time_diff_hours = gmdate('H', $time_diff_seconds);
+                    $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
+                    $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+                    $timesheetSheet->setCellValueByColumnAndRow($startCol + 8, $startRowData, $time_diff_hours.':'.$time_diff_minutes);
+                }
+                $startRowData++; // Increment row for the next data row
+
+            }
+
 
             $month_periode = $Year.intval($Month);
             $result = DB::table('timesheet_details as td')
@@ -66,18 +127,13 @@ class ExportTimesheet extends Controller
                         ->whereColumn('timesheet_details.user_timesheet', '=', 'user_timesheet')
                         ->where('ts_status_id', 29)
                         ->where('timesheet_details.month_periode', $Year.intval($Month))
-                        ->groupBy('user_timesheet');
+                        ->groupBy('user_timesheet', 'ts_mandays');
                 })
                 ->whereNotIn('ts_task', ['Other', 'Sick'])
                 ->where('ts_status_id', 29)
                 ->where('timesheet_details.month_periode', $Year.intval($Month))
                 ->groupBy('user_timesheet')
                 ->get();
-
-
-           // Set up the starting row and column for the data
-            $startRow = 8;
-            $startCol = 2;
 
             // Create a DateTime object for the first day of the selected month
             $dateToCount = new DateTime("$Year-$Month-01");
@@ -190,6 +246,9 @@ class ExportTimesheet extends Controller
                     $sheet->setCellValueByColumnAndRow($startCol + 11, $startRow - 1, array_sum($total));
                 } // Set the firstRow flag to false after the first row for each user
             }
+
+            // create new sheet
+
 
 
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
