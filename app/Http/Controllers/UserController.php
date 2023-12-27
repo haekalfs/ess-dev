@@ -37,7 +37,26 @@ class UserController extends Controller
 
         $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
         $banks = $response->json();
-    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'banks' => $banks]);
+
+        // Mengubah nama bank menjadi huruf kapital pada huruf pertama
+        $bankNames = array_map(function ($bank) {
+            $name = ucwords(strtolower($bank['name'])); // Mengubah nama bank menjadi huruf kapital pada huruf pertama
+            $words = explode(' ', $name); // Memisahkan kata dalam nama bank
+
+            // Mengecek panjang kata setelah kata "Bank" dan mengubahnya menjadi UPPERCASE jika kurang dari atau sama dengan 4 huruf
+            foreach ($words as $key => $word) {
+                if (strtolower($word) === 'bank' && isset($words[$key + 1])) {
+                    $nextWord = $words[$key + 1];
+                    if (strlen($nextWord) <= 4) {
+                        $words[$key + 1] = strtoupper($nextWord);
+                    }
+                }
+            }
+
+            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi nama bank
+        }, $banks);
+
+    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'bankNames' => $bankNames]);
     }
 
     public function store(Request $request)
@@ -157,10 +176,10 @@ class UserController extends Controller
         // $med_balance->save();
 
 
-        $emailUser = $request->email;
-        $userName = $request->name;
+        // $emailUser = $request->email;
+        // $userName = $request->name;
 
-        dispatch(new NotifyUserCreation($emailUser, $userName));
+        // dispatch(new NotifyUserCreation($emailUser, $userName));
 
     	return redirect('/manage/users')->with('success', 'User Create successfully');
     }
@@ -183,31 +202,51 @@ class UserController extends Controller
 
         $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
         $banks = $response->json();
-        return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'banks' => $banks]);
+
+        $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
+        $banks = $response->json();
+
+        // Mengubah nama bank menjadi huruf kapital pada huruf pertama
+        $bankNames = array_map(function ($bank) {
+            $name = ucwords(strtolower($bank['name'])); // Mengubah nama bank menjadi huruf kapital pada huruf pertama
+            $words = explode(' ', $name); // Memisahkan kata dalam nama bank
+
+            // Mengecek panjang kata setelah kata "Bank" dan mengubahnya menjadi UPPERCASE jika kurang dari atau sama dengan 4 huruf
+            foreach ($words as $key => $word) {
+                if (strtolower($word) === 'bank' && isset($words[$key + 1])) {
+                    $nextWord = $words[$key + 1];
+                    if (strlen($nextWord) <= 4) {
+                        $words[$key + 1] = strtoupper($nextWord);
+                    }
+                }
+            }
+
+            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi nama bank
+        }, $banks);
+        return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'bankNames' => $bankNames]);
     }
     
     public function update(Request $request, $id)
     {
-        $dep_data = Department::all();
-        $pos_data = Position::all();
+        
         $user = User::find($id);
-        $this->validate($request,[
-            'name' => 'required',
-            'email' => 'required',
-            'status' => 'required',
-            'position' => 'required',
-            'department' => 'required',
-            'hired_date'=> 'required',
-            'employee_id' => 'required',
-            'employee_status' => 'required',
-            'usr_id_type'=> 'required',
-            'usr_id_no'=> 'required',
-            'usr_id_expiration'=> 'required',
-            'usr_dob'=> 'required',
-            'usr_birth_place'=> 'required',
-            'usr_gender'=> 'required',
-            'usr_religion'=> 'required',
-            ]);
+        // $this->validate($request,[
+        //     'name' => 'required',
+        //     'email' => 'required',
+        //     'status' => 'required',
+        //     'position' => 'required',
+        //     'department' => 'required',
+        //     'hired_date'=> 'required',
+        //     'employee_id' => 'required',
+        //     'employee_status' => 'required',
+        //     'usr_id_type'=> 'required',
+        //     'usr_id_no'=> 'required',
+        //     'usr_id_expiration'=> 'required',
+        //     'usr_dob'=> 'required',
+        //     'usr_birth_place'=> 'required',
+        //     'usr_gender'=> 'required',
+        //     'usr_religion'=> 'required',
+        // ]);
 
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
@@ -293,12 +332,7 @@ class UserController extends Controller
             $user_detail->save();
 
 
-        return view('manage.users_edit', [
-            'user' => $user,
-            'dep_data' => $dep_data,
-            'pos_data' => $pos_data,
-            'success' => 'User Edit successfully'
-        ]);
+        return redirect()->back()->with('success', "You've Edited $user->name Successfully");
     }
 
 }
