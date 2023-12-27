@@ -1,6 +1,12 @@
 @extends('layouts.login')
 
 @section('landing-page')
+@if ($message = Session::get('failed'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{!! $message !!}</strong>
+</div>
+@endif
 <div class="row mb-4 align-items-center flex-lg-row-reverse">
     <div class="col-md-6 col-xl-7 mb-4 mb-lg-0 ">
         <!-- requires glightbox, please flag the option in the picostrap customizer panel-->
@@ -247,6 +253,13 @@
             @endif
         </div>
     </form>
+</div>
+<div class="form-group text-center" style="margin-top: 5%; margin-bottom:0%;">
+    <div class="col-xs-8">
+        <a class="btn btn-sm btn-light rounded-pill h3 font-weight-bold text-gray-800" href="{{ url('login/google') }}" style="border-radius: 20px; padding: 5px 15px;">
+            <img src="https://img.icons8.com/color/16/000000/google-logo.png" style="vertical-align: middle;"> Sign in with Google
+        </a>
+    </div>
 </div>
 @endsection
 

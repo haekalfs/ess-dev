@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
@@ -18,6 +19,9 @@ use App\Http\Middleware\CheckRole;
 */
 
 Route::get('/',[App\Http\Controllers\HomeController::class, 'index'])->middleware('auth');
+
+Route::get('login/google', [LoginController::class, 'redirectToProvider']);
+Route::get('login/google/callbackESS', [LoginController::class, 'handleProviderCallback']);
 
 Auth::routes();
 
@@ -64,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/timesheet/summary/remind/{id}/{year}/{month}', 'TimesheetController@remind')->name('remind');
 
     Route::get('/timesheet/user/preview/surat_penugasan/download/{timesheet_id}', 'TimesheetController@download_surat');
+    Route::get('/retrieveRolesHO', 'ManagementController@retrieveRoles');
 
     // // Testing
     Route::get('/development', 'HomeController@notification_indev');
