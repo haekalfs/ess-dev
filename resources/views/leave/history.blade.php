@@ -94,7 +94,7 @@ active
                           <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaAnnualSum }}</td>
                       </tr>
                       <tr>
-                          <th>5 Year Term</th>
+                          <th>Leave Quota Used</th>
                           <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
                       </tr>
                       <tr>
@@ -285,7 +285,7 @@ active
                                                     <th>Active Periode</th>
                                                     <th>Expired On</th>
                                                     <th>Status</th>
-                                                    <th>Default Quota</th>
+                                                    <th>Initial Quota</th>
                                                     <th>Quota Used</th>
                                                     <th>Quota Left</th>
                                                 </tr>

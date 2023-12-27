@@ -7,6 +7,10 @@ active
 @endsection
 
 @section('content')
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="far fa-smile-beam"></i> Welcome aboard, {{ Auth::user()->name }}!</h1>
+    {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
+</div>
 @if ($message = Session::get('failed'))
 <div class="alert alert-danger alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -20,8 +24,79 @@ active
 </div>
 @endif
 <div class="row zoom90">
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4 queue">
+        <div class="card border-bottom-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Services Year</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-people-carry fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-bottom-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Leave Balance</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-plane-departure fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-bottom-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Reimbursements</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">9</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4 formHistory">
+        <div class="card border-bottom-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Project Assigned</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-network-wired fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Area Chart -->
-    <div class="col-xl-6 col-lg-6">
+    {{-- <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -59,7 +134,6 @@ active
         </div>
     </div>
 
-    <!-- Pie Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
@@ -75,7 +149,7 @@ active
                           <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaAnnual }}</td>
                       </tr>
                       <tr>
-                          <th>5 Year Term</th>
+                          <th>Leave Quota Used</th>
                           <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
                       </tr>
                       <tr>
@@ -94,7 +168,7 @@ active
                 </table>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="col-xl-12 col-md-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
