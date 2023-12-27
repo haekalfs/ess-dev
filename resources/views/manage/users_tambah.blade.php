@@ -114,21 +114,10 @@ active
                                                     <span style="color:red; font-size: 13px; font-style: italic" id="user-id-error"></span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="password">Coorporate Email :</label>
-                                                    <input class="form-control" name="coorporate_email" placeholder="Coorporate Email..." />
-                                                    @if($errors->has('email'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('email')}}
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="password">Personal Email :</label>
-                                                    <input class="form-control" name="personal_email" placeholder="Personal Email..." />
+                                                    <label for="password">Email :</label>
+                                                    <input class="form-control" name="email" placeholder="Email..." />
                                                     @if($errors->has('email'))
                                                         <div class="text-danger">
                                                             {{ $errors->first('email')}}
@@ -427,8 +416,8 @@ active
                                             <label for="password">Bank Name :</label>
                                             <select class="form-control" name="usr_bank_name" id="banks">
                                                 <option value="">Choose Bank</option>
-                                                @foreach ($banks as $bank)
-                                                    <option value="{{ $bank['code'] }}">{{ $bank['name'] }}</option>
+                                                @foreach ($bankNames as $bank)
+                                                    <option value="{{ $bank }}">{{ $bank }}</option>
                                                 @endforeach
                                             </select>
                                             @if($errors->has('usr_bank_name'))
@@ -496,7 +485,7 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Identity Expiration :</label>
-                                            <input class="form-control" type="text"   name="usr_id_expiration" placeholder="User Identity Expiration..." >
+                                            <input class="form-control" type="text"  name="usr_id_expiration" value="1-1-2099" placeholder="User Identity Expiration..." >
                                             @if($errors->has('usr_id_expiration'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_id_expiration')}}
