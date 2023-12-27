@@ -252,10 +252,12 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
+            @usr_acc(901)
             <!-- Heading -->
             <div class="sidebar-heading">
                 System & Data
             </div>
+            @endusr_acc
 
             <!-- Nav Item - Pages Collapse Menu -->
             @usr_acc(901)
@@ -304,15 +306,10 @@
             </li>
             @else
             @endusr_acc
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>{{ __('Logout') }}</span>
-                </a>
-            </li>
             <!-- Divider -->
+            @usr_acc(901)
             <hr class="sidebar-divider">
+            @endusr_acc
 
             <!-- Heading -->
             <div class="sidebar-heading">
@@ -339,6 +336,15 @@
                         <a class="collapse-item" href="#">AMS - Assets Controller</a>
                     </div>
                 </div>
+            </li>
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>{{ __('Logout') }}</span>
+                </a>
             </li>
 
             <!-- Divider -->

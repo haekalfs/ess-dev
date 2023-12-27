@@ -579,18 +579,20 @@ initializeDateRangePicker();
 });
 
 $(document).ready(function() {
-    $('#location').change(function() {
-        var selectedLocation = $(this).val();
+    $('#location, #task').change(function() {
+        var selectedLocation = $('#location').val();
+        var selectedTask = $('#task').val();
         var fileInput = $('#surat_penugasan_wfh');
-        if (selectedLocation === "WFH") {
+
+        if (selectedLocation === "WFH" || selectedTask === "Sick") {
             fileInput.addClass('validate');
             $('#fileInputIfexistWfh').show();
         } else {
             fileInput.removeClass('validate');
             $('#fileInputIfexistWfh').hide();
         }
-
     });
+
     $(document).on('click', '.selectFileWfh', function() {
         var fileID = $(this).data('fileid');
         var loadingIndicator = $('#loadingIndicatorWfh' + fileID);
