@@ -20,12 +20,21 @@ active
         </button>
     </div>
 </div>
-@if(isset($success))
-    <div class="alert alert-success">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>{{ $success }}</strong>
-    </div>
+
+@if ($message = Session::get('success'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
 @endif
+
+@if ($message = Session::get('failed'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
 <style>
 .img-thumbnail.no-image {
   position: relative;
@@ -139,21 +148,10 @@ active
                                                     @endif
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="password">Coorporate Email :</label>
-                                                    <input class="form-control" name="coorporate_email" placeholder="Coorporate Email..." value="{{ $user->email }}" />
-                                                    @if($errors->has('email'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('email')}}
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="password">Personal Email :</label>
-                                                    <input class="form-control" name="personal_email" placeholder="Personal Email..." value="{{ $user->email }}" />
+                                                    <label for="password">Email :</label>
+                                                    <input class="form-control" name="email" placeholder="Email..." value="{{ $user->email }}" />
                                                     @if($errors->has('email'))
                                                         <div class="text-danger">
                                                             {{ $errors->first('email')}}
@@ -444,8 +442,8 @@ active
                                             <label for="password">Bank Name :</label>
                                             <select class="form-control" name="usr_bank_name" id="banks">
                                                 <option value="">Choose Bank</option>
-                                                @foreach ($banks as $bank)
-                                                    <option value="{{ $bank['code'] }}" @if($user->users_detail->usr_bank_name == $bank['code']) selected @endif>{{ $bank['name'] }}</option>
+                                                @foreach ($bankNames as $bank)
+                                                    <option value="{{ $bank }}" @if($user->users_detail->usr_bank_name == $bank) selected @endif>{{ $bank }}</option>
                                                 @endforeach
                                             </select>
                                             @if($errors->has('usr_bank_name'))
@@ -513,7 +511,7 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Identity Expiration :</label>
-                                            <input class="form-control" type="text"   name="usr_id_expiration" placeholder="User Identity Expiration..." value="{{ $user->users_detail->usr_id_expiration }}" />
+                                            <input class="form-control" type="text"  name="usr_id_expiration" placeholder="User Identity Expiration..." value="{{ $user->users_detail->usr_id_expiration }}" />
                                             @if($errors->has('usr_id_expiration'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_id_expiration')}}
