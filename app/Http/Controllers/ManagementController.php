@@ -36,7 +36,7 @@ class ManagementController extends Controller
         $pages = Page::all();
         foreach ($users as $user) {
             if (!isset($usersData[$user->id])) {
-                
+
                 // If this is the first time we've seen this user, create a new entry in the $usersData array
                 $usersData[$user->id] = [
                     'us_Dat' => $user->id,
@@ -69,11 +69,11 @@ class ManagementController extends Controller
         ->rightJoin('pages', 'pages.id', '=', 'user_access.page_id')
         ->orderBy('page_id', 'asc')
         ->get();
-    
+
         $usersAcData = [];
         foreach ($user_access as $userAc) {
             if (!isset($usersAcData[$userAc->page_id])) {
-                
+
                 // If this is the first time we've seen this user, create a new entry in the $usersData array
                 $usersAcData[$userAc->page_id] = [
                     'page_id' => $userAc->page_id,
@@ -100,12 +100,12 @@ class ManagementController extends Controller
                 'created_at' => $userAcData['created_at']
             ];
         }
-        
+
         return view('management.roles', ['users' => $usersList, 'access' => $usersAcList, 'pages' => $pages,'r_name' => $r_name, 'us_List' => $u_List, 'Assign' => $Assign]);
     }
 
-    public function manage_access(){
-
+    public function manage_access()
+    {
         $r_name = Role::all();
 
         $pages = Page::all();
@@ -116,11 +116,11 @@ class ManagementController extends Controller
         ->rightJoin('pages', 'pages.id', '=', 'user_access.page_id')
         ->orderBy('page_id', 'asc')
         ->get();
-    
+
         $usersAcData = [];
         foreach ($user_access as $userAc) {
             if (!isset($usersAcData[$userAc->page_id])) {
-                
+
                 // If this is the first time we've seen this user, create a new entry in the $usersData array
                 $usersAcData[$userAc->page_id] = [
                     'page_id' => $userAc->page_id,
@@ -147,16 +147,18 @@ class ManagementController extends Controller
                 'created_at' => $userAcData['created_at']
             ];
         }
-        
+
         return view('management.manage_access', ['access' => $usersAcList, 'pages' => $pages,'r_name' => $r_name]);
     }
 
-    public function manage_roles(){
+    public function manage_roles()
+    {
         $r_name = Role::all();
         return view('management.manage_roles', ['r_name' => $r_name]);
     }
 
-    public function remove_roles_from_user($id){
+    public function remove_roles_from_user($id)
+    {
         Usr_role::where('user_id', $id)->delete();
         return redirect('/management/security_&_roles/')->with('failed', 'User Roles has been Removed!');
     }
@@ -290,5 +292,15 @@ class ManagementController extends Controller
         $api_edit->save();
 
         return redirect()->back()->with('success', 'API KEY Update Success');
+    }
+
+    //this should be corrected later
+    public function retrieveRoles()
+    {
+        $retrieveRoles = Usr_role::where('role_name', 's-user')
+            ->distinct('user_id') // Fetch distinct user_id values
+            ->pluck('user_id'); // Retrieve only the user_id values
+
+        return response()->json($retrieveRoles);
     }
 }

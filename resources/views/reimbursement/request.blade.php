@@ -170,39 +170,29 @@ active
                                 <div class="row" id="targetContainer">
                                     <div class="col-md-4" id="originalForm">
 
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    {{-- <input type="file" class="file-input" > --}}
-                                                    <div class="custom-file">
-                                                        <input type="file" class="custom-file-input" id="receipt" name="receipt[]" multiple required>
-                                                        <label class="custom-file-label" id="sp-label-wfh">Choose file</label>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <input type="file" class="file-input" id="receipt" name="receipt[]" multiple required>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="password">Receipt Date :</label>
-                                                    <input type="date" class="form-control" name="description[]" id="description" value="{{ date('Y-m-d') }}" required>
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="password">Description :</label>
+                                                        <input type="text" class="form-control" name="description[]" id="description" value="" required>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="password">Description :</label>
-                                                    <input type="text" class="form-control" name="description[]" id="description" value="" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <div class="input-group mb-2">
-                                                        <div class="input-group-prepend">
-                                                            <div class="input-group-text">Rp.</div>
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <div class="input-group mb-2">
+                                                            <div class="input-group-prepend">
+                                                                <div class="input-group-text">Rp.</div>
+                                                            </div>
+                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
                                                         </div>
-                                                        <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

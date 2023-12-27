@@ -418,7 +418,7 @@ function showSuccessMessage(){
                     $('#entry-form')[0].reset();
                     $('#locationContainer').css('display', 'block');
                     fetchLocationProject(1);
-                    $('#sp-label').text('Choose File');
+                    $('#sp-label-wfh').text('Choose File');
                     showSuccessMessage();
                     // Fetch the updated list of activities
                     fetchActivities(yearput, monthput);
@@ -476,6 +476,7 @@ function showSuccessMessage(){
                     $('#locationContainerRed').css('display', 'block');
                     fetchLocationProjectRed(1);
                     $('.validate-red').removeClass('is-invalid');
+                    $('#surat_penugasan').addClass('validate-red');
                     $('#sp-label').text('Choose File');
                     showSuccessMessage();
                     // Fetch the updated list of activities
@@ -581,7 +582,6 @@ $(document).ready(function() {
     $('#location').change(function() {
         var selectedLocation = $(this).val();
         var fileInput = $('#surat_penugasan_wfh');
-        var checkbox = $('#flexCheckWfh');
         if (selectedLocation === "WFH") {
             fileInput.addClass('validate');
             $('#fileInputIfexistWfh').show();
@@ -589,26 +589,86 @@ $(document).ready(function() {
             fileInput.removeClass('validate');
             $('#fileInputIfexistWfh').hide();
         }
-        if (checkbox.is(':checked')) {
-            $('#surat_penugasan_wfh').removeClass('validate');
-        }
+
+    });
+    $(document).on('click', '.selectFileWfh', function() {
+        var fileID = $(this).data('fileid');
+        var loadingIndicator = $('#loadingIndicatorWfh' + fileID);
+        var selectFile = $('#selectFileWfh' + fileID);
+
+        var fileName = $(this).siblings('.file-infoWfh').text();
+        $('#sp-label-wfh').text(fileName);
+        $('#selectedFileUploadedWfh').val(fileName); // Update the label of the file input
+        $('#surat_penugasan_wfh').prop('files', null); // Clear previously selected files
+        $('#surat_penugasan_wfh').removeClass('validate');
+
+        // Show loading indicator for the selected row
+        loadingIndicator.show();
+        selectFile.hide();
+
+        // Simulate a delay before showing/hiding elements
+        setTimeout(function() {
+            loadingIndicator.hide();
+            $('#filesUploadedWfh').hide(); // Hide all file containers
+            $('#uploadFileWfh').show();
+            $('#fields').show();
+            $('#flexCheckWfh').prop('checked', false);
+            selectFile.show(); // Show the upload file section
+        }, 1500); // Adjust the delay time (in milliseconds) as needed
     });
 
     $('#flexCheckWfh').change(function() {
         if ($(this).is(':checked')) {
-            $('#surat_penugasan_wfh').removeClass('validate');
+            $('#filesUploadedWfh').show();
+            $('#uploadFileWfh').hide();
+            $('#fields').hide();
+        } else {
+            $('#filesUploadedWfh').hide();
+            $('#uploadFileWfh').show();
+            $('#fields').show();
         }
     });
 });
 
-$(function() {
-  $('#flexCheckDefault').change(function() {
-    if ($(this).is(':checked')) {
-      $('#surat_penugasan').removeClass('validate-red');
-    } else {
-      $('#surat_penugasan').addClass('validate-red');
-    }
-  });
+
+$(document).ready(function() {
+    $(document).on('click', '.selectFile', function() {
+        var fileID = $(this).data('fileid');
+        var loadingIndicator = $('#loadingIndicator' + fileID);
+        var selectFile = $('#selectFile' + fileID);
+
+        var fileName = $(this).siblings('.file-info').text();
+        $('#sp-label').text(fileName);
+        $('#selectedFileUploaded').val(fileName); // Update the label of the file input
+        $('#surat_penugasan').prop('files', null); // Clear previously selected files
+        $('#surat_penugasan').removeClass('validate-red');
+
+        // Show loading indicator for the selected row
+        loadingIndicator.show();
+        selectFile.hide();
+
+        // Simulate a delay before showing/hiding elements
+        setTimeout(function() {
+            loadingIndicator.hide();
+            $('#filesUploaded').hide(); // Hide all file containers
+            $('#uploadFile').show();
+            $('#fields-red').show();
+            $('#flexCheckDefault').prop('checked', false);
+            selectFile.show(); // Show the upload file section
+        }, 1500); // Adjust the delay time (in milliseconds) as needed
+    });
+
+    $('#flexCheckDefault').change(function() {
+        if ($(this).is(':checked')) {
+            $('#filesUploaded').show();
+            $('#uploadFile').hide();
+            $('#fields-red').hide();
+        } else {
+            $('#filesUploaded').hide();
+            $('#uploadFile').show();
+            $('#fields-red').show();
+        }
+    });
 });
 
 
@@ -782,48 +842,61 @@ function fetchLocationProjectUpdate(selectedValue,secondValue) {
                 var userAllowed = $('#usersAllowed').val();
 
                 function updateLocation(selectedTask) {
-                    if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
-                        $('#updateLocationSelect').css('display', 'block');
-                        locationSelect.val(selectedTask.substr(-2));
-                        locationSelect.prop('readonly', true);
-                        $('#update_activity').prop('readonly', false);
-                        if (ts_type) {
-                            if (['murdi', 'haekals', 'dio'].includes(userAllowed)) {
-                                // User is allowed
-                                $('#update_from, #update_to').prop('readonly', false);
-                                $('#deleteBtn').css('display', 'block');
+                    var roles = [];
+
+                    $.ajax({
+                        url: '/retrieveRolesHO',
+                        type: 'GET',
+                        success: function(response) {
+                            roles = response;
+
+                            if (selectedTask === "StandbyLK" || selectedTask === "StandbyLN" || selectedTask === "HO") {
+                                $('#updateLocationSelect').css('display', 'block');
+                                locationSelect.val(selectedTask.substr(-2));
+                                locationSelect.prop('readonly', true);
+                                $('#update_activity').prop('readonly', false);
+                                if (ts_type) {
+                                    if (roles.includes(userAllowed)) {
+                                        // User is allowed
+                                        $('#update_from, #update_to').prop('readonly', false);
+                                        $('#deleteBtn').css('display', 'block');
+                                        taskSelect.prop('readonly', false);
+                                        taskSelect.css('pointer-events', 'auto');
+                                    } else {
+                                        // User is not allowed
+                                        $('#update_from, #update_to').prop('readonly', true);
+                                        $('#deleteBtn').css('display', 'none');
+                                        taskSelect.prop('readonly', true);
+                                        taskSelect.css('pointer-events', 'none');
+                                    }
+                                } else {
+                                    $('#update_from, #update_to').prop('readonly', false);
+                                    $('#deleteBtn').css('display', 'block');
+                                    taskSelect.prop('readonly', false);
+                                    taskSelect.css('pointer-events', 'auto');
+                                }
+                                locationSelect.css('pointer-events', 'none');
+                            } else if (selectedTask === "Other" || selectedTask === "Sick") {
+                                $('#updateLocationSelect').css('display', 'none');
+                                $('#update_activity, #update_from, #update_to').val("-");
+                                $('#update_activity, #update_from, #update_to').prop('readonly', true);
+                                locationSelect.prop('readonly', true);
+                                locationSelect.css('pointer-events', 'none');
                                 taskSelect.prop('readonly', false);
                                 taskSelect.css('pointer-events', 'auto');
                             } else {
-                                // User is not allowed
-                                $('#update_from, #update_to').prop('readonly', true);
-                                $('#deleteBtn').css('display', 'none');
-                                taskSelect.prop('readonly', true);
-                                taskSelect.css('pointer-events', 'none');
+                                $('#updateLocationSelect').css('display', 'block');
+                                $('#update_activity, #update_from, #update_to').prop('readonly', false);
+                                locationSelect.prop('readonly', false);
+                                locationSelect.css('pointer-events', 'auto');
+                                taskSelect.prop('readonly', false);
+                                taskSelect.css('pointer-events', 'auto');
                             }
-                        } else {
-                            $('#update_from, #update_to').prop('readonly', false);
-                            $('#deleteBtn').css('display', 'block');
-                            taskSelect.prop('readonly', false);
-                            taskSelect.css('pointer-events', 'auto');
+                        },
+                        error: function(response) {
+                            console.log(response);
                         }
-                        locationSelect.css('pointer-events', 'none');
-                    } else if (selectedTask === "Other" || selectedTask === "Sick") {
-                        $('#updateLocationSelect').css('display', 'none');
-                        $('#update_activity, #update_from, #update_to').val("-");
-                        $('#update_activity, #update_from, #update_to').prop('readonly', true);
-                        locationSelect.prop('readonly', true);
-                        locationSelect.css('pointer-events', 'none');
-                        taskSelect.prop('readonly', false);
-                        taskSelect.css('pointer-events', 'auto');
-                    } else {
-                        $('#updateLocationSelect').css('display', 'block');
-                        $('#update_activity, #update_from, #update_to').prop('readonly', false);
-                        locationSelect.prop('readonly', false);
-                        locationSelect.css('pointer-events', 'auto');
-                        taskSelect.prop('readonly', false);
-                        taskSelect.css('pointer-events', 'auto');
-                    }
+                    });
                 }
 
                 taskSelect.on('change', function() {

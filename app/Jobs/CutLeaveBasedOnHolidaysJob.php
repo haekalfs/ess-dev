@@ -87,8 +87,8 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                 ->orderBy('expiration', 'asc')
                 ->get();
 
-            if($totalHolidays > 8){ //set the maximum cut to only 8
-                $totalHolidays = 8;
+            if($totalHolidays > 12){ //set the maximum cut to only 8
+                $totalHolidays = 12;
             }
             $countQuota = $totalHolidays; // Initialize the count
 

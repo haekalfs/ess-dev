@@ -28,7 +28,7 @@ class ApprovedLeave extends Mailable
                 'link' => 'https://timereport.perdana.co.id/leave/history'
             ];
 
-            $subject = 'Leave Request Reminder';
+            $subject = 'Leave Request Status';
 
             return $this->markdown('mailer.approved_leave', $data)
                         ->subject($subject)

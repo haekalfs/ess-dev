@@ -302,21 +302,39 @@ active
                                     <label for="email" style="margin-bottom: 0;">
                                         <span class="text-danger"><i>Surat Penugasan :</i></span>
                                     </label>
-                                    {{-- <div class="ml-auto">
+                                    <div class="ml-auto">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckWfh">
-                                            <label class="form-check-label" for="flexCheckWfh">Skip</label>
+                                            <label class="form-check-label" for="flexCheckWfh">Show Recent Files</label>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" style="display: block;" id="uploadFileWfh">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" id="surat_penugasan_wfh" name="surat_penugasan_wfh" onchange="changeFileName('surat_penugasan_wfh', 'sp-label-wfh')">
                                         <label class="custom-file-label" id="sp-label-wfh">Choose file</label>
                                     </div>
                                     <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 500kb</i></small>
                                 </div>
+                                <div id="filesUploadedWfh" style="display: none;">
+                                    @if($filesUploaded)
+                                        @foreach($filesUploaded as $fu)
+                                            <div class="file-container">
+                                                <div class="file-infoWfh">
+                                                    {{ $fu->file_name }}
+                                                </div>
+                                                <a data-fileid="{{ $fu->id }}" id="selectFileWfh{{$fu->id}}" class="btn btn-sm btn-primary selectFileWfh">Select</a>
+                                                <div id="loadingIndicatorWfh{{$fu->id}}" style="display: none;" class="spinner-border" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
+                            <input name="selectedFileUploadedWfh" id="selectedFileUploadedWfh" type="hidden" />
+                        </div>
+                        <div class="row" id="fields">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
@@ -345,8 +363,6 @@ active
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group" id="locationContainer">
                                     <label for="location">Location :</label>
@@ -359,8 +375,6 @@ active
                                     </select> --}}
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
@@ -373,8 +387,6 @@ active
                                     <input type="text" class="form-control validate time-input" required autocomplete="off" placeholder="HH:mm" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
@@ -412,21 +424,39 @@ active
                                     <label for="email" style="margin-bottom: 0;">
                                         <span class="text-danger"><i>Surat Penugasan :</i></span>
                                     </label>
-                                    {{-- <div class="ml-auto">
+                                    <div class="ml-auto">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">Skip</label>
+                                            <label class="form-check-label" for="flexCheckDefault">Show Recent Files</label>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" style="display: block;" id="uploadFile">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input validate-red" id="surat_penugasan" name="surat_penugasan" onchange="changeFileName('surat_penugasan', 'sp-label')">
                                         <label class="custom-file-label" id="sp-label">Choose file</label>
                                     </div>
-                                    <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 500kb</i></small>
+                                    <small style="color: red;"><i>Only pdf, jpg, png, jpeg allowed! Maximum 5000kb</i></small>
+                                </div>
+                                <div id="filesUploaded" style="display: none;">
+                                    @if($filesUploaded)
+                                        @foreach($filesUploaded as $fu)
+                                            <div class="file-container">
+                                                <div class="file-info">
+                                                    {{ $fu->file_name }}
+                                                </div>
+                                                <a data-fileid="{{ $fu->id }}" id="selectFile{{$fu->id}}" class="btn btn-sm btn-primary selectFile">Select</a>
+                                                <div id="loadingIndicator{{$fu->id}}" style="display: none;" class="spinner-border" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
+                            <input name="selectedFileUploaded" id="selectedFileUploaded" type="hidden" />
+                        </div>
+                        <div class="row" id="fields-red">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Task :</label>
@@ -455,8 +485,6 @@ active
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group" id="locationContainerRed">
                                     <label for="password">Location :</label>
@@ -469,8 +497,6 @@ active
                                     </select> --}}
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">From :</label>
@@ -483,8 +509,6 @@ active
                                     <input type="text" class="form-control validate-red time-input" required autocomplete="off" placeholder="HH:mm" name="to" id="end-time" timeFormat="HH:mm">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Activity :</label>
@@ -729,6 +753,37 @@ active
         </div>
     </div>
 </div>
+  <style>
+    /* CSS for the file container */
+.file-container {
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%; /* Adjust width as needed */
+  border-radius: 8px;
+}
+
+/* Style for the file information */
+.file-info {
+  flex-grow: 1;
+  margin-right: 10px; /* Adjust spacing as needed */
+}
+
+/* Style for the "Select" button */
+.select-button {
+  background-color: #007bff; /* Change to your preferred button color */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+  </style>
+{{-- this need to be corrected --}}
 <input type="hidden" id="usersAllowed" name="usersAllowed" value="{{Auth::id()}}">
 <script>
 $(document).ready(function() {

@@ -142,8 +142,15 @@ class LeaveApprovalController extends Controller
         $employees = User::whereIn('id', $getLeaveReq->req_by)->get();
         $userName = Auth::user()->name;
 
-        foreach ($employees as $employee) {
-            dispatch(new NotifyLeaveApproved($employee, $userName));
+        ///only director send the emails
+        switch (true) {
+            case in_array(Auth::user()->id, $checkUserDir):
+                foreach ($employees as $employee) {
+                    dispatch(new NotifyLeaveApproved($employee, $userName));
+                }
+                break;
+            default:
+                break;
         }
 
         return redirect('/approval/leave')->with('success',"You approved the leave request!");

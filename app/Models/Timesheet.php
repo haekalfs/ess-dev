@@ -17,4 +17,8 @@ class Timesheet extends Model
     public function surat_penugasan(){
     	return $this->hasMany('App\Models\Surat_penugasan', 'ts_id_date', 'timesheet_id');
     }
+
+    public function user(){
+    	return $this->belongsTo('App\Models\User', 'ts_user_id', 'id')->withDefault();
+    }
 }

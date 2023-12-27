@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 
 class UserController extends Controller
@@ -33,7 +34,10 @@ class UserController extends Controller
         $pos_data = Position::all();
         $latestForm = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('employee_id')->max();
         $nextEmpID = $latestForm + 1;
-    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID]);
+
+        $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
+        $banks = $response->json();
+    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'banks' => $banks]);
     }
 
     public function store(Request $request)
@@ -146,11 +150,11 @@ class UserController extends Controller
         $emp_leave->expiration = $newDate->format('Y-m-d');
         $emp_leave->save();
 
-        $med_balance = new Emp_medical_balance();
-        $med_balance->user_id = $request->usr_id;
-        $med_balance->medical_balance = 0;
-        $med_balance->medical_deducted = 0;
-        $med_balance->save();
+        // $med_balance = new Emp_medical_balance();
+        // $med_balance->user_id = $request->usr_id;
+        // $med_balance->medical_balance = 0;
+        // $med_balance->medical_deducted = 0;
+        // $med_balance->save();
 
 
         $emailUser = $request->email;
@@ -176,7 +180,10 @@ class UserController extends Controller
         $user = User::with('users_detail')->findOrFail($id);
         $dep_data = Department::all();
         $pos_data = Position::all();
-        return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data]);
+
+        $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
+        $banks = $response->json();
+        return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'banks' => $banks]);
     }
     
     public function update(Request $request, $id)

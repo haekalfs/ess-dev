@@ -331,6 +331,13 @@ class TimesheetController extends Controller
             ->whereIn('project_assignment_users.project_assignment_id', $assignmentArray)
             ->get();
 
+        $filesUploaded = Surat_penugasan::where('user_id', Auth::id())
+        ->whereMonth('ts_date', $month)
+        ->whereYear('ts_date', $year)
+        ->orderBy('created_at', 'desc')
+        ->take(5) // Limit the query to retrieve only 5 records
+        ->get();
+
         $validStatusIDs = Approval_status::whereIn('id', [2, 3, 6, 8])->pluck('approval_status_id')->toArray();
         if ($lastUpdate) {
             if (in_array($lastUpdate->ts_status_id, $validStatusIDs)) {
@@ -341,14 +348,14 @@ class TimesheetController extends Controller
                 $encryptMonth = Crypt::encrypt($month);
                 $previewButton = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
                 Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available until the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
-                return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
+                return view('timereport.timesheet_entry', compact('calendar', 'filesUploaded', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
             }
         } else {
             $encryptYear = Crypt::encrypt($year);
             $encryptMonth = Crypt::encrypt($month);
             $previewButton = "/timesheet/entry/preview/" . $encryptYear . "/" . $encryptMonth;
             Session::flash('timesheet-cutoffdate', "Timesheet Submission is only available until the end of 5th ".date("F", mktime(0, 0, 0, $month + 1, 1))."!");
-            return view('timereport.timesheet_entry', compact('calendar', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
+            return view('timereport.timesheet_entry', compact('calendar', 'filesUploaded', 'year', 'month', 'previewButton', 'assignment', 'pLocations', 'leaveRequests'));
         }
         // // Return the calendar view with the calendar data
         // return view('timereport.timesheet_entry', compact('calendar', 'year', 'month'));
@@ -383,6 +390,7 @@ class TimesheetController extends Controller
             'to' => 'required',
             'activity' => 'required',
             'surat_penugasan_wfh' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:5000',
+            'selectedFileUploadedWfh' => 'sometimes',
         ]);
 
         if ($validator->fails()) {
@@ -493,7 +501,8 @@ class TimesheetController extends Controller
                 $file = $request->file('surat_penugasan_wfh');
                 $surat_penugasan_wfh = $request->file('surat_penugasan_wfh');
                 $fileExtension = $surat_penugasan_wfh->getClientOriginalExtension();
-                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $orgName = $surat_penugasan_wfh->getClientOriginalName();
+                $fileName = uniqid() . '_' . $orgName;
                 $filePath = 'surat_penugasan/' . $fileName;
                 $upload_folder = public_path('surat_penugasan/');
 
@@ -508,6 +517,38 @@ class TimesheetController extends Controller
                 $fileEntry->file_path = $filePath;
                 $fileEntry->timesheet_id = str_replace('-', '', $request->clickedDate);
                 $fileEntry->save();
+            } else {
+                if($request->selectedFileUploadedWfh){
+                    $checkFile = Surat_penugasan::where('file_name', $request->selectedFileUploadedWfh)->first();
+
+                    // Assuming $fileEntry is your existing file entry
+                    $originalFilePath = public_path($checkFile->file_path);
+                    $newFileName = pathinfo($originalFilePath, PATHINFO_FILENAME); // Extract original file name without extension
+                    $fileExtension = pathinfo($originalFilePath, PATHINFO_EXTENSION); // Extract file extension
+
+                    $newFilePath = $originalFilePath; // Initial new file path, same as the original file
+
+                    // Check if the file already exists with the new name, if it does, increment the name
+                    $i = 1;
+                    while (file_exists($newFilePath)) {
+                        $newFileNameWithNumber = $newFileName . '_' . $i; // Append a number to the file name
+                        $newFilePath = public_path('surat_penugasan/') . $newFileNameWithNumber . '.' . $fileExtension; // Create the new file path
+                        $i++;
+                    }
+
+                    // Now, duplicate the file to the new path
+                    if (copy($originalFilePath, $newFilePath)) {
+                        // File has been duplicated successfully
+                        // You can use $newFilePath as the path to the duplicated file
+                        $fileEntry = new Surat_penugasan;
+                        $fileEntry->user_id = Auth::user()->id;
+                        $fileEntry->ts_date = $request->clickedDate;
+                        $fileEntry->file_name = $newFileNameWithNumber . '.' . $fileExtension;
+                        $fileEntry->file_path = 'surat_penugasan/' . $newFileNameWithNumber . '.' . $fileExtension;
+                        $fileEntry->timesheet_id = str_replace('-', '', $request->clickedDate);
+                        $fileEntry->save();
+                    }
+                }
             }
         } catch (Exception $e) {
             //do nothing
@@ -529,6 +570,7 @@ class TimesheetController extends Controller
             'to' => 'required',
             'activity' => 'required',
             'surat_penugasan' => 'sometimes|mimes:pdf,png,jpeg,jpg|max:5000',
+            'selectedFileUploaded' => 'sometimes'
         ]);
 
         if ($validator->fails()) {
@@ -637,7 +679,8 @@ class TimesheetController extends Controller
                 $file = $request->file('surat_penugasan');
                 $surat_penugasan = $request->file('surat_penugasan');
                 $fileExtension = $surat_penugasan->getClientOriginalExtension();
-                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $orgName = $surat_penugasan->getClientOriginalName();
+                $fileName = uniqid() . '_' . $orgName;
                 $filePath = 'surat_penugasan/' . $fileName;
                 $upload_folder = public_path('surat_penugasan/');
 
@@ -652,6 +695,38 @@ class TimesheetController extends Controller
                 $fileEntry->file_path = $filePath;
                 $fileEntry->timesheet_id = str_replace('-', '', $request->clickedDateRed);
                 $fileEntry->save();
+            } else {
+                if($request->selectedFileUploaded){
+                    $checkFile = Surat_penugasan::where('file_name', $request->selectedFileUploaded)->first();
+
+                    // Assuming $fileEntry is your existing file entry
+                    $originalFilePath = public_path($checkFile->file_path);
+                    $newFileName = pathinfo($originalFilePath, PATHINFO_FILENAME); // Extract original file name without extension
+                    $fileExtension = pathinfo($originalFilePath, PATHINFO_EXTENSION); // Extract file extension
+
+                    $newFilePath = $originalFilePath; // Initial new file path, same as the original file
+
+                    // Check if the file already exists with the new name, if it does, increment the name
+                    $i = 1;
+                    while (file_exists($newFilePath)) {
+                        $newFileNameWithNumber = $newFileName . '_' . $i; // Append a number to the file name
+                        $newFilePath = public_path('surat_penugasan/') . $newFileNameWithNumber . '.' . $fileExtension; // Create the new file path
+                        $i++;
+                    }
+
+                    // Now, duplicate the file to the new path
+                    if (copy($originalFilePath, $newFilePath)) {
+                        // File has been duplicated successfully
+                        // You can use $newFilePath as the path to the duplicated file
+                        $fileEntry = new Surat_penugasan;
+                        $fileEntry->user_id = Auth::user()->id;
+                        $fileEntry->ts_date = $request->clickedDateRed;
+                        $fileEntry->file_name = $newFileNameWithNumber . '.' . $fileExtension;
+                        $fileEntry->file_path = 'surat_penugasan/' . $newFileNameWithNumber . '.' . $fileExtension;
+                        $fileEntry->timesheet_id = str_replace('-', '', $request->clickedDateRed);
+                        $fileEntry->save();
+                    }
+                }
             }
         } catch (Exception $e) {
             //do nothing
