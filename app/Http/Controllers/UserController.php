@@ -12,6 +12,7 @@ use App\Models\Position;
 use App\Models\Department;
 use App\Models\Emp_leave_quota;
 use App\Models\Emp_medical_balance;
+use App\Models\Usr_role;
 use App\Jobs\NotifyUserCreation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -175,6 +176,11 @@ class UserController extends Controller
         // $med_balance->medical_deducted = 0;
         // $med_balance->save();
 
+        $user_role = new Usr_role();
+        $user_role->role_name = "employee";
+        $user_role->role_id = 8;
+        $user_role->user_id = $request->usr_id;
+        $user_role->save();
 
         // $emailUser = $request->email;
         // $userName = $request->name;
@@ -190,7 +196,9 @@ class UserController extends Controller
         $data2 = DB::table('users_details')->where('user_id', $id)->delete();
         $leave = Emp_leave_quota::where('user_id', $id)->delete();
         $med = Emp_medical_balance::where('user_id', $id)->delete();
-        return redirect()->back()->with('success', 'User delete successfully');
+        $user_role = Usr_role::where('user_id', $id)->delete();
+
+        return redirect()->back()->with('success', "You've Deleted User $id Successfully");
     }
     
 
