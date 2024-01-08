@@ -48,11 +48,16 @@ class GenerateLeaveAnnually extends Command
         $empQoutas = Emp_leave_quota::whereNotNull('expiration')->whereNotNull('active_periode')->pluck('user_id')->toArray();
         $users = User::whereIn('id', $empQoutas)->get();
         $endMonth = 3; // March
+        $currentDate = Carbon::now();
 
+        $now = date('Y-m-d');
         foreach ($users as $user) {
             $hiredDate = $user->users_detail->hired_date; //this should produce Y-m-d on string
             if($hiredDate){
                 $hiredDate = Carbon::createFromFormat('Y-m-d', $user->users_detail->hired_date);
+
+                // Add a year to the hired date
+                $oneYearAfterHired = $hiredDate->copy()->addYear();
 
                 $checkUsersQuotaAnnual = Emp_leave_quota::where('leave_id', 10)
                     ->where('user_id', $user->id)
@@ -95,16 +100,19 @@ class GenerateLeaveAnnually extends Command
                     $lastQuotaExpiration = Carbon::createFromFormat('Y-m-d', $checkUsersQuotaAnnual->expiration); //validation for creating so it does not multiplies
                     if ($lastQuotaExpiration->isCurrentYear() || $lastQuotaExpiration->isNextYear()) {
                         if ($totalMonths > 0) {
-                            // Generate and save the newly added positive quota
-                            $empLeave = new Emp_leave_quota;
-                            $empLeave->user_id = $user->id;
-                            $empLeave->quota_used = 0;
-                            $empLeave->leave_id = 10;
-                            $empLeave->once_in_service_years = 0;
-                            $empLeave->active_periode = $startDate->format('Y-m-d');
-                            $empLeave->expiration = $endDate->format('Y-m-d');
-                            $empLeave->quota_left = $totalMonths;
-                            $empLeave->save();
+                            // Check if the current date is greater than or equal to one year after hired date
+                            if ($currentDate->greaterThanOrEqualTo($oneYearAfterHired)) {
+                                // Generate and save the newly added positive quota
+                                $empLeave = new Emp_leave_quota;
+                                $empLeave->user_id = $user->id;
+                                $empLeave->quota_used = 0;
+                                $empLeave->leave_id = 10;
+                                $empLeave->once_in_service_years = 0;
+                                $empLeave->active_periode = $startDate->format('Y-m-d');
+                                $empLeave->expiration = $endDate->format('Y-m-d');
+                                $empLeave->quota_left = $totalMonths;
+                                $empLeave->save();
+                            }
                         }
                     }
                 }
