@@ -181,7 +181,7 @@ active
                         <div class="row">
                             <div class="col-md-5">
                                 <div class="form-group">
-                                    <label for="email">Project Name :</label>
+                                    <label for="email">Client Name :</label>
                                     <input type="text" class="form-control" name="client_name">
                                 </div>
                             </div>

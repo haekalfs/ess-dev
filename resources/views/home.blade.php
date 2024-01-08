@@ -23,6 +23,20 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+<?php
+$hired_date = Auth::user()->users_detail->hired_date; // assuming $hired_date is in Y-m-d format
+$current_date = date('Y-m-d'); // get the current date
+
+// create DateTime objects from the hired_date and current_date values
+$hired_date_obj = new DateTime($hired_date);
+$current_date_obj = new DateTime($current_date);
+
+// calculate the difference between the hired_date and current_date
+$diff = $current_date_obj->diff($hired_date_obj);
+
+// get the total number of years from the difference object
+$total_years_of_service = $diff->y;
+?>
 <div class="row zoom90">
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4 queue">
@@ -32,7 +46,7 @@ active
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                             Services Year</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_years_of_service.' Years'?></div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-people-carry fa-2x text-gray-300"></i>
@@ -50,7 +64,7 @@ active
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                             Leave Balance</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalQuota }}</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-plane-departure fa-2x text-gray-300"></i>
@@ -68,7 +82,7 @@ active
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                             Reimbursements</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">9</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">N/a</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -86,7 +100,7 @@ active
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                             Project Assigned</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">N/a</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-network-wired fa-2x text-gray-300"></i>
@@ -209,23 +223,6 @@ active
                                         <a class="btn btn-sm btn-primary mt-0" data-id="{{ $feed->id }}" class="card-link">Read more</a>
                                     </div>
                                 @endforeach
-                                 {{-- <h5 class="card-title">Peraturan Perusahaan 2023 - PT Konsulindo Informatika Perdana</h5>
-                              <p class="card-text">Dear All,<br>
-                                The following is a link regarding the company regulation in Perdana Consulting
-                                Thank you for your attention.
-                                <br>Sincerely,<br><br>
-                                Perdana Consulting</p>
-                              <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/personal/admin_office365_perdana_co_id/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fadmin%5Foffice365%5Fperdana%5Fco%5Fid%2FDocuments%2FPeraturan%20Perusahaan%20%2D%20Konsulindo%20Informatika%20Perdana%202023%2Epdf&parent=%2Fpersonal%2Fadmin%5Foffice365%5Fperdana%5Fco%5Fid%2FDocuments&ga=1" class="card-link">Read more</a>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Peraturan Perusahaan 2021 - PT Konsulindo Informatika Perdana</h5>
-                                <p class="card-text">Dear All,<br>
-                                  The following is a link regarding the company regulation in Perdana Consulting
-                                  Thank you for your attention.
-                                  <br>Sincerely,<br><br>
-                                  Perdana Consulting</p>
-                                <a class="btn btn-sm @role('freelancer') btn-success @else btn-primary @endrole" href="https://perdana365-my.sharepoint.com/:b:/g/personal/admin_office365_perdana_co_id/ET8qcmGYOk9LtyebhqZmJroB2_6CQ1EGsEpGH0b5tmtZYQ?e=5ddh4u" class="card-link">Read more</a> --}}
-
                             </div>
                         </div>
                     </div>

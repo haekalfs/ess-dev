@@ -51,7 +51,7 @@ active
                         <div class="col-md-6">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <label>Type of Reimbursement :</label><br />
+                                    <label>Type of Reimbursement <span class="text-danger">*</span>:</label><br />
                                     <label class="col-md-6">
                                         <input class="form-radio-input" type="radio" name="type_reimburse" id="projectRadio" value="Project" checked="">
                                         <span class="form-radio-sign">Project</span>
@@ -89,7 +89,7 @@ active
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <label>Payment Method :</label><br />
+                                    <label>Payment Method <span class="text-danger">*</span>:</label><br />
                                     <label class="col-md-5">
                                         <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
                                         <span class="form-radio-sign">Cash</span>
@@ -119,16 +119,16 @@ active
                         </div>
                         <div class="col-md-6">
                             <div class="form-group" style="display: none;" id="reqApproval">
-                                <label for="password">Request Approval To :</label>
+                                <label for="password">Request Approval To <span class="text-danger">*</span>:</label>
                                 <select class="form-control" id="approver" name="approver">
                                     <option value="" disabled selected>Select Division...</option>
                                     @foreach($approver as $app)
-                                    <option value="{{$app->id}}">{{ $app->department_name}}</option>
+                                        <option value="{{$app->group_id}}">{{ $app->user->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="comment">Notes :</label>
+                                <label for="comment">Notes <span class="text-danger">*</span>:</label>
                                 <textarea class="form-control" id="comment" rows="2" name="notes" required></textarea>
                             </div>
                         </div>
@@ -169,30 +169,36 @@ active
                             <div class="col-lg-12">
                                 <div class="row" id="targetContainer">
                                     <div class="col-md-4" id="originalForm">
-
-                                            <div class="row">
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <input type="file" class="file-input" id="receipt" name="receipt[]" multiple required>
-                                                    </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <input type="file" accept="image/*" onchange="loadFile(event)" class="file-input" id="receipt" name="receipt[]" multiple required>
+                                                    <img id="output" style="margin-top: 10px;" width="100%" height="300"/>
                                                 </div>
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <label for="password">Description :</label>
-                                                        <input type="text" class="form-control" name="description[]" id="description" value="" required>
-                                                    </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="password">Receipt Expiration <span class="text-danger">*</span>:</label>
+                                                    <input type="date" class="form-control" name="expiration[]" id="expiration" value="" required>
                                                 </div>
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <div class="input-group mb-2">
-                                                            <div class="input-group-prepend">
-                                                                <div class="input-group-text">Rp.</div>
-                                                            </div>
-                                                            <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label for="password">Description <span class="text-danger">*</span>:</label>
+                                                    <input type="text" class="form-control" name="description[]" id="description" value="" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <div class="input-group mb-2">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text">Rp.</div>
                                                         </div>
+                                                        <input type="text" class="form-control" id="amount" name="amount[]" oninput="formatAmount(this)" placeholder="Total Expenses" value="" required>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

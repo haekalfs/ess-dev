@@ -78,7 +78,7 @@ $(document).ready(function() {
             reimbursementTypeSelect.style.display = 'none';
         }
     });
-    
+
     othersRadio.addEventListener('change', function () {
         if (this.checked) {
             // Disable the "project" select element and set reimbursementType as required
@@ -99,32 +99,32 @@ $(document).ready(function() {
 
     let copyCounter = 0;
 
-    copyButton.addEventListener("click", function (event) {
+    copyButton.addEventListener('click', function(event) {
         event.preventDefault();
 
         if (copyCounter < 6) {
             const clonedForm = originalForm.cloneNode(true);
 
-            // Modify the input's name attributes
+            // Modify the IDs and names of elements inside the cloned form
             const itemInput = clonedForm.querySelector("#receipt");
-            itemInput.name = "receipt[]";
-
             const descriptionInput = clonedForm.querySelector("#description");
-            descriptionInput.name = "description[]";
-
+            const expirationInput = clonedForm.querySelector("#expiration");
             const priceInput = clonedForm.querySelector("#amount");
+
+            itemInput.name = "receipt[]";
+            descriptionInput.name = "description[]";
             priceInput.name = "amount[]";
 
             // Clear input values
             itemInput.value = "";
             descriptionInput.value = "";
+            expirationInput.value = "";
             priceInput.value = "";
 
             // Generate unique IDs for cloned elements
             itemInput.id = `receipt${copyCounter}`;
             descriptionInput.id = `description${copyCounter}`;
             priceInput.id = `amount${copyCounter}`;
-
             // Append the cloned form to the target container
             targetContainer.appendChild(clonedForm);
 
@@ -135,6 +135,15 @@ $(document).ready(function() {
             undoButton.style.display = "block";
         }
     });
+
+    // Update the loadFile function to handle multiple previews
+    const loadFile = function(event) {
+        const output = event.target.nextElementSibling; // Get the next element (image preview) after the input
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+            URL.revokeObjectURL(output.src); // free memory
+        };
+    };
 
     undoButton.addEventListener("click", function (event) {
         event.preventDefault();
@@ -155,9 +164,9 @@ $(document).ready(function() {
 
     form.addEventListener("submit", function (event) {
         event.preventDefault();
-    
+
         const formData = new FormData();
-    
+
         // Append each file input separately
         const fileInputs = document.querySelectorAll('input[type="file"]');
         fileInputs.forEach((fileInput, index) => {
@@ -167,11 +176,12 @@ $(document).ready(function() {
                 formData.append('receipt[]', fileInput.files[0]); // Assuming you want to handle only the first file
             }
         });
-    
+
         // Append other form fields as needed
         formData.append('description', document.getElementById('description').value);
+        formData.append('expiration', document.getElementById('expiration').value);
         formData.append('amount', document.getElementById('amount').value);
-    
+
         fetch("/reimbursement/create/submit", {
             method: "POST",
             body: formData,
@@ -184,15 +194,15 @@ $(document).ready(function() {
                 console.error(error);
             });
     });
-    
+
 
     function formatAmount(input) {
         // Remove non-numeric characters
         let amount = input.value.replace(/[^0-9]/g, '');
-    
+
         // Add thousands separator (dots) using a regular expression
         amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
         // Set the formatted value back to the input
         input.value = amount;
     }
@@ -200,10 +210,10 @@ $(document).ready(function() {
     function formatAmountPrefix(input) {
         // Remove non-numeric characters
         let amount = input.value.replace(/[^0-9]/g, '');
-    
+
         // Add thousands separator (dots) using a regular expression
         amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
         // Format the numeric value with "Rp." prefix
         const formattedValue = `Rp. ${amount}`;
 
@@ -217,3 +227,4 @@ $(document).ready(function() {
         const label = document.getElementById("receipt-label");
         label.innerText = fileName;
     }
+
