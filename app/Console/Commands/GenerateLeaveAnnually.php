@@ -45,7 +45,8 @@ class GenerateLeaveAnnually extends Command
     public function handle()
     {
         date_default_timezone_set("Asia/Jakarta");
-        $users = User::all();
+        $empQoutas = Emp_leave_quota::whereNotNull('expiration')->whereNotNull('active_periode')->pluck('user_id')->toArray();
+        $users = User::whereIn('id', $empQoutas)->get();
         $endMonth = 3; // March
 
         foreach ($users as $user) {
