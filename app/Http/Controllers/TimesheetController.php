@@ -156,6 +156,8 @@ class TimesheetController extends Controller
         // Get the hired_date
         $hired_date = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first();
         $hired_date = new DateTime($hired_date);
+        // Deducting one day from the date
+        $hired_date->modify('-1 day');
 
         $yearH = $hired_date->format('Y');
 
@@ -196,6 +198,8 @@ class TimesheetController extends Controller
 
     public function timesheet_entry($year, $month)
     {
+        // $test = Cache::get('holiday_data');
+        // var_dump($test);
         $year = Crypt::decrypt($year);
         $month = Crypt::decrypt($month);
         $lastUpdate = DB::table('timesheet')

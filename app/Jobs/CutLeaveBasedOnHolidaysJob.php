@@ -78,48 +78,70 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
             }
         }
 
-        $users = User::all();
+        $checkIfAlreadyCut = Leave_request_history::whereYear('created_at', $year)
+            ->where('leave_request_id', 99)
+            ->get();
 
-        foreach ($users as $user) {
-            $checkQuota = Emp_leave_quota::where('user_id', $user->id)
-                ->whereIn('leave_id', [10, 20])
-                ->where('expiration', '>=', date('Y-m-d'))
-                ->orderBy('expiration', 'asc')
-                ->get();
+        if($checkIfAlreadyCut->isEmpty()){
+            $users = User::all();
 
-            if($totalHolidays > 12){ //set the maximum cut to only 8
-                $totalHolidays = 12;
-            }
-            $countQuota = $totalHolidays; // Initialize the count
+            foreach ($users as $user) {
+                $checkQuota = Emp_leave_quota::where('user_id', $user->id)
+                    ->whereIn('leave_id', [10, 20])
+                    ->where('expiration', '>=', date('Y-m-d'))
+                    ->orderBy('expiration', 'asc')
+                    ->get();
 
-            foreach ($checkQuota as $quota) {
-                if ($countQuota > 0) {
-                    $remainingQuota = $quota->quota_left;
-                    $deductedQuota = min($countQuota, $remainingQuota);
-                    $countQuota -= $deductedQuota;
-
-                    $quota->quota_used += $deductedQuota;
-                    $quota->quota_left -= $deductedQuota;
-                    $quota->save();
-
-                    $history = New Leave_request_history;
-                    $history->req_date = date('Y-m-d');
-                    $history->req_by = $user->id;
-                    $history->quota_used = $deductedQuota;
-                    $history->quota_left = $quota->quota_left;
-                    $history->description = "Joint Holidays [Deducted by System]";
-                    $history->leave_id = $quota->leave_id;
-                    $history->emp_leave_quota_id = $quota->id;
-                    $history->requested_days = $totalHolidays;
-                    $history->save();
-                } else {
-                    break; // Stop deducting if countQuota reaches zero
+                if ($totalHolidays > 12) { // Set the maximum cut to only 8
+                    $totalHolidays = 12;
                 }
-                $entry = new Notification_alert;
-                $entry->user_id = $user->id;
-                $entry->message = "Your Leave Balance has been deducted due to Joint Holidays";
-                $entry->importance = 404;
-                $entry->save();
+
+                $countQuota = $totalHolidays; // Initialize the count
+
+                foreach ($checkQuota as $key => $quota) {
+                    if ($countQuota > 0) {
+                        $deductedQuota = min($countQuota, $quota->quota_left);
+                        $countQuota -= $deductedQuota;
+
+                        $quota->quota_used += $deductedQuota;
+                        $quota->quota_left -= $deductedQuota;
+                        $quota->save();
+
+                        // Update the count for the next quota if it's negative
+                        $countQuota = max(0, $countQuota);
+
+                        $history = new Leave_request_history;
+                        $history->req_date = date('Y-m-d');
+                        $history->req_by = $user->id;
+                        $history->quota_used = $deductedQuota;
+                        $history->quota_left = $quota->quota_left;
+                        $history->description = "Joint Holidays [Deducted by System]";
+                        $history->leave_id = $quota->leave_id;
+                        $history->emp_leave_quota_id = $quota->id;
+                        $history->leave_request_id = 99;
+                        $history->requested_days = $totalHolidays;
+                        $history->save();
+
+                        // Check if this is the last quota and countQuota is still not zero
+                        if ($key === count($checkQuota) - 1 && $countQuota > 0) {
+                            $quota->quota_left -= $countQuota;
+                            $quota->save();
+                        }
+                    }
+                }
+
+                $negativeQuotas = Emp_leave_quota::where('user_id', $user->id)
+                    ->whereIn('leave_id', [10, 20])
+                    ->where('quota_left', '<', 0)
+                    ->get();
+
+                foreach ($negativeQuotas as $negativeQuota) {
+                    $entry = new Notification_alert;
+                    $entry->user_id = $user->id;
+                    $entry->message = "Your Leave Balance has gone negative due to Joint Holidays";
+                    $entry->importance = 404;
+                    $entry->save();
+                }
             }
         }
     }

@@ -80,17 +80,31 @@ class GenerateLeaveAnnually extends Command
                         $totalMonths = 12;
                     }
 
+                    if ($checkUsersQuotaAnnual->quota_left < 0) {
+                        $existingNegativeQuota = abs($checkUsersQuotaAnnual->quota_left);
+
+                        // Adjust totalMonths for the new quota based on the existing negative quota
+                        $totalMonths = max(0, $totalMonths - $existingNegativeQuota);
+
+                        // Update the existing quota_left to 0
+                        $checkUsersQuotaAnnual->quota_left = 0;
+                        $checkUsersQuotaAnnual->save();
+                    }
+
                     $lastQuotaExpiration = Carbon::createFromFormat('Y-m-d', $checkUsersQuotaAnnual->expiration); //validation for creating so it does not multiplies
                     if ($lastQuotaExpiration->isCurrentYear() || $lastQuotaExpiration->isNextYear()) {
-                        $empLeave = new Emp_leave_quota;
-                        $empLeave->user_id = $user->id;
-                        $empLeave->quota_used = 0;
-                        $empLeave->leave_id = 10;
-                        $empLeave->once_in_service_years = 0;
-                        $empLeave->active_periode = $startDate->format('Y-m-d');
-                        $empLeave->expiration = $endDate->format('Y-m-d');
-                        $empLeave->quota_left = $totalMonths;
-                        $empLeave->save();
+                        if ($totalMonths > 0) {
+                            // Generate and save the newly added positive quota
+                            $empLeave = new Emp_leave_quota;
+                            $empLeave->user_id = $user->id;
+                            $empLeave->quota_used = 0;
+                            $empLeave->leave_id = 10;
+                            $empLeave->once_in_service_years = 0;
+                            $empLeave->active_periode = $startDate->format('Y-m-d');
+                            $empLeave->expiration = $endDate->format('Y-m-d');
+                            $empLeave->quota_left = $totalMonths;
+                            $empLeave->save();
+                        }
                     }
                 }
 

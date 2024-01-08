@@ -10,7 +10,7 @@ class Reimbursement_item extends Model
     use HasFactory;
     public $incrementing = false;
     protected $table = "reimbursement_items";
-    protected $fillable = ["id", "receipt_file", "file_path", "amount", "description", "status", "approved_status", "reimbursement_id", "created_at", "updated_at"];
+    protected $fillable = ["id", "receipt_file", 'receipt_expiration',"file_path", "amount", "description", "status", "approved_status", "reimbursement_id", "created_at", "updated_at"];
 
     public function request(){
     	return $this->belongsTo('App\Models\Reimbursement', 'reimbursement_id', 'id')

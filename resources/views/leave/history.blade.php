@@ -339,7 +339,7 @@ active
                                                         <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->req_date)->format('d-M-Y') }}</td>
                                                         <td>{{ $lqu->leave->description }}</td>
                                                         <td>{{ $lqu->requested_days }}</td>
-                                                        <td>- {{ $lqu->quota_used }}</td>
+                                                        <td>{{ $lqu->quota_used }}</td>
                                                         <td>{{ $lqu->quota_left }}</td>
                                                         <td>{{ $lqu->description }}</td>
                                                         {{-- <td>{{ $lqu->emp_leave_quota->active_periode }}</td>
