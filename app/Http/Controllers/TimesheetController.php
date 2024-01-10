@@ -72,7 +72,7 @@ class TimesheetController extends Controller
                 ->whereMonth('ts_date', $entry)
                 ->whereYear('ts_date', $currentYear)
                 ->orderBy('updated_at', 'desc')
-                ->whereNull('ts_type')
+                // ->whereNull('ts_type')
                 ->where('ts_user_id', Auth::user()->id)
                 ->first();
             if ($lastUpdate) {
@@ -965,6 +965,7 @@ class TimesheetController extends Controller
 
         $entry->allowance = $countAllowances;
         $entry->incentive = $totalIncentive;
+        $entry->ts_type = 0;
         $entry->save();
 
         return response()->json(['success' => 'Entry updated successfully.']);

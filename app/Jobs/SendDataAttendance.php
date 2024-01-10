@@ -50,6 +50,7 @@ class SendDataAttendance implements ShouldQueue
                             [
                                 'ts_id_date' => str_replace('-', '', $data->date),
                                 'ts_user_id' => $data->fingerId->user_id,
+                                'ts_type' => 1,
                             ],
                             [
                                 'ts_date' => $data->date,
@@ -61,7 +62,6 @@ class SendDataAttendance implements ShouldQueue
                                 'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
                                 'allowance' => 70000,
                                 'incentive' => 0,
-                                'ts_type' => 1,
                                 'ts_status_id' => 10,
                                 // Add more activity columns as needed
                             ]
