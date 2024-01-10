@@ -253,7 +253,7 @@ class ApprovalController extends Controller
         } else {
             $checkTotalRows = DB::table('timesheet_details')
                 ->select('*')
-                ->where('month_periode', $year . $month)
+                ->where('month_periode', $year . intval($month))
                 ->where('user_timesheet', $user_timesheet)
                 ->whereNotIn('ts_status_id', [10, 15])
                 ->count();

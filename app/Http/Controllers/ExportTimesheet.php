@@ -36,7 +36,7 @@ class ExportTimesheet extends Controller
         $checkUserPost = Auth::user()->users_detail->position->id;
 
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [10])) {
+        if (in_array($checkUserPost, [22])) {
             $templatePath = public_path('template_fm.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getSheet(0);
@@ -51,8 +51,10 @@ class ExportTimesheet extends Controller
             $startDate = Carbon::create($Year, $Month, 1)->startOfMonth();
             $endDate = Carbon::create($Year, $Month)->endOfMonth();
 
+            $getUserIds = Timesheet_detail::where('month_periode', $Year.intval($Month))->where('ts_status_id', 29)->pluck('user_timesheet')->toArray();
+
             // Get the Timesheet records between the start and end dates
-            $empActivities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_user_id', 'asc')->orderBy('ts_date', 'asc')->get();
+            $empActivities = Timesheet::where('ts_status_id', 29)->whereIn('ts_user_id', $getUserIds)->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->orderBy('ts_user_id', 'asc')->orderBy('ts_date', 'asc')->get();
             $lastUserData = '';
 
             foreach($empActivities as $data){
