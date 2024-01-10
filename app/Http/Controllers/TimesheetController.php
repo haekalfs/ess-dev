@@ -965,7 +965,7 @@ class TimesheetController extends Controller
 
         $entry->allowance = $countAllowances;
         $entry->incentive = $totalIncentive;
-        $entry->ts_type = 0;
+        $entry->ts_type = NULL;
         $entry->save();
 
         return response()->json(['success' => 'Entry updated successfully.']);

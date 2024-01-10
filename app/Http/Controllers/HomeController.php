@@ -6,9 +6,11 @@ use App\Models\Emp_leave_quota;
 use App\Models\Headline;
 use App\Models\News_feed;
 use App\Models\Notification_alert;
-use Session;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class HomeController extends Controller
 {
@@ -29,6 +31,40 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // Check if the quotes data is cached
+        if (!Cache::has('quotes')) {
+            // Read the contents of the JSON file if not cached
+            $quotesJson = file_get_contents(public_path('quotes.json'));
+
+            // Convert JSON string to an associative array
+            $quotesArray = json_decode($quotesJson, true);
+
+            // Cache the quotes data for 24 hours (adjust the time according to your needs)
+            Cache::put('quotes', $quotesArray, now()->addHours(24));
+        }
+
+        // Get quotes data from the cache
+        $quotesArray = Cache::get('quotes');
+
+        if ($quotesArray && is_array($quotesArray) && count($quotesArray) > 0) {
+            // Select a random quote from the fetched data
+            $randomQuote = $quotesArray[array_rand($quotesArray)];
+
+            // Set the quote and author separately in the session
+            if (isset($randomQuote['quote']) && isset($randomQuote['author'])) {
+                Session::flash('success', 'Daily Qoutes : ' . $randomQuote['quote'] . ' 🎉✨🔢');
+                Session::flash('author', 'Daily Qoutes : ' . $randomQuote['author']);
+            } else {
+                // Handle missing quote or author data from the file
+                Session::flash('success', 'No quote available');
+                Session::flash('author', 'Unknown author');
+            }
+        } else {
+            // Handle empty or invalid data from the file or cache
+            Session::flash('success', 'No quotes available');
+            Session::flash('author', 'Unknown author');
+        }
+
         $newsFeed = News_feed::orderBy('created_at', 'desc')->get();
 
         try {

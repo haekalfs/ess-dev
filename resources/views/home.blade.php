@@ -11,6 +11,13 @@ active
     <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
     {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
 </div>
+@if ($message = Session::get('success'))
+<div class="alert alert-success alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ $message }}</strong>
+</div>
+@endif
+
 @if ($message = Session::get('failed'))
 <div class="alert alert-danger alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
