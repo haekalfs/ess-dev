@@ -91,4 +91,9 @@ class User extends Authenticatable
     {
         return $this->hasOne('App\Models\Timesheet_approver');
     }
+
+    public function export()
+    {
+        return $this->hasOne('App\Models\Setting');
+    }
 }

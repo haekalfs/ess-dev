@@ -15,6 +15,7 @@ use App\Models\Reimbursement_item;
 use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
+use App\Models\Setting;
 use Carbon\Carbon;
 use DateTime;
 use Exception;
@@ -495,8 +496,12 @@ class ReimburseController extends Controller
 	{
         $checkUserPost = Auth::user()->users_detail->position->id;
 
+        //Tabel Setting Export Role
+        $settingExport = Setting::where('id', 2)->first();
+        $checkSettingExport = $settingExport->position_id;
+
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [22])) {
+        if (in_array($checkUserPost, [$checkSettingExport])) {
             $templatePath = public_path('template_reimbursement.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();

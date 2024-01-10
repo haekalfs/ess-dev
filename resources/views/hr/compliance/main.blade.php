@@ -267,6 +267,45 @@ active
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div class="col-md-12">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Export Role</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">Timesheet Export :</label>
+                                                                    <select class="form-control" name="export_ts" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $export_ts->user_id ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Reimburse Export :</label>
+                                                                    <select class="form-control" name="export_reimburse" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $export_reimburse->user_id ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -328,7 +367,7 @@ active
                                                             <input type="number" class="form-control" name="reimburse_approve_closed_date" value="{{ $reimburseCutoffdate->start_date }}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    {{-- <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="comment">New Financial Password :</label>
                                                             <input type="password" class="form-control" id="password" name="password" value="">
@@ -340,7 +379,7 @@ active
                                                             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="">
                                                         </div>
                                                         <span id="passwordError" style="color: red;"></span>
-                                                    </div>
+                                                    </div> --}}
                                                 </div>
                                             </td>
                                         </tr>

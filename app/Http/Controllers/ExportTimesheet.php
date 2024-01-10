@@ -13,6 +13,7 @@ use App\Models\Timesheet_detail;
 use App\Models\Timesheet_workflow;
 use App\Models\User;
 use App\Models\Users_detail;
+use App\Models\Setting;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
@@ -35,8 +36,12 @@ class ExportTimesheet extends Controller
 
         $checkUserPost = Auth::user()->users_detail->position->id;
 
+        //Tabel Setting Export Role
+        $settingExport = Setting::where('id', 1)->first();
+        $checkSettingExport = $settingExport->position_id;
+
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [22])) {
+        if (in_array($checkUserPost, [$checkSettingExport])) {
             $templatePath = public_path('template_fm.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getSheet(0);
