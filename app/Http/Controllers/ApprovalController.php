@@ -32,6 +32,7 @@ use App\Models\User;
 use App\Models\Usr_role;
 use Carbon\Carbon;
 use DateTime;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -496,10 +497,22 @@ class ApprovalController extends Controller
         }
 
         $cachedData = Cache::get('holiday_data');
+        $maxAttempts = 5;
+        $attempts = 0;
 
         if (!$cachedData) {
-            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
-            return redirect(url()->previous());
+            while (!$cachedData && $attempts < $maxAttempts) {
+                try {
+                    $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                    $array = json_decode($json, true);
+                    Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+                    $cachedData = $array;
+                } catch (Exception $e) {
+                    // Handle exception or log error
+                    sleep(5); // Wait for 5 seconds before retrying
+                    $attempts++;
+                }
+            }
         } else {
             $array = $cachedData;
             // Use the cached data
