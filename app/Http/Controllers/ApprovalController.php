@@ -500,27 +500,39 @@ class ApprovalController extends Controller
         $maxAttempts = 5;
         $attempts = 0;
 
-        if (!$cachedData) {
-            while (!$cachedData && $attempts < $maxAttempts) {
-                try {
-                    $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
-                    $array = json_decode($json, true);
-                    Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
-                    $cachedData = $array;
-                } catch (Exception $e) {
-                    // Handle exception or log error
-                    sleep(5); // Wait for 5 seconds before retrying
-                    $attempts++;
+        // Retry with exponential backoff
+        while (!$cachedData && $attempts < $maxAttempts) {
+            try {
+                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                $array = json_decode($json, true);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    // Handle JSON decoding error
+                    throw new Exception('JSON decoding error: ' . json_last_error_msg());
                 }
+
+                Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+                $cachedData = $array;
+            } catch (Exception $e) {
+                // Handle exception or log error
+                $attempts++;
+
+                // Exponential backoff: Wait for 2^$attempts seconds before retrying
+                sleep(pow(2, $attempts));
+
+                continue;
             }
-        } else {
-            $array = $cachedData;
-            // Use the cached data
+        }
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
+            throw new Exception('Unable to retrieve holiday data.');
         }
 
         $formattedDatesHoliday = [];
 
-        foreach ($array as $date => $data) {
+        foreach ($cachedData as $date => $data) {
             // Check if the 'holiday' key is true for the date
             if (isset($data['holiday']) && $data['holiday'] === true) {
                 $formattedDatesHoliday[] = [
