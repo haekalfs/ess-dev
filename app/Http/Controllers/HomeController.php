@@ -6,8 +6,11 @@ use App\Models\Emp_leave_quota;
 use App\Models\Headline;
 use App\Models\News_feed;
 use App\Models\Notification_alert;
+use App\Models\Project_assignment_user;
+use App\Models\Reimbursement;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -52,16 +55,16 @@ class HomeController extends Controller
 
             // Set the quote and author separately in the session
             if (isset($randomQuote['quote']) && isset($randomQuote['author'])) {
-                Session::flash('success', 'Daily Qoutes : ' . $randomQuote['quote'] . ' 🎉✨🔢');
+                Session::flash('quotes', 'Daily Qoutes : ' . $randomQuote['quote'] . ' 🎉✨🔢');
                 Session::flash('author', 'Daily Qoutes : ' . $randomQuote['author']);
             } else {
                 // Handle missing quote or author data from the file
-                Session::flash('success', 'No quote available');
+                Session::flash('quotes', 'No quote available');
                 Session::flash('author', 'Unknown author');
             }
         } else {
             // Handle empty or invalid data from the file or cache
-            Session::flash('success', 'No quotes available');
+            Session::flash('quotes', 'No quotes available');
             Session::flash('author', 'Unknown author');
         }
 
@@ -76,6 +79,29 @@ class HomeController extends Controller
             // Do nothing
         }
 
+        // Get the current year and month
+        $currentYear = now()->year;
+        $currentMonth = now()->month;
+
+        // Set the start date and end date for the current month
+        $startDate = Carbon::create($currentYear, $currentMonth, 1)->startOfMonth();
+        $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+
+        // Fetch data for the current month and user
+        $findAssignment = Project_assignment_user::where('user_id', Auth::id())
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->where('periode_start', '<=', $endDate->format('Y-m-d'))
+                    ->where('periode_end', '>=', $startDate->format('Y-m-d'));
+            })
+            ->get();
+
+        // Count the number of records
+        $countAssignments = $findAssignment->count();
+
+
+
+        $reimbursementCount = Reimbursement::where('f_req_by', Auth::id())->whereYear('created_at', $currentYear)->count();
+
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
             ->where('expiration', '>=', date('Y-m-d'))
@@ -89,11 +115,9 @@ class HomeController extends Controller
             ->where('leave_id', 20)
             ->sum('quota_left');
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
-        if($empLeaveQuotaFiveYearTerm == NULL){
-            $empLeaveQuotaFiveYearTerm = "-";
-        }
+
         $headline = Headline::all();
-       return view('home', compact('empLeaveQuotaAnnual', 'empLeaveQuotaWeekendReplacement', 'headline', 'newsFeed','empLeaveQuotaFiveYearTerm', 'totalQuota'));
+       return view('home', compact('empLeaveQuotaAnnual', 'countAssignments', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
     }
 
     public function notification_indev()

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\ApprovalLeave;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -40,8 +41,12 @@ class NotifyLeaveApproval implements ShouldQueue
     public function handle()
     {
         $notification = new ApprovalLeave($this->employee, $this->userName);
-        Mail::send('mailer.approval_leave', $notification->data(), function ($message) use ($notification) {
+        $getId = Setting::find(3);
+        $ccTo = User::find($getId->user_id);
+
+        Mail::send('mailer.approval_leave', $notification->data(), function ($message) use ($notification, $ccTo) {
             $message->to($notification->emailTo())
+                    ->cc($ccTo->email) // Add CC recipient here
                     ->subject($notification->emailSubject());
         });
     }

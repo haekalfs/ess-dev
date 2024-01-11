@@ -2,16 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\ApprovalTimesheet;
-use App\Mail\TimesheetReminderAllEmp;
-use App\Mail\TimesheetReminderEmployee;
-use App\Models\Timesheet_detail;
-use App\Models\User;
+use App\Jobs\SendTimesheetReminderJob;
 use App\Models\Users_detail;
-use App\Models\Usr_role;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Mail;
 
 class SendTimesheetEntryReminder extends Command
 {
@@ -27,7 +21,7 @@ class SendTimesheetEntryReminder extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Send timesheet entry reminders to employees';
 
     /**
      * Create a new command instance.
@@ -46,37 +40,29 @@ class SendTimesheetEntryReminder extends Command
      */
     public function handle()
     {
-        // $users = User::where('id', 'haekals')->get();
-        $users = Users_detail::groupBy('user_id')->pluck('user_id')->toArray();
-        $usersToRemind = User::whereIn('id', $users)->get();
+        // Retrieve user IDs to be reminded
+        $userIds = Users_detail::groupBy('user_id')->pluck('user_id')->toArray();
 
-        $year = date('Y');
-        $month = date('m');
-        $previousMonth = date('m', strtotime('-1 month'));
-        
-        foreach ($usersToRemind as $employee) {
-            try {
-                $year = date('Y');
-                $month = date('m');
-                $previousMonth = date('m', strtotime('-1 month'));
-        
-                $notification = new TimesheetReminderAllEmp($employee, $year, $previousMonth);
-        
-                Mail::send('mailer.timesheet_entry', $notification->data(), function ($message) use ($notification) {
-                    $message->to($notification->emailTo())
-                            ->subject($notification->emailSubject());
-                });
-            } catch (\Exception $e) {
-                // Handle the error, e.g., log the error message
-                \Log::error('Error sending email: ' . $e->getMessage());
-            }
+        // Get the current date
+        $currentDate = Carbon::now();
+
+        // Calculate the previous month
+        $previousMonth = $currentDate->subMonth();
+
+        // Obtain the previous month and year separately
+        $year = $previousMonth->year;
+        $month = $previousMonth->month;
+
+        // If you need the month in a specific format (e.g., with leading zeros), you can use the format method
+        $monthFormatted = $previousMonth->format('m');
+
+        // Dispatch a job for each user to be reminded
+        foreach ($userIds as $userId) {
+            dispatch(new SendTimesheetReminderJob($userId, $year, $monthFormatted));
         }
-    }
 
-    // public function schedule(Schedule $schedule)
-    // {
-    //     $schedule->command('timesheet:send-reminder')
-    //         ->twiceMonthly(5, 7)
-    //         ->daily();
-    // }
+        $this->info('Timesheet entry reminders dispatched successfully.');
+
+        return 0;
+    }
 }

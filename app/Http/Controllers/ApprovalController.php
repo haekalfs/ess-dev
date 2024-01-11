@@ -34,12 +34,13 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Session;
+use Illuminate\Support\Facades\Session;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -494,6 +495,28 @@ class ApprovalController extends Controller
             }
         }
 
+        $cachedData = Cache::get('holiday_data');
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
+        } else {
+            $array = $cachedData;
+            // Use the cached data
+        }
+
+        $formattedDatesHoliday = [];
+
+        foreach ($array as $date => $data) {
+            // Check if the 'holiday' key is true for the date
+            if (isset($data['holiday']) && $data['holiday'] === true) {
+                $formattedDatesHoliday[] = [
+                    'date' => date('Y-m-d', strtotime($date)),
+                    'summary' => implode(', ', $data['summary'])
+                ];
+            }
+        }
+
         $assignmentNames = $assignment->pluck('project_name')->implode(', ');
         if ($assignment->isEmpty()) {
             $assignmentNames = "None";
@@ -524,7 +547,7 @@ class ApprovalController extends Controller
             ->get()
             ->count();
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate', 'endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
 

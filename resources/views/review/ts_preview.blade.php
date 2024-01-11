@@ -1,8 +1,8 @@
 @extends('layouts.main')
 
-@section('title', 'Timesheet Approval - ESS')
+@section('title', 'Timesheet Preview - ESS')
 
-@section('active-page-approval')
+@section('active-page-timesheet')
 active
 @endsection
 
@@ -57,7 +57,7 @@ active
                             </thead>
                             <tbody>
                                 <tr class="table-sm">
-                                    <td>Nama</td>
+                                    <td>Name</td>
                                     <td>: {{$user_info->name}}</td>
                                 </tr>
                                 <tr class="table-sm">
@@ -142,9 +142,25 @@ active
                 <tbody>
                     <?php $total_work_hours = 0; ?>
                     @for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay())
+                    @php
+                        $currentDate = $date->format('Y-m-d');
+                        $isHoliday = false;
+                        $holidayDescription = '';
+
+                        // Check if the current date is in the array of formatted holiday dates
+                        foreach ($formattedDatesHoliday as $holiday) {
+                            if ($holiday['date'] === $currentDate) {
+                                $isHoliday = true;
+                                $holidayDescription = $holiday['summary'];
+                                break; // Break the loop once found
+                            }
+                        }
+                    @endphp
                         <tr>
                             <td>
                                 @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
+                                    <span class="text-danger">{{ $date->format('D') }}</span>
+                                @elseif ($isHoliday)
                                     <span class="text-danger">{{ $date->format('D') }}</span>
                                 @else
                                     {{ $date->format('D') }}
@@ -154,11 +170,19 @@ active
                                 @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
                                     @if (in_array($date->format('Y-m-d'), $srtDate))
                                         <a href="/timesheet/user/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span class="text-danger">{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-danger"></i></a>
+                                    @elseif ($isHoliday)
+                                        <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @else
                                         <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @endif
                                 @else
-                                    {{ $date->format('d-M-Y') }}
+                                    @if (in_array($date->format('Y-m-d'), $srtDate))
+                                        <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span>{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-primary"></i></a>
+                                    @elseif ($isHoliday)
+                                        <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
+                                    @else
+                                        {{ $date->format('d-M-Y') }}
+                                    @endif
                                 @endif
                             </td>
                             <td>
@@ -168,6 +192,11 @@ active
                                     @foreach ($activities as $timesheet)
                                         @if ($timesheet->ts_date == $date->format('Y-m-d'))
                                             {{ $timesheet->ts_task }}<br>
+                                        @else
+                                            @if ($isHoliday)
+                                                <span class="text-danger">{{ $holidayDescription }}</span>
+                                                <?php break; ?>
+                                            @endif
                                         @endif
                                     @endforeach
                                 @endif
@@ -250,7 +279,8 @@ active
                                             }
                                             $time_diff_hours = gmdate('H', $time_diff_seconds);
                                             $time_diff_minutes = substr(gmdate('i', $time_diff_seconds), 0, 2);
-                                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60)); echo $time_diff_hours.':'.$time_diff_minutes." Hours";
+                                            $total_work_hours += ($time_diff_hours + ($time_diff_minutes / 60));
+                                            echo $time_diff_hours.':'.$time_diff_minutes." Hours";
                                         }
                                     ?>
                                 @endif
@@ -333,7 +363,7 @@ active
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_location }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_mandays }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->approval_status->status_desc }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @else
@@ -341,7 +371,7 @@ active
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_location }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_mandays }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->activity }}</td>
+                                <td style="border-bottom: none; border-top: none;">{{ $wf->approval_status->status_desc }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @endif

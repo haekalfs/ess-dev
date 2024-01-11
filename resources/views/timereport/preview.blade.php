@@ -180,9 +180,25 @@ active
                 <tbody>
                     <?php $total_work_hours = 0; ?>
                     @for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay())
+                    @php
+                        $currentDate = $date->format('Y-m-d');
+                        $isHoliday = false;
+                        $holidayDescription = '';
+
+                        // Check if the current date is in the array of formatted holiday dates
+                        foreach ($formattedDatesHoliday as $holiday) {
+                            if ($holiday['date'] === $currentDate) {
+                                $isHoliday = true;
+                                $holidayDescription = $holiday['summary'];
+                                break; // Break the loop once found
+                            }
+                        }
+                    @endphp
                         <tr>
                             <td>
                                 @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
+                                    <span class="text-danger">{{ $date->format('D') }}</span>
+                                @elseif ($isHoliday)
                                     <span class="text-danger">{{ $date->format('D') }}</span>
                                 @else
                                     {{ $date->format('D') }}
@@ -192,12 +208,16 @@ active
                                 @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
                                     @if (in_array($date->format('Y-m-d'), $srtDate))
                                         <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span class="text-danger">{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-danger"></i></a>
+                                    @elseif ($isHoliday)
+                                        <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @else
                                         <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @endif
                                 @else
                                     @if (in_array($date->format('Y-m-d'), $srtDate))
                                         <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span>{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-primary"></i></a>
+                                    @elseif ($isHoliday)
+                                        <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @else
                                         {{ $date->format('d-M-Y') }}
                                     @endif
@@ -210,6 +230,11 @@ active
                                     @foreach ($activities as $timesheet)
                                         @if ($timesheet->ts_date == $date->format('Y-m-d'))
                                             {{ $timesheet->ts_task }}<br>
+                                        @else
+                                            @if ($isHoliday)
+                                                <span class="text-danger">{{ $holidayDescription }}</span>
+                                                <?php break; ?>
+                                            @endif
                                         @endif
                                     @endforeach
                                 @endif

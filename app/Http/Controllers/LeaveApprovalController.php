@@ -139,7 +139,7 @@ class LeaveApprovalController extends Controller
         $entry->importance = 1;
         $entry->save();
 
-        $employees = User::whereIn('id', $getLeaveReq->req_by)->get();
+        $employees = User::where('id', $getLeaveReq->req_by)->get();
         $userName = Auth::user()->name;
 
         ///only director send the emails

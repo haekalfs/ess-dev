@@ -17,7 +17,9 @@ use DateTime;
 use PDF;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class ReviewController extends Controller
 {
@@ -194,6 +196,28 @@ class ReviewController extends Controller
             }
         }
 
+        $cachedData = Cache::get('holiday_data');
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
+        } else {
+            $array = $cachedData;
+            // Use the cached data
+        }
+
+        $formattedDatesHoliday = [];
+
+        foreach ($array as $date => $data) {
+            // Check if the 'holiday' key is true for the date
+            if (isset($data['holiday']) && $data['holiday'] === true) {
+                $formattedDatesHoliday[] = [
+                    'date' => date('Y-m-d', strtotime($date)),
+                    'summary' => implode(', ', $data['summary'])
+                ];
+            }
+        }
+
         $surat_penugasan = Surat_penugasan::where('user_id', $user_id)->pluck('ts_date')->toArray();
         $srtDate = [];
         foreach ($surat_penugasan as $ts_date_srt) {
@@ -233,7 +257,7 @@ class ReviewController extends Controller
         ->count();
 
         // return response()->json($activities);
-        return view('review.ts_preview', compact('year', 'month','info', 'getTotalDays', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('review.ts_preview', compact('year', 'month','info', 'formattedDatesHoliday', 'getTotalDays', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function print_selected($year, $month, $user_timesheet)

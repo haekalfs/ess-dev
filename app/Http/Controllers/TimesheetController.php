@@ -231,7 +231,12 @@ class TimesheetController extends Controller
                 for ($j = $dayOfWeek - 1; $j >= 0; $j--) {
                     $week[] = $lastDayPrevMonth - $j;
                 }
-                $week[] = $dayCounter;
+                $date = Carbon::create($year, $month, $dayCounter);
+                $holiday = $this->getDayStatus($date);
+                $week[] = [
+                    'day' => $dayCounter,
+                    'status' => $holiday
+                ];
                 $dayCounter++;
                 $firstDayAdded = true;
             }
@@ -1163,6 +1168,28 @@ class TimesheetController extends Controller
             }
         }
 
+        $cachedData = Cache::get('holiday_data');
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
+        } else {
+            $array = $cachedData;
+            // Use the cached data
+        }
+
+        $formattedDatesHoliday = [];
+
+        foreach ($array as $date => $data) {
+            // Check if the 'holiday' key is true for the date
+            if (isset($data['holiday']) && $data['holiday'] === true) {
+                $formattedDatesHoliday[] = [
+                    'date' => date('Y-m-d', strtotime($date)),
+                    'summary' => implode(', ', $data['summary'])
+                ];
+            }
+        }
+
         $surat_penugasan = Surat_penugasan::where('user_id', Auth::user()->id)->pluck('ts_date')->toArray();
         $srtDate = [];
         foreach ($surat_penugasan as $ts_date_srt) {
@@ -1202,7 +1229,7 @@ class TimesheetController extends Controller
         ->get()
         ->count();
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month', 'getTotalDays', 'removeBtnSubmit', 'totalHours', 'info', 'assignmentNames', 'srtDate', 'startDate', 'endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month', 'getTotalDays', 'removeBtnSubmit', 'totalHours', 'info', 'assignmentNames', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
@@ -1714,10 +1741,8 @@ class TimesheetController extends Controller
         if ($validator->passes()) {
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
-            $approvals->whereYear('date_submitted', $Year);
             $approvals->where('month_periode', $Year . intval($Month));
         } else {
-            $approvals->whereYear('date_submitted', $Year);
             $approvals->where('month_periode', $Year . intval($Month));
         }
 

@@ -11,7 +11,7 @@ active
     <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
     {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
 </div>
-@if ($message = Session::get('success'))
+@if ($message = Session::get('quotes'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
     <strong>{{ $message }}</strong>
@@ -89,7 +89,7 @@ $total_years_of_service = $diff->y;
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                             Reimbursements</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">N/a</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $reimbursementCount }}</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -107,7 +107,7 @@ $total_years_of_service = $diff->y;
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                             Project Assigned</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">N/a</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $countAssignments }}</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-network-wired fa-2x text-gray-300"></i>
