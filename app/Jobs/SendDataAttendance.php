@@ -46,26 +46,33 @@ class SendDataAttendance implements ShouldQueue
                         if ($latestTime && $latestTime->greaterThan(Carbon::createFromTime(18, 0, 0))) {
                             $latestTime = Carbon::createFromTime(18, 0, 0); // Set it to 18:00 PM if it's later
                         }
-                        Timesheet::updateOrCreate(
-                            [
-                                'ts_id_date' => str_replace('-', '', $data->date),
-                                'ts_user_id' => $data->fingerId->user_id,
-                                'ts_type' => 1,
-                            ],
-                            [
-                                'ts_date' => $data->date,
-                                'ts_task' => 'HO',
-                                'ts_task_id' => 'HO',
-                                'ts_location' => 'HO',
-                                'ts_activity' => 'HO Activities',
-                                'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
-                                'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
-                                'allowance' => 70000,
-                                'incentive' => 0,
-                                'ts_status_id' => 10,
-                                // Add more activity columns as needed
-                            ]
-                        );
+
+                        $checkDate = Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
+                            ->where('ts_user_id', $data->fingerId->user_id)
+                            ->get();
+
+                        if ($checkDate->isEmpty()) {
+                            Timesheet::updateOrCreate(
+                                [
+                                    'ts_id_date' => str_replace('-', '', $data->date),
+                                    'ts_user_id' => $data->fingerId->user_id,
+                                    'ts_type' => 1,
+                                ],
+                                [
+                                    'ts_date' => $data->date,
+                                    'ts_task' => 'HO',
+                                    'ts_task_id' => 'HO',
+                                    'ts_location' => 'HO',
+                                    'ts_activity' => 'HO Activities',
+                                    'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
+                                    'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
+                                    'allowance' => 70000,
+                                    'incentive' => 0,
+                                    'ts_status_id' => 10,
+                                    // Add more activity columns as needed
+                                ]
+                            );
+                        }
                     }
                 }
                 // stop
