@@ -485,7 +485,7 @@ active
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="password">Identity Expiration :</label>
-                                            <input class="form-control" type="text"  name="usr_id_expiration" value="1-1-2099" placeholder="User Identity Expiration..." >
+                                            <input class="form-control" type="date"  name="usr_id_expiration" value="<?php echo '2999-01-01' ?>" placeholder="User Identity Expiration..." >
                                             @if($errors->has('usr_id_expiration'))
                                                 <div class="text-danger">
                                                     {{ $errors->first('usr_id_expiration')}}
