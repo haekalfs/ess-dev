@@ -104,6 +104,7 @@ class ManagementController extends Controller
         return view('management.roles', ['users' => $usersList, 'access' => $usersAcList, 'pages' => $pages,'r_name' => $r_name, 'us_List' => $u_List, 'Assign' => $Assign]);
     }
 
+    //unused
     public function manage_access()
     {
         $r_name = Role::all();
@@ -151,6 +152,7 @@ class ManagementController extends Controller
         return view('management.manage_access', ['access' => $usersAcList, 'pages' => $pages,'r_name' => $r_name]);
     }
 
+    //unused
     public function manage_roles()
     {
         $r_name = Role::all();
@@ -160,7 +162,7 @@ class ManagementController extends Controller
     public function remove_roles_from_user($id)
     {
         Usr_role::where('user_id', $id)->delete();
-        return redirect('/management/security_&_roles/')->with('failed', 'User Roles has been Removed!');
+        return redirect()->back()->with('failed', 'User Roles has been Removed!');
     }
 
     public function assign_roles(Request $request)
@@ -181,12 +183,13 @@ class ManagementController extends Controller
             'role_id' => $request->inputRole,
             'role_name' => $roleName,
         ]);
-        return redirect('/management/security_&_roles/')->with('success', 'Role Assign successfully');
+        return redirect()->back()->with('success', 'Role Assign successfully');
     }
 
-    public function remove_access($id){
+    public function remove_access($id)
+    {
         User_access::where('page_id', $id)->delete();
-        return redirect('/management/security_&_roles/manage/access')->with('failed', 'All Access has been Removed!');
+        return redirect()->back()->with('failed', 'All Access has been Removed!');
     }
 
     public function grant_access_to_roles(Request $request)
@@ -201,7 +204,7 @@ class ManagementController extends Controller
             'page_id' => $request->inputPage,
             'role_id' => $request->inputRole
         ]);
-        return redirect('/management/security_&_roles/manage/access')->with('success', "Access Granted to $roleName");
+        return redirect()->back()->with('success', "Access Granted to $roleName");
     }
 
     public function add_roles(Request $request)
@@ -221,20 +224,13 @@ class ManagementController extends Controller
             'role' => $request->new_role_code,
             'description' => $request->new_role
         ]);
-        return redirect('/management/security_&_roles/manage/roles')->with('success', 'Role Create successfully');
+        return redirect()->back()->with('success', 'Role Create successfully');
     }
 
     public function delete_roles($id)
     {
         DB::table('roles')->where('id', $id)->delete();
-        return redirect('/management/security_&_roles/manage/roles')->with('failed', 'Role has been deleted!');
-    }
-
-    public function assign_delete($id)
-    {
-        // $users = DB::table('roles')->where('user_id', $user_id)->delete();
-        $Assign = User::where('id', $id);
-        return redirect('/management/security_&_roles/')->with('success', 'Role delete successfully');
+        return redirect()->back()->with('failed', 'Role has been deleted!');
     }
 
     public function test($id)
@@ -297,7 +293,7 @@ class ManagementController extends Controller
     //this should be corrected later
     public function retrieveRoles()
     {
-        $retrieveRoles = Usr_role::where('role_name', 's-user')
+        $retrieveRoles = Usr_role::where('role_name', 'consultant')
             ->distinct('user_id') // Fetch distinct user_id values
             ->pluck('user_id'); // Retrieve only the user_id values
 
