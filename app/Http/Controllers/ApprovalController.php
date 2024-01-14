@@ -166,13 +166,29 @@ class ApprovalController extends Controller
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
                         } else {
-                            //gagal
-                            $approvals = Timesheet_detail::select('*')
+                            $checkApprovalNonPC = Timesheet_detail::select('*')
+                            ->whereIn('priority', [3, 4])
+                            ->whereIn('user_timesheet', $Check)
+                            ->where('month_periode', $Year . intval($Month))
+                            ->groupBy('user_timesheet', 'month_periode')
+                            ->pluck('user_timesheet')
+                            ->toArray();
+                            if(!empty($checkApprovalNonPC)){
+                                $approvals = Timesheet_detail::select('*')
+                                    ->where('RequestTo', Auth::user()->id)
+                                    ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                    ->whereNotIn('user_timesheet', $checkApprovalNonPC)
+                                    ->where('month_periode', $Year . intval($Month))
+                                    ->groupBy('user_timesheet', 'month_periode')
+                                    ->get();
+                            } else {
+                                $approvals = Timesheet_detail::select('*')
                                 ->where('month_periode', $Year . intval($Month))
                                 ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
                                 ->whereNotIn('ts_status_id', [29, 404, 30, 15])
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
+                            }
                         }
                     } else {
                         $approvals = Timesheet_detail::select('*')

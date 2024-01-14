@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\CutLeaveQuotaEmp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,6 +15,7 @@ use App\Models\Notification_alert;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
 class CutLeaveBasedOnHolidaysJob implements ShouldQueue
@@ -142,6 +144,8 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                     $entry->importance = 404;
                     $entry->save();
                 }
+
+                dispatch(new NotifyDeductedLeaveQuota($user, $totalHolidays));
             }
         }
     }

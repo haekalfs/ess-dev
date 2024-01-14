@@ -1,0 +1,852 @@
+{
+    "2023-01-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru 2023"
+        ],
+        "year": 2023
+    },
+    "2023-01-22": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Imlek 2574 Kongzili"
+        ],
+        "year": 2023
+    },
+    "2023-01-23": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Imlek"
+        ],
+        "year": 2023
+    },
+    "2023-02-18": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Isra' Mi'raj Nabi Muhammad SAW"
+        ],
+        "year": 2023
+    },
+    "2023-03-22": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Nyepi 1945"
+        ],
+        "year": 2023
+    },
+    "2023-03-23": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Nyepi"
+        ],
+        "year": 2023
+    },
+    "2023-04-07": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Wafat Isa Al Masih"
+        ],
+        "year": 2023
+    },
+    "2023-04-19": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Fitri"
+        ],
+        "year": 2023
+    },
+    "2023-04-20": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Fitri"
+        ],
+        "year": 2023
+    },
+    "2023-04-21": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Fitri"
+        ],
+        "year": 2023
+    },
+    "2023-04-22": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Idul Fitri 1444 H"
+        ],
+        "year": 2023
+    },
+    "2023-04-23": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Idul Fitri 1444 H"
+        ],
+        "year": 2023
+    },
+    "2023-04-24": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Fitri"
+        ],
+        "year": 2023
+    },
+    "2023-04-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Fitri"
+        ],
+        "year": 2023
+    },
+    "2023-05-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Buruh Internasional"
+        ],
+        "year": 2023
+    },
+    "2023-05-18": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Kenaikan Isa Al Masih"
+        ],
+        "year": 2023
+    },
+    "2023-06-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Lahir Pancasila"
+        ],
+        "year": 2023
+    },
+    "2023-06-02": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Waisak"
+        ],
+        "year": 2023
+    },
+    "2023-06-04": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Waisak 2567"
+        ],
+        "year": 2023
+    },
+    "2023-06-28": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Adha"
+        ],
+        "year": 2023
+    },
+    "2023-06-29": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul Adha 1444 H"
+        ],
+        "year": 2023
+    },
+    "2023-06-30": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Idul Adha"
+        ],
+        "year": 2023
+    },
+    "2023-07-19": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Islam 1445 H"
+        ],
+        "year": 2023
+    },
+    "2023-08-17": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Kemerdekaan Republik Indonesia ke 78"
+        ],
+        "year": 2023
+    },
+    "2023-09-28": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Maulid Nabi Muhammad SAW"
+        ],
+        "year": 2023
+    },
+    "2023-12-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Natal"
+        ],
+        "year": 2023
+    },
+    "2023-12-26": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Natal"
+        ],
+        "year": 2023
+    },
+    "2022-01-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru 2022"
+        ],
+        "year": 2022
+    },
+    "2022-02-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Imlek 2573 Kongzili"
+        ],
+        "year": 2022
+    },
+    "2022-02-28": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Isra' Mi'raj Nabi Muhammad SAW"
+        ],
+        "year": 2022
+    },
+    "2022-03-03": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Nyepi 1944"
+        ],
+        "year": 2022
+    },
+    "2022-04-15": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Wafat Isa Al Masih"
+        ],
+        "year": 2022
+    },
+    "2022-04-29": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Hari Raya Idul Fitri 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-05-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Buruh Internasional"
+        ],
+        "year": 2022
+    },
+    "2022-05-02": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Idul Fitri 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-05-03": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Idul Fitri 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-05-04": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Hari Raya Idul Fitri 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-05-05": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Hari Raya Idul Fitri 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-05-06": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Hari Raya Idul Fitri 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-05-16": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Waisak 2566"
+        ],
+        "year": 2022
+    },
+    "2022-05-26": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Kenaikan Isa Al Masih"
+        ],
+        "year": 2022
+    },
+    "2022-06-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Lahir Pancasila"
+        ],
+        "year": 2022
+    },
+    "2022-07-09": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul Adha 1443 H"
+        ],
+        "year": 2022
+    },
+    "2022-07-30": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Islam 1444 H"
+        ],
+        "year": 2022
+    },
+    "2022-08-17": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Kemerdekaan Republik Indonesia"
+        ],
+        "year": 2022
+    },
+    "2022-10-08": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Maulid Nabi Muhammad SAW"
+        ],
+        "year": 2022
+    },
+    "2022-12-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Natal"
+        ],
+        "year": 2022
+    },
+    "2021-01-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru 2021 Masehi"
+        ],
+        "year": 2021
+    },
+    "2021-02-12": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Imlek 2572 Kongzili"
+        ],
+        "year": 2021
+    },
+    "2021-03-11": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Isra' Mi'raj Nabi Muhammad SAW"
+        ],
+        "year": 2021
+    },
+    "2021-03-14": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Suci Nyepi Tahun Baru Saka 1943"
+        ],
+        "year": 2021
+    },
+    "2021-04-02": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Wafat Isa Al Masih"
+        ],
+        "year": 2021
+    },
+    "2021-05-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Buruh Internasional"
+        ],
+        "year": 2021
+    },
+    "2021-05-12": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Hari Raya Idul Fitri 1442 Hijriah"
+        ],
+        "year": 2021
+    },
+    "2021-05-13": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul fitri 1442 Hijriah"
+        ],
+        "year": 2021
+    },
+    "2021-05-14": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul fitri 1442 Hijriah"
+        ],
+        "year": 2021
+    },
+    "2021-05-26": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Waisak 2565"
+        ],
+        "year": 2021
+    },
+    "2021-06-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Lahir Pancasila"
+        ],
+        "year": 2021
+    },
+    "2021-07-20": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul Adha 1442 Hijriah"
+        ],
+        "year": 2021
+    },
+    "2021-08-11": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Islam 1443 Hijriah"
+        ],
+        "year": 2021
+    },
+    "2021-08-17": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Kemerdekaan Republik Indonesia"
+        ],
+        "year": 2021
+    },
+    "2021-10-20": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Maulid Nabi Muhammad SAW"
+        ],
+        "year": 2021
+    },
+    "2021-12-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Natal"
+        ],
+        "year": 2021
+    },
+    "2020-01-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru 2020  Masehi"
+        ],
+        "year": 2020
+    },
+    "2020-01-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Imlek 2571 Kongzili"
+        ],
+        "year": 2020
+    },
+    "2020-03-22": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Isra Mi'raj Nabi Muhammad SAW"
+        ],
+        "year": 2020
+    },
+    "2020-03-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Nyepi Tahun Baru Saka 1942"
+        ],
+        "year": 2020
+    },
+    "2020-04-10": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Wafat Isa Al Masih"
+        ],
+        "year": 2020
+    },
+    "2020-05-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Buruh Internasional"
+        ],
+        "year": 2020
+    },
+    "2020-05-07": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Waisak 2564"
+        ],
+        "year": 2020
+    },
+    "2020-05-21": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Kenaikan Isa Al Masih"
+        ],
+        "year": 2020
+    },
+    "2020-05-24": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul Fitri 1441 Hijriyah"
+        ],
+        "year": 2020
+    },
+    "2020-05-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul Fitri 1441 Hijriyah"
+        ],
+        "year": 2020
+    },
+    "2020-06-01": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Lahir Pancasila"
+        ],
+        "year": 2020
+    },
+    "2020-07-31": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Idul Adha 1441 Hijriyah"
+        ],
+        "year": 2020
+    },
+    "2020-08-17": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Kemerdekaan RI ke 75"
+        ],
+        "year": 2020
+    },
+    "2020-08-20": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Tahun Baru Islam 1442 Hijriyah"
+        ],
+        "year": 2020
+    },
+    "2020-08-21": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Tahun Baru Islam 1442 Hijriyah"
+        ],
+        "year": 2020
+    },
+    "2020-10-28": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Maulid Nabi Muhammad SAW"
+        ],
+        "year": 2020
+    },
+    "2020-10-29": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Maulid Nabi Muhammad SAW"
+        ],
+        "year": 2020
+    },
+    "2020-10-30": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Maulid Nabi Muhammad SAW"
+        ],
+        "year": 2020
+    },
+    "2020-12-09": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Pilkada 2020"
+        ],
+        "year": 2020
+    },
+    "2020-12-24": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Cuti Bersama Hari Raya Natal"
+        ],
+        "year": 2020
+    },
+    "2020-12-25": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Hari Raya Natal"
+        ],
+        "year": 2020
+    },
+    "2020-12-31": {
+        "description": [
+            "Hari libur nasional"
+        ],
+        "holiday": true,
+        "summary": [
+            "Pengganti Cuti Bersama Hari Raya Idul Fitri 1441 Hijriyah"
+        ],
+        "year": 2020
+    }
+}

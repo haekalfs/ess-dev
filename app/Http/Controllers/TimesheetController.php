@@ -108,21 +108,45 @@ class TimesheetController extends Controller
 
     public function getDayStatus($date)
     {
+        $json = null;
+        $array = null;
         $cachedData = Cache::get('holiday_data');
-        $maxAttempts = 15;
+        $maxAttempts = 5;
         $attempts = 0;
+
+        // Check if the year of the given date is the current year
+        $dateTime = new DateTime($date);
+        $yearToCheck = $dateTime->format('Y');
+        $isCurrentYear = ($yearToCheck == date('Y'));
 
         while (!$cachedData && $attempts < $maxAttempts) {
             try {
-                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                if (!$isCurrentYear) {
+                    // Check if the local file exists before reading it
+                    $localFilePath = public_path("holidays_indonesia.json");
+                    if (file_exists($localFilePath)) {
+                        $json = file_get_contents($localFilePath);
+                    } else {
+                        $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                    }
+                } else {
+                    // Use the API to get the data
+                    $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                }
+
                 $array = json_decode($json, true);
                 Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
                 $cachedData = $array;
             } catch (Exception $e) {
                 // Handle exception or log error
-                sleep(5); // Wait for 5 seconds before retrying
+                sleep(1); // Wait for 5 seconds before retrying
                 $attempts++;
             }
+        }
+
+        if (!$isCurrentYear) {
+            // Forget the cache if the year is not the current year
+            Cache::forget('holiday_data');
         }
 
         if (!$cachedData) {
@@ -1707,7 +1731,25 @@ class TimesheetController extends Controller
         // Get the Timesheet records between the start and end dates
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('ts_date', 'asc')->get();
 
-        $pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'), ['timesheet' => $activities,  'user_info' => $user_info,]);
+        $userId = Auth::user()->id;
+
+        $subquery = DB::table('timesheet')
+            ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(incentive AS DECIMAL(10, 2)) AS incentive'), 'ts_task_id', 'ts_id_date', 'allowance')
+            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(incentive AS DECIMAL(10, 2)) DESC) AS rn')
+            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->where('ts_user_id', $userId)
+            ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id');
+
+        $sql = '(' . $subquery->toSql() . ') as subquery';
+
+        $results = DB::table(DB::raw($sql))
+            ->mergeBindings($subquery)
+            ->select('ts_task', 'ts_location', 'ts_user_id', 'incentive as incentive', 'ts_task_id', 'allowance as max_allowance', DB::raw('COUNT(*) as total_rows'))
+            ->where('rn', 1)
+            ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id')
+            ->get();
+
+        $pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'), ['timesheet' => $activities, 'results' => $results,  'user_info' => $user_info]);
         return $pdf->download('timesheet - ' . $year . $month . '.pdf');
     }
 
@@ -1724,10 +1766,27 @@ class TimesheetController extends Controller
 
         $user_info_details = Users_detail::where('user_id', $user_timesheet)->first();
         $user_info_emp_id = $user_info_details->employee_id;
+
+        $subquery = DB::table('timesheet')
+            ->select('ts_task', 'ts_location', 'ts_user_id', DB::raw('CAST(incentive AS DECIMAL(10, 2)) AS incentive'), 'ts_task_id', 'ts_id_date', 'allowance')
+            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY ts_id_date ORDER BY CAST(incentive AS DECIMAL(10, 2)) DESC) AS rn')
+            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->where('ts_user_id', $user_timesheet)
+            ->groupBy('ts_id_date', 'ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id');
+
+        $sql = '(' . $subquery->toSql() . ') as subquery';
+
+        $results = DB::table(DB::raw($sql))
+            ->mergeBindings($subquery)
+            ->select('ts_task', 'ts_location', 'ts_user_id', 'incentive as incentive', 'ts_task_id', 'allowance as max_allowance', DB::raw('COUNT(*) as total_rows'))
+            ->where('rn', 1)
+            ->groupBy('ts_task', 'ts_location', 'ts_user_id', 'incentive', 'ts_task_id')
+            ->get();
+
         // Get the Timesheet records between the start and end dates
         $activities = Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', $user_timesheet)->orderBy('ts_date', 'asc')->get();
 
-        $pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'), ['timesheet' => $activities,  'user_info' => $user_info,]);
+        $pdf = PDF::loadview('timereport.timereport_pdf', compact('year', 'month', 'user_info_emp_id'), ['timesheet' => $activities, 'results' => $results, 'user_info' => $user_info]);
         return $pdf->download('timesheet #' . $user_timesheet . '-' . $year . $month . '.pdf');
     }
 

@@ -94,11 +94,32 @@
         </tbody>
 
 	</table>
-    <table class="table table-bordered">
+    <table class="table table-borderless">
         <tbody>
             <tr class="table-sm">
-                <td class="m-0 font-weight-bold text-danger" width="600px">Total Workhours (Exclude Break Time)</td>
-                <td class="text-center"><?php echo intval($total_work_hours); ?> Hours</td>
+                <td class="m-0 font-weight-bold" width="270px">
+                    <div>Total Workhours (Exclude Break Time)</div>
+                    <div>Total Mandays</div>
+                    <div>Summary</div>
+                </td>
+                <td>
+                    <div>: <?php echo intval($total_work_hours); ?> Hours</div>
+                    @foreach($results as $result)
+                        @php
+                            $array[] = $result->total_rows;
+                        @endphp
+                    @endforeach
+                    @php
+                        $sum = array_sum($array);
+                        echo ': '.$sum.' Days';
+                    @endphp
+                    @foreach($results as $result)
+                        <div>: {{ $result->ts_task }} : {{ $result->total_rows }} Days</div>
+                        @php
+                            $array[] = $result->total_rows;
+                        @endphp
+                    @endforeach
+                </td>
             </tr>
         </tbody>
     </table>

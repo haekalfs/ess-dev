@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\File;
+
+use App\Http\Controllers\HolidayController;
 use App\Http\Middleware\CheckRole;
 
 /*
@@ -27,6 +29,7 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['suspicious'])->group(function () {
+    Route::get('/fetch-and-format-holidays', [HolidayController::class, 'fetchAndFormatHolidays']);
 
     Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->name('status.read');
 
@@ -198,7 +201,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/manage/roles/add_roles', 'ManagementController@add_roles');
         Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles');
-        Route::get('/manage/roles/assign_delete/{id}', 'ManagementController@assign_delete');
 
     //Employees Database
     Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database');
