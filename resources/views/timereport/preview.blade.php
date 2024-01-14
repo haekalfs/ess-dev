@@ -215,7 +215,7 @@ active
                                     @endif
                                 @else
                                     @if (in_array($date->format('Y-m-d'), $srtDate))
-                                        <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span>{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-primary"></i></a>
+                                        <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>/{{Auth::id()}}"><span>{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-primary"></i></a>
                                     @elseif ($isHoliday)
                                         <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @else
