@@ -1844,9 +1844,9 @@ class TimesheetController extends Controller
         return redirect()->back()->with('success', "An email has been sent!");
     }
 
-    public function download_surat($timesheet_id)
+    public function download_surat($timesheet_id,$userId)
     {
-        $getFile = Surat_penugasan::where('timesheet_id', $timesheet_id)->first();
+        $getFile = Surat_penugasan::where('timesheet_id', $timesheet_id)->where('user_id', $userId)->first();
         $filePath = public_path($getFile->file_path);
 
         // Check if the file exists

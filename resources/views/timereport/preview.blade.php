@@ -207,7 +207,7 @@ active
                             <td>
                                 @if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6)
                                     @if (in_array($date->format('Y-m-d'), $srtDate))
-                                        <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>"><span class="text-danger">{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-danger"></i></a>
+                                        <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>/{{Auth::id()}}"><span class="text-danger">{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-danger"></i></a>
                                     @elseif ($isHoliday)
                                         <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                     @else

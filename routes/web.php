@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
         //Preview
     Route::get('/timesheet/entry/preview/{year}/{month}', 'TimesheetController@preview')->name('preview.timesheet');
     Route::get('/timesheet/entry/preview/print/{year}/{month}', 'TimesheetController@print');
-    Route::get('/timesheet/entry/preview/surat_penugasan/download/{timesheet_id}', 'TimesheetController@download_surat');
+    Route::get('/timesheet/entry/preview/surat_penugasan/download/{timesheet_id}/{id}', 'TimesheetController@download_surat');
         //submit
     Route::get('/timesheet/entry/submit/{year}/{month}', 'TimesheetController@submit_timesheet')->name('submit-timesheet');
     Route::get('/timesheet/entry/cancel_submit/{year}/{month}', 'TimesheetController@cancel_submit_timesheet')->name('submit-timesheet');
