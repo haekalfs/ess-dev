@@ -167,9 +167,7 @@ class ManagementController extends Controller
 
     public function assign_roles(Request $request)
     {
-        $lastId = Usr_role::orderBy('id', 'desc')->first();
-        $nextId = ($lastId) ? $lastId->id + 1 : 1;
-
+        
         $this->validate($request, [
             'inputUser' => 'required',
             'inputRole' => 'required'
@@ -178,7 +176,6 @@ class ManagementController extends Controller
         $roleName = Role::where('id', $request->inputRole)->pluck('role')->first();
 
         Usr_role::create([
-            'id' => $nextId,
             'user_id' => $request->inputUser,
             'role_id' => $request->inputRole,
             'role_name' => $roleName,
