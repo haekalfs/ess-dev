@@ -1192,39 +1192,60 @@ class TimesheetController extends Controller
             }
         }
 
-        $cachedData = Cache::get('holiday_data');
-        $maxAttempts = 5;
-        $attempts = 0;
+        $json = null;
+$array = null;
+$cachedData = Cache::get('holiday_data');
+$maxAttempts = 5;
+$attempts = 0;
 
-        // Retry with exponential backoff
-        while (!$cachedData && $attempts < $maxAttempts) {
-            try {
+// Check if the year of the given date is the current year
+$dateTime = new DateTime($date);
+$yearToCheck = $dateTime->format('Y');
+$isCurrentYear = ($yearToCheck == date('Y'));
+
+while (!$cachedData && $attempts < $maxAttempts) {
+    try {
+        if (!$isCurrentYear) {
+            // Check if the local file exists before reading it
+            $localFilePath = public_path("holidays_indonesia.json");
+            if (file_exists($localFilePath)) {
+                $json = file_get_contents($localFilePath);
+            } else {
                 $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
-                $array = json_decode($json, true);
-
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    // Handle JSON decoding error
-                    throw new Exception('JSON decoding error: ' . json_last_error_msg());
-                }
-
-                Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
-                $cachedData = $array;
-            } catch (Exception $e) {
-                // Handle exception or log error
-                $attempts++;
-
-                // Exponential backoff: Wait for 2^$attempts seconds before retrying
-                sleep(pow(2, $attempts));
-
-                continue;
             }
+        } else {
+            // Use the API to get the data
+            $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
         }
 
-        if (!$cachedData) {
-            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
-            return redirect(url()->previous());
-            throw new Exception('Unable to retrieve holiday data.');
+        $array = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Handle JSON decoding error
+            throw new Exception('JSON decoding error: ' . json_last_error_msg());
         }
+
+        Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+        $cachedData = $array;
+    } catch (Exception $e) {
+        // Handle exception or log error
+        sleep(1); // Wait for 1 second before retrying
+        $attempts++;
+    }
+}
+
+if (!$isCurrentYear) {
+    // Forget the cache if the year is not the current year
+    Cache::forget('holiday_data');
+}
+
+if (!$cachedData) {
+    Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+    return redirect(url()->previous());
+} else {
+    $array = $cachedData;
+    // Use the cached data
+}
 
         $formattedDatesHoliday = [];
 
@@ -1663,9 +1684,7 @@ class TimesheetController extends Controller
             }
             $totalHoursWithoutDays = intval($total_work_hours) - $getTotalDays;
             $totalMinutes = ($total_work_hours - intval($total_work_hours)) * 60; // Extract minutes
-            echo $totalHoursWithoutDays." Hours ".intval($totalMinutes)." Minutes";
             $percentage = (($totalHoursWithoutDays + $totalMinutes / 60) / $totalHours) * 100;
-            echo "(".intval($percentage)."%)";
             $final = $totalHoursWithoutDays." Hours ". "(".intval($percentage)."%)";
 
             foreach ($empApproval as $test) {
@@ -1695,6 +1714,10 @@ class TimesheetController extends Controller
             Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '15']);
 
             $ts_date_desc = date("F", mktime(0, 0, 0, $month, 1)) . ' ' . $year;
+
+            if($total_work_hours < $totalHours){
+                Session::flash('failed', "Insufficient Total Work Hours This Month! We've noticed that your total work hours for the current month are below the required threshold. Please be informed that this may lead to a deduction in your allowances. To ensure you receive your full allowances, make sure to meet the required number of work hours. If you have any concerns or questions, please reach out to your supervisor or the HR department.");
+            }
             // return response()->json($activities);
             Session::flash('success', "Your Timereport $ts_date_desc has been submitted!");
             return redirect()->back();

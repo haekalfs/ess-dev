@@ -50,9 +50,9 @@ active
     <div class="card-body">
         <div class="tab-content" id="pageTabContent">
             <div class="tab-pane fade show active" id="page1" role="tabpanel" aria-labelledby="page1-tab">
-                <form method="post">
+                <form method="post" action="/manage/roles/assign_roles">
                     @csrf
-                    <div class="col-md-12" action="/manage/roles/assign_roles">
+                    <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-5">
                                 <div class="form-group">
