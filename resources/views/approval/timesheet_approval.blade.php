@@ -119,7 +119,7 @@ active
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->date_submitted }}</td>
                                             <td style="border-bottom: none; border-top: none;">{{ date("F", mktime(0, 0, 0, substr($approval->month_periode, 4, 2), 1)) }} - {{ substr($approval->month_periode, 0, 4) }}</td>
                                             <td  style="border-bottom: none; border-top: none;" class="action text-center">
-                                                <a href="/approval/timesheet/preview/{{$approval->user_timesheet}}/{{ substr($approval->month_periode, 0, 4) }}/{{ substr($approval->month_periode, 4, 2) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Preview</a>
+                                                <a href="/approval/timesheet/preview/{{ Crypt::encrypt($approval->user_timesheet) }}/{{ Crypt::encrypt(substr($approval->month_periode, 0, 4)) }}/{{ Crypt::encrypt(substr($approval->month_periode, 4, 2)) }}" class="btn btn-secondary btn-sm" style="margin-left: 3%;"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Preview</a>
                                             </td>
                                             @endif
                                         </tr>

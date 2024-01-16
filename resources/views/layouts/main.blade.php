@@ -457,7 +457,7 @@
                                         </a>
                                     @endforeach
                                 @endif
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Showing latest notification of 7 days</a>
+                                <a class="dropdown-item text-center small text-gray-500" href="/notification-center/{{ Crypt::encrypt(Auth::id()) }}">Show All Notifications</a>
                             </div>
                         </li>
 

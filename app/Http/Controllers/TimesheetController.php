@@ -1193,59 +1193,59 @@ class TimesheetController extends Controller
         }
 
         $json = null;
-$array = null;
-$cachedData = Cache::get('holiday_data');
-$maxAttempts = 5;
-$attempts = 0;
+        $array = null;
+        $cachedData = Cache::get('holiday_data');
+        $maxAttempts = 5;
+        $attempts = 0;
 
-// Check if the year of the given date is the current year
-$dateTime = new DateTime($date);
-$yearToCheck = $dateTime->format('Y');
-$isCurrentYear = ($yearToCheck == date('Y'));
+        // Check if the year of the given date is the current year
+        $dateTime = new DateTime($date);
+        $yearToCheck = $dateTime->format('Y');
+        $isCurrentYear = ($yearToCheck == date('Y'));
 
-while (!$cachedData && $attempts < $maxAttempts) {
-    try {
-        if (!$isCurrentYear) {
-            // Check if the local file exists before reading it
-            $localFilePath = public_path("holidays_indonesia.json");
-            if (file_exists($localFilePath)) {
-                $json = file_get_contents($localFilePath);
-            } else {
-                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+        while (!$cachedData && $attempts < $maxAttempts) {
+            try {
+                if (!$isCurrentYear) {
+                    // Check if the local file exists before reading it
+                    $localFilePath = public_path("holidays_indonesia.json");
+                    if (file_exists($localFilePath)) {
+                        $json = file_get_contents($localFilePath);
+                    } else {
+                        $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                    }
+                } else {
+                    // Use the API to get the data
+                    $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                }
+
+                $array = json_decode($json, true);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    // Handle JSON decoding error
+                    throw new Exception('JSON decoding error: ' . json_last_error_msg());
+                }
+
+                Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+                $cachedData = $array;
+            } catch (Exception $e) {
+                // Handle exception or log error
+                sleep(1); // Wait for 1 second before retrying
+                $attempts++;
             }
+        }
+
+        if (!$isCurrentYear) {
+            // Forget the cache if the year is not the current year
+            Cache::forget('holiday_data');
+        }
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
         } else {
-            // Use the API to get the data
-            $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+            $array = $cachedData;
+            // Use the cached data
         }
-
-        $array = json_decode($json, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            // Handle JSON decoding error
-            throw new Exception('JSON decoding error: ' . json_last_error_msg());
-        }
-
-        Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
-        $cachedData = $array;
-    } catch (Exception $e) {
-        // Handle exception or log error
-        sleep(1); // Wait for 1 second before retrying
-        $attempts++;
-    }
-}
-
-if (!$isCurrentYear) {
-    // Forget the cache if the year is not the current year
-    Cache::forget('holiday_data');
-}
-
-if (!$cachedData) {
-    Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
-    return redirect(url()->previous());
-} else {
-    $array = $cachedData;
-    // Use the cached data
-}
 
         $formattedDatesHoliday = [];
 

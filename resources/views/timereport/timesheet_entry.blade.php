@@ -179,8 +179,8 @@ active
                                             @if ($status === "red")
                                                 <td data-toggle="modal" class="clickable text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div><br></td>
                                             @elseif ($status === 2907)
-                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    {{-- <a><i class="fas fa-plane-departure fa-sm"></i></a> --}}
+                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
+                                                    <a><i class="fas fa-plane-departure fa-sm"></i></a>
                                                 </td>
                                             @elseif ($status === 404)
                                             <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div>

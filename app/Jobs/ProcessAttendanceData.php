@@ -74,7 +74,7 @@ class ProcessAttendanceData implements ShouldQueue
                 $time = isset($dateTimeParts[1]) ? $dateTimeParts[1] : null;
 
                 // Check if the date matches today or yesterday
-                if ($date === $currentDate || $date === $yesterdayDate || $date === $threeDaysDate) {
+                if ($date) {
                     $checkinout = new Checkinout();
                     $checkinout->user_id = $PIN;
                     $checkinout->date = $date;

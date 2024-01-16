@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 
 
@@ -28,8 +29,8 @@ class UserController extends Controller
         $data = User::all();
         return view('manage.users', ['data' => $data]);
     }
-    
-    public function tambah()
+
+    public function user_creation()
     {
         $dep_data = Department::all();
         $pos_data = Position::all();
@@ -75,7 +76,7 @@ class UserController extends Controller
             'employee_id'=> 'required',
             'profile_pic' => 'sometimes|file|image|mimes:jpeg,png,jpg|max:2048'
             ]);
-        
+
         $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
         $nextId = intval(substr($lastId, 4)) + 1;
         $hash_pwd = Hash::make($request->password);
@@ -92,7 +93,7 @@ class UserController extends Controller
             $nama_file_profile = null;
         }
 
-        
+
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
@@ -110,7 +111,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => $hash_pwd,
     	]);
- 
+
         Users_detail::create([
             'id' => $nextId,
             'user_id' => $request->usr_id,
@@ -160,7 +161,7 @@ class UserController extends Controller
 
         // Mendapatkan tahun setelah 1 tahun
         $newYear = $newDate->year;
-        
+
         $emp_leave = new Emp_leave_quota();
         $emp_leave->user_id = $request->usr_id;
         $emp_leave->leave_id = 10;
@@ -200,10 +201,11 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', "You've Deleted User $id Successfully");
     }
-    
+
 
     public function edit($id)
     {
+        $id = Crypt::decrypt($id);
         $user = User::with('users_detail')->findOrFail($id);
         $dep_data = Department::all();
         $pos_data = Position::all();
@@ -233,10 +235,10 @@ class UserController extends Controller
         }, $banks);
         return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'bankNames' => $bankNames]);
     }
-    
+
     public function update(Request $request, $id)
     {
-        
+
         $user = User::find($id);
         // $this->validate($request,[
         //     'name' => 'required',
@@ -270,7 +272,7 @@ class UserController extends Controller
 
             // Memindahkan file profil yang baru diunggah
             $profile_file->storeAs('public/' . $tujuan_upload_profile, $nama_file_profile);
-        
+
         } elseif ($user->users_detail->profile_pic) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $nama_file_profile = $user->users_detail->profile_pic;
@@ -282,7 +284,7 @@ class UserController extends Controller
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
-            
+
             $nama_file_cv = $request->usr_id . "." . $cv_file->getClientOriginalExtension();
             $tujuan_upload_cv = 'cv';
 

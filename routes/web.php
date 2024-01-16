@@ -29,8 +29,14 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['suspicious'])->group(function () {
+    //Commands
     Route::get('/fetch-and-format-holidays', [HolidayController::class, 'fetchAndFormatHolidays']);
+    Route::get('/cut-leave-based-on-joint-holidays', 'CommandsController@cut_leave_based_on_joint_holidays');
+    Route::get('/send-timesheet-entry-reminder', 'CommandsController@send_reminder_timesheet_entry');
+    Route::get('/send-timesheet-approval-reminder', 'CommandsController@send_approval_timesheet_entry');
 
+    //Notification Center
+    Route::get('/notification-center/{id}', 'NotificationsController@index');
     Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->name('status.read');
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -170,7 +176,7 @@ Route::middleware(['auth'])->group(function () {
 
     //manage users
     Route::get('/manage/users', 'UserController@index')->middleware(['checkRole:admin,manager']);
-    Route::get('/users/tambah', 'UserController@tambah')->middleware(['checkRole:admin,manager']);
+    Route::get('/manage/users/new-user-registration', 'UserController@user_creation')->middleware(['checkRole:admin,manager']);
     Route::post('/users/store', 'UserController@store')->middleware(['checkRole:admin,manager']);
     Route::get('/users/edit/{id}', 'UserController@edit');
     Route::put('/users/update/{id}', 'UserController@update');

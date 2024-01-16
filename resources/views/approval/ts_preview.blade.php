@@ -243,15 +243,26 @@ active
                             <td>
                                 @if (in_array($date->format('Y-m-d'), $formattedDates))
                                     <span><i>Leave Day</i></span>
+                                @elseif ($isHoliday)
+                                    @php
+                                        $timesheetFound = false;
+                                    @endphp
+                                    @foreach ($activities as $timesheet)
+                                        @if ($timesheet->ts_date == $date->format('Y-m-d'))
+                                            {{ $timesheet->ts_task }}<br>
+                                            @php
+                                                $timesheetFound = true;
+                                                break; // Break out of the loop once a matching timesheet is found
+                                            @endphp
+                                        @endif
+                                    @endforeach
+                                    @unless($timesheetFound)
+                                        <span class="text-danger">{{ $holidayDescription }}</span>
+                                    @endunless
                                 @else
                                     @foreach ($activities as $timesheet)
                                         @if ($timesheet->ts_date == $date->format('Y-m-d'))
                                             {{ $timesheet->ts_task }}<br>
-                                        @else
-                                            @if ($isHoliday)
-                                                <span class="text-danger">{{ $holidayDescription }}</span>
-                                                <?php break; ?>
-                                            @endif
                                         @endif
                                     @endforeach
                                 @endif

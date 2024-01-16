@@ -434,6 +434,9 @@ class ApprovalController extends Controller
 
     public function ts_preview($user_id, $year, $month)
     {
+        $user_id = Crypt::decrypt($user_id);
+        $year = Crypt::decrypt($year);
+        $month = Crypt::decrypt($month);
         // $year = Crypt::decrypt($year);
         // $month = Crypt::decrypt($month);
         // Set the default time zone to Jakarta
@@ -512,14 +515,32 @@ class ApprovalController extends Controller
             }
         }
 
+        $json = null;
+        $array = null;
         $cachedData = Cache::get('holiday_data');
         $maxAttempts = 5;
         $attempts = 0;
 
-        // Retry with exponential backoff
+        // Check if the year of the given date is the current year
+        $dateTime = new DateTime($startDate);
+        $yearToCheck = $dateTime->format('Y');
+        $isCurrentYear = ($yearToCheck == date('Y'));
+
         while (!$cachedData && $attempts < $maxAttempts) {
             try {
-                $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                if (!$isCurrentYear) {
+                    // Check if the local file exists before reading it
+                    $localFilePath = public_path("holidays_indonesia.json");
+                    if (file_exists($localFilePath)) {
+                        $json = file_get_contents($localFilePath);
+                    } else {
+                        $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                    }
+                } else {
+                    // Use the API to get the data
+                    $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                }
+
                 $array = json_decode($json, true);
 
                 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -531,19 +552,22 @@ class ApprovalController extends Controller
                 $cachedData = $array;
             } catch (Exception $e) {
                 // Handle exception or log error
+                sleep(1); // Wait for 1 second before retrying
                 $attempts++;
-
-                // Exponential backoff: Wait for 2^$attempts seconds before retrying
-                sleep(pow(2, $attempts));
-
-                continue;
             }
+        }
+
+        if (!$isCurrentYear) {
+            // Forget the cache if the year is not the current year
+            Cache::forget('holiday_data');
         }
 
         if (!$cachedData) {
             Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
             return redirect(url()->previous());
-            throw new Exception('Unable to retrieve holiday data.');
+        } else {
+            $array = $cachedData;
+            // Use the cached data
         }
 
         $formattedDatesHoliday = [];

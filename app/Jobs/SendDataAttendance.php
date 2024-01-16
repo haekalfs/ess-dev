@@ -63,15 +63,30 @@ class SendDataAttendance implements ShouldQueue
                                     'ts_task' => 'HO',
                                     'ts_task_id' => 'HO',
                                     'ts_location' => 'HO',
-                                    'ts_activity' => 'HO Activities',
+                                    'ts_activity' => '[ Created by System ] HO Activities',
                                     'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
                                     'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
                                     'allowance' => 70000,
                                     'incentive' => 0,
                                     'ts_status_id' => 10,
-                                    // Add more activity columns as needed
                                 ]
                             );
+                        } else {
+                            $hasMatchingRows = Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
+                            ->where('ts_user_id', $data->fingerId->user_id)
+                            ->where('ts_location', 'HO')
+                            ->exists();
+
+                            // Update only if there are matching rows
+                            if ($hasMatchingRows) {
+                            Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
+                                ->where('ts_user_id', $data->fingerId->user_id)
+                                ->where('ts_location', 'HO')
+                                ->update([
+                                    'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
+                                    'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
+                                ]);
+                            }
                         }
                     }
                 }
