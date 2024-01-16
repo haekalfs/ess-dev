@@ -75,6 +75,7 @@ class SendDataAttendance implements ShouldQueue
                             $hasMatchingRows = Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
                             ->where('ts_user_id', $data->fingerId->user_id)
                             ->where('ts_location', 'HO')
+                            ->where('ts_type', 1)
                             ->exists();
 
                             // Update only if there are matching rows
