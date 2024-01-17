@@ -94,7 +94,14 @@ active
                                     @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requesting Approval to</td>
-                                        <td>: {{ $row->dept->department_name }}</td>
+                                        <td>:
+                                            <?php
+                                                $uniqueApprovers = array_unique($row->approval->pluck('RequestTo')->toArray());
+                                                $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
+                                                $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
+                                                echo $commaDelimitedApprovers;
+                                            ?>
+                                        </td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Notes</td>

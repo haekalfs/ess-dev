@@ -38,7 +38,7 @@ active
         <div class="text-right">
             <form method="POST" action="/reimbursement/manage/disbursed/all">
                 @csrf
-                <button type="submit" id="bulkPaid" style="display: none;" class="btn btn-success btn-sm btn-edit"><i class="fas fa-check"></i> Disbursed</button>
+                <button type="submit" id="bulkPaid" style="display: none;" class="btn btn-success btn-sm btn-edit"><i class="fas fa-check"></i> Mark as Paid</button>
                 <input type="hidden" name="usersName" id="usersName" value="" />
                 <input type="hidden" name="formId" id="formId" value="" />
             </form>

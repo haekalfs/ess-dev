@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cut-leave-based-on-joint-holidays', 'CommandsController@cut_leave_based_on_joint_holidays');
     Route::get('/send-timesheet-entry-reminder', 'CommandsController@send_reminder_timesheet_entry');
     Route::get('/send-timesheet-approval-reminder', 'CommandsController@send_approval_timesheet_entry');
+    Route::get('/check-employment-status', 'CommandsController@notify_hr_employment_status');
 
     //Notification Center
     Route::get('/notification-center/{id}', 'NotificationsController@index');

@@ -70,20 +70,13 @@ class ReimburseController extends Controller
             return redirect('/reimbursement/create/request');
         }
 
+        $nowYear = date('Y');
         $project = $request->project;
 
         $typeOfReimbursement = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->project_name;
         $userDept = (empty(Company_project::find($project))) ? 1 : 4;
         $RequestTo = empty($request->approver) ? $userDept : $request->approver;
 
-        $approvalFinance_GA = Timesheet_approver::whereIn('id', [10, 45])
-            ->get();
-        $approvalSales = Timesheet_approver::whereIn('id', [50, 45])
-            ->get();
-        $approvalHCM = Timesheet_approver::whereIn('id', [10, 60])
-            ->get();
-        $approvalService = Timesheet_approver::whereIn('id', [20, 40])
-            ->get();
         $approvalByGroup = Timesheet_approver::where('group_id', $RequestTo)
             ->get();
 
@@ -99,7 +92,7 @@ class ReimburseController extends Controller
             $uniqueId = hexdec(substr(uniqid(), 0, 8));
         }
 
-        $existingID = Reimbursement::whereNull('deleted_at')->orderBy('f_id', 'desc')->pluck('f_id')->first();
+        $existingID = Reimbursement::whereNull('deleted_at')->orderBy('f_id', 'desc')->whereYear('created_at', $nowYear)->pluck('f_id')->first();
         if($existingID){
             $nextID = $existingID + 1;
         } else {
@@ -184,78 +177,19 @@ class ReimburseController extends Controller
                     ]);
                     $userToApprove[] = $approverGroup->approver;
                 }
-                // switch (true) {
-                //     case ($RequestTo == 4):
-                //         foreach($approvalFinance_GA as $approverGa){
-                //             Reimbursement_approval::create([
-                //                 'status' => 20,
-                //                 'RequestTo' => $approverGa->approver,
-                //                 'reimb_item_id' => $itemId,
-                //                 'reimbursement_id' => $uniqueId
-                //             ]);
-                //             $userToApprove[] = $approverGa->approver;
-                //         }
-                //         break;
-                //         // No break statement here, so it will continue to the next case
-                //     case ($RequestTo == 2):
-                //         foreach($approvalService as $approverService){
-                //             Reimbursement_approval::create([
-                //                 'status' => 20,
-                //                 'RequestTo' => $approverService->approver,
-                //                 'reimb_item_id' => $itemId,
-                //                 'reimbursement_id' => $uniqueId
-                //             ]);
-                //             $userToApprove[] = $approverService->approver;
-                //         }
-                //         if(!$usersWithPMRole->isEmpty()){
-                //             foreach($usersWithPMRole as $approverPM){
-                //                 Reimbursement_approval::create([
-                //                     'status' => 20,
-                //                     'RequestTo' => $approverPM->approver,
-                //                     'reimb_item_id' => $itemId,
-                //                     'reimbursement_id' => $uniqueId
-                //                 ]);
-                //                 $userToApprove[] = $approverPM->approver;
-                //             }
-                //         }
-                //         break;
-                //     case ($RequestTo == 3):
-                //         foreach($approvalHCM as $approverHCM){
-                //             Reimbursement_approval::create([
-                //                 'status' => 20,
-                //                 'RequestTo' => $approverHCM->approver,
-                //                 'reimb_item_id' => $itemId,
-                //                 'reimbursement_id' => $uniqueId
-                //             ]);
-                //             $userToApprove[] = $approverHCM->approver;
-                //         }
-                //         break;
-                //     case ($RequestTo == 1):
-                //         foreach($approvalSales as $approverSales){
-                //             Reimbursement_approval::create([
-                //                 'status' => 20,
-                //                 'RequestTo' => $approverSales->approver,
-                //                 'reimb_item_id' => $itemId,
-                //                 'reimbursement_id' => $uniqueId
-                //             ]);
-                //             $userToApprove[] = $approverSales->approver;
-                //         }
-                //         break; // Add break statement here to exit the switch block after executing the case
-                //     default:
-                //         return redirect()->back()->with('failed', "You haven't assigned to any department! Ask HR Dept to correcting your account details");
-                //     break;
+
+                // if (!$findAssignment->isEmpty())
+                // {
+                //     foreach ($usersWithPMRole as $pm) {
+                //         Reimbursement_approval::create([
+                //             'status' => 20,
+                //             'RequestTo' => $pm->user_id,
+                //             'reimb_item_id' => $itemId,
+                //             'reimbursement_id' => $uniqueId
+                //         ]);
+                //         $userToApprove[] = $approverGroup->approver;
+                //     }
                 // }
-
-                //Approval Queue for Financial Manager
-                // $fm = Timesheet_approver::find(15);
-
-                // Reimbursement_approval::create([
-                //     'status' => 20,
-                //     'RequestTo' => $fm->approver,
-                //     'reimb_item_id' => $itemId,
-                //     'reimbursement_id' => $uniqueId
-                // ]);
-                // $userToApprove[] = $fm->approver;
             }
 
             $employees = User::whereIn('id', $userToApprove)->get();
@@ -501,7 +435,7 @@ class ReimburseController extends Controller
         $checkSettingExport = $settingExport->position_id;
 
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [$checkSettingExport])) {
+        if (in_array($checkUserPost, [10])) {
             $templatePath = public_path('template_reimbursement.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();

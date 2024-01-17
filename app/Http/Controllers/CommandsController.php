@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CheckEmploymentStatus;
 use App\Jobs\CutLeaveBasedOnHolidaysJob;
 use App\Jobs\SendTimesheetApprovalNotification;
 use App\Jobs\SendTimesheetReminderJob;
@@ -86,5 +87,16 @@ class CommandsController extends Controller
         }
 
         return redirect()->back()->with('success', "Reminder has bent sent to all approvers!");
+    }
+
+    public function notify_hr_employment_status()
+    {
+        // dispatch(new CutLeaveBasedOnHolidaysJob());
+        // return redirect()->back()->with('success', "All Employees Leave Quota has been Deducted!");
+        // Dispatch the job
+        CheckEmploymentStatus::dispatch();
+
+        // Optionally, you can flash a message to indicate successful dispatch
+        return redirect()->back()->with('success', 'Employment status check job dispatched successfully!');
     }
 }

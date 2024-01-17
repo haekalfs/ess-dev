@@ -98,7 +98,14 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requesting Approval to</td>
-                                        <td>: {{ $row->dept->department_name }}</td>
+                                        <td>:
+                                            <?php
+                                                $uniqueApprovers = array_unique($row->approval->pluck('RequestTo')->toArray());
+                                                $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
+                                                $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
+                                                echo $commaDelimitedApprovers;
+                                            ?>
+                                        </td>
                                     </tr>
                                     {{-- <tr class="table-sm">
                                         <td style="width: 150px;">Status</td>
@@ -151,7 +158,7 @@ active
                                         @php
                                             $approved = false;
                                         @endphp
-                                        
+
                                         @foreach ($usr->approval as $status)
                                             @if ($status->status == 29)
                                                 <a><i class="fas fa-check-circle" style="color: #005eff;"></i> <small>Approved</small></a>
@@ -167,16 +174,16 @@ active
                                                 @endphp
                                             @endif
                                         @endforeach
-                                            
+
                                         @unless ($approved)
-                                            <a><i class="fas fa-spinner fa-spin"></i> <small>Waiting for Approval</small></a>    
+                                            <a><i class="fas fa-spinner fa-spin"></i> <small>Waiting for Approval</small></a>
                                         @endunless
                                     </td>
                                     <td class="text-center" style="width: 290px;">
                                         @php
                                             $approved = false;
                                         @endphp
-                                        
+
                                         @foreach ($usr->approval as $status)
                                             @if ($status->status == 29 || $status->status == 30 || $status->status == 404)
                                                 <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> View Details</a>
@@ -186,7 +193,7 @@ active
                                                 @endphp
                                             @endif
                                         @endforeach
-                                            
+
                                         @unless ($approved)
                                             <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Action</a>
                                             <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> View Details</a>
@@ -335,13 +342,13 @@ active
     });
 
 
-    
+
     const label = document.getElementById("receipt-label");
-    
+
     $(document).on('click', '.btn-edit', function() {
         var itemId = $(this).data('item-id');
         $('#item_id').val(itemId);
-    
+
         $.ajax({
             url: '/retrieveReimburseData/' + itemId,
             method: 'GET',
@@ -388,7 +395,7 @@ active
     $(document).on('click', '.btn-details', function() {
         var itemId = $(this).data('item-id');
         $('#item_id').val(itemId);
-    
+
         fetchApproverDetails(itemId);
     });
 
