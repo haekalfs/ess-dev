@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\API_key;
 use App\Models\Setting;
+use App\Models\Position;
 use App\Models\Users_fingerprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -56,6 +57,9 @@ class HrController extends Controller
 		$Default_Approve1 = Timesheet_approver::where('id', 29)->first();
 		$Default_Approve2 = Timesheet_approver::where('id', 28)->first();
 
+		//Position
+		$position = Position::all();
+
 		//export TS
 		$setting_export_ts = Setting::where('id', 1)->first();
 
@@ -87,6 +91,7 @@ class HrController extends Controller
         'users' => $users,
 		'export_ts' => $setting_export_ts,
 		'export_reimburse' => $setting_export_reimburse,
+		'position'	=> $position,
 
 		]);
 	}
@@ -185,21 +190,14 @@ class HrController extends Controller
 			$input_Default_Approve2->save();
 
 		//Export TS
-		$user_ts = $request->export_ts;
-		$user_info_ts = Users_detail::where('user_id', $user_ts)->first();
-
 			$input_export_ts = Setting::where('id', 1)->first();
-			$input_export_ts->user_id = $user_ts;
-			$input_export_ts->position_id = $user_info_ts->position_id;
+			$input_export_ts->position_id = $request->export_ts;
 			$input_export_ts->save();
 
 		//Export Reimburse
-		$user_reimburse = $request->export_reimburse;
-		$user_info_reimburse = Users_detail::where('user_id', $user_reimburse)->first();
 
 			$input_export_reimburse = Setting::where('id', 2)->first();
-			$input_export_reimburse->user_id = $user_reimburse;
-			$input_export_reimburse->position_id = $user_info_reimburse->position_id;
+			$input_export_reimburse->position_id = $request->export_reimburse;
 			$input_export_reimburse->save();
 
 			

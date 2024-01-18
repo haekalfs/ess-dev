@@ -283,8 +283,8 @@ active
                                                                     <label for="email">Timesheet Export :</label>
                                                                     <select class="form-control" name="export_ts" >
                                                                         <option selected disabled>Choose...</option>
-                                                                        @foreach($user as $us)
-                                                                        <option value="{{ $us->id }}" @if( $us->id == $export_ts->user_id ) selected @endif >{{ $us->name }}</option>
+                                                                        @foreach($position as $pos)
+                                                                        <option value="{{ $pos->id }}" @if( $pos->id == $export_ts->position_id ) selected @endif >{{ $pos->position_name }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
@@ -294,8 +294,8 @@ active
                                                                     <label for="password">Reimburse Export :</label>
                                                                     <select class="form-control" name="export_reimburse" >
                                                                         <option selected disabled>Choose...</option>
-                                                                        @foreach($user as $us)
-                                                                        <option value="{{ $us->id }}" @if( $us->id == $export_reimburse->user_id ) selected @endif >{{ $us->name }}</option>
+                                                                        @foreach($position as $pos)
+                                                                        <option value="{{ $pos->id }}" @if( $pos->id == $export_reimburse->position_id ) selected @endif >{{ $pos->position_name }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>

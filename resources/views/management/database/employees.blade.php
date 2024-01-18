@@ -61,8 +61,8 @@ active
                                     <label for="status">Status:</label>
                                     <select name="status" class="form-control" id="status">
                                         <option value="">All</option>
-                                        <option value="Active" {{ request('status_active') == 'Active' ? 'selected' : '' }}>Active</option>
-                                        <option value="nonActive" {{ request('status_active') == 'nonActive' ? 'selected' : '' }}>Non Active</option>
+                                        <option value="Active" @if(request('status') == 'Active') selected @endif>Active</option>
+                                        <option value="nonActive" @if(request('status') == 'nonActive') selected @endif>Non Active</option>
                                     </select>
                                 </div>
                             </div>

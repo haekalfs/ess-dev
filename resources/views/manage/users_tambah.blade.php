@@ -78,7 +78,7 @@ active
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Profile Picture:</label>
+                                        <label>Profile Picture :</label>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="openFileInIframe('profile', 'profile-label', 'profile-preview')">
                                             <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
@@ -88,7 +88,7 @@ active
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Emp. CV:</label>
+                                        <label>Emp. CV :</label>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="openFileInIframe('cv', 'cv-label', 'cv-preview')">
                                             <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
@@ -131,8 +131,8 @@ active
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="email">Employee ID :</label>
-                                                <input class="form-control"  name="employee_id" placeholder="Employee ID..." value="{{ $nextEmpID }}"readonly/>
+                                                <label for="email">Employee ID : <span class="text-danger">*</span></label>
+                                                <input class="form-control"  name="employee_id" placeholder="Employee ID..." value="{{ $nextEmpID }}" readonly/>
                                                 @if($errors->has('employee_id'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('employee_id')}}
@@ -142,15 +142,15 @@ active
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="password">User ID :</label>
-                                                <input class="form-control flex" id="usr_id" name="usr_id" placeholder="User ID..."/>
+                                                <label for="password">User ID : <span class="text-danger">*</span></label>
+                                                <input class="form-control flex" id="usr_id" name="usr_id" placeholder="User ID..." required/>
                                                 <span style="color:red; font-size: 13px; font-style: italic" id="user-id-error"></span>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="password">Email :</label>
-                                                <input class="form-control" name="email" placeholder="Email..." />
+                                                <label for="password">Email : <span class="text-danger">*</span></label>
+                                                <input class="form-control" name="email" placeholder="Email..." required />
                                                 @if($errors->has('email'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('email')}}
@@ -160,8 +160,8 @@ active
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="password">Password :</label>
-                                                <input class="form-control" name="password" value="" placeholder="***********"/>
+                                                <label for="password">Password : <span class="text-danger">*</span></label>
+                                                <input class="form-control" name="password" value="" placeholder="***********" required/>
                                             </div>
                                         </div>
                                     </div>
@@ -170,8 +170,8 @@ active
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="comment">Position :</label>
-                                                <select class="form-control " id="position" name="position"  >
+                                                <label for="comment">Position : <span class="text-danger">*</span></label>
+                                                <select class="form-control " id="position" name="position" required >
                                                     <option selected disabled>Choose...</option>
                                                     @foreach($pos_data as $pos)
                                                     <option value="{{ $pos ->id }}">{{ $pos ->position_name }}</option>
@@ -181,8 +181,8 @@ active
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="email">Department :</label>
-                                                <select class="form-control " id="department" name="department"  >
+                                                <label for="email">Department : <span class="text-danger">*</span></label>
+                                                <select class="form-control " id="department" name="department" required >
                                                     <option selected disabled>Choose...</option>
                                                     @foreach($dep_data as $depart)
                                                     <option value="{{ $depart ->id }}">{{ $depart ->department_name }}</option>
@@ -194,8 +194,8 @@ active
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="email">Status :</label>
-                                                <select class="form-control " name="status"  >
+                                                <label for="email">Status : <span class="text-danger">*</span></label>
+                                                <select class="form-control " name="status" required >
                                                     <option selected disabled>Choose...</option>
                                                     <option value="Active">Active</option>
                                                     <option value="nonActive">Non Active</option>
@@ -205,11 +205,12 @@ active
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="password">Employement Status :</label>
-                                                <select class="form-control " name="employee_status" >
+                                                <label for="password">Employement Status : <span class="text-danger">*</span></label>
+                                                <select class="form-control " name="employee_status" required >
                                                     <option selected disabled>Choose...</option>
                                                     <option value="Freelance">Freelance</option>
                                                     <option value="Probation">Probation</option>
+                                                    <option value="MT">Management Trainee</option>
                                                     <option value="Contract">Contract</option>
                                                     <option value="Permanent">Permanent</option>
                                                 </select>
@@ -219,8 +220,8 @@ active
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="email">Hired Date :</label>
-                                                <input class="form-control" type="date"  name="hired_date" id="hired_date" value="" />
+                                                <label for="email">Hired Date : <span class="text-danger">*</span></label>
+                                                <input class="form-control" type="date"  name="hired_date" id="hired_date" value="" required />
                                                 @if($errors->has('hired_date'))
                                                     <div class="text-danger">
                                                         {{ $errors->first('hired_date')}}
@@ -231,7 +232,7 @@ active
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="password">Resignation Date :</label>
+                                                <label for="password">Resignation Date : <span class="text-danger">*</span></label>
                                                 <input class="form-control" type="date"  name="resignation_date" id="resignation_date" value="" />
                                                 @if($errors->has('resignation_date'))
                                                     <div class="text-danger">
@@ -277,7 +278,7 @@ active
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="comment">Name :</label>
+                                                <label for="comment">Name : <span class="text-danger">*</span></label>
                                                 <input class="form-control" type="text" name="name" placeholder="Name..."/>
                                                 @if($errors->has('name'))
                                                     <div class="text-danger">
