@@ -88,7 +88,7 @@ active
                                         </div>
                                     </div>
                                     @if($user->users_detail->cv)
-                                    <a href="{{ url('/storage/cv/'.$user->users_detail->cv) }}" target="_blank">
+                                    <a data-toggle="modal" data-target="#CVModal">
                                             <img class="img-thumbnail" width="110px" src="https://img.icons8.com/cute-clipart/64/pdf.png" alt="CV Image">
                                         </a>
                                     @else
@@ -204,6 +204,7 @@ active
                                                         <option selected disabled>Choose...</option>
                                                         <option value="Freelance" @if($user->users_detail->employee_status == 'Freelance') selected @endif>Freelance</option>
                                                         <option value="Probation" @if($user->users_detail->employee_status == 'Probation') selected @endif>Probation</option>
+                                                        <option value="MT" @if($user->users_detail->employee_status == 'MT') selected @endif>Management Trainee</option>
                                                         <option value="Contract" @if($user->users_detail->employee_status == 'Contract') selected @endif>Contract</option>
                                                         <option value="Permanent"@if($user->users_detail->employee_status == 'Permanent') selected @endif>Permanent</option>
                                                     </select>
@@ -539,19 +540,37 @@ active
         </div>
     </div>
 </form>
-<!-- Modal -->
+<!-- Modal Foto -->
 <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-body">
-                <div class="close-icon">
-                    <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
-                </div>
-                <img src="{{ url('/storage/profile_pic/'.$user->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Picture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <img src="{{ url('/storage/profile_pic/'.$user->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="CVModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">CV</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <iframe height="600px" src="{{ url('/storage/cv/'.$user->users_detail->cv) }}"></iframe>
+    </div>
+  </div>
+</div>
+
+
 <style>
     .close-icon {
     position: absolute;
