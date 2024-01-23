@@ -57,17 +57,29 @@ active
                     </div>
                     <div class="col-md-5">
                         <div class="form-group">
-                            <label for="password">Year :</label>
+                            @if ($notify)
+                                <label for="password">Year<span class="position-absolute top-0 start-100 translate-middle badge bg-danger text-white">!</span> :</label>
+                            @else
+                                <label for="password">Year :</label>
+                            @endif
                             <select class="form-control" name="yearOpt" required>
                                 @foreach (array_reverse($yearsBefore) as $year)
-                                    <option value="{{ $year }}" @if ($year == $Year) selected @endif>{{ $year }}</option>
+                                    <option value="{{ $year }}" @if ($year == $Year) selected @endif>{{ $year }}
+                                        @if(in_array($year, $notifyYear))
+                                            &#x2757; <!-- Display the warning icon if $month is in $notifyMonth -->
+                                        @endif
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="password">Month :</label>
+                            @if ($notify)
+                                <label for="password">Month<span class="position-absolute top-0 start-100 translate-middle badge bg-danger text-white">!</span> :</label>
+                            @else
+                                <label for="password">Month :</label>
+                            @endif
                             <select class="form-control" name="monthOpt" required>
                                 @foreach (range(1, 12) as $month)
                                     <option value="{{ $month }}" @if ($month == $Month) selected @endif>

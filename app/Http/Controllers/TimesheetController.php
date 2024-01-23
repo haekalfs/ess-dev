@@ -1118,7 +1118,7 @@ class TimesheetController extends Controller
 
         $user_info = User::find(Auth::user()->id);
 
-        $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year . $month)->groupBy('ts_task', 'ts_location', 'RequestTo', 'activity')->orderBy('updated_at', 'asc')->orderBy('priority', 'desc')->orderBy('ts_task', 'asc')->get();
+        $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year . intval($month))->groupBy('ts_task', 'ts_location', 'RequestTo', 'activity')->orderBy('updated_at', 'asc')->orderBy('priority', 'desc')->orderBy('ts_task', 'asc')->get();
 
         $userId = Auth::user()->id;
 
@@ -1379,7 +1379,7 @@ class TimesheetController extends Controller
             Timesheet_detail::updateOrCreate([
                 'user_id' => Auth::user()->id,
                 'activity' => 'Submitted',
-                'month_periode' => $year . $month,
+                'month_periode' => $year . intval($month),
             ], [
                 'ts_status_id' => 15,
                 'date_submitted' => date('Y-m-d'),
@@ -1634,8 +1634,8 @@ class TimesheetController extends Controller
             ->get()
             ->count();
 
-            //delete previous data
-            Timesheet_detail::where('month_periode', $year.$month)->where('user_timesheet', Auth::user()->id)->whereNotIn('ts_status_id', [10, 15])->delete();
+            //delete previous data if resubmitted
+            Timesheet_detail::where('month_periode', $year . intval($month))->where('user_timesheet', Auth::user()->id)->whereNotIn('ts_status_id', [10, 15])->delete();
             $work_hours = 0;
             $start_time = PHP_INT_MAX;
             $end_time = 0;
@@ -1690,7 +1690,7 @@ class TimesheetController extends Controller
             foreach ($empApproval as $test) {
                 Timesheet_detail::updateOrCreate([
                     'user_id' => Auth::user()->id,
-                    'month_periode' => $year.$month,
+                    'month_periode' => $year . intval($month),
                     'RequestTo' => $test['name'],
                     'ts_task' => $test['task'],
                     'ts_location' => $test['location']
@@ -1709,7 +1709,7 @@ class TimesheetController extends Controller
                     'priority' => $test['priority']
                 ]);
             }
-            Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year . $month)->where('user_timesheet', Auth::user()->id)->delete();
+            Timesheet_detail::where('RequestTo', Auth::user()->id)->where('month_periode', $year . intval($month))->where('user_timesheet', Auth::user()->id)->delete();
             // Update Timesheet records between the start and end dates
             Timesheet::whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])->where('ts_user_id', Auth::user()->id)->orderBy('created_at', 'desc')->update(['ts_status_id' => '15']);
 

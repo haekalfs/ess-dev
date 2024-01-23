@@ -210,12 +210,14 @@ class ApprovalController extends Controller
             }
 
             //Notification untuk Timesheet Approval adalah 2 sedangkan untuk status di tiap user 2A
+            $notifyYear = [];
             $notifyMonth = [];
             $notify = false;
             $getNotification = Notification_alert::where('type', 2)->where('user_id', Auth::id())->whereNull('read_stat')->get();
             foreach ($getNotification as $getNotification) {
                 if ($getNotification) {
                     $notifyMonth[] = substr($getNotification->month_periode, 4);
+                    $notifyYear[] = substr($getNotification->month_periode, 0, 4);
                     $notify = $getNotification->id;
                 }
             }
@@ -233,7 +235,7 @@ class ApprovalController extends Controller
                     ->where('month_periode', $Year . intval($Month))
                     ->update(['read_stat' => 1]);
             }
-            return view('approval.timesheet_approval', ['notify' => $notify, 'notifyMonth' => $notifyMonth, 'approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'Month' => $Month, 'Year' => $Year, 'employees' => $employees]);
+            return view('approval.timesheet_approval', ['notify' => $notify, 'notifyMonth' => $notifyMonth, 'notifyYear' => $notifyYear, 'approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'Month' => $Month, 'Year' => $Year, 'employees' => $employees]);
         } else {
             // Handle the case when the date is not within the range
             return redirect()->back()->with('failed', 'This page can only be accessed between the 5th - 8th of each month.');
@@ -248,14 +250,14 @@ class ApprovalController extends Controller
             'approval_notes' => 'sometimes'
         ]);
 
-        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year . $month)->get();
+        $countRows = Timesheet_detail::where('RequestTo', Auth::user()->id)->where('user_timesheet', $user_timesheet)->where('month_periode', $year . intval($month))->get();
 
         $timesheetApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver');
         $checkUserDir = $timesheetApproversDir->toArray();
 
         $Check = DB::table('timesheet_details')
             ->select('*')
-            ->where('month_periode', $year . $month)
+            ->where('month_periode', $year . intval($month))
             ->where('user_timesheet', $user_timesheet)
             ->whereNotIn('ts_status_id', [10, 15, 29])
             ->whereNotIn('RequestTo', $checkUserDir)
@@ -296,13 +298,22 @@ class ApprovalController extends Controller
                 case in_array(Auth::user()->id, $checkUserDir):
                     $tsStatusId = '29';
                     $activity = 'Approved';
+
+                    //soon fixed
+                    $entry = new Notification_alert;
+                    $entry->user_id = 'suryadi';
+                    $entry->message = "Emp's Timesheet Pending!";
+                    $entry->importance = 1;
+                    $entry->month_periode = $year . intval($month);
+                    $entry->type = "2";
+                    $entry->save();
                     break;
                 default:
                     $tsStatusId = '30';
                     break;
             }
 
-            $approve = Timesheet_detail::where('month_periode', $year . $month)
+            $approve = Timesheet_detail::where('month_periode', $year . intval($month))
                 ->where('user_timesheet', $user_timesheet)
                 ->where('RequestTo', Auth::user()->id)
                 ->where('ts_task_id', $row->ts_task_id);
@@ -344,7 +355,7 @@ class ApprovalController extends Controller
         $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been Approved! by $approverName";
         $entry->importance = 1;
-        $entry->month_periode = $year . $month;
+        $entry->month_periode = $year . intval($month);
         $entry->type = "2A";
         $entry->save();
 
@@ -396,7 +407,7 @@ class ApprovalController extends Controller
 
         foreach ($countRows as $row) { ///test buat dihapus nnti karna double loops
 
-            $reject = Timesheet_detail::where('month_periode', $year . $month)
+            $reject = Timesheet_detail::where('month_periode', $year . intval($month))
                 ->where('user_timesheet', $user_timesheet)
                 ->where('RequestTo', Auth::user()->id)
                 ->where('ts_task_id', $row->ts_task_id);
@@ -425,7 +436,7 @@ class ApprovalController extends Controller
         $ts_name = date("F", mktime(0, 0, 0, $month, 1)) . ' - ' . $year;
         $entry->message = "Your Timesheet of $ts_name has been rejected!";
         $entry->importance = 404;
-        $entry->month_periode = $year . $month;
+        $entry->month_periode = $year . intval($month);
         $entry->type = "2A";
         $entry->save();
 

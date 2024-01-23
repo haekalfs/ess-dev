@@ -9,17 +9,28 @@ function checkFormValidity() {
     }
 }
 
+
 // Add an event listener to the "Submit Request" button
 document.getElementById('showConfirmation').addEventListener('click', checkFormValidity);
 
-// Add an event listener to the "Confirm" button in the modal
+// Add an event listener to the "Submit Request" button
 document.getElementById('confirmSubmit').addEventListener('click', function () {
     // Close the modal
     $('#confirmationModal').modal('hide');
 
-    // Submit the form if it's valid
-    if (document.getElementById('myForm').checkValidity()) {
-        document.getElementById('myForm').submit();
+    // Check date expiration
+    var expirationDate = $('input[name^="expiration"]').val();
+    var currentDate = new Date();
+    var sevenDaysBeforeNow = new Date(currentDate);
+    sevenDaysBeforeNow.setDate(currentDate.getDate() - 7);
+
+    if (new Date(expirationDate) < sevenDaysBeforeNow) {
+        alert('Receipt date is expired & cannot be reimbursed!.');
+    } else {
+        // Submit the form if it's valid
+        if (document.getElementById('myForm').checkValidity()) {
+            document.getElementById('myForm').submit();
+        }
     }
 });
 

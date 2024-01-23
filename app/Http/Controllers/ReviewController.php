@@ -18,6 +18,7 @@ use Exception;
 use PDF;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -104,27 +105,32 @@ class ReviewController extends Controller
             ->select('timesheet_details.*', 'u.name', 'ud.employee_id')
             ->get();
 
-        $getNotification = Notification_alert::where('type', 2)->whereNull('read_stat')->first();
-        if($getNotification){
-            $notifyMonth = substr($getNotification->month_periode, 4);
-            $notify = $getNotification->id;
-        } else {
-            $notifyMonth = false;
-            $notify = false;
+        $notifyYear = [];
+        $notifyMonth = [];
+        $notify = false;
+        $getNotification = Notification_alert::where('type', 2)->where('user_id', Auth::id())->whereNull('read_stat')->get();
+        foreach ($getNotification as $getNotification) {
+            if ($getNotification) {
+                $notifyMonth[] = substr($getNotification->month_periode, 4);
+                $notifyYear[] = substr($getNotification->month_periode, 0, 4);
+                $notify = $getNotification->id;
+            }
         }
 
         $setToRead = Notification_alert::where('type', 2)
             ->whereNull('read_stat')
+            ->where('user_id', Auth::id())
             ->where('month_periode', $Year . intval($Month))
             ->get();
 
         if ($setToRead->count() > 0) {
             Notification_alert::where('type', 2)
                 ->whereNull('read_stat')
+                ->where('user_id', Auth::id())
                 ->where('month_periode', $Year . intval($Month))
                 ->update(['read_stat' => 1]);
         }
-        return view('review.finance', compact('notify','notifyMonth','approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
+        return view('review.finance', compact('notify','notifyMonth','notifyYear', 'approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
     }
 
     public function ts_preview($user_id, $year, $month)
