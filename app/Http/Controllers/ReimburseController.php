@@ -74,6 +74,8 @@ class ReimburseController extends Controller
         $project = $request->project;
 
         $typeOfReimbursement = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->project_name;
+        $companyProjectId = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->id;
+
         $userDept = (empty(Company_project::find($project))) ? 1 : 4;
         $RequestTo = empty($request->approver) ? $userDept : $request->approver;
 
@@ -81,8 +83,9 @@ class ReimburseController extends Controller
             ->get();
 
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
-        $usersWithPMRole = Project_assignment_user::where('company_project_id', $typeOfReimbursement)
+        $usersWithPMRole = Project_assignment_user::where('company_project_id', $companyProjectId)
         ->whereIn('project_assignment_id', $findAssignment)
+        ->where('periode_end', '>=', date('Y-m-d'))
         ->where('role', 'PM')
         ->get();
 
