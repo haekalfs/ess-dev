@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyLeaveApproval;
 use App\Jobs\NotifyLeaveApproved;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
@@ -150,6 +151,13 @@ class LeaveApprovalController extends Controller
                 }
                 break;
             default:
+                $getIdApprover = Leave_request_approval::where('id', $id)->whereIn('RequestTo', $checkUserDir)->pluck('RequestTo')->groupBy('RequestTo')->get();
+                $employees = User::whereIn('id', $getIdApprover)->get();
+                $userName = $getLeaveReq->req_by;
+
+                foreach ($employees as $employee) {
+                    dispatch(new NotifyLeaveApproval($employee, $userName));
+                }
                 break;
         }
 
