@@ -170,7 +170,20 @@ class ReimburseController extends Controller
                 $data->save();
 
                 $userToApprove = [];
-                //PM blom
+
+                if($usersWithPMRole)
+                {
+                    foreach($usersWithPMRole as $approverPm){
+                        Reimbursement_approval::create([
+                            'status' => 20,
+                            'RequestTo' => $approverPm->user_id,
+                            'reimb_item_id' => $itemId,
+                            'reimbursement_id' => $uniqueId
+                        ]);
+                        $userToApprove[] = $approverPm->approver;
+                    }
+                }
+
                 foreach($approvalByGroup as $approverGroup){
                     Reimbursement_approval::create([
                         'status' => 20,
@@ -180,19 +193,6 @@ class ReimburseController extends Controller
                     ]);
                     $userToApprove[] = $approverGroup->approver;
                 }
-
-                // if (!$findAssignment->isEmpty())
-                // {
-                //     foreach ($usersWithPMRole as $pm) {
-                //         Reimbursement_approval::create([
-                //             'status' => 20,
-                //             'RequestTo' => $pm->user_id,
-                //             'reimb_item_id' => $itemId,
-                //             'reimbursement_id' => $uniqueId
-                //         ]);
-                //         $userToApprove[] = $approverGroup->approver;
-                //     }
-                // }
             }
 
             $employees = User::whereIn('id', $userToApprove)->get();

@@ -196,18 +196,17 @@ active
 				<div class="modal-body" style="">
                     <div class="col-md-12 zoom90">
                         <div class="row">
-                            <div class="col-md-6">
-                                <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
-                            </div>
-                            <div class="col-md-6 zoom90">
+                            <div class="col-md-12 zoom90">
                                 <div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
                                     <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-money-bill-wave"></i> Settlement for Disbursement</h1>
+                                    <button class="btn btn-secondary">View Receipt</button>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="to">Employee's Expenses :</label>
                                             <input type="text" class="form-control" name="current_amount" readonly oninput="formatAmount(this)" id="current_amount">
+                                            <small style="color: red;"><i>Amount of Employee's Request.</i></small>
                                         </div>
                                     </div>
                                     <div class="col-md-2 d-flex justify-content-center align-items-center">
@@ -217,16 +216,14 @@ active
                                         <div class="form-group">
                                             <label for="to">Payout :</label>
                                             <input type="text" class="form-control" name="approved_amount" oninput="formatAmountPrefix(this)" id="approved_amount">
+                                            <small style="color: red;"><i>Set the payout amount that will disbursed</i></small>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="approval_notes">Notes :</label>
+                                            <label for="approval_notes">Notes to Employee :</label>
                                             <textarea type="text" class="form-control" name="approval_notes" id="approval_notes"></textarea>
                                         </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <small style="color: red;"><i>NOTE : Only financial managers or those at the same level are allowed to define the payout amount.</i></small>
                                     </div>
                                     <div class="col-md-12 mt-4">
                                         <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
@@ -290,7 +287,7 @@ active
             url: '/retrieveReimburseData/' + itemId,
             method: 'GET',
             success: function(response) {
-                $('#approved_amount').val(response.amount);
+                $('#approved_amount').val("Rp. " + response.approved_amount);
                 $('#current_amount').val("Rp. " + response.amount);
             },
             error: function(xhr) {

@@ -28,12 +28,12 @@ class MasterDataExport implements Responsable
         $templatePath = public_path('template_masterdata.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
-        
-        
+
+
         // Set up the starting row and column for the data
         $startRow = 8;
         $startCol = 2;
-        
+
         // Tulis data dari tabel user
         $row = $startRow;
         foreach ($this->user as $user) {

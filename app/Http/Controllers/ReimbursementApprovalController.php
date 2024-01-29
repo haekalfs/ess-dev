@@ -17,10 +17,15 @@ use Illuminate\Support\Facades\Validator;
 
 class ReimbursementApprovalController extends Controller
 {
-    public function reimbursement_approval()
+    public function reimbursement_approval($yearSelected = null)
     {
-        $currentYear = date('Y');
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
 
+        $currentYear = date('Y');
+        if ($yearSelected) {
+            $currentYear = $yearSelected;
+        }
         // Get the current day of the month
         $currentDay = date('j');
 
@@ -31,7 +36,7 @@ class ReimbursementApprovalController extends Controller
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
-                if (in_array($checkUserPost, [10, 8, 12, 6, 22])) {
+                if (in_array($checkUserPost, [8, 12, 6, 22])) {
                     $Check = DB::table('reimbursement_approval')
                     ->select('reimb_item_id')
                     ->whereNotIn('RequestTo', $ts_approver)
@@ -41,7 +46,7 @@ class ReimbursementApprovalController extends Controller
                     ->toArray();
                     if (!empty($Check)) {
                         $approvals = Reimbursement_approval::select('*')
-                        // ->whereYear('date_submitted', $currentYear)
+                        ->whereYear('created_at', $currentYear)
                         ->where('RequestTo', Auth::user()->id)
                         ->whereNotIn('status', [29, 30, 404])
                         ->whereIn('reimb_item_id', $Check)
@@ -62,7 +67,7 @@ class ReimbursementApprovalController extends Controller
                         ->toArray();
                     if (!empty($Check)) {
                         $approvals = reimbursement_approval::select('*')
-                        // ->whereYear('date_submitted', $currentYear)
+                        ->whereYear('created_at', $currentYear)
                         ->where('RequestTo', Auth::user()->id)
                         ->whereNotIn('status', [29, 30, 404])
                         ->whereIn('reimb_item_id', $Check)
@@ -75,7 +80,7 @@ class ReimbursementApprovalController extends Controller
                             ->get();
                     }
                 }
-            return view('approval.reimbursement.reimbursement_approval', ['approvals' => $approvals]);
+            return view('approval.reimbursement.reimbursement_approval', ['approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'yearSelected' => $yearSelected]);
         } else {
             // Handle the case when the date is not within the range
             return redirect()->back()->with('failed', 'Today this page has been restricted, try again later...');
@@ -161,20 +166,11 @@ class ReimbursementApprovalController extends Controller
 
         if(in_array(Auth::id(), $ts_approver)){
             $statNum = 29;
-            if (!empty($request->approved_amount)) {
-                //formatting amount
-                $rawAmount = $request->approved_amount;
-                $numericAmount = preg_replace('/[^0-9]/', '', $rawAmount);
-                $formattedAmount = number_format($numericAmount);
-
-                $item->approved_amount = $formattedAmount;
-            } else {
-                $item->approved_amount = $request->current_amount;
-            }
             $reimb_req = Reimbursement::find($item->reimbursement_id);
             $reimb_req->status_id = 29;
             $reimb_req->save();
 
+            //notification
             $entry = new Notification_alert();
             $entry->user_id = $reimb_req->f_req_by;
             $entry->message = "-";
@@ -192,11 +188,21 @@ class ReimbursementApprovalController extends Controller
                 dispatch(new NotifyReimbursementApproved($employee, $userName));
             }
         }
+        if (!empty($request->approved_amount)) {
+            //formatting amount
+            $rawAmount = $request->approved_amount;
+            $numericAmount = preg_replace('/[^0-9]/', '', $rawAmount);
+            $formattedAmount = number_format($numericAmount);
+
+            $item->approved_amount = $formattedAmount;
+        } else {
+            $item->approved_amount = $request->current_amount;
+        }
         $item->save();
 
         $approvalItem = Reimbursement_approval::where('reimb_item_id', $item_id)
                         ->where('RequestTo', Auth::user()->id)
-                        ->update(['status' => $statNum, 'notes' => $request->approval_notes]);
+                        ->update(['status' => $statNum, 'notes' => $request->approval_notes, 'approved_amount' => 'test']);
 
         return redirect()->back()->with('success',"You approved the leave request!");
     }

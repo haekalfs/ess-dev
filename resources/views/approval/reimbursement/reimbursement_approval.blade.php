@@ -7,9 +7,19 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-<h1 class="h3 mb-2 zoom90 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement Approval</h1>
-<p class="zoom90 mb-4">Approval Page.</p>
+<div class="zoom90 d-sm-flex align-items-center justify-content-between">
+    <div>
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement Approval</h1>
+        <p class="mb-4">Approval Page.</p>
+    </div>
+    <div>
+        <select class="form-control" id="year" name="year" required onchange="redirectToPage()">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
+            @endforeach
+        </select>
+    </div>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -58,7 +68,7 @@ active
                         <td>{{ $approval->request->user->name }}</td>
                         <td class="text-center">
                             <a class="btn btn-primary btn-sm mr-2" href="/approval/reimburse/view/{{ $approval->request->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
-                            <a class="btn btn-secondary btn-sm" href="/approval/reimburse/view/{{ $approval->request->id }}"><i class="fas fa-paper-plane"></i> Handover</a>
+                            {{-- <a class="btn btn-secondary btn-sm" href="/approval/reimburse/view/{{ $approval->request->id }}"><i class="fas fa-paper-plane"></i> Handover</a> --}}
                         </td>
                     </tr>
                     @endforeach
@@ -72,4 +82,14 @@ active
     width: 300px;
 }
 </style>
+<script>
+    function redirectToPage() {
+        var selectedOption = document.getElementById("year").value;
+        var url = "{{ url('/approval/reimburse') }}"; // Specify the base URL
+
+        url += "/" + selectedOption;
+
+        window.location.href = url; // Redirect to the desired page
+    }
+</script>
 @endsection

@@ -10,7 +10,7 @@ class Reimbursement_approval extends Model
     use HasFactory;
     protected $table = "reimbursement_approval";
 
-    protected $fillable = ["id", "status", "RequestTo", "reimb_item_id", "notes", "approved_status", "reimbursement_id", "created_at", "updated_at"];
+    protected $fillable = ["id", "status", "RequestTo", "reimb_item_id", "notes", "approved_amount", "reimbursement_id", "created_at", "updated_at"];
 
     public function request(){
     	return $this->belongsTo('App\Models\Reimbursement', 'reimbursement_id', 'id')
