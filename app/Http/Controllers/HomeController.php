@@ -134,7 +134,7 @@ class HomeController extends Controller
             ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
             ->groupBy('ts_user_id')
             ->orderByRaw('AVG(TIME_TO_SEC(ts_from_time))')
-            ->whereNotIn('ts_user_id', $exclude)
+            ->whereIn('ts_user_id', $exclude)
             ->take(5)
             ->get();
 
