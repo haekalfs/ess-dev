@@ -9,6 +9,7 @@ use App\Models\Notification_alert;
 use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Timesheet;
+use App\Models\Usr_role;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -126,12 +127,14 @@ class HomeController extends Controller
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
 
+        $exclude = Usr_role::whereNotIn('role_name', 'consultant')->groupBy('user_id')->pluck('user_id')->toArray();
+
         $activities = DB::table('timesheet')
         ->select('ts_user_id', DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'))
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
         ->groupBy('ts_user_id')
         ->orderByRaw('AVG(TIME_TO_SEC(ts_from_time))')
-        ->whereNotIn('ts_user_id', ['julyansyah'])
+        ->whereNotIn('ts_user_id', $exclude)
         ->take(5)
         ->get();
 
