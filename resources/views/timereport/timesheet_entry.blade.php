@@ -344,6 +344,7 @@ active
                                         <optgroup label="Presales">
                                         <option value="Presales">Presales</option>
                                         <option value="Trainer">Trainer</option>
+                                        </optgroup>
                                         <optgroup label="Others">
                                             <option value="StandbyLK">Standby (LK)</option>
                                             <option value="StandbyLN">Standby (LN)</option>

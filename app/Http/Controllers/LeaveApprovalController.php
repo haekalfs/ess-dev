@@ -151,7 +151,7 @@ class LeaveApprovalController extends Controller
                 }
                 break;
             default:
-                $getIdApprover = Leave_request_approval::where('id', $id)->whereIn('RequestTo', $checkUserDir)->pluck('RequestTo')->groupBy('RequestTo')->get();
+                $getIdApprover = Leave_request_approval::where('id', $id)->whereIn('RequestTo', $checkUserDir)->groupBy('RequestTo')->pluck('RequestTo')->toArray();
                 $employees = User::whereIn('id', $getIdApprover)->get();
                 $userName = $getLeaveReq->req_by;
 
