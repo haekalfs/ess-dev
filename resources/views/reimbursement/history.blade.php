@@ -67,11 +67,13 @@ active
                         <td>
                             @if($reimb->status_id == 20)
                             <span class="m-0 font-weight-bold text-secondary"><i class="fas fa-spinner fa-spin"></i> Waiting for Approval</span>
-                            @elseif($reimb->status_id == 29) 
-                            <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Approved</span>
-                            @elseif($reimb->status_id == 2002) 
+                            @elseif($reimb->status_id == 30)
+                            <span class="m-0 font-weight-bold" style="color: #00d5ff;"><i class="fas fa-check-circle" style="color: #00d5ff;"></i> Partially Approved</span>
+                            @elseif($reimb->status_id == 29)
+                            <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> All Approved</span>
+                            @elseif($reimb->status_id == 2002)
                             <span class="m-0 font-weight-bold text-success"><i class="fas fa-check-circle" style="color: #01e476;"></i> Paid</span>
-                            @else 
+                            @else
                             <span class="m-0 font-weight-bold text-danger"><i class="fas fa-times-circle" style="color: #ff0000;"></i> Rejected</span>
                             @endif
                         </td>
@@ -85,7 +87,7 @@ active
                             @php
                                 $approved = false;
                             @endphp
-                            
+
                             @foreach ($reimb->approval as $status)
                                 @if ($status->status == 29 || $status->status == 30 || $status->status == 404)
                                     <a class="btn btn-primary btn-sm" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
@@ -95,9 +97,9 @@ active
                                     @endphp
                                 @endif
                             @endforeach
-                                
+
                             @unless ($approved)
-                                <a class="btn btn-primary btn-sm" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
+                                <a class="btn btn-primary btn-sm mr-2" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
                                 <a href="/reimbursement/history/cancel/{{ $reimb->id }}" class="btn btn-danger btn-sm">
                                     <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel
                                 </a>

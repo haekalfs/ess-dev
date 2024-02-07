@@ -3,18 +3,20 @@
 namespace App\Mail;
 
 use App\Models\Reimbursement;
+use App\Models\Reimbursement_approval;
+use App\Models\Reimbursement_item;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ReimbursementPaid extends Mailable
+class ReimbursementPartiallyApproved extends Mailable
 {
     protected $employee;
     protected $formCreator;
 
-    public function __construct(User $employee, Reimbursement $formCreator)
+    public function __construct(User $employee, Reimbursement_approval $formCreator)
     {
         $this->employee = $employee;
         $this->formCreator = $formCreator;
@@ -22,7 +24,7 @@ class ReimbursementPaid extends Mailable
 
     public function build()
     {
-        $subject = 'Your Reimbursement Request has been Paid : '. $this->formCreator->f_type;
+        $subject = 'New Status for Reimbursement Request : '. $this->formCreator->request->f_type;
         $link = 'https://timereport.perdana.co.id/reimbursement/history/';
 
         if($this->formCreator->ccTo){
@@ -38,7 +40,7 @@ class ReimbursementPaid extends Mailable
             $formattedCcEmails = NULL;
         }
 
-        return $this->markdown('mailer.reimburse_paid')
+        return $this->markdown('mailer.reimburse_partially_approved')
                     ->subject($subject)
                     ->to($this->employee->email)
                     ->cc($formattedCcEmails)

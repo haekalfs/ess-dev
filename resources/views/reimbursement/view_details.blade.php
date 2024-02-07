@@ -172,6 +172,12 @@ active
                                                     $approved = true;
                                                     break;
                                                 @endphp
+                                            @elseif ($status->status == 30)
+                                                <a><i class="fas fa-check-circle" style="color: #005eff;"></i> <small>Approved</small></a>
+                                                @php
+                                                    $approved = true;
+                                                    break;
+                                                @endphp
                                             @endif
                                         @endforeach
 
@@ -186,7 +192,7 @@ active
 
                                         @foreach ($usr->approval as $status)
                                             @if ($status->status == 29 || $status->status == 30 || $status->status == 404)
-                                                <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> View Details</a>
+                                                <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                                 @php
                                                     $approved = true;
                                                     break;
@@ -195,8 +201,8 @@ active
                                         @endforeach
 
                                         @unless ($approved)
-                                            <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Action</a>
-                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> View Details</a>
+                                            <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                         @endunless
                                     </td>
                                 </tr>

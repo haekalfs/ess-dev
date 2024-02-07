@@ -277,11 +277,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
     Route::get('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
     Route::get('reimbursement/view/preview/{id}', 'ReimburseController@previewPdf')->name('pdf.preview');
-
-    Route::get('/approval/reimburse/view/{id}', 'ReimbursementApprovalController@view_details')->name('reimburse.approval-view-req');
+    Route::get('/download-receipt/reimbursement/{id}', 'ReimburseController@downloadReceipt');
 
     Route::match(['get', 'post'], '/approval/reimburse/view/approve/{id}', 'ReimbursementApprovalController@approve')->name('reimburse.approve');
     Route::match(['get', 'post'], '/approval/reimburse/view/reject/{id}', 'ReimbursementApprovalController@reject')->name('reimburse.reject');
+    Route::get('/approval/reimburse/view/{id}', 'ReimbursementApprovalController@view_details')->name('reimburse.approval-view-req');
+
     Route::get('/retrieveApproverList/{id}', 'ReimbursementApprovalController@listApprover')->name('list-approver');
 
     Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement');

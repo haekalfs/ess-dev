@@ -7,6 +7,7 @@ active
 @endsection
 
 @section('content')
+
 <div class="row align-items-center zoom90">
     <div class="col">
         <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement #{{ $f_id }}</h1>
@@ -63,7 +64,7 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Reimbursement Type</td>
-                                        <td>: {{ $row->f_type }}</td>
+                                        <td class="font-weight-bold text-primary">: {{ $row->f_type }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Payment Method</td>
@@ -160,7 +161,7 @@ active
                                         @elseif ($usr->status == 404)
                                             <i class="far fa-times-circle"></i>
                                         @else
-                                            <a><i class="far fa-check-circle fa-spin"></i></a>
+                                            <a><i class="far fa-check-circle"></i></a>
                                         @endif
                                     </td>
                                     <td class="action text-center">
@@ -182,7 +183,7 @@ active
 </div>
 
 <div class="modal fade" id="editAmountModal" tabindex="-1" role="dialog" aria-labelledby="modalPeriod" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header border-bottom-1">
 				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="editAmountModalLabel">Preview Item</h5>
@@ -197,35 +198,46 @@ active
                     <div class="col-md-12 zoom90">
                         <div class="row">
                             <div class="col-md-12 zoom90">
-                                <div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+                                <div class="zoom90 d-sm-flex align-items-center justify-content-between mb-4">
                                     <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-money-bill-wave"></i> Settlement for Disbursement</h1>
-                                    <button class="btn btn-secondary">View Receipt</button>
+                                    <div>
+                                        <a id="downloadBtn" class="btn btn-primary mr-2"><i class="fas fa-download"></i> Download</a>
+                                        <button type="button" id="viewReceipt" class="btn btn-secondary" onclick="toggleReceipt()"><i class="fas fa-eye"></i> View Receipt</button>
+                                        <button type="button" id="closeReceipt" style="display: none;" class="btn btn-secondary2" onclick="toggleReceipt()">Close</button>
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label for="to">Employee's Expenses :</label>
-                                            <input type="text" class="form-control" name="current_amount" readonly oninput="formatAmount(this)" id="current_amount">
-                                            <small style="color: red;"><i>Amount of Employee's Request.</i></small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex justify-content-center align-items-center">
-                                        <i class="fas fa-arrow-right"></i>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label for="to">Payout :</label>
-                                            <input type="text" class="form-control" name="approved_amount" oninput="formatAmountPrefix(this)" id="approved_amount">
-                                            <small style="color: red;"><i>Set the payout amount that will disbursed</i></small>
+                                <div class="col-md-12" style="display: none;" id="receiptContainer">
+                                    <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
+                                </div>
+                                <div class="row" id="detailContainer">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <label for="to">Employee's Request :</label>
+                                                    <input type="text" class="form-control" name="current_amount" readonly oninput="formatAmount(this)" id="current_amount">
+                                                    <small style="color: red;"><i>Amount of Employee's Request.</i></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 d-flex justify-content-center align-items-center">
+                                                <i class="fas fa-arrow-right"></i>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <label for="to">Amount to be Processed :</label>
+                                                    <input type="text" class="form-control" name="approved_amount" title="Leave it blank/null if you won't edit the value!" oninput="formatAmountPrefix(this)" id="approved_amount">
+                                                    <small style="color: red;"><i>Set the payout amount that will disbursed.</i></small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="approval_notes">Notes to Employee :</label>
-                                            <textarea type="text" class="form-control" name="approval_notes" id="approval_notes"></textarea>
+                                            <textarea type="text" class="form-control" rows="5" name="approval_notes" id="approval_notes"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 mt-4">
+                                    {{-- <div class="col-md-12 mt-4">
                                         <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
                                             <thead class="thead-light">
                                                 <tr>
@@ -238,18 +250,18 @@ active
                                                 <!-- Ajax Data -->
                                             </tbody>
                                         </table>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
 				    </div>
                 </div>
 				<div class="modal-footer">
-                    <a href="#" class="btn btn-primary btn-sm" id="approveButton" style="margin-right: 5px;">
-                        <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Approve
-                    </a>
-                    <a href="#" class="btn btn-danger btn-sm" id="rejectButton" style="margin-right: 5px;">
+                    <a href="#" class="btn btn-sm btn-danger mr-2" id="rejectButton" onclick='askConfirm();'>
                         <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject
+                    </a>
+                    <a href="#" class="btn btn-sm btn-primary" id="approveButton" onclick='askConfirm();'>
+                        <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Approve
                     </a>
                 </div>
 			</form>
@@ -289,6 +301,10 @@ active
             success: function(response) {
                 $('#approved_amount').val("Rp. " + response.approved_amount);
                 $('#current_amount').val("Rp. " + response.amount);
+                // Assuming response.url contains the desired URL
+                var downloadUrl = "/download-receipt/reimbursement/" + response.id;
+                // Set the href attribute of the download button
+                $('#downloadBtn').attr('href', downloadUrl);
             },
             error: function(xhr) {
                 // Handle error
@@ -301,54 +317,57 @@ active
             $('#pdfIframe').attr('src', '');
         });
 
-        // Click event handler for the Approve button
+        function askConfirm(action) {
+            var confirmation = confirm("Are you sure you want to " + action + "?");
+
+            if (confirmation) {
+                // User clicked OK, proceed with form submission
+                submitForm(action);
+            } else {
+                // User clicked Cancel, do nothing or handle as needed
+            }
+        }
+
+        function submitForm(action) {
+            var test = document.getElementById('item_id').value;
+
+            // Assuming you want to submit the form with ID "approvalItemForm"
+            var formData = $('#approvalItemForm').serialize(); // Serialize the form data
+
+            var url;
+
+            if (action === "approve") {
+                url = '/approval/reimburse/view/approve/' + test;
+            } else if (action === "reject") {
+                url = '/approval/reimburse/view/reject/' + test;
+            }
+
+            // Perform an AJAX POST request to the controller
+            $.ajax({
+                url: url, // Replace with your controller URL
+                method: 'POST', // Change to POST if necessary
+                data: formData,
+                success: function(response) {
+                    $('#successModal').modal('show');
+                    window.location.reload();
+                },
+                error: function(error) {
+                    // Handle error response as needed
+                    console.error(error);
+                }
+            });
+        }
+
+        // Event handler for the Approve button
         $('#approveButton').on('click', function(e) {
             e.preventDefault(); // Prevent the default navigation behavior
-
-            var test = document.getElementById('item_id').value;
-
-            // Assuming you want to submit the form with ID "editItemForm"
-            var formData = $('#approvalItemForm').serialize(); // Serialize the form data
-
-            // Perform an AJAX POST request to the controller
-            $.ajax({
-                url: '/approval/reimburse/view/approve/' + test, // Replace with your controller URL
-                method: 'POST', // Change to POST if necessary
-                data: formData,
-                success: function(response) {
-                    $('#successModal').modal('show');
-                    window.location.reload();
-                },
-                error: function(error) {
-                    // Handle error response as needed
-                    console.error(error);
-                }
-            });
+            askConfirm("approve");
         });
 
-        // Click event handler for the Reject button
+        // Event handler for the Reject button
         $('#rejectButton').on('click', function(e) {
             e.preventDefault(); // Prevent the default navigation behavior
-
-            var test = document.getElementById('item_id').value;
-
-            // Assuming you want to submit the form with ID "editItemForm"
-            var formData = $('#approvalItemForm').serialize(); // Serialize the form data
-
-            // Perform an AJAX POST request to the controller
-            $.ajax({
-                url: '/approval/reimburse/view/reject/' + test, // Replace with your controller URL
-                method: 'POST', // Change to POST if necessary
-                data: formData,
-                success: function(response) {
-                    $('#successModal').modal('show');
-                    window.location.reload();
-                },
-                error: function(error) {
-                    // Handle error response as needed
-                    console.error(error);
-                }
-            });
+            askConfirm("reject");
         });
     });
 
@@ -380,6 +399,29 @@ active
             }
         });
     }
+</script>
+
+<script>
+let click = 0;
+
+function toggleReceipt() {
+    var viewBtn = document.getElementById("viewReceipt");
+    var receiptContainer = document.getElementById("receiptContainer");
+    var detailContainer = document.getElementById("detailContainer");
+
+    click++;
+
+    if (click % 2 === 1) {
+        // Showing receipt and close button
+        viewBtn.textContent = "Close Receipt";
+        receiptContainer.style.display = "block";
+        detailContainer.style.display = "none";
+    } else {
+        viewBtn.textContent = "View Receipt";
+        receiptContainer.style.display = "none";
+        detailContainer.style.display = "block";
+    }
+}
 </script>
 @endsection
 

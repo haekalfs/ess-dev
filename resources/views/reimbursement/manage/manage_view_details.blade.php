@@ -171,6 +171,12 @@ active
                                                     $approved = true;
                                                     break;
                                                 @endphp
+                                            @elseif ($status->status == 30)
+                                                <a><i class="fas fa-check-circle" style="color: #005eff;"></i> <small>Approved</small></a>
+                                                @php
+                                                    $approved = true;
+                                                    break;
+                                                @endphp
                                             @endif
                                         @endforeach
 

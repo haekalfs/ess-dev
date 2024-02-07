@@ -22,6 +22,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -82,9 +83,7 @@ class ReimburseController extends Controller
         $approvalByGroup = Timesheet_approver::where('group_id', $RequestTo)
             ->get();
 
-        $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::where('company_project_id', $companyProjectId)
-        ->whereIn('project_assignment_id', $findAssignment)
         ->where('periode_end', '>=', date('Y-m-d'))
         ->where('role', 'PM')
         ->get();
@@ -171,16 +170,15 @@ class ReimburseController extends Controller
 
                 $userToApprove = [];
 
-                if($usersWithPMRole)
-                {
-                    foreach($usersWithPMRole as $approverPm){
+                if ($usersWithPMRole->isNotEmpty()) {
+                    foreach ($usersWithPMRole as $approverPm) {
                         Reimbursement_approval::create([
                             'status' => 20,
                             'RequestTo' => $approverPm->user_id,
                             'reimb_item_id' => $itemId,
                             'reimbursement_id' => $uniqueId
                         ]);
-                        $userToApprove[] = $approverPm->approver;
+                        $userToApprove[] = $approverPm->user_id;
                     }
                 }
 
@@ -196,10 +194,10 @@ class ReimburseController extends Controller
             }
 
             $employees = User::whereIn('id', $userToApprove)->get();
-            $userName = Auth::user()->name;
+            $form = Reimbursement::find($uniqueId);
 
             foreach ($employees as $employee) {
-                dispatch(new NotifyReimbursementCreation($employee, $userName));
+                dispatch(new NotifyReimbursementCreation($employee, $form));
             }
             Session::flash('success',"Request has been submitted!");
             return redirect('/reimbursement/history');
@@ -214,10 +212,12 @@ class ReimburseController extends Controller
         $reimbursement = Reimbursement::where('id', $id)->get();
 
         foreach ($reimbursement as $as) {
-            if ($as->status_id == 20 || $as->status_id == 30) {
+            if ($as->status_id == 20) {
                 $status = "Waiting for Approval";
+            }elseif ($as->status_id == 30) {
+                $status = "Partially Approved";
             } elseif ($as->status_id == 29) {
-                $status = "Approved";
+                $status = "All Approved";
             } elseif ($as->status_id == 2002) {
                 $status = "Paid";
             } elseif ($as->status_id == 404) {
@@ -396,7 +396,6 @@ class ReimburseController extends Controller
     public function disbursed_all(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'usersName' => 'required',
             'formId' => 'required'
         ]);
 
@@ -405,24 +404,27 @@ class ReimburseController extends Controller
             return redirect()->back();
         }
 
-        // Extract and convert the comma-delimited values into an array
-        $usersName = explode(',', $request->input('usersName'));
-        $usersName = array_filter($usersName);
-
         //id
         $formId = explode(',', $request->input('formId'));
         $formId = array_filter($formId);
 
         // Ensure both arrays are not empty before proceeding
-        if (!empty($usersName) && !empty($formId)) {
-            // Update records in the Reimbursement table where id is in the $formId array
-            Reimbursement::whereIn('id', $formId)->update(['status_id' => 2002]);
+        if (!empty($formId)) {
+            //loop the formId passed
+            foreach($formId as $form){
+                // Update records in the Reimbursement table where id is in the $formId array
+                Reimbursement::whereIn('id', $formId)->update(['status_id' => 2002]);
 
-            $employees = User::whereIn('id', $usersName)->get();
-            $userName = Auth::user()->name;
+                $getForm = Reimbursement::find($form);
 
-            foreach ($employees as $employee) {
-                dispatch(new NotifyReimbursementPaid($employee, $userName));
+                if ($getForm) {
+                    $employees = User::where('id', $getForm->f_req_by)->get();
+
+                    // Send mail
+                    foreach ($employees as $employee) {
+                        dispatch(new NotifyReimbursementPaid($employee, $getForm));
+                    }
+                }
             }
         }
 
@@ -446,13 +448,17 @@ class ReimburseController extends Controller
             $startRow = 8;
             $startCol = 2;
 
-            $approvedReimb = Reimbursement::where('status_id', 29)
+            $checkApprovals = Reimbursement_approval::whereNotIn('status', [404,20])->groupBy('reimbursement_id')->pluck('reimbursement_id')
+            ->toArray();
+
+            $approvedReimb = Reimbursement::where('status_id', (29||30))
+            ->whereIn('id', $checkApprovals)
             ->whereYear('created_at', $Year)
             ->whereMonth('created_at', $Month)
             ->pluck('id')
             ->toArray();
 
-            $result = Reimbursement_item::where('reimbursement_id', $approvedReimb)->get();
+            $result = Reimbursement_item::whereIn('reimbursement_id', $approvedReimb)->get();
 
             // Initialize the last printed user name
             $lastUser = '';
@@ -538,7 +544,7 @@ class ReimburseController extends Controller
         foreach ($reimbursement as $as) {
             if ($as->status_id == 20) {
                 $status = "Waiting for Approval";
-            } elseif ($as->status_id == 29) {
+            } elseif ($as->status_id == (29 || 30)) {
                 $btnApprove = "";
                 $status = "Approved";
             } elseif ($as->status_id == 2002) {
@@ -560,5 +566,19 @@ class ReimburseController extends Controller
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
         return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'stat' => $status, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+    }
+
+    public function downloadReceipt($Id)
+    {
+        $getFile = Reimbursement_item::find($Id);
+        $filePath = public_path($getFile->file_path);
+
+        // Check if the file exists
+        if (File::exists($filePath)) {
+            return response()->download($filePath);
+        }
+
+        // File not found
+        abort(404);
     }
 }
