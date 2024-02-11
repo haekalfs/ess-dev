@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>The Item from your request : {{ $formCreator->request->f_type }} has been <span style="color: red;"><i>Rejected</i></span> by {{ $formCreator->RequestTo }}. Please note that this is final and cannot be contested.</p>
+<p>An item from your request : {{ $formCreator->request->f_type }} has been <span style="color: red;"><i>Rejected</i></span> by {{ $formCreator->user->name }}. Please note that this is final and cannot be contested.</p>
 <p>Here are the notes provided: <br>{{ $formCreator->notes }}</p>
 
 <p>Please review the details of your request by clicking the link below:</p>

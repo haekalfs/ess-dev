@@ -1,8 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>The Item from your request : {{ $formCreator->request->f_type }} has been changed by Finance Dept. The total approved amount is: Rp {{ $formCreator->approved_amount }}
-    . Please note that this is final and cannot be contested.</p>
-<p>Here are the notes provided: <br>{{ $formCreator->notes }}</p>
+<p>An item : {{ $formCreator->description }} from your request : {{ $formCreator->request->f_type }}, has been changed by Finance Dept. Please note that this is final and cannot be contested.</p>
 
 <p>Please review the details of your request by clicking the link below:</p>
 <p><a href="{{ $link }}"><strong>Click Here</strong></a></p>

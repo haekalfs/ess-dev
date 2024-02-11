@@ -41,7 +41,7 @@ class ReimbursementApprovalController extends Controller
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
             //should add more position
-                if (in_array($checkUserPost, [8, 12, 6, 22])) {
+                if (in_array($checkUserPost, [8, 12, 6, 10, 22])) {
                     $Check = DB::table('reimbursement_approval')
                     ->select('reimb_item_id')
                     ->whereNotIn('RequestTo', $ts_approver)
@@ -207,6 +207,16 @@ class ReimbursementApprovalController extends Controller
             ->whereIn('status', [20])
             ->count();
 
+        $checkEveryApprover = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)
+            ->where('RequestTo', Auth::id())
+            ->whereIn('status', [20])
+            ->count();
+
+        $changeStatus = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)
+            ->whereNotIn('RequestTo', [Auth::id()])
+            ->whereIn('status', [20])
+            ->count();
+
         $approved_amount = $item->amount;
         $rawAmount = $request->approved_amount;
         $numericAmount = (float) preg_replace('/[^0-9]/', '', $rawAmount);
@@ -221,13 +231,11 @@ class ReimbursementApprovalController extends Controller
 
         $item->save();
 
-        $statusToUpdate = $checkRowsLeft ? 30 : 29;
+        $statusToUpdate = $changeStatus ? 30 : 29;
 
         Reimbursement_approval::where('reimb_item_id', $item->id)
             ->where('RequestTo', Auth::user()->id)
             ->update(['status' => $statusToUpdate, 'notes' => $request->approval_notes, 'approved_amount' => $approved_amount]);
-
-        Reimbursement::where('id', $item->reimbursement_id)->update(['status_id' => $statusToUpdate]);
 
         $formApproval = Reimbursement_approval::where('reimb_item_id', $item->id)
         ->where('RequestTo', Auth::user()->id)->first();
@@ -235,12 +243,21 @@ class ReimbursementApprovalController extends Controller
         if ($reimbursement && $item) {
             // Send mail
             foreach ($employees as $employee) {
-                $notification = $checkRowsLeft ? new NotifyReimbursementPartiallyApproved($employee, $formApproval) : new NotifyReimbursementApproved($employee, $reimbursement);
-                dispatch($notification);
+                if ($checkRowsLeft == 1) {
+                    Reimbursement::where('id', $item->reimbursement_id)->update(['status_id' => $statusToUpdate]);
+                    //send email
+                    $notification = new NotifyReimbursementApproved($employee, $reimbursement);
+                    dispatch($notification);
+                } else if ($checkEveryApprover == 1){
+                    //dispatch to user
+                    $notification = new NotifyReimbursementPartiallyApproved($employee, $formApproval);
+                    dispatch($notification);
+                }
             }
         }
         //Send to next Approver
-        if($checkRowsLeft){
+        if($checkEveryApprover == 1){
+            //dispatch to approver
             $checkApprovalRowsLeft = Reimbursement_approval::whereNotIn('RequestTo', [Auth::id()])
             ->where('reimbursement_id', $item->reimbursement_id)
             ->whereIn('status', [20])
@@ -290,11 +307,11 @@ class ReimbursementApprovalController extends Controller
         $reimbItem = Reimbursement_item::find($item_id);
         $checkRowsLeft = Reimbursement_approval::whereNotIn('reimb_item_id', [$reimbItem->id])
             ->where('reimbursement_id', $reimbItem->reimbursement_id)
-            ->where('status', 404)
+            ->whereIn('status', [20, 30, 29])
             ->count();
 
         // Update reimbursement request status if all items are rejected
-        if ($checkRowsLeft > 0) {
+        if ($checkRowsLeft === 0) {
             Reimbursement::where('id', function ($query) use ($item_id) {
                 $query->select('reimbursement_id')->from('reimbursement_items')->where('id', $item_id);
             })->update(['status_id' => 404]);

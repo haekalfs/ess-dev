@@ -1,10 +1,8 @@
 <p>Dear, {{ $name }}</p>
 
-<p>Your Reimbursement Request for: {{ $formCreator->request->f_type }} has been partially approved by {{ $formCreator->RequestTo }}. The total approved amount is: Rp {{ $formCreator->approved_amount }}
-    . Please note that this approval is subject to final/director approval.</p>
-<p>Here are the notes provided: <br>{{ $formCreator->notes }}</p>
+<p>Your Reimbursement Request : {{ $formCreator->request->f_type }}, has been approved by {{ $formCreator->user->name }}. Please note that this approval is subject to final/director approval.</p>
 
-<p>Please review the details of your partially approved reimbursement by clicking the link below:</p>
+<p>Please review the details of your request by clicking the link below:</p>
 <p><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 
 <p>Should you have any questions or require further assistance, feel free to contact us.</p>
