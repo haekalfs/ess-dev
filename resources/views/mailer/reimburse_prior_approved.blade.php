@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>{{ $formCreator->user->name }} has requested reimbursement for: {{ $formCreator->request->f_type }}, and it has been partially approved by {{ $formCreator->RequestTo }} with a total approved amount of: Rp {{ number_format($formCreator->approved_amount, 0, ',', '.') }}. We are awaiting your final approval.</p>
+<p>{{ $formCreator->user->name }} has requested reimbursement for: {{ $formCreator->request->f_type }}, and it has been partially approved by {{ $formCreator->RequestTo }} with a total approved amount of: Rp {{ $formCreator->approved_amount }}. We are awaiting your final approval.</p>
 
 <p>Please review the request and see the attached notes, if any.</p>
 

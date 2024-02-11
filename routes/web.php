@@ -275,7 +275,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reimbursement/view/{id}', 'ReimburseController@view_details')->name('reimburse-view-req');
     Route::get('/retrieveReimburseData/{id}', 'ReimburseController@retrieveReimburseData');
     Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
-    Route::get('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
+    Route::post('/reimbursement/edit/update/{item_id}', 'ReimburseController@updateReimburseDataFinance');
+    Route::delete('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
     Route::get('reimbursement/view/preview/{id}', 'ReimburseController@previewPdf')->name('pdf.preview');
     Route::get('/download-receipt/reimbursement/{id}', 'ReimburseController@downloadReceipt');
 

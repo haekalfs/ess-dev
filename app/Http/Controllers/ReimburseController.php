@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyChangesReimbursementbyFinance;
+use App\Jobs\NotifyReimburseCancelRequest;
 use App\Jobs\NotifyReimbursementCreation;
 use App\Jobs\NotifyReimbursementPaid;
 use App\Models\Company_project;
@@ -209,31 +211,14 @@ class ReimburseController extends Controller
 
     public function view_details($id)
     {
-        $reimbursement = Reimbursement::where('id', $id)->get();
-
-        foreach ($reimbursement as $as) {
-            if ($as->status_id == 20) {
-                $status = "Waiting for Approval";
-            }elseif ($as->status_id == 30) {
-                $status = "Partially Approved";
-            } elseif ($as->status_id == 29) {
-                $status = "All Approved";
-            } elseif ($as->status_id == 2002) {
-                $status = "Paid";
-            } elseif ($as->status_id == 404) {
-                $status = "Rejected";
-            } else {
-                $status = "Unknown Status";
-            }
-            $f_id = $as->f_id;
-        }
-
+        $reimbursement = Reimbursement::find($id);
+        $f_id = $reimbursement->f_id;
         $emp = User::all();
 
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
-        return view('reimbursement.view_details', ['reimbursement' => $reimbursement, 'stat' => $status, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('reimbursement.view_details', ['reimbursement' => $reimbursement,'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function retrieveReimburseData($id)
@@ -292,14 +277,40 @@ class ReimburseController extends Controller
         return response()->json(['success' => 'Item updated successfully.']);
     }
 
-    public function cancel_request($id)
-	{
-        $reimbRequest = Reimbursement::where('id',$id)->first();
+    public function updateReimburseDataFinance(Request $request, $item_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required'
+        ]);
 
-        $deleteRA = Reimbursement_approval::where('reimbursement_id', $id)->get();
-        foreach ($deleteRA as $del) {
-            $del->delete();
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
         }
+
+        $item = Reimbursement_item::find($item_id);
+        $item->approved_amount = $request->amount;
+        $item->save();
+
+        $employees = User::where('id', $item->request->f_req_by)->get();
+
+        foreach ($employees as $employee) {
+            dispatch(new NotifyChangesReimbursementbyFinance($employee, $item));
+        }
+
+        return response()->json(['success' => 'Item updated successfully.']);
+    }
+
+    public function cancel_request(Request $request, $id)
+	{
+        $reimbRequest = Reimbursement::find($id);
+
+        // Fetching IDs of users associated with the reimbursements
+        $approvalIds = Reimbursement_approval::where('reimbursement_id', $id)->pluck('RequestTo');
+
+        // Dispatching notification jobs to users
+        User::whereIn('id', $approvalIds)->get()->each(function ($employee) use ($reimbRequest) {
+            dispatch(new NotifyReimburseCancelRequest($employee, $reimbRequest->user->name));
+        });
 
         if ($reimbRequest) {
             $fileReceipt = Reimbursement_item::where("reimbursement_id", $reimbRequest->id);
@@ -325,7 +336,12 @@ class ReimburseController extends Controller
             $reimbRequest->delete();
         }
 
-        return redirect()->back()->with('success', "Reimbursement Request has been canceled!");
+        // Deleting reimbursement approvals
+        Reimbursement_approval::where('reimbursement_id', $id)->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
 	}
 
     public function previewPdf($id)
@@ -448,15 +464,17 @@ class ReimburseController extends Controller
             $startRow = 8;
             $startCol = 2;
 
-            $checkApprovals = Reimbursement_approval::whereNotIn('status', [404,20])->groupBy('reimbursement_id')->pluck('reimbursement_id')
-            ->toArray();
+            $checkApprovals = Reimbursement_approval::whereNotIn('status', [404, 20])
+                ->groupBy('reimbursement_id')
+                ->pluck('reimbursement_id')
+                ->toArray();
 
-            $approvedReimb = Reimbursement::where('status_id', (29||30))
-            ->whereIn('id', $checkApprovals)
-            ->whereYear('created_at', $Year)
-            ->whereMonth('created_at', $Month)
-            ->pluck('id')
-            ->toArray();
+            $approvedReimb = Reimbursement::whereIn('status_id', [29, 30])
+                ->whereIn('id', $checkApprovals)
+                ->whereYear('created_at', $Year)
+                ->whereMonth('created_at', $Month)
+                ->pluck('id')
+                ->toArray();
 
             $result = Reimbursement_item::whereIn('reimbursement_id', $approvedReimb)->get();
 
@@ -466,6 +484,7 @@ class ReimburseController extends Controller
             $firstRow = true; // Flag to check if it's the first row for each user
             $total = [];
 
+            $no = 1;
             foreach ($result as $index => $row) {
                 // Calculate the total mandays for each user
                 if ($row->request->f_req_by !== $lastUser) {
@@ -507,13 +526,15 @@ class ReimburseController extends Controller
                     $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, $row->request->f_type);
                     $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, $row->request->f_payment_method);
                     $lastId = $row->request->f_id;
+                    $no = 1;
                 }
 
-                $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $row->description);
+                $sheet->setCellValueByColumnAndRow($startCol + 4, $startRow, $no.'. '.$row->description);
                 $sheet->setCellValueByColumnAndRow($startCol + 5, $startRow, $row->amount);
                 $sheet->setCellValueByColumnAndRow($startCol + 6, $startRow, $row->approved_amount);
 
                 $startRow++;
+                $no++;
                 $firstRow = false; // Set the firstRow flag to false after the first row for each user
             }
 
@@ -539,25 +560,8 @@ class ReimburseController extends Controller
 
     public function manage_view_details($id)
     {
-        $reimbursement = Reimbursement::where('id', $id)->get();
-
-        foreach ($reimbursement as $as) {
-            if ($as->status_id == 20) {
-                $status = "Waiting for Approval";
-            } elseif ($as->status_id == (29 || 30)) {
-                $btnApprove = "";
-                $status = "Approved";
-            } elseif ($as->status_id == 2002) {
-                $status = "Paid";
-            } elseif ($as->status_id == 404) {
-                $btnApprove = "";
-                $status = "Rejected";
-            } else {
-                $btnApprove = "";
-                $status = "Unknown Status";
-            }
-            $f_id = $as->f_id;
-        }
+        $reimbursement = Reimbursement::find($id);
+        $f_id = $reimbursement->f_id;
 
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
@@ -565,7 +569,7 @@ class ReimburseController extends Controller
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
-        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'stat' => $status, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function downloadReceipt($Id)

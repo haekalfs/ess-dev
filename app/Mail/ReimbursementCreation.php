@@ -23,7 +23,7 @@ class ReimbursementCreation extends Mailable
     public function build()
     {
         $subject = 'New Request for Reimbursement : '. $this->formCreator->f_type;
-        $link = 'https://timereport.perdana.co.id/reimbursement/history/';
+        $link = 'https://timereport.perdana.co.id/approval/reimburse/';
 
         if($this->formCreator->ccTo){
             // Split comma-delimited string into an array of email addresses

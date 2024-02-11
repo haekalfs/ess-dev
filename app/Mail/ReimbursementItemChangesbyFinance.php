@@ -11,12 +11,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ReimbursementRejected extends Mailable
+class ReimbursementItemChangesbyFinance extends Mailable
 {
     protected $employee;
     protected $formCreator;
 
-    public function __construct(User $employee, Reimbursement_approval $formCreator)
+    public function __construct(User $employee, Reimbursement_item $formCreator)
     {
         $this->employee = $employee;
         $this->formCreator = $formCreator;
@@ -40,7 +40,7 @@ class ReimbursementRejected extends Mailable
             $formattedCcEmails = NULL;
         }
 
-        return $this->markdown('mailer.reimburse_rejected')
+        return $this->markdown('mailer.reimburse_changed_by_finance')
                     ->subject($subject)
                     ->to($this->employee->email)
                     ->cc($formattedCcEmails)

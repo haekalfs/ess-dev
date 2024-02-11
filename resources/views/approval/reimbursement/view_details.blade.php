@@ -11,12 +11,24 @@ active
 <div class="row align-items-center zoom90">
     <div class="col">
         <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement #{{ $f_id }}</h1>
-        <p class="mb-4 text-danger"><i>{{ $stat }}</i></p>
+        @if($reimbursement->status_id == 20)
+        <p class="mb-4 text-primary"><i>Waiting for Approval</i></p>
+        @elseif($reimbursement->status_id == 404)
+        <p class="mb-4 text-danger"><i>Rejected</i></p>
+        @else
+        <p class="mb-4 text-primary"><i>Approved</i></p>
+        @endif
     </div>
     <div class="col-auto">
-        <a href="/approval/reimburse/" class="btn btn-primary btn-sm">
-            <i class="fas fa-backward"></i>&nbsp; Go Back
-        </a>
+        @if($reimbursement_items_count > 0)
+            <a href="#" class="btn btn-primary btn-sm" onclick="showPreventModal();">
+                <i class="fas fa-backward"></i>&nbsp; Go Back
+            </a>
+        @else
+            <a href="/approval/reimburse/" class="btn btn-primary btn-sm">
+                <i class="fas fa-forward"></i>&nbsp; Go Back
+            </a>
+        @endif
     </div>
 </div>
 @if ($message = Session::get('success'))
@@ -53,24 +65,22 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
-                                    @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Form ID.</td>
-                                        <td>: {{ $row->id }}</td>
+                                        <td>: {{ $reimbursement->id }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requested By</td>
-                                        <td>: {{ $row->user->name }}</td>
+                                        <td>: {{ $reimbursement->user->name }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Reimbursement Type</td>
-                                        <td class="font-weight-bold text-primary">: {{ $row->f_type }}</td>
+                                        <td class="font-weight-bold text-primary">: {{ $reimbursement->f_type }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Payment Method</td>
-                                        <td>: {{ $row->f_payment_method }}</td>
+                                        <td>: {{ $reimbursement->f_payment_method }}</td>
                                     </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -92,12 +102,11 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
-                                    @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requesting Approval to</td>
                                         <td>:
                                             <?php
-                                                $uniqueApprovers = array_unique($row->approval->pluck('RequestTo')->toArray());
+                                                $uniqueApprovers = array_unique($reimbursement->approval->pluck('RequestTo')->toArray());
                                                 $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
                                                 $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
                                                 echo $commaDelimitedApprovers;
@@ -106,17 +115,16 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Notes</td>
-                                        <td>: {{ $row->notes }}</td>
+                                        <td>: {{ $reimbursement->notes }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Date Requested</td>
-                                        <td>: {{ $row->created_at }}</td>
+                                        <td>: {{ $reimbursement->created_at }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Last Updated</td>
-                                        <td>: {{ $row->updated_at }}</td>
+                                        <td>: {{ $reimbursement->updated_at }}</td>
                                     </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -208,6 +216,7 @@ active
                                 </div>
                                 <div class="col-md-12" style="display: none;" id="receiptContainer">
                                     <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
+                                    <img id="imageframe" style="display: none;" src="" width="100%" height="400px"/>
                                 </div>
                                 <div class="row" id="detailContainer">
                                     <div class="col-md-12">
@@ -277,6 +286,21 @@ active
         </div>
     </div>
 </div>
+<div class="modal fade" id="preventModal" tabindex="-1" aria-labelledby="preventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <span class="m-0 font-weight-bold text-danger">You need to review the request first! before leave the page. Take action for all items (Approve/Reject) please...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function showPreventModal() {
+        $('#preventModal').modal('show');
+    }
+</script>
+
 <style>
 .action{
     width: 180px;
@@ -292,8 +316,11 @@ active
         var fileUrl = '{{ route("pdf.preview", ":id") }}';
         fileUrl = fileUrl.replace(':id', itemId);
 
-        // Load the content in the modal iframe
-        $('#pdfIframe').attr('src', fileUrl);
+        // Function to check if the file extension represents an image
+        function isImage(filename) {
+            var extension = filename.split('.').pop().toLowerCase();
+            return ['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(extension);
+        }
 
         $.ajax({
             url: '/retrieveReimburseData/' + itemId,
@@ -303,6 +330,17 @@ active
                 $('#current_amount').val("Rp. " + response.amount);
                 // Assuming response.url contains the desired URL
                 var downloadUrl = "/download-receipt/reimbursement/" + response.id;
+                if (isImage(response.receipt_file)) {
+                    // If it's an image, show image frame and hide PDF frame
+                    $('#imageframe').attr('src', fileUrl);
+                    $('#imageframe').show();
+                    $('#pdfIframe').hide();
+                } else {
+                    // If it's not an image (assume it's a PDF), show PDF frame and hide image frame
+                    $('#pdfIframe').attr('src', fileUrl);
+                    $('#pdfIframe').show();
+                    $('#imageframe').hide();
+                }
                 // Set the href attribute of the download button
                 $('#downloadBtn').attr('href', downloadUrl);
             },
@@ -315,6 +353,7 @@ active
         // When the modal is hidden, clear the iframe src
         $('#pdfModal').on('hidden.bs.modal', function () {
             $('#pdfIframe').attr('src', '');
+            $('#imageframe').attr('src', '');
         });
 
         function askConfirm(action) {

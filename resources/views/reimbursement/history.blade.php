@@ -100,7 +100,7 @@ active
 
                             @unless ($approved)
                                 <a class="btn btn-primary btn-sm mr-2" href="/reimbursement/view/{{ $reimb->id }}"><i class='fas fa-fw fa-eye'></i> View</a>
-                                <a href="/reimbursement/history/cancel/{{ $reimb->id }}" class="btn btn-danger btn-sm">
+                                <a href="#" onclick="deleteRequest(event, {{ $reimb->id }})" class="btn btn-danger btn-sm">
                                     <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Cancel
                                 </a>
                             @endunless

@@ -10,7 +10,13 @@ active
 <div class="row align-items-center zoom90">
     <div class="col">
         <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement #{{ $f_id }}</h1>
-        <p class="mb-4 text-danger"><i>{{ $stat }}</i></p>
+        @if($reimbursement->status_id == 20)
+        <p class="mb-4 text-primary"><i>Waiting for Approval</i></p>
+        @elseif($reimbursement->status_id == 404)
+        <p class="mb-4 text-danger"><i>Rejected</i></p>
+        @else
+        <p class="mb-4 text-primary"><i>Approved</i></p>
+        @endif
     </div>
     <div class="col-auto">
         <a href="/reimbursement/manage" class="btn btn-primary btn-sm">
@@ -52,24 +58,22 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
-                                    @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Form ID.</td>
-                                        <td>: {{ $row->id }}</td>
+                                        <td>: {{ $reimbursement->id }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requested By</td>
-                                        <td>: {{ $row->user->name }}</td>
+                                        <td>: {{ $reimbursement->user->name }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Reimbursement Type</td>
-                                        <td>: {{ $row->f_type }}</td>
+                                        <td class="font-weight-bold text-primary">: {{ $reimbursement->f_type }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Payment Method</td>
-                                        <td>: {{ $row->f_payment_method }}</td>
+                                        <td>: {{ $reimbursement->f_payment_method }}</td>
                                     </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -91,12 +95,11 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
-                                    @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requesting Approval to</td>
                                         <td>:
                                             <?php
-                                                $uniqueApprovers = array_unique($row->approval->pluck('RequestTo')->toArray());
+                                                $uniqueApprovers = array_unique($reimbursement->approval->pluck('RequestTo')->toArray());
                                                 $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
                                                 $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
                                                 echo $commaDelimitedApprovers;
@@ -105,17 +108,16 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Notes</td>
-                                        <td>: {{ $row->notes }}</td>
+                                        <td>: {{ $reimbursement->notes }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Date Requested</td>
-                                        <td>: {{ $row->created_at }}</td>
+                                        <td>: {{ $reimbursement->created_at }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Last Updated</td>
-                                        <td>: {{ $row->updated_at }}</td>
+                                        <td>: {{ $reimbursement->updated_at }}</td>
                                     </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -140,7 +142,7 @@ active
                                 <th>Description</th>
                                 <th>Expense</th>
                                 <th>Payout</th>
-                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -153,36 +155,9 @@ active
                                     <td>{{ $usr->description }}</td>
                                     <td>Rp. {{ $usr->amount }}</td>
                                     <td>Rp. {{ $usr->approved_amount ?? '—' }}</td>
-                                    <td>
-                                        @php
-                                            $approved = false;
-                                        @endphp
-
-                                        @foreach ($usr->approval as $status)
-                                            @if ($status->status == 29)
-                                                <a><i class="fas fa-check-circle" style="color: #005eff;"></i> <small>Approved</small></a>
-                                                @php
-                                                    $approved = true;
-                                                    break;
-                                                @endphp
-                                            @elseif ($status->status == 404)
-                                                <a><i class="fas fa-times-circle" style="color: #ff0000;"></i> <small>Rejected</small></a>
-                                                @php
-                                                    $approved = true;
-                                                    break;
-                                                @endphp
-                                            @elseif ($status->status == 30)
-                                                <a><i class="fas fa-check-circle" style="color: #005eff;"></i> <small>Approved</small></a>
-                                                @php
-                                                    $approved = true;
-                                                    break;
-                                                @endphp
-                                            @endif
-                                        @endforeach
-
-                                        @unless ($approved)
-                                            <a><i class="fas fa-spinner fa-spin"></i> <small>Waiting for Approval</small></a>
-                                        @endunless
+                                    <td class="text-center" style="width: 20%;">
+                                        <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                        <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -206,6 +181,7 @@ active
             <div class="modal-body">
                 <!-- iframe to display the PDF -->
                 <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
+                <img id="imageframe" style="display: none;" src="" width="100%" height="400px"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -214,6 +190,35 @@ active
     </div>
 </div>
 
+<div class="modal fade zoom90" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Approval Flow</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Request To</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ApproverList">
+                        <!-- Ajax Data -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -223,6 +228,39 @@ active
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editAmountModal" tabindex="-1" role="dialog" aria-labelledby="modalPeriod" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header border-bottom-1">
+				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="editAmountModalLabel">Edit Item</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<form method="post" id="editItemForm" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="item_id" id="item_id" value="">
+				<div class="modal-body" style="">
+                    <div class="col-md-12 zoom90">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="to">Amount :</label>
+                                    <input type="text" class="form-control" name="amount" oninput="formatAmount(this)" id="amount" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateReimburseDataSubmit">Submit Request</button>
+                  </div>
+			</form>
+		</div>
+	</div>
+</div>
 <style>
 .action{
     width: 180px;
@@ -230,118 +268,141 @@ active
 </style>
 <script>
 $(document).ready(function () {
-        // When a button with class 'preview-pdf' is clicked
-        $('.preview-pdf').click(function () {
-            // Get the user's ID from the data-id attribute
-            var userId = $(this).data('id');
+    // When a button with class 'preview-pdf' is clicked
+    $('.preview-pdf').click(function () {
+        // Get the user's ID from the data-id attribute
+        var userId = $(this).data('id');
 
-            // Set the URL for the PDF or image preview based on the user's ID
-            var fileUrl = '{{ route("pdf.preview", ":id") }}';
-            fileUrl = fileUrl.replace(':id', userId);
+        // Set the URL for the PDF or image preview based on the user's ID
+        var fileUrl = '{{ route("pdf.preview", ":id") }}';
+        fileUrl = fileUrl.replace(':id', userId);
 
-            // Open the modal
-            $('#pdfModal').modal('show');
-
-            // Load the content in the modal iframe
-            $('#pdfIframe').attr('src', fileUrl);
-
-            // Prevent the default link behavior
-            return false;
-        });
-
-        // When the modal is hidden, clear the iframe src
-        $('#pdfModal').on('hidden.bs.modal', function () {
-            $('#pdfIframe').attr('src', '');
-        });
-    });
+        // Open the modal
+        $('#pdfModal').modal('show');
 
 
-
-    const label = document.getElementById("receipt-label");
-
-    $(document).on('click', '.btn-edit', function() {
-        var itemId = $(this).data('item-id');
-        $('#item_id').val(itemId);
+        // Function to check if the file extension represents an image
+        function isImage(filename) {
+            var extension = filename.split('.').pop().toLowerCase();
+            return ['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(extension);
+        }
 
         $.ajax({
-            url: '/retrieveReimburseData/' + itemId,
+            url: '/retrieveReimburseData/' + userId,
             method: 'GET',
             success: function(response) {
-                // Populate the form fields with the received data
-                $('#description').val(response.description);
-                $('#amount').val(response.amount);
-                label.innerText = response.receipt_file;
-            },
-            error: function(xhr) {
-                // Handle error
-                console.log(xhr.responseText);
-            }
-        });
-    });
-
-    $(document).on('click', '#updateReimburseDataSubmit', function() {
-        var formData = new FormData($('#editItemForm')[0]); // Use FormData to include the file
-        var itemId = $('#item_id').val();
-
-        // Make an AJAX request to update the project data
-        $.ajax({
-            url: '/reimbursement/edit/save/' + itemId,
-            method: 'POST', // Use POST instead of PUT
-            data: formData,
-            contentType: false, // Important for handling file uploads
-            processData: false, // Important for handling file uploads
-            success: function(response) {
-                // Handle success
-                console.log(response);
-
-                // Close the modal
-                $('#editAmountModal').modal('hide');
-                $('#editItemForm')[0].reset();
-                window.location.reload();
-            },
-            error: function(xhr) {
-                // Handle error
-                console.log(xhr.responseText);
-            }
-        });
-    });
-
-    $(document).on('click', '.btn-details', function() {
-        var itemId = $(this).data('item-id');
-        $('#item_id').val(itemId);
-
-        fetchApproverDetails(itemId);
-    });
-
-
-    function fetchApproverDetails(id) {
-        $.ajax({
-            url: '/retrieveApproverList/' + id,
-            type: 'GET',
-            success: function(response) {
-                // Clear the table body
-                $('#ApproverList').empty();
-                // Check if the response is empty or null
-                if (response.length === 0) {
-                    // Display a message to the user
-                    $('#ApproverList').append($('<tr><td class="text-center" colspan="3">No data available in table.</td></tr>'));
+                if (isImage(response.receipt_file)) {
+                    // If it's an image, show image frame and hide PDF frame
+                    $('#imageframe').attr('src', fileUrl);
+                    $('#imageframe').show();
+                    $('#pdfIframe').hide();
                 } else {
-                    // Loop through the activities and append each row to the table
-                    $.each(response, function(index, activity) {
-                        var row = $('<tr></tr>').attr('data-id', activity.id);
-                        row.append($('<td></td>').text(activity.RequestTo));
-                        row.append($('<td></td>').html(activity.status));
-                        row.append($('<td></td>').text(activity.notes));
-                        $('#ApproverList').append(row);
-                        $('#approval_notes').val(activity.notes);
-                    });
+                    // If it's not an image (assume it's a PDF), show PDF frame and hide image frame
+                    $('#pdfIframe').attr('src', fileUrl);
+                    $('#pdfIframe').show();
+                    $('#imageframe').hide();
                 }
             },
-            error: function(response) {
-                console.log(response);
+            error: function(xhr) {
+                // Handle error
+                console.log(xhr.responseText);
             }
         });
-    }
+
+        // Prevent the default link behavior
+        return false;
+    });
+
+    // When the modal is hidden, clear the iframe src
+    $('#pdfModal').on('hidden.bs.modal', function () {
+        $('#pdfIframe').attr('src', '');
+    });
+});
+
+
+const label = document.getElementById("receipt-label");
+
+$(document).on('click', '.btn-edit', function() {
+    var itemId = $(this).data('item-id');
+    $('#item_id').val(itemId);
+
+    $.ajax({
+        url: '/retrieveReimburseData/' + itemId,
+        method: 'GET',
+        success: function(response) {
+            // Populate the form fields with the received data
+            $('#amount').val(response.approved_amount);
+        },
+        error: function(xhr) {
+            // Handle error
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+$(document).on('click', '#updateReimburseDataSubmit', function() {
+    var formData = new FormData($('#editItemForm')[0]); // Use FormData to include the file
+    var itemId = $('#item_id').val();
+
+    // Make an AJAX request to update the project data
+    $.ajax({
+        url: '/reimbursement/edit/update/' + itemId,
+        method: 'POST', // Use POST instead of PUT
+        data: formData,
+        contentType: false, // Important for handling file uploads
+        processData: false, // Important for handling file uploads
+        success: function(response) {
+            // Handle success
+            console.log(response);
+
+            // Close the modal
+            $('#editAmountModal').modal('hide');
+            $('#editItemForm')[0].reset();
+            window.location.reload();
+        },
+        error: function(xhr) {
+            // Handle error
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+$(document).on('click', '.btn-details', function() {
+    var itemId = $(this).data('item-id');
+    $('#item_id').val(itemId);
+
+    fetchApproverDetails(itemId);
+});
+
+
+function fetchApproverDetails(id) {
+    $.ajax({
+        url: '/retrieveApproverList/' + id,
+        type: 'GET',
+        success: function(response) {
+            // Clear the table body
+            $('#ApproverList').empty();
+            // Check if the response is empty or null
+            if (response.length === 0) {
+                // Display a message to the user
+                $('#ApproverList').append($('<tr><td class="text-center" colspan="3">No data available in table.</td></tr>'));
+            } else {
+                // Loop through the activities and append each row to the table
+                $.each(response, function(index, activity) {
+                    var row = $('<tr></tr>').attr('data-id', activity.id);
+                    row.append($('<td></td>').text(activity.RequestTo));
+                    row.append($('<td></td>').html(activity.status));
+                    row.append($('<td></td>').text(activity.notes));
+                    $('#ApproverList').append(row);
+                    $('#approval_notes').val(activity.notes);
+                });
+            }
+        },
+        error: function(response) {
+            console.log(response);
+        }
+    });
+}
 </script>
 @endsection
 
