@@ -158,13 +158,32 @@ class ApprovalController extends Controller
                             ->pluck('user_timesheet')
                             ->toArray();
                         if (!empty($checkApprovalPC)) {
-                            $approvals = Timesheet_detail::select('*')
+                            $checkRowsLeft = Timesheet_detail::select('*')
+                                ->where('RequestTo', Auth::id())
+                                ->where('ts_status_id', 20)
+                                ->whereNotIn('user_timesheet', $checkApprovalPC)
+                                ->where('month_periode', $Year . intval($Month))
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->pluck('user_timesheet')
+                                ->toArray();
+                            if($checkRowsLeft)
+                            {
+                                $approvals = Timesheet_detail::select('*')
                                 ->where('RequestTo', Auth::user()->id)
                                 ->whereNotIn('ts_status_id', [29, 404, 30, 15])
-                                ->whereIn('user_timesheet', $checkApprovalPC)
+                                ->whereIn('user_timesheet', $checkRowsLeft)
                                 ->where('month_periode', $Year . intval($Month))
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
+                            } else {
+                                $approvals = Timesheet_detail::select('*')
+                                    ->where('RequestTo', Auth::user()->id)
+                                    ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                    ->whereIn('user_timesheet', $checkApprovalPC)
+                                    ->where('month_periode', $Year . intval($Month))
+                                    ->groupBy('user_timesheet', 'month_periode')
+                                    ->get();
+                            }
                         } else {
                             $checkApprovalNonPC = Timesheet_detail::select('*')
                             ->whereIn('user_timesheet', $Check)
