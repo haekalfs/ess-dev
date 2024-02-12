@@ -167,7 +167,6 @@ class ApprovalController extends Controller
                                 ->get();
                         } else {
                             $checkApprovalNonPC = Timesheet_detail::select('*')
-                            ->whereIn('priority', [3, 4])
                             ->whereIn('user_timesheet', $Check)
                             ->where('month_periode', $Year . intval($Month))
                             ->groupBy('user_timesheet', 'month_periode')
