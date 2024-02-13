@@ -424,6 +424,15 @@ function showSuccessMessage(){
                     fetchActivities(yearput, monthput);
                 },
                 error: function(response,jqXHR, textStatus, errorThrown) {
+                    document.getElementById("activity").removeAttribute("readonly");
+                    document.getElementById("location").removeAttribute("readonly");
+                    document.getElementById("location").readOnly = false;
+                    document.getElementById("location").style.pointerEvents = "auto";
+                    document.getElementById("start-time").removeAttribute("readonly");
+                    document.getElementById("end-time").removeAttribute("readonly");
+                    fileInput.removeClass('validate');
+                    $('#locationContainer').show();
+                    $('#fileInputIfexistWfh').hide();
                     $('#entry-form')[0].reset();
                     var errorMessage = response.responseJSON.error; // Get the error message from the JSON response
                     $('.alert-danger').text(errorMessage);
@@ -484,6 +493,11 @@ function showSuccessMessage(){
                 },
                 error: function(response,jqXHR, textStatus, errorThrown) {
                     console.log(response);
+                    $('#locationContainerRed').css('display', 'block');
+                    document.getElementById("activity").removeAttribute("readonly");
+                    document.getElementById("location").removeAttribute("readonly");
+                    document.getElementById("start-time").removeAttribute("readonly");
+                    document.getElementById("end-time").removeAttribute("readonly");
                     $('#entry-form-red')[0].reset();
                     var errorMessage = response.responseJSON.error; // Get the error message from the JSON response
                     $('.alert-danger').text(errorMessage);

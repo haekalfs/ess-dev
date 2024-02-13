@@ -3,9 +3,11 @@
 namespace App\Jobs;
 
 use App\Mail\ApprovalLeave;
-use App\Mail\ReimbursementApproved;
 use App\Mail\ReimbursementPaid;
+use App\Mail\ReimbursementPartiallyApproved;
 use App\Models\Reimbursement;
+use App\Models\Reimbursement_approval;
+use App\Models\Reimbursement_item;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -15,14 +17,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class NotifyReimbursementApproved implements ShouldQueue
+class NotifyReimbursementPartiallyApproved implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $employee;
     protected $formCreator;
 
-    public function __construct(User $employee, Reimbursement $formCreator)
+    public function __construct(User $employee, Reimbursement_approval $formCreator)
     {
         $this->employee = $employee;
         $this->formCreator = $formCreator;
@@ -30,7 +32,7 @@ class NotifyReimbursementApproved implements ShouldQueue
 
     public function handle()
     {
-        $notification = new ReimbursementApproved($this->employee, $this->formCreator);
+        $notification = new ReimbursementPartiallyApproved($this->employee, $this->formCreator);
 
         Mail::send($notification);
     }

@@ -239,3 +239,33 @@ $(document).ready(function() {
         label.innerText = fileName;
     }
 
+
+    function deleteRequest(event, id) {
+        event.preventDefault();
+        swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this request!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    // perform the actual delete request
+                    axios.delete('/reimbursement/history/cancel/' + id)
+                        .then(response => {
+                            // show success message using SweetAlert
+                            swal("Poof! Request has been deleted!", {
+                                icon: "success",
+                            });
+
+                            // remove the assignment from the page
+                            window.location.href = '/reimbursement/history';
+                        })
+                        .catch(error => {
+                            // show error message using SweetAlert
+                            swal("Oops!", "Something went wrong while deleting the Request!", "error");
+                        });
+                }
+            });
+    }

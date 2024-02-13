@@ -10,7 +10,13 @@ active
 <div class="row align-items-center zoom90">
     <div class="col">
         <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Reimbursement #{{ $f_id }}</h1>
-        <p class="mb-4 text-danger"><i>{{ $stat }}</i></p>
+        @if($reimbursement->status_id == 20)
+        <p class="mb-4 text-primary"><i>Waiting for Approval</i></p>
+        @elseif($reimbursement->status_id == 404)
+        <p class="mb-4 text-danger"><i>Rejected</i></p>
+        @else
+        <p class="mb-4 text-primary"><i>Approved</i></p>
+        @endif
     </div>
     <div class="col-auto">
         <a href="/reimbursement/history/" class="btn btn-primary btn-sm">
@@ -52,24 +58,22 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
-                                    @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Form ID.</td>
-                                        <td>: {{ $row->id }}</td>
+                                        <td>: {{ $reimbursement->id }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Date Requested</td>
-                                        <td>: {{ $row->created_at }}</td>
+                                        <td>: {{ $reimbursement->created_at }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Reimbursement Type</td>
-                                        <td>: {{ $row->f_type }}</td>
+                                        <td class="font-weight-bold text-primary">: {{ $reimbursement->f_type }}</td>
                                     </tr>
                                     {{-- <tr class="table-sm">
                                         <td style="width: 200px;">Description</td>
-                                        <td>: <i>{{ $row->f_purpose_of_purchase }}</i></td>
+                                        <td>: <i>{{ $reimbursement->f_purpose_of_purchase }}</i></td>
                                     </tr> --}}
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -91,16 +95,15 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
-                                    @foreach($reimbursement as $row)
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Payment Method</td>
-                                        <td>: {{ $row->f_payment_method }}</td>
+                                        <td>: {{ $reimbursement->f_payment_method }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requesting Approval to</td>
                                         <td>:
                                             <?php
-                                                $uniqueApprovers = array_unique($row->approval->pluck('RequestTo')->toArray());
+                                                $uniqueApprovers = array_unique($reimbursement->approval->pluck('RequestTo')->toArray());
                                                 $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
                                                 $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
                                                 echo $commaDelimitedApprovers;
@@ -109,13 +112,12 @@ active
                                     </tr>
                                     {{-- <tr class="table-sm">
                                         <td style="width: 150px;">Status</td>
-                                        <td>: {{ $row->status_id }}</td>
+                                        <td>: {{ $reimbursement->status_id }}</td>
                                     </tr> --}}
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Notes</td>
-                                        <td>: {{ $row->notes }}</td>
+                                        <td>: {{ $reimbursement->notes }}</td>
                                     </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -186,7 +188,7 @@ active
 
                                         @foreach ($usr->approval as $status)
                                             @if ($status->status == 29 || $status->status == 30 || $status->status == 404)
-                                                <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> View Details</a>
+                                                <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                                 @php
                                                     $approved = true;
                                                     break;
@@ -195,8 +197,8 @@ active
                                         @endforeach
 
                                         @unless ($approved)
-                                            <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Action</a>
-                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> View Details</a>
+                                            <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                         @endunless
                                     </td>
                                 </tr>
@@ -271,6 +273,7 @@ active
             <div class="modal-body">
                 <!-- iframe to display the PDF -->
                 <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
+                <img id="imageframe" style="display: none;" src="" width="100%" height="400px"/>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -328,8 +331,34 @@ active
             // Open the modal
             $('#pdfModal').modal('show');
 
-            // Load the content in the modal iframe
-            $('#pdfIframe').attr('src', fileUrl);
+
+            // Function to check if the file extension represents an image
+            function isImage(filename) {
+                var extension = filename.split('.').pop().toLowerCase();
+                return ['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(extension);
+            }
+
+            $.ajax({
+                url: '/retrieveReimburseData/' + userId,
+                method: 'GET',
+                success: function(response) {
+                    if (isImage(response.receipt_file)) {
+                        // If it's an image, show image frame and hide PDF frame
+                        $('#imageframe').attr('src', fileUrl);
+                        $('#imageframe').show();
+                        $('#pdfIframe').hide();
+                    } else {
+                        // If it's not an image (assume it's a PDF), show PDF frame and hide image frame
+                        $('#pdfIframe').attr('src', fileUrl);
+                        $('#pdfIframe').show();
+                        $('#imageframe').hide();
+                    }
+                },
+                error: function(xhr) {
+                    // Handle error
+                    console.log(xhr.responseText);
+                }
+            });
 
             // Prevent the default link behavior
             return false;

@@ -117,8 +117,9 @@ active
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->created_at->format('d-M-Y H:m') }}</td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
-                                            <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                                <a href="/timesheet/summary/remind/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
+                                            <td style="border-bottom: none; border-top: none;" width='230px'>
+                                                <a href="/timesheet/summary/remind/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm mr-2"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
+                                                <a href="/timesheet/summary/preview/timesheet/{{ Crypt::encrypt($approval->user_timesheet) }}/{{ Crypt::encrypt($Year) }}/{{ Crypt::encrypt($Month) }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Preview</a>
                                             </td>
                                             @endif
                                         </tr>
@@ -144,7 +145,7 @@ active
         </div>
     </div>
     <div class="card-body">
-        
+
     </div>
 </div> --}}
 <style>

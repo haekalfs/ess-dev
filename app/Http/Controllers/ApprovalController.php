@@ -159,16 +159,34 @@ class ApprovalController extends Controller
                             ->pluck('user_timesheet')
                             ->toArray();
                         if (!empty($checkApprovalPC)) {
-                            $approvals = Timesheet_detail::select('*')
+                            $checkRowsLeft = Timesheet_detail::select('*')
+                                ->where('RequestTo', Auth::id())
+                                ->where('ts_status_id', 20)
+                                ->whereNotIn('user_timesheet', $checkApprovalPC)
+                                ->where('month_periode', $Year . intval($Month))
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->pluck('user_timesheet')
+                                ->toArray();
+                            if($checkRowsLeft)
+                            {
+                                $approvals = Timesheet_detail::select('*')
                                 ->where('RequestTo', Auth::user()->id)
                                 ->whereNotIn('ts_status_id', [29, 404, 30, 15])
-                                ->whereIn('user_timesheet', $checkApprovalPC)
+                                ->whereIn('user_timesheet', $checkRowsLeft)
                                 ->where('month_periode', $Year . intval($Month))
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->get();
+                            } else {
+                                $approvals = Timesheet_detail::select('*')
+                                    ->where('RequestTo', Auth::user()->id)
+                                    ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                    ->whereIn('user_timesheet', $checkApprovalPC)
+                                    ->where('month_periode', $Year . intval($Month))
+                                    ->groupBy('user_timesheet', 'month_periode')
+                                    ->get();
+                            }
                         } else {
                             $checkApprovalNonPC = Timesheet_detail::select('*')
-                            ->whereIn('priority', [3, 4])
                             ->whereIn('user_timesheet', $Check)
                             ->where('month_periode', $Year . intval($Month))
                             ->groupBy('user_timesheet', 'month_periode')
@@ -360,7 +378,7 @@ class ApprovalController extends Controller
         $entry->type = "2A";
         $entry->save();
 
-        //perlu dirombak karena jika reject salah satu, quota ini harus di deduct
+        //perlu dirombak karena jika reject salah satu, quota ini harus di deduct// removed 5 year term
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
         $countWeekendReplacement = Emp_leave_quota::where('user_id', $user_timesheet)
             ->where('leave_id', 100)
@@ -370,28 +388,28 @@ class ApprovalController extends Controller
         $getYear = date('Y');
         $expirationYear = $getYear + 1;
 
-        if (!$weekendReplacementInCurrentMonth) {
-            Emp_leave_quota::updateOrCreate([
-                'user_id' => Auth::user()->id,
-                'leave_id' => 100,
-            ], [
-                'quota_left' => 0,
-                'active_periode' => date('Y-m-d'),
-                'expiration' => "$expirationYear-03-31", //this should be change to dynamic
-                'once_in_service_years' => false
-            ]);
-        } else {
-            $totalWeekendReplacement = $weekendReplacementInCurrentMonth + $countWeekendReplacement;
-            Emp_leave_quota::updateOrCreate([
-                'user_id' => Auth::user()->id,
-                'leave_id' => 100,
-            ], [
-                'quota_left' => $totalWeekendReplacement,
-                'active_periode' => date('Y-m-d'),
-                'expiration' => "9999-01-01",
-                'once_in_service_years' => false
-            ]);
-        }
+        // if (!$weekendReplacementInCurrentMonth) {
+        //     Emp_leave_quota::updateOrCreate([
+        //         'user_id' => Auth::user()->id,
+        //         'leave_id' => 100,
+        //     ], [
+        //         'quota_left' => 0,
+        //         'active_periode' => date('Y-m-d'),
+        //         'expiration' => "$expirationYear-03-31", //this should be change to dynamic
+        //         'once_in_service_years' => false
+        //     ]);
+        // } else {
+        //     $totalWeekendReplacement = $weekendReplacementInCurrentMonth + $countWeekendReplacement;
+        //     Emp_leave_quota::updateOrCreate([
+        //         'user_id' => Auth::user()->id,
+        //         'leave_id' => 100,
+        //     ], [
+        //         'quota_left' => $totalWeekendReplacement,
+        //         'active_periode' => date('Y-m-d'),
+        //         'expiration' => "9999-01-01",
+        //         'once_in_service_years' => false
+        //     ]);
+        // }
 
         return redirect('/approval/timesheet/p')->with('success', "You approved $user_timesheet timereport!");
     }

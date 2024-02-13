@@ -3,7 +3,13 @@
 namespace App\Jobs;
 
 use App\Mail\ApprovalLeave;
+use App\Mail\ReimbursementItemChangesbyFinance;
+use App\Mail\ReimbursementPaid;
+use App\Mail\ReimbursementPartiallyApproved;
 use App\Mail\ReimbursementRejected;
+use App\Models\Reimbursement;
+use App\Models\Reimbursement_approval;
+use App\Models\Reimbursement_item;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -18,32 +24,18 @@ class NotifyReimbursementRejected implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $employee;
-    protected $reimbId;
+    protected $formCreator;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param  User  $employee
-     * @param  string  $reimbId
-     * @return void
-     */
-    public function __construct(User $employee, string $reimbId)
+    public function __construct(User $employee, Reimbursement_approval $formCreator)
     {
         $this->employee = $employee;
-        $this->reimbId = $reimbId;
+        $this->formCreator = $formCreator;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
-        $notification = new ReimbursementRejected($this->employee, $this->reimbId);
-        Mail::send('mailer.reimburse_rejected', $notification->data(), function ($message) use ($notification) {
-            $message->to($notification->emailTo())
-                    ->subject($notification->emailSubject());
-        });
+        $notification = new ReimbursementRejected($this->employee, $this->formCreator);
+
+        Mail::send($notification);
     }
 }

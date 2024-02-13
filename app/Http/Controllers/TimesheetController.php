@@ -365,8 +365,7 @@ class TimesheetController extends Controller
             ->get();
 
         $filesUploaded = Surat_penugasan::where('user_id', Auth::id())
-        ->whereMonth('ts_date', $month)
-        ->whereYear('ts_date', $year)
+        ->whereYear('created_at', $year)
         ->orderBy('created_at', 'desc')
         ->take(5) // Limit the query to retrieve only 5 records
         ->get();
@@ -497,7 +496,7 @@ class TimesheetController extends Controller
 
         if($ts_task_id == "StandbyLK"){
             $fare = 110000;
-        } elseif ($ts_task_id == "StandbyLK") {
+        } elseif ($ts_task_id == "StandbyLN") {
             $fare = 200000;
         } else {
             $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();
@@ -675,7 +674,7 @@ class TimesheetController extends Controller
 
         if($ts_task_id == "StandbyLK"){
             $fare = 110000;
-        } elseif ($ts_task_id == "StandbyLK") {
+        } elseif ($ts_task_id == "StandbyLN") {
             $fare = 200000;
         } else {
             $fare = Project_location::where('location_code', $request->location)->pluck('fare')->first();

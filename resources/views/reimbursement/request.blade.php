@@ -178,7 +178,7 @@ active
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="form-group">
-                                                    <label for="password">Receipt Expiration <span class="text-danger">*</span>:</label>
+                                                    <label for="password">Receipt Date <span class="text-danger">*</span>:</label>
                                                     <input type="date" class="form-control" name="expiration[]" id="expiration" value="" required>
                                                 </div>
                                             </div>

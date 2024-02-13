@@ -198,6 +198,46 @@ $total_years_of_service = $diff->y;
             </div>
             <!-- Card Body -->
             <div class="card-body">
+                <div class="row zoom80">
+                    <div class="col-md-12">
+                        <div id="header" style="padding-top:0%;">
+                            <h1>Employee of The Month</h1>
+                            <button class="share">
+                                <i class="fas fa-share fa-2x"></i>
+                            </button>
+                        </div>
+                          <div id="leaderboard">
+                            <div class="ribbon"></div>
+                            <table>
+                                @foreach($activities as $key => $activity)
+                                    <tr>
+                                        <td class="number">{{ $key + 1 }}</td>
+                                        <td class="name">{{ $activity->ts_user_id }}</td>
+                                        <td class="points">
+                                            @if($key === 0)
+                                                {{ $activity->earliest_come_time }} <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
+                                            @else
+                                                {{ $activity->earliest_come_time }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                          </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-12 col-md-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="lc-block position-relative">
@@ -238,4 +278,207 @@ $total_years_of_service = $diff->y;
         </div>
     </div>
 </div>
+<style>
+
+    #header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem;
+    }
+
+    .share {
+      width: 4.5rem;
+      height: 3rem;
+      background-color: #f55e77;
+      border: 0;
+      border-bottom: 0.2rem solid #c0506a;
+      border-radius: 2rem;
+      cursor: pointer;
+    }
+
+    .share:active {
+      border-bottom: 0;
+    }
+
+    .share i {
+      color: #fff;
+      font-size: 2rem;
+    }
+
+    h1 {
+      font-family: "Rubik", sans-serif;
+      font-size: 1.7rem;
+      color: #141a39;
+      text-transform: uppercase;
+      cursor: default;
+    }
+
+    #leaderboard {
+      width: 100%;
+      position: relative;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      color: #141a39;
+      cursor: default;
+    }
+
+    tr {
+      transition: all 0.2s ease-in-out;
+      border-radius: 0.2rem;
+    }
+
+    tr:not(:first-child):hover {
+      background-color: #fff;
+      transform: scale(1.1);
+      -webkit-box-shadow: 0px 5px 15px 8px #e4e7fb;
+      box-shadow: 0px 5px 15px 8px #e4e7fb;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #f9f9f9;
+    }
+
+    tr:nth-child(1) {
+      color: #fff;
+    }
+
+    td {
+      height: 5rem;
+      font-family: "Rubik", sans-serif;
+      font-size: 1.4rem;
+      padding: 1rem 2rem;
+      position: relative;
+    }
+
+    .number {
+      width: 1rem;
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .name {
+      text-align: left;
+      font-size: 1.2rem;
+    }
+
+    .points {
+      font-weight: bold;
+      font-size: 1.3rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .points:first-child {
+      width: 10rem;
+    }
+
+    .gold-medal {
+      height: 3rem;
+      margin-left: 1.5rem;
+    }
+
+    .ribbon {
+      width: 42rem;
+      height: 5.5rem;
+      top: -0.5rem;
+      background-color: #5c5be5;
+      position: absolute;
+      left: -1rem;
+      -webkit-box-shadow: 0px 15px 11px -6px #7a7a7d;
+      box-shadow: 0px 15px 11px -6px #7a7a7d;
+    }
+
+    .ribbon::before {
+      content: "";
+      height: 1.5rem;
+      width: 1.5rem;
+      bottom: -0.8rem;
+      left: 0.35rem;
+      transform: rotate(45deg);
+      background-color: #5c5be5;
+      position: absolute;
+      z-index: -1;
+    }
+
+    .ribbon::after {
+      content: "";
+      height: 1.5rem;
+      width: 1.5rem;
+      bottom: -0.8rem;
+      right: 0.35rem;
+      transform: rotate(45deg);
+      background-color: #5c5be5;
+      position: absolute;
+      z-index: -1;
+    }
+
+    #buttons {
+      width: 100%;
+      margin-top: 3rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .exit {
+      width: 11rem;
+      height: 3rem;
+      font-family: "Rubik", sans-serif;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      color: #7e7f86;
+      border: 0;
+      background-color: #fff;
+      border-radius: 2rem;
+      cursor: pointer;
+    }
+
+    .exit:hover {
+      border: 0.1rem solid #5c5be5;
+    }
+
+    .continue {
+      width: 11rem;
+      height: 3rem;
+      font-family: "Rubik", sans-serif;
+      font-size: 1.3rem;
+      color: #fff;
+      text-transform: uppercase;
+      background-color: #5c5be5;
+      border: 0;
+      border-bottom: 0.2rem solid #3838b8;
+      border-radius: 2rem;
+      cursor: pointer;
+    }
+
+    .continue:active {
+      border-bottom: 0;
+    }
+
+    @media (max-width: 740px) {
+        * {
+          font-size: 70%;
+        }
+    }
+
+    @media (max-width: 500px) {
+        * {
+          font-size: 55%;
+        }
+    }
+
+    @media (max-width: 390px) {
+        * {
+          font-size: 45%;
+        }
+    }
+        </style>
 @endsection

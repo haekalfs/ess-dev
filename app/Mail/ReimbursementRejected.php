@@ -2,6 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\Reimbursement;
+use App\Models\Reimbursement_approval;
+use App\Models\Reimbursement_item;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,50 +12,43 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class ReimbursementRejected extends Mailable
+{
+    protected $employee;
+    protected $formCreator;
+
+    public function __construct(User $employee, Reimbursement_approval $formCreator)
     {
-        protected $employee;
-        protected $reimbId;
-    
-        public function __construct(User $employee, $reimbId)
-        {
-            $this->employee = $employee;
-            $this->reimbId = $reimbId;
-        }
-    
-        public function build()
-        {
-            $data = [
-                'name' => $this->employee->name,
-                'email' => $this->employee->email,
-                'reimbId' => $this->reimbId,
-                'link' => 'https://timereport.perdana.co.id/reimbursement/view/'
-            ];
-    
-            $subject = 'Reimbursement Request Status';
-    
-            return $this->markdown('mailer.reimburse_rejected', $data)
-                        ->subject($subject)
-                        ->to($this->employee->email);
-        }
-    
-        public function emailSubject()
-        {
-            return 'Reimbursement Request Status';
-        }
-    
-        public function emailTo()
-        {
-            return $this->employee->email;
-        }
-        
-        public function data()
-        {
-            return [
-                'name' => $this->employee->name,
-                'email' => $this->employee->email,
-                'reimbId' => $this->reimbId,
-                'link' => 'https://timereport.perdana.co.id/reimbursement/view/'
-            ];
-        }
+        $this->employee = $employee;
+        $this->formCreator = $formCreator;
     }
-    
+
+    public function build()
+    {
+        $subject = 'New Status for Reimbursement Request : '. $this->formCreator->request->f_type;
+        $link = 'https://timereport.perdana.co.id/reimbursement/history/';
+
+        if($this->formCreator->ccTo){
+            // Split comma-delimited string into an array of email addresses
+            $ccEmails = explode(',', $this->formCreator->ccTo);
+
+            // Format email addresses individually
+            $formattedCcEmails = [];
+            foreach ($ccEmails as $email) {
+                $formattedCcEmails[] = ['email' => trim($email)];
+            }
+        } else {
+            $formattedCcEmails = NULL;
+        }
+
+        return $this->markdown('mailer.reimburse_rejected')
+                    ->subject($subject)
+                    ->to($this->employee->email)
+                    ->cc($formattedCcEmails)
+                    ->with([
+                        'name' => $this->employee->name,
+                        'email' => $this->employee->email,
+                        'formCreator' => $this->formCreator,
+                        'link' => $link
+                    ]);
+    }
+}

@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>This is Reimbursement approval reminder, {{ $userName }} has requesting reimbursement and require your approval. Kindly request your review for the documents.</p>
+<p>{{ $userName }} has requesting reimbursement for : {{ $formCreator->f_type }}, and it requires your approvals. Kindly request your review for the documents.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>

@@ -13,7 +13,7 @@ class Reimbursement extends Model
     protected $fillable = ["id", "f_id", "f_type", "f_req_by","f_payment_method", "f_approver", "notes", "status_id", "created_at", "updated_at"];
 
     public function items(){
-    	return $this->hasMany('App\Models\Reimbursement_item', 'id', 'reimbursement_id');
+    	return $this->hasMany('App\Models\Reimbursement_item', 'reimbursement_id', 'id');
     }
 
     public function approval(){

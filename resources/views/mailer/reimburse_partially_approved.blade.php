@@ -1,7 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>An item from your request : {{ $formCreator->request->f_type }} has been <span style="color: red;"><i>Rejected</i></span> by {{ $formCreator->user->name }}. Please note that this is final and cannot be contested.</p>
-<p>Here are the notes provided: <br>{{ $formCreator->notes }}</p>
+<p>Your Reimbursement Request : {{ $formCreator->request->f_type }}, has been approved by {{ $formCreator->user->name }}. Please note that this approval is subject to final/director approval.</p>
 
 <p>Please review the details of your request by clicking the link below:</p>
 <p><a href="{{ $link }}"><strong>Click Here</strong></a></p>

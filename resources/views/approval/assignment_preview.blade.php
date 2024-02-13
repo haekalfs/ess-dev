@@ -10,7 +10,7 @@ active
 <!-- Page Heading -->
 <div class="row align-items-center zoom90">
     <div class="col">
-        <h1 class="h3 mb-2 text-gray-800"><i class="fas fa-network-wired"></i> Project Assignment #{{ $assignment_id }}</h1>
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-network-wired"></i> Project Assignment #{{ $assignment_id }}</h1>
         <p class="mb-4 text-danger"><i>{{ $stat }}</i></p>
     </div>
     {!! $btnApprove !!}

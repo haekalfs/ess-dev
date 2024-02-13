@@ -1,12 +1,11 @@
 <p>Dear, {{ $name }}</p>
 
-<p>An item from your request : {{ $formCreator->request->f_type }} has been <span style="color: red;"><i>Rejected</i></span> by {{ $formCreator->user->name }}. Please note that this is final and cannot be contested.</p>
-<p>Here are the notes provided: <br>{{ $formCreator->notes }}</p>
+<p>{{ $formCreator->user->name }} has requested reimbursement for: {{ $formCreator->request->f_type }}. We are awaiting your final approval.</p>
 
-<p>Please review the details of your request by clicking the link below:</p>
+<p>Please open the link below to review the request:</p>
 <p><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 
-<p>Should you have any questions or require further assistance, feel free to contact us.</p>
+<p>If you have any questions or need further assistance, please don't hesitate to contact us.</p>
 
 <p>Regards,<br>
 <img src="{{ asset('img/PC-01Mailer.png') }}" alt="ESS Admin" style="height: 40px; width: 90px;" /><br>
