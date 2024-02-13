@@ -9,35 +9,30 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Medical_approval extends Authenticatable
+class Medical_payment extends Authenticatable
 {
     use HasFactory;
     // use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
-    protected $table = 'medical_approvals';
+    protected $table = 'medical_payment';
     protected $fillable = [
         'id',
         'medical_id',
-        'RequestTo',
-        'status',
-        'total_amount_approved',
-        'approval_notes',
+        'payment_approver',
+        'paid_status',
+        'note',
+        'payment_date',
+        'total_payment'
     ];
 
     public function medical()
     {
         return $this->belongsTo('App\Models\Medical', 'medical_id', 'id')
-        ->withDefault();
+            ->withDefault();
     }
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'RequestTo', 'id')
-            ->withDefault();
-    }
-    public function approval_status()
-    {
-        return $this->belongsTo('App\Models\Approval_status', 'status', 'approval_status_id')
+        return $this->belongsTo('App\Models\User', 'payment_approver', 'id')
         ->withDefault();
     }
 }

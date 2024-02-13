@@ -10,11 +10,11 @@ use Illuminate\Http\Request;
 use App\Models\Medical;
 use App\Models\Medical_approval;
 use App\Models\Medical_details;
+use App\Models\Medical_payment;
 use App\Models\User;
 use App\Models\Timesheet_approver;
-use App\Models\Project_assignment_user;
-use App\Models\Emp_leave_quota;
 use App\Models\Emp_medical_balance;
+use App\Models\Position;
 use Illuminate\Contracts\Session\Session as SessionSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -22,34 +22,84 @@ use Carbon\Carbon;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Ilovepdf\Ilovepdf;
-
+use Illuminate\Support\Facades\Storage;
 use function GuzzleHttp\Promise\all;
+use App\Http\Controllers\DateTime;
+use App\Models\Timesheet;
+use DateTime as GlobalDateTime;
 
 class MedicalController extends Controller
 {
-    public function index()
+    public function index($yearSelected = null)
     {
+        $hired_date = Auth::user()->users_detail->hired_date; // assuming $hired_date is in Y-m-d format
+        $current_date = date('Y-m-d'); // get the current date
+
+        // create DateTime objects from the hired_date and current_date values
+        $hired_date_obj = new GlobalDateTime($hired_date);
+        $current_date_obj = new GlobalDateTime($current_date);
+
+        // calculate the difference between the hired_date and current_date
+        $diff = $current_date_obj->diff($hired_date_obj);
+
+        // get the total number of years from the difference object
+        $total_years_of_service = $diff->y;
+
         // Mendapatkan pengguna yang login
         $user = Auth::user();
 
-        // Mendapatkan data medis sesuai dengan pengguna yang login
-        $med = Medical::where('user_id', $user->id)->get();
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
 
-        $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)
+        $currentYear = date('Y');
+        if ($yearSelected) {
+            $currentYear = $yearSelected;
+        }
+        
+        $med = Medical::where('user_id', $user->id)->whereYear('med_req_date', $currentYear)->get();
+// dd($med->medical_approval);
+        $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
         ->first();
 
+        
         return view('medical.medical', 
         [
             'med' => $med,
-            'emp_medical_balance' => $emp_medical_balance
+            'emp_medical_balance' => $emp_medical_balance,
+            'total_years_of_service' => $total_years_of_service,
+            'yearSelected' => $yearSelected,
+            'yearsBefore' => $yearsBefore,
         ]);
     }
     public function entry()
     {
 
         $lastId = Medical::orderBy('id', 'desc')->first();
-        $nextId = ($lastId) ? $lastId->med_number + 1 : 1;
-        return view('medical.medical_tambah', compact('nextId'));
+        $lastNumber = ($lastId) ? intval(substr($lastId->id, 4, 5)) : 0;
+        $currentPrefix = ($lastId) ? substr($lastId->id, 0, 2) : '44';
+
+        // Menentukan tahun saat ini
+        $currentYear = date('y');
+
+        // Menambahkan angka 44 dan tahun ke dalam ID baru
+        $nextNumber = str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT); // Format nomor dengan leading zeros
+
+        // Cek apakah tahun saat ini lebih dari 2024
+        if ($currentYear > 24) {
+            // Tambahkan 1 ke dua digit pertama
+            $currentPrefix = strval(intval($currentPrefix) + 1);
+            // Reset digit terakhir menjadi 0 jika tabel tidak kosong
+            $nextNumber = '00000';
+        }
+
+        $nextId = $currentPrefix . $nextNumber;
+
+        // Jika tabel Medical kosong, mulai dari 4400000
+        if (!$lastId) {
+            $nextId = '4400000';
+        }
+
+        return view('medical.medical_request', compact('nextId'));
     }
 
     public function store(Request $request)
@@ -59,38 +109,51 @@ class MedicalController extends Controller
             'attach.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'amount.*' => 'required',
             'desc.*' => 'required',
+            'date_exp.*' => 'required'
         ]);
 
         $attachments = $request->file('attach');
         $amounts = $request->input('amount');
         $descriptions = $request->input('desc');
-
+        $date_exp = $request->input('date_exp');
 
         $approval = Timesheet_approver::whereIn('id', [99])->first();
-        // ID Medical
+        $payment_approval = Timesheet_approver::where('id', [15])->first();
+
+
         $lastId = Medical::orderBy('id', 'desc')->first();
+        $lastNumber = ($lastId) ? intval(substr($lastId->id, 4, 5)) : 0;
+        $currentPrefix = ($lastId) ? substr($lastId->id, 0, 2) : '44';
 
-        // Mengambil bagian angka saja dari ID terakhir (menghilangkan 'M' dan konversi ke angka)
-        $lastNumber = ($lastId) ? intval($lastId->id) : 0;
+        // Menentukan tahun saat ini
+        $currentYear = date('y');
 
-        // Menghitung ID berikutnya dimulai dari 100
-        $nextNumber = max($lastNumber + 1, 100); // Pastikan tidak kurang dari 100
+        // Menambahkan angka 44 dan tahun ke dalam ID baru
+        $nextNumber = str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT); // Format nomor dengan leading zeros
 
-        // Membuat ID baru dengan format yang diinginkan (100M, 101M, 102M, dst.)
-        $nextId = $nextNumber . 'M';
+        // Cek apakah tahun saat ini lebih dari 2024
+        if ($currentYear > 24) {
+            // Tambahkan 1 ke dua digit pertama
+            $currentPrefix = strval(intval($currentPrefix) + 1);
+            // Reset digit terakhir menjadi 0 jika tabel tidak kosong
+            $nextNumber = '00000';
+        }
 
+        $nextId = $currentPrefix . $nextNumber;
 
-        // Medical Number
-        $lastMedNumber = Medical::orderBy('med_number', 'desc')->first();
-        $nextMedNumber = ($lastMedNumber) ? $lastMedNumber->med_number + 1 : 1;
+        // Jika tabel Medical kosong, mulai dari 4400000
+        if (!$lastId) {
+            $nextId = '4400000';
+        }
+        $attachment_num = $nextId;
+
+        $request_date = date('ymd');
 
         // Membuat entri baru dalam tabel Medicals
         $medical = new Medical();
         $medical->id = $nextId;
         $medical->user_id = Auth::user()->id;
-        $medical->med_number = $nextMedNumber;
-        $medical->med_req_date = date('Y-m-d');
-        $medical->paid_status = 15;
+        $medical->med_req_date = date('Y-m-d');;
         $medical->med_payment = $request->payment_method;
         $medical->med_total_amount = $request->totalAmountInput;
         $medical->save();
@@ -99,12 +162,12 @@ class MedicalController extends Controller
         foreach ($attachments as $key => $attachment) {
 
             $extension = $attachment->getClientOriginalExtension();
-            $filename = $nextId . '_' . $key .  '_' .  Auth::user()->id . '.' . $extension;
+            $filename = $attachment_num . $request_date . $key .'.'. $extension;
 
             $amount = str_replace('.', '', $amounts[$key]); // Menghilangkan titik
-            $result = $amount * 0.8;
-            $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
-
+            // $result = $amount * 0.8;
+            // $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
+            // $format_angka = number_format($roundedAmount, 0, ',', '.');
             // Menyimpan file attach ke dalam folder yang diinginkan
             $attach_tujuan = '/storage/med_pic';
             $attachment->move(public_path($attach_tujuan), $filename);
@@ -116,7 +179,8 @@ class MedicalController extends Controller
             $meddet->mdet_attachment = $filename;
             $meddet->mdet_amount = $amounts[$key];
             $meddet->mdet_desc = $descriptions[$key];
-            $meddet->amount_approved =  $roundedAmount;
+            $meddet->amount_approved =  $amounts[$key];
+            $meddet->mdet_date_exp = $date_exp[$key];
             $meddet->save();
         }
 
@@ -128,14 +192,20 @@ class MedicalController extends Controller
         $medical_approve->status = 15;
         $medical_approve->save();
         
+        $medical_payment = new Medical_payment();
+        $medical_payment->medical_id = $nextId;
+        $medical_payment->payment_approver = $payment_approval->approver;
+        $medical_payment->paid_status = 15;
+        $medical_payment->save(); 
+
         $employees = User::where('id', $userToApprove)->get();
         $userName = Auth::user()->name;
 
-        foreach ($employees as $employee) {
-            dispatch(new NotifyMedicalCreation($employee, $userName));
-        }
+        // foreach ($employees as $employee) {
+        //     dispatch(new NotifyMedicalCreation($employee, $userName));
+        // }
 
-        return redirect('/medical/history')->with('Success', 'Medical Reimburse Add successfully');
+        return redirect('/medical/history')->with('success', 'Medical Reimburse Add successfully, Dont forget to bring the original receipt to the Finance Department.');
     }
 
     
@@ -144,10 +214,8 @@ class MedicalController extends Controller
         Medical::findOrFail($id)->delete();
         Medical_details::where('medical_id', $id)->delete();
         Medical_approval::where('medical_id', $id)->delete();
-        // dd($id);
-        $user = Auth::user();
-        $med = Medical::where('user_id', $user->id)->get();
-        return view('medical.medical', ['med' => $med])->with('Success', 'Medical Reimburse Delete successfully');
+
+        return redirect()->back()->with('success', 'Medical Reimburse Delete successfully');
     }
     
     public function edit($id)
@@ -186,26 +254,27 @@ class MedicalController extends Controller
 
         if ($request->hasFile('attach_edit')) {
             $inputAttach = $request->file('attach_edit');
+            $fileOld = $medDet->mdet_attachment;
 
+            // Hapus file menggunakan Storage
+            Storage::delete(public_path('med_pic/' . $fileOld));
+
+            $filenameOld = pathinfo($fileOld, PATHINFO_FILENAME);
             $extension = $inputAttach->getClientOriginalExtension();
-            $filename = $medical_id . 'M' . '_' . $mdet_id .  '_' .  Auth::user()->id . '.' . $extension;
+            $filename = $filenameOld . '.' . $extension;
 
-            $attach_tujuan = '/med_pic';
+            $attach_tujuan = 'med_pic';
             $inputAttach->storeAs('public/' . $attach_tujuan, $filename);
 
-            // Menghapus file attachment lama jika ada
-            $oldAttach = public_path($attach_tujuan . '/' . $filename);
-            if (file_exists($oldAttach)) {
-                unlink($oldAttach);
-            }
         } elseif ($medDet->mdet_attachment) {
-            // Menggunakan foto profil yang sudah ada dalam database jika ada
             $filename = $medDet->mdet_attachment;
         }
+
         // $med_detail = Medical_details::find($mdet_id);
         $medDet->mdet_id = $medDet->mdet_id;
         $medDet->mdet_attachment = $filename;
         $medDet->mdet_amount = $request->input_mdet_amount;
+        $medDet->mdet_date_exp = $request->input_mdet_date_exp;
         $medDet->mdet_desc = $request->input_mdet_desc;
         $medDet->save();
 
@@ -311,35 +380,70 @@ class MedicalController extends Controller
         return redirect('/medical/history')->with('success', 'Re-Submit Your Medical Successfully.');
     }
 
+
 // Medical Review By Finance Manager
     public function review_fm(Request $request)
     {
+        $approve = Timesheet_approver::where('id', 15)->first();
+        $approval = $approve->approver;
+
         $medReview = Medical_approval::where('status', 29)->pluck('medical_id')->toArray(); // Get medical_ids that match the condition
 
-        $query = Medical::whereIn('id', $medReview)->whereNotIn('paid_status', [29]); // Apply the medReview filter first
-// dd($query);
-        // Filter by user_id
-        if ($request->has('user_id') && $request->user_id !== '1') {
-            $query->where('user_id', $request->user_id);
-        }
-
-        // Filter by year
-        if ($request->has('year') && $request->year !== '') {
-            $query->whereYear('med_req_date', $request->year);
-        }
-
-        // Filter by month
-        if ($request->has('month') && $request->month !== '') {
-            $query->whereMonth('med_req_date', $request->month);
-        }
-
-        $med = $query->get();
         $user = User::all();
+
         $currentYear = Carbon::now()->year;
         $month = Carbon::now()->month;
         $currentMonth = date('m');
         $years = range($currentYear, $currentYear - 10);
-        return view('medical.review_medical', ['med' => $med, 'user' => $user, 'years' => $years, 'month' => $month, 'currentMonth' => $currentMonth]);
+
+        $statusPay = $request->input('status_pay', '20'); // Mengambil nilai status_pay dari permintaan, defaultnya '20' (Unpaid)
+
+        $query = Medical::whereIn('id', $medReview)
+        ->with(['medical_payment' => function ($query) use ($approval) {
+            $query->where('payment_approver', $approval);
+        }])
+            ->where(function ($query) use ($request) {
+                // Filter by user_id
+                if ($request->has('user_id') && $request->user_id !== '1') {
+                    $query->where('user_id', $request->user_id);
+                }
+
+                // Filter by year
+                if ($request->has('year') && $request->year !== '') {
+                    $query->whereYear('med_req_date', $request->year);
+                } else {
+                    // Jika tidak ada filter tahun, ambil data untuk tahun saat ini
+                    $query->whereYear('med_req_date', Carbon::now()->year);
+                }
+
+                // Filter by month
+                if ($request->has('month') && $request->month !== '') {
+                    $query->whereMonth('med_req_date', $request->month);
+                } else {
+                    // Jika tidak ada filter bulan, ambil data untuk bulan saat ini
+                    $query->whereMonth('med_req_date', Carbon::now()->month);
+                }
+            })
+            ->whereHas('medical_payment', function ($q) use ($statusPay) {
+                // Filter by status_pay
+                $q->where('paid_status', $statusPay);
+            });
+
+        $med = $query->get();
+
+
+        // dd($med);
+        $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
+        ->first();
+        return view('medical.review_medical', 
+        [
+            'med' => $med, 
+            'user' => $user, 
+            'years' => $years, 
+            'month' => $month, 
+            'currentMonth' => $currentMonth,
+            'emp_medical_balance' => $emp_medical_balance
+        ]);
 
     }
 
@@ -350,15 +454,46 @@ class MedicalController extends Controller
         $MedId = $user_med->med_number;
         $employees = User::where('id', $userId)->get();
         $userName = Auth::user()->name;
-        foreach ($employees as $employee) {
-            dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
-        }
-        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+
+ // // Cari $medBalance yang masih aktif dan memiliki tahun yang sama
+        // $medBalance = Emp_medical_balance::where('user_id', $userMedId)
+        //     ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
+        //     ->first();
+
+        //     $balance = $medBalance->medical_balance;
+        //     if (is_numeric($balance)) {
+        //         $balanceAmount = str_replace('.', '', $balance);
+        //         $AmountApproved = str_replace('.', '', $totalAmountApproved);
+        //         $total = $balanceAmount - $AmountApproved;
+        //         $formattedTotal = number_format($total, 0, ',', '.');
+
+        //         $medBalance->medical_remaining = $formattedTotal;
+        //         $medBalance->save();
+        //     } else {
+        //         // Handle the case when $balance is non-numeric
+        //     }
+
+        //     $deducted = $medBalance->medical_deducted;
+        //     if (is_numeric($deducted) && is_numeric($totalAmountApproved)) {
+        //         $deductedAmount = str_replace('.', '', $deducted);
+        //        ggg $AmountApproved = str_replace('.', '', $totalAmountApproved);
+        //         $totalDeducted = $deductedAmount + $AmountApproved;
+        //         $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
+
+        //         $medBalance->medical_deducted = $formattedDeductedTotal;
+        //         $medBalance->save();
+        //     } else {
+        //         // Handle the case when $deducted or $totalAmountApproved is non-numeric
+        //     }
 
         $med = Medical::where('id', $id)->first();
         $med->paid_status = 29;
         $med->save();
 
+        // foreach ($employees as $employee) {
+        //     dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
+        // }
+        // $userName = $user_med->user->name; // Mengambil nama pengguna terkait
         
         return redirect('/medical/review')->with('success', "You Have Paid $userName Medical Reimbursement ");
     }
@@ -373,16 +508,24 @@ class MedicalController extends Controller
             $query->where('user_id', $request->user_id);
         }
 
+        // Initialize $year variable
+        $year = null;
+
         // Filter by year
         if ($request->has('year') && $request->year !== '') {
-            $query->whereYear('active_periode', $request->year);
+            $year = $request->year;
+            $query->whereYear('active_periode', $year);
+        } else {
+            // Jika tidak ada filter tahun, ambil data untuk tahun saat ini
+            $year = Carbon::now()->year;
+            $query->whereYear('active_periode', $year);
         }
 
-        
         $medBalance = $query->get();
         $user = User::all();
         $currentYear = Carbon::now()->year;
         $years = range($currentYear, $currentYear - 10);
+
 
         return view('medical.medical_manage', ['medBalance' => $medBalance, 'user' => $user, 'years' => $years]);
     }

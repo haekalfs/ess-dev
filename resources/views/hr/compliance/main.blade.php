@@ -306,6 +306,34 @@ active
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div class="col-md-12">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Emails</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">CC Emails :</label>
+                                                                    <select class="form-control" name="email_cc" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $user)
+                                                                        <option value="{{ $user->id }}" @if( $user->id == $cc_email->user_id ) selected @endif >{{ $user->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">

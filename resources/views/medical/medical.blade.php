@@ -8,8 +8,14 @@ active
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h2 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Reimburse</b></h2>
-    {{-- <a data-toggle="modal" data-target="#addModal" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> New Assignment</a> --}}
+    <h4 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Reimburse</b></h4>
+    <div>
+        <select class="form-control" id="yearSelected" name="yearSelected" required onchange="redirectToPageAssignment()">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
+            @endforeach
+        </select>
+    </div>
 </div>
 
 @if ($message = Session::get('success'))
@@ -32,7 +38,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="row zoom90">
+<div class="row zoom80">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
@@ -44,10 +50,6 @@ active
             <div class="card-body">
                 <table class="table table-borderless table-sm">
                     <tr>
-                        <th>User ID</th>
-                        <td style="text-align: start; font-weight:500">: {{Auth::user()->id}}</td>
-                    </tr>
-                    <tr>
                         <th>Employee ID</th>
                         <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->employee_id}}</td>
                     </tr>
@@ -58,6 +60,10 @@ active
                     <tr>
                         <th>Hired Date</th>
                         <td style="text-align: start; font-weight:500">: {{Auth::user()->users_detail->hired_date}}</td>
+                    </tr>
+                    <tr>
+                        <th>Service Years</th>
+                        <td style="text-align: start; font-weight:500">: {{ $total_years_of_service }} Years</td>
                     </tr>
                   </tr>
               </table>
@@ -104,17 +110,16 @@ active
     </div>
 </div>
 
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 zoom80">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Medical History</h6>
         <div class="text-right">
-            <a href="/medical/entry" class="btn btn-primary btn-sm">New Request</a>
-            {{-- <a href="" class="btn btn-primary btn-sm">View Report</a> --}}
+            <a href="/medical/entry" id="newRequestBtn" class="btn btn-primary btn-sm"><i class="fa fa-plus" aria-hidden="true"></i> New Request</a>
         </div>
     </div>
     <!-- Card Body -->
-    <div class="card-body zoom90">
+    <div class="card-body">
         <table class="table table-bordered table-hover " id="dataTable">
                 <thead>
                     <tr class="text-center">
@@ -129,56 +134,51 @@ active
                 <tbody>
                     @foreach($med as $q)
                     <tr>
-                        <td>MED_0000{{$q->med_number}}</td>
+                        <td>MED_{{$q->id}}</td>
                         <td>{{$q->med_req_date}}</td>
                         <td>{{$q->med_payment}}</td>
                         <td class="text-center">
-                            @foreach ($q->medical_approval as $md)
-                                @switch($md->status)
-                                    @case(29)
-                                        <span class="badge  badge-success" style="font-size: 14px">Approved By {{ $md->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
-                                        @break
-                                    @case(15)
-                                        <span class="badge badge-secondary" style="font-size: 14px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
-                                        @break
-                                    @case(404)
-                                        <span class="badge badge-danger" style="font-size: 14px">Rejected By {{ $md->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
-                                        @break
-                                    @default
-                                        <span class="badge badge-info" style="font-size: 14px">Status Tidak Dikenal</span>
-                                @endswitch
-                            @endforeach
-                        </td>
-                        <td class="text-center">
-                            @switch($q->paid_status)
-                                @case(20)
-                                    <span class="badge badge-pill badge-primary" style="font-size: 14px">Waiting For Payment <i class="fa fa-check" aria-hidden="true"></i></span>
+                            @switch($q->medical_approval->status)
+                                @case(29)
+                                    Approved By {{ $q->medical_approval->user->name }}  <i class="fa fa-check" aria-hidden="true"></i>
                                     @break
                                 @case(15)
-                                    <span class="badge badge-pill badge-secondary" style="font-size: 14px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
-                                    @break
-                                @case(29)
-                                    <span class="badge badge-pill badge-success" style="font-size: 16px">Paid <i class="fa fa-check-circle" aria-hidden="true"></i></span>
+                                    Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i>
                                     @break
                                 @case(404)
-                                    <span class="badge badge-pill badge-danger" style="font-size: 16px">Rejected <i class="fa fa-exclamation" aria-hidden="true"></i></span>
+                                    Rejected By {{ $q->medical_approval->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i>
                                     @break
                                 @default
-                                    <span class="badge badge-pill badge-info" style="font-size: 16px">Status Tidak Dikenal</span>
+                                    Status Tidak Dikenal
                             @endswitch
                         </td>
-                        <td class="row-cols-2 justify-content-betwen text-center">
-                            @foreach ($q->medical_approval as $md)
-                                @if ($md->status == 29 || $md->status == 404)
-                                    <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $q->id }}" id="manButton">View<i class="fas fa-fw fa-eye fa-sm"></i></a>
-                                @else
-                                    <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                    <i class="fas fa-fw fa-edit justify-content-center"></i>
-                                </a>
-                                    <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
-                                @endif
-                            @endforeach
-                            
+                        <td class="text-center">
+                            @switch($q->medical_payment->paid_status)
+                                @case(20)
+                                    Waiting For Payment <i class="fa fa-spinner" aria-hidden="true"></i>
+                                    @break
+                                @case(15)
+                                    Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i>
+                                    @break
+                                @case(29)
+                                    Paid <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    @break
+                                @case(404)
+                                    Rejected <i class="fa fa-exclamation" aria-hidden="true"></i>
+                                    @break
+                                @default
+                                    Unknown</span>
+                            @endswitch
+                        </td>
+                        <td class="cols-2 justify-content-betwen text-center">
+                            @if ($q->medical_approval->status == 29 || $q->medical_approval->status == 404)
+                                <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $q->id }}" id="manButton"><i class="fa fa-eye" aria-hidden="true"></i> View</i></a>
+                            @else
+                                <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                <i class="fas fa-fw fa-edit justify-content-center"></i>
+                            </a>
+                                <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                            @endif
                         </td>
                     </tr>
                     @endforeach
@@ -211,8 +211,32 @@ active
 </div>
 @endforeach
 
-
 <script>
+    function redirectToPageAssignment() {
+        var selectedOption = document.getElementById("yearSelected").value;
+        var url = "{{ url('/medical/history') }}"; // Specify the base URL
+
+        url += "/" + selectedOption;
+
+        window.location.href = url; // Redirect to the desired page
+    }
+    document.getElementById('newRequestBtn').addEventListener('click', function(event) {
+        // Ambil nilai dari variabel yang sudah didefinisikan sebelumnya
+        var totalYearsOfService = {{ $total_years_of_service }};
+        // var medicalBalance = {{ $emp_medical_balance->medical_balance  }};
+
+        // Lakukan validasi
+        if (totalYearsOfService >= 1 ) {
+            // Lanjutkan untuk pindah halaman jika kondisi terpenuhi
+            window.location.href = event.target.href;
+        } else {
+            // Tampilkan alert jika kondisi tidak terpenuhi
+            alert('Unfortunately your service year is still below one year !!!');
+            // Hentikan aksi default (pindah halaman)
+            event.preventDefault();
+        }
+    });
+
     function togglePasswordVisibility() {
     var medicalBalance = document.getElementById('medicalBalance');
     var eyeIcon = document.getElementById('eyeIcon');

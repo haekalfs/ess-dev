@@ -243,7 +243,7 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/kirimemail','MailerController@index');
 
     //medical reimburse
-    Route::get('/medical/history', 'MedicalController@index')->middleware('auth');
+    Route::get('/medical/history/{yearSelected?}', 'MedicalController@index')->middleware('auth');
     Route::get('/medical/entry', 'MedicalController@entry')->middleware('auth');
 
     Route::get('/medical/edit/{id}', 'MedicalController@edit')->middleware('auth');
