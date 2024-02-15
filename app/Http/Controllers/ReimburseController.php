@@ -610,7 +610,7 @@ class ReimburseController extends Controller
         $checkSettingExport = $settingExport->position_id;
 
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [10])) {
+        if (in_array($checkUserPost, [10,9,21,22,23,8])) {
             $templatePath = public_path('template_reimbursement.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
@@ -758,7 +758,7 @@ class ReimburseController extends Controller
             ->toArray();
 
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [10])) {
+        if (in_array($checkUserPost, [10,9,21,22,23,8])) {
             if($mainForm->status_id == 2002){
                 $templatePath = public_path('template_reimbursement_item_paid.xlsx');
             } else {
@@ -847,8 +847,8 @@ class ReimburseController extends Controller
             $headers = [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ];
-
-            return response()->download($filePath, "test.xlsx", $headers);
+            $fileName = $mainForm->f_id . '_' . $mainForm->f_type . '_' . $mainForm->user->id;
+            return response()->download($filePath, "$fileName.xlsx", $headers);
         } else {
             abort(403, 'Unauthorized');
         }
