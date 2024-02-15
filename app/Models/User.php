@@ -66,6 +66,10 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Medical_approval');
     }
+    public function medical_payment()
+    {
+        return $this->hasOne('App\Models\Medical_payment');
+    }
 
     public function timesheet_detail(){
     	return $this->hasMany('App\Models\Timesheet_detail');

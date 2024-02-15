@@ -66,6 +66,9 @@ class HrController extends Controller
 		//export reimburse
 		$setting_export_reimburse = Setting::where('id', 2)->first();
 
+		//CC Emails
+		$cc_email = Setting::where('id', 3 )->first();
+
         $usersFingerprint = Users_fingerprint::all();
         $users = User::all();
 
@@ -92,7 +95,7 @@ class HrController extends Controller
 		'export_ts' => $setting_export_ts,
 		'export_reimburse' => $setting_export_reimburse,
 		'position'	=> $position,
-
+		'cc_email' => $cc_email
 		]);
 	}
 
@@ -200,7 +203,12 @@ class HrController extends Controller
 			$input_export_reimburse->position_id = $request->export_reimburse;
 			$input_export_reimburse->save();
 
-			
+		//CC Emails
+
+			$input_email_cc = Setting::where('id', 3 )->first();
+			$input_email_cc->user_id = $request->email_cc;
+			$input_email_cc->save();
+
 		return redirect()->back()->with('success', 'Compilance Edit Success');
 	}
 

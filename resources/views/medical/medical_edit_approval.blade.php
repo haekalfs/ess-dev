@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h4 mb-0 text-gray-800" style="font-weight:bold">Medical Request Number # MED_0000{{ $med->med_number }}</h1>
+    <h4 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Request Number # MED_{{ $med->id }}</b></h4>
     <div>
         <a class="btn btn-danger btn-sm" type="button" href="/approval/medical" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
     </div>
@@ -66,28 +66,32 @@ active
 	align-items: center;
 }
 </style>
-<div class="row zoom90">
+<div class="row zoom80">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Request Information</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Request Information</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <table class="table table-borderless table-sm">
                     <tr>
+                        <th>Employee ID</th>
+                        <td style="text-align: start; font-weight:500">: {{$med->user->users_detail->employee_id}}</td>
+                    </tr>
+                    <tr>
                         <th>Name</th>
                         <td style="text-align: start; font-weight:500">: {{$med->user->name}}</td>
                     </tr>
                     <tr>
-                        <th>Request Date</th>
-                        <td style="text-align: start; font-weight:500">: {{$med->med_req_date}}</td>
+                        <th>Hired Date</th>
+                        <td style="text-align: start; font-weight:500">: {{$med->user->users_detail->hired_date}}</td>
                     </tr>
                     <tr>
-                        <th>Payment Method</th>
-                        <td style="text-align: start; font-weight:500">: {{$med->med_payment}}</td>
+                        <th>Position</th>
+                        <td style="text-align: start; font-weight:500">: {{ $med->user->users_detail->position->position_name }}</td>
                     </tr>
               </table>
             </div>
@@ -99,21 +103,21 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Detail Information</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Detail Information</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                     <tr>
                         <tr>
-                            <th>Medical Balance</th>
-                            <td style="text-align: start; font-weight:500">: {{ $medBalance->medical_balance }}</td>
+                            <th>Request Date</th>
+                            <td style="text-align: start; font-weight:500">: {{$med->med_req_date}}</td>
                         </tr>
-                          <tr>
-                            <th>Medical Deducted</th>
-                            <td style="text-align: start; font-weight:500">: {{ $medBalance->medical_deducted }}</td>
+                        <tr>
+                            <th>Payment Method</th>
+                            <td style="text-align: start; font-weight:500">: {{$med->med_payment}}</td>
                         </tr>
-                          <tr>
+                        <tr>
                             <th>No Account Bank</th>
                             <td style="text-align: start; font-weight:500">: {{ $med->user->users_detail->usr_bank_account }}  An. {{ $med->user->users_detail->usr_bank_account_name }} </td>
                         </tr>
@@ -123,7 +127,7 @@ active
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row zoom80">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
@@ -143,6 +147,7 @@ active
                             <tr>
                                 {{-- <th>No</th> --}}
                                 <th>Attachment</th>
+                                <th>Reciept Date</th>
                                 <th>Description</th>
                                 <th>Amount Request</th>
                                 <th>Amount Approved</th>
@@ -154,6 +159,9 @@ active
 								<td class="centered-button">
                                     {{-- <img style="width: 80px; height: 80px; object-fit:fill;" class="img-fluid" src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" alt="Attachment" data-toggle="modal" data-target="#myModal{{ $md->mdet_id}}"> --}}
 									<button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#myModal{{ $md->mdet_id }}">View</button>
+                                </td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $md->mdet_date_exp }}
                                 </td>
 								<td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
                                     {{ $md->mdet_desc }}
@@ -174,12 +182,12 @@ active
 							</tr>
 							@endforeach
                             <tr class="p-3 mb-2 bg-secondary text-white" style="border-bottom: 1px solid #dee2e6;">
-                                <td colspan="2" class="text-center">Total</td>
+                                <td colspan="3" class="text-center">Total</td>
 								<td class="text-start">
                                     <span id="totalAmount" name="totalAmount"></span>
                                     <input id="totalAmount" name="totalAmount" value="" hidden>
                                 </td>
-								<td colspan="2" class="text-start" >
+								<td colspan="3" class="text-start" >
                                     <span id="totalAmountApproved" name="totalAmountApproved"></span>
                                 </td>
                             </tr>
@@ -212,7 +220,11 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" width="100%" height="500px" alt="Attachment"></iframe>
+                    @if(pathinfo($md->mdet_attachment, PATHINFO_EXTENSION) == 'pdf')
+                        <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
+                    @else
+                        <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
+                    @endif
                 </div>
             </div>
         </div>
@@ -397,7 +409,7 @@ for (var i = 0; i < amountElements.length; i++) {
 
 // Menampilkan total amount
 var totalAmountDisplay = document.getElementById("totalAmount");
-totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString().replace(/,/g, '.');
+totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString('id-ID');
 
 
 
@@ -415,15 +427,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Display total amount approved in different locations
     var totalAmountApprovedDisplay1 = document.getElementById("totalAmountApproved");
-    totalAmountApprovedDisplay1.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
+    totalAmountApprovedDisplay1.textContent = "Rp. " + totalAmountApproved.toLocaleString('id-ID');
 
     var totalAmountApprovedDisplay2 = document.getElementById("totalAmountApproved2");
-    totalAmountApprovedDisplay2.textContent = "Rp. " + totalAmountApproved.toLocaleString().replace(/,/g, '.');
+    totalAmountApprovedDisplay2.textContent = "Rp. " + totalAmountApproved.toLocaleString('id-ID');
 
     // Update total amount approved in input field
     var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput");
     if (totalAmountApprovedInput) {
-        totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/\./g, "").replace(",", ".");
+        totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/,/g, ".");
     }
 });
 // Simpan nilai totalApprovedAmount dalam input tersembunyi saat menghitungnya

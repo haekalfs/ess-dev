@@ -20,6 +20,7 @@ use App\Jobs\NotifyMedicalApproved;
 use App\Models\Cutoffdate;
 //medical
 use App\Models\Notification_alert;
+use App\Models\Position;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Reimbursement_approval;
@@ -706,7 +707,15 @@ class ApprovalController extends Controller
             ->first();
         $medBalance = Emp_medical_balance::where('user_id', $med->user_id)->first();
 
-        return view('medical.medical_edit_approval', ['med' => $med, 'medDet' => $medDet, 'medAppUpdate' => $medAppUpdate, 'medBalance' => $medBalance]);
+        $position = Position::all();
+        return view('medical.medical_edit_approval', 
+        [
+            'med' => $med, 
+            'medDet' => $medDet, 
+            'medAppUpdate' => $medAppUpdate, 
+            'medBalance' => $medBalance,
+            'position' => $position,
+        ]);
     }
 
     public function update_approval(Request $request, $mdet_id, $medical_id)
@@ -732,7 +741,7 @@ class ApprovalController extends Controller
         ]);
 
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
-        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+        $userNameRequestor = $user_med->user->name; // Mengambil nama pengguna terkait
         $userMedId = $user_med->user_id;
         $totalAmountApproved = $request->input('totalAmountApprovedInput');
 
@@ -743,51 +752,24 @@ class ApprovalController extends Controller
         $medApprove->status = 29;
         $medApprove->approval_notes = $request->input_approve_note;
         $medApprove->approval_date = $request->date_approved;
+        $medApprove->total_amount_approved = $totalAmountApproved;
         $medApprove->save();
-
-        $medical = Medical::findOrFail($id);
-        $medical->paid_status = 20;
-        $medical->total_amount_approved = $totalAmountApproved;
-        $medical->save();
 
         $currentYear = Carbon::now()->year;
 
-        // Cari $medBalance yang masih aktif dan memiliki tahun yang sama
-        $medBalance = Emp_medical_balance::where('user_id', $userMedId)
-            ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
-            ->first();
+       
 
-        if ($medBalance) {
-            $balance = $medBalance->medical_balance;
-            $balanceAmount = str_replace('.', '', $balance);
-            $AmountApproved = str_replace('.', '', $totalAmountApproved);
-            $total = $balanceAmount - $AmountApproved;
-            $formattedTotal = number_format($total, 0, ',', '.');
 
-            $medBalance->medical_remaining = $formattedTotal;
-            $medBalance->save();
-
-            $deducted = $medBalance->medical_deducted;
-            $deductedAmount = str_replace('.', '', $deducted);
-            $AmountApproved = str_replace('.', '', $totalAmountApproved);
-            $totalDeducted = $deductedAmount + $AmountApproved;
-            $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
-
-            $medBalance->medical_deducted = $formattedDeductedTotal;
-            $medBalance->save();
-
-            $MedId = $medical->med_number;
+            $MedId = $user_med->id;
             $employees = User::where('id', $userMedId)->get();
             $userName = Auth::user()->name;
 
-            foreach ($employees as $employee) {
-                dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
-            }
+            // foreach ($employees as $employee) {
+            //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
+            // }
 
-            return redirect('/approval/medical')->with('success', "You've Approved $userName Medical Reimburse ");
-        } else {
-            return response()->json(['message' => 'Data Emp_medical_balance aktif untuk tahun ' . $currentYear . ' tidak ditemukan'], 404);
-        }
+            return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId ");
+
     }
 
     public function reject_medical(Request $request, $id)

@@ -19,16 +19,10 @@ class Medical extends Authenticatable
     protected $table = 'medicals';
     protected $fillable = [
         'id',
-        'med_number',
         'user_id',
         'med_req_date',
         'med_payment',
         'med_status',
-        'med_total_amount',
-        'approved_by',
-        'approved_note',
-        'total_approved',
-        'approved_date',
     ];
 
     public function user()
@@ -43,6 +37,10 @@ class Medical extends Authenticatable
 
     public function medical_approval()
     {
-        return $this->hasMany('App\Models\Medical_approval');
+        return $this->hasOne('App\Models\Medical_approval');
+    }
+    public function medical_payment()
+    {
+        return $this->hasOne('App\Models\Medical_payment');
     }
 }

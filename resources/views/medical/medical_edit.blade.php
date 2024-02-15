@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="mb-4 d-sm-flex align-items-center justify-content-between">
-    <h4 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Request Number # MED_0000{{ $med->med_number }}</b></h4>
+    <h4 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Request Number # MED_{{ $med->id }}</b></h4>
     <a class="btn btn-danger btn-sm" type="button" href="/medical/history" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
 </div>
 @if ($message = Session::get('success'))
@@ -61,7 +61,7 @@ active
 	align-items: center;
 }
 </style>
-<div class="row">
+<div class="row zoom80">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4" >
@@ -73,34 +73,23 @@ active
                         @php
                             $approved = false;
                         @endphp
-                        @foreach ($med->medical_approval as $m)
-                            @if ($m->status == 29)
+                        @if ($med->medical_approval->status == 29)
 
-                            @elseif ($m->status == 404)
-                                <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#resubmitModal"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
-                            @endif
-                        @endforeach
-                        <a class="btn btn-secondary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/download" target="_blank" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a>
+                        @elseif ($med->medical_approval->status == 404)
+                            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#resubmitModal"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
+                        @endif
+                        {{-- <a class="btn btn-secondary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/download" target="_blank" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a> --}}
                     </div>
                 </div>
             </div>
             <!-- Card Body -->
-            <div class="card-body zoom90">
+            <div class="card-body">
                 <div class="row">
-                    <div class="col-md-3 align-items-center text-center">
-                        <div class="col-md text-center">
-                            @if($user_info->users_detail->profile_pic)
-                                <img class="img-profile rounded-circle" height="150px"width="150px" style="object-fit:fill;" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
-                            @else
-                                <div class="img-profile rounded-circle no-image"><i class="no-image-text">No Image Available</i></div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Employee Information</th>
+                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Medical Information</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -119,21 +108,19 @@ active
 								<tr class="table-sm">
                                     <td>Status</td>
                                     <td>: 
-                                        @foreach ($med->medical_approval as $md)
-                                            @switch($md->status)
-                                                @case(29)
-                                                    <span class="badge  badge-success" style="font-size: 14px">Approved By {{ $md->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
-                                                    @break
-                                                @case(15)
-                                                    <span class="badge badge-secondary" style="font-size: 12px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
-                                                    @break
-                                                @case(404)
-                                                    <span class="badge badge-danger" style="font-size: 14px">Rejected By {{ $md->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
-                                                    @break
-                                                @default
-                                                    <span class="badge badge-info" style="font-size: 12px">Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
-                                            @endswitch
-                                        @endforeach
+                                        @switch($med->medical_approval->status)
+                                            @case(29)
+                                                <span class="badge  badge-success" style="font-size: 14px">Approved By {{ $med->medical_approval->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
+                                                @break
+                                            @case(15)
+                                                <span class="badge badge-secondary" style="font-size: 12px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                                @break
+                                            @case(404)
+                                                <span class="badge badge-danger" style="font-size: 14px">Rejected By {{ $med->medical_approval->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
+                                                @break
+                                            @default
+                                                <span class="badge badge-info" style="font-size: 12px">Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
+                                        @endswitch
                                     </td>
                                 </tr>
                             </tbody>
@@ -146,37 +133,47 @@ active
                                     <th style="padding-left: 0;" class="m-0  text-primary" colspan="2">Approval Information</th>
                                 </tr>
                             </thead>
-                            @foreach ($med->medical_approval as $m)
-                                @if ($m->status == 29)
-                                    <tr>
-                                        <th>Approved By</th>
-                                        <td>: {{$m->user->name}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Approved Date</th>
-                                        <td>: {{$m->approval_date}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Approved Notes</th>
-                                        <td>: {{$m->approval_notes}}</td>
-                                    </tr>
-                                @elseif ($m->status == 404)
-                                    <tr>
-                                        <th>Rejected By</th>
-                                        <td>: {{$m->user->name}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Rejected Date</th>
-                                        <td>: {{$m->approval_date}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Rejected Notes</th>
-                                        <td>: {{$m->approval_note}}</td>
-                                    </tr>
-                                @else
-
-                                @endif
-                            @endforeach
+                                <tr class="table-sm">
+                                    <th>Approval Name</th>
+                                    <td>: {{$med->medical_approval->user->name}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <th>Approval Date</th>
+                                    <td>: {{$med->medical_approval->approval_date}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <th>Total Amount Approved (Rp.)</th>
+                                    <td>: {{$med->medical_approval->total_amount_approved}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <th>Approval Notes</th>
+                                    <td>: {{$med->medical_approval->approval_notes}}</td>
+                                </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        <table class="table table-borderless">
+							<thead>
+                                <tr>
+                                    <th style="padding-left: 0;" class="m-0  text-primary" colspan="2">Payement Information</th>
+                                </tr>
+                            </thead>
+                                <tr class="table-sm">
+                                    <th>Name</th>
+                                    <td>: {{$med->medical_payment->user->name}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <th>Payment Date</th>
+                                    <td>: {{$med->medical_payment->payment_date}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <th>Total Payment (Rp.)</th>
+                                    <td>: {{$med->medical_payment->total_payment}}</td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <th>Payment Notes</th>
+                                    <td>: {{$med->medical_payment->notes}}</td>
+                                </tr>
                         </table>
                     </div>
                 </div>
@@ -184,13 +181,13 @@ active
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row zoom80">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Medical Details Number #MED_0000{{ $med->med_number }}</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
                 <div class="text-right">
                     {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a> --}}
                 </div>
@@ -203,6 +200,7 @@ active
                             <tr>
                                 {{-- <th>No</th> --}}
                                 <th>Attachment</th>
+                                <th>Reciept Date Expired</th>
                                 <th>Description</th>
                                 <th>Amount Request</th>
                                 <th>Amount Approved</th>
@@ -215,32 +213,26 @@ active
                                     {{-- <img style="width: 80px; height: 80px; object-fit:fill;" class="img-fluid" src="{{ url('/storage/med_pic/'.$md->mdet_attachment)}}" alt="Attachment" data-toggle="modal" data-target="#myModal{{ $md->mdet_id}}"> --}}
 									<button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#myModal{{ $md->mdet_id }}">View</button>
                                 </td>
-								<td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $md->mdet_desc }}
-                                </td>
+                                <td>{{ $md->mdet_date_exp }}</td>
+								<td>{{ $md->mdet_desc }}</td>
 								<td>
                                     Rp. <span class="amount" id="amount">{{ $md->mdet_amount }}</span>
                                 </td>
 								<td>
-                                    @foreach ($med->medical_approval as $m)
-                                        @if ($m->status == 29)
-                                            Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
-                                        @else
-                                            Rp. 0
-                                        @endif
-                                    @endforeach
+                                    @if ($med->medical_approval->status == 29)
+                                        Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
+                                    @else
+                                        Rp. 0
+                                    @endif
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
-                                    @foreach ($med->medical_approval as $m)
-                                        @if ($m->status == 29)
+                                    @if ($med->medical_approval->status == 29)
                                            
-                                        @else
-                                            <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                                <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
-                                            </a>
-                                        @endif
-                                    @endforeach
-                                    
+                                    @else
+                                        <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                            <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
+                                        </a>
+                                    @endif
                                     {{-- @if(empty($medButton))
                                         <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
                                             <i class="fas fa-fw fa-edit justify-content-center"></i>
@@ -252,7 +244,7 @@ active
 							</tr>
 							@endforeach
                             <tr class="p-3 mb-2 bg-secondary text-white" style="border-bottom: 1px solid #dee2e6;">
-                                <td colspan="2" class="text-center">Total</td>
+                                <td colspan="3" class="text-center">Total</td>
 								<td class="text-start">
                                     <span id="totalAmountDisplay" name="totalAmountDisplay"></span>
                                 </td>
@@ -352,26 +344,10 @@ active
 </div>
 </form>
 
-<!-- Modal Profile -->
-<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="text-right" width="100px">
-    </div>
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="close-icon">
-                    <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
-                </div>
-                <img src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Modal Attachment -->
 @foreach($medDet as $md)
     <div class="modal fade" id="myModal{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="myModalLabel">Attachment</h5>
@@ -380,7 +356,11 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" height="500px"></iframe>
+                    @if(pathinfo($md->mdet_attachment, PATHINFO_EXTENSION) == 'pdf')
+                        <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
+                    @else
+                        <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
+                    @endif
                 </div>
             </div>
         </div>
@@ -390,7 +370,7 @@ active
 <form action="/medical/edit/{{ $med->id }}/update/{{ $md->mdet_id }}" enctype="multipart/form-data" method="POST">
 @csrf
 @method('PUT')
-    <div class="modal fade" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade zoom90" id="ModalMedDet{{ $md->mdet_id}}" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -409,6 +389,10 @@ active
                             </div>
                         </div>
                         <small style="color: red;"><i>if you don't want to change the attachment, you don't need to input a new one.</i></small>
+                        <div class="form-group">
+                            <label for="password">Reciept Date :</label>
+                            <input class="form-control flex" name="input_mdet_date_exp" type="date" value="{{ $md->mdet_date_exp }}"/>
+                        </div>
                         <div class="form-group mt-2">
                             <label for="password">Description :</label>
                             <textarea class="form-control flex" name="input_mdet_desc" placeholder="Description..." style="height: auto">{{ $md->mdet_desc }}</textarea>
@@ -476,29 +460,29 @@ function updateAttachmentLabel(id) {
 
     // Menampilkan total amount
     var totalAmountDisplay = document.getElementById("totalAmountDisplay");
-    totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString();
+    totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString('id-ID');
      // Update total amount approved in input field
     var totalAmountInput = document.getElementById("totalAmountInput");
     if (totalAmountInput) {
-        totalAmountInput.value = totalAmount.toLocaleString().replace(/\./g, "").replace(",", ".");
+        totalAmountInput.value = totalAmount.toLocaleString().replace(/\./g, ".");
     }
 
 
 
 // Amount Approved
-    // Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
     var amountElements = document.getElementsByClassName("amountApproved");
-    var totalAmountApproved = 0;
+var totalAmountApproved = 0;
 
-    for (var i = 0; i < amountElements.length; i++) {
+for (var i = 0; i < amountElements.length; i++) {
     var amountText = amountElements[i].textContent;
     var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
     totalAmountApproved += amountApprovedNumber;
-    }
+}
 
-    // Menampilkan total amount
-    var totalAmountApprovedDisplay = document.getElementById("totalAmountApproved");
-    totalAmountApprovedDisplay.textContent = "Rp. " + totalAmountApproved.toLocaleString();
+// Menampilkan total amount
+var totalAmountApprovedDisplay = document.getElementById("totalAmountApproved");
+totalAmountApprovedDisplay.textContent = "Rp. " + totalAmountApproved.toLocaleString('id-ID');
+
 
 </script>
 @endsection
