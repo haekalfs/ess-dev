@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>An item : {{ $formCreator->description }} from your request : {{ $formCreator->request->f_type }}, has been changed by Finance Dept. Please note that this is final and cannot be contested.</p>
 

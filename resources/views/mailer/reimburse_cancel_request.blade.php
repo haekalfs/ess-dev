@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>{{ $userName }} has canceled the request. Please ignore this message.</p>
 

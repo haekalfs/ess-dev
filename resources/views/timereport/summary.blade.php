@@ -82,7 +82,7 @@ active
                     </div>
                     <div class="col-md-12"><br>
                         <div class="table-responsive">
-                            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
+                            <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Emp ID</th>
@@ -95,12 +95,7 @@ active
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($approvals->isEmpty())
-                                        <tr style="border-bottom: 1px solid #dee2e6;">
-                                            <td colspan="7" class="text-center"><a><i>No Data Available</i></a></td>
-                                        </tr>
-                                    @else
-                                        @foreach($approvals as $index => $approval)
+                                    @foreach($approvals as $index => $approval)
                                         <tr>
                                             @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
                                             <td style="border-bottom: none; border-top: none;"></td>
@@ -117,17 +112,13 @@ active
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->activity }}</td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->created_at->format('d-M-Y H:m') }}</td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->RequestTo }}</td>
-                                            <td style="border-bottom: none; border-top: none;" width='230px'>
+                                            <td class="text-center" style="border-bottom: none; border-top: none;" width='230px'>
                                                 <a href="/timesheet/summary/remind/{{ $approval->user_timesheet }}/{{ $Year }}/{{ $Month }}" class="btn btn-primary btn-sm mr-2"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Remind</a>
                                                 <a href="/timesheet/summary/preview/timesheet/{{ Crypt::encrypt($approval->user_timesheet) }}/{{ Crypt::encrypt($Year) }}/{{ Crypt::encrypt($Month) }}" class="btn btn-primary btn-sm"><i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Preview</a>
                                             </td>
                                             @endif
                                         </tr>
-                                        @endforeach
-                                    @endif
-                                    <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td colspan="7" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
-                                    </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

@@ -63,17 +63,17 @@ active
                                         <td>: {{ $reimbursement->id }}</td>
                                     </tr>
                                     <tr class="table-sm">
-                                        <td style="width: 150px;">Date Requested</td>
-                                        <td>: {{ $reimbursement->created_at }}</td>
+                                        <td style="width: 150px;">Payment Method</td>
+                                        <td>: {{ $reimbursement->f_payment_method }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Reimbursement Type</td>
                                         <td class="font-weight-bold text-primary">: {{ $reimbursement->f_type }}</td>
                                     </tr>
-                                    {{-- <tr class="table-sm">
-                                        <td style="width: 200px;">Description</td>
-                                        <td>: <i>{{ $reimbursement->f_purpose_of_purchase }}</i></td>
-                                    </tr> --}}
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;" class="text-success font-weight-bold">Total Granted Funds :</td>
+                                        <td class="text-success font-weight-bold">: IDR {{ number_format($reimbursement->f_granted_funds, 0, ',', '.') }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -96,27 +96,20 @@ active
                             <table class="table table-borderless">
                                 <tbody>
                                     <tr class="table-sm">
-                                        <td style="width: 150px;">Payment Method</td>
-                                        <td>: {{ $reimbursement->f_payment_method }}</td>
-                                    </tr>
-                                    <tr class="table-sm">
-                                        <td style="width: 180px;">Requesting Approval to</td>
-                                        <td>:
-                                            <?php
-                                                $uniqueApprovers = array_unique($reimbursement->approval->pluck('RequestTo')->toArray());
-                                                $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
-                                                $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
-                                                echo $commaDelimitedApprovers;
-                                            ?>
-                                        </td>
-                                    </tr>
-                                    {{-- <tr class="table-sm">
-                                        <td style="width: 150px;">Status</td>
-                                        <td>: {{ $reimbursement->status_id }}</td>
-                                    </tr> --}}
-                                    <tr class="table-sm">
                                         <td style="width: 150px;">Notes</td>
                                         <td>: {{ $reimbursement->notes }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;">Date Requested</td>
+                                        <td>: {{ $reimbursement->created_at->format('Y-m-d') }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 180px;">Last Updated</td>
+                                        <td>: {{ $reimbursement->updated_at->format('Y-m-d') }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;" class="text-success font-weight-bold">Paid On</td>
+                                        <td class="text-success font-weight-bold">: {{ $reimbursement->f_paid_on }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -140,8 +133,8 @@ active
                             <tr>
                                 <th>Receipt</th>
                                 <th>Description</th>
-                                <th>Expense</th>
-                                <th>Payout</th>
+                                <th class="text-danger font-weight-bold">My Request</th>
+                                <th class="text-success font-weight-bold">Granted Funds</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -151,11 +144,15 @@ active
                                 $row_number = 1;
                             @endphp
                             @foreach ($reimbursement_items as $usr)
+                            {{-- <small class="position-absolute top-0 start-100 translate-middle badge bg-success text-white">{{ $difference < 0 ? '+' : '-' }}{{ number_format(abs($difference), 0, ',', '.') }}</small> --}}
+                            @php
+                                $difference = floatval(str_replace([',','.'], '', $usr->amount)) - (floatval(str_replace([',','.'], '', $usr->approved_amount)) ?? 0);
+                            @endphp
                                 <tr>
                                     <td class="text-center" style="width: 20%;"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
                                     <td>{{ $usr->description }}</td>
-                                    <td>Rp. {{ $usr->amount }}</td>
-                                    <td>Rp. {{ $usr->approved_amount ?? '—' }}</td>
+                                    <td class="text-danger font-weight-bold">Rp. {{ $usr->amount }}</td>
+                                    <td class="text-success font-weight-bold">Rp. {{ $usr->approved_amount ?? '—' }}</td>
                                     <td>
                                         @php
                                             $approved = false;
@@ -297,6 +294,7 @@ active
                         <tr>
                             <th>Request To</th>
                             <th>Status</th>
+                            <th>Granted Funds</th>
                             <th>Notes</th>
                         </tr>
                     </thead>
@@ -446,6 +444,7 @@ active
                         var row = $('<tr></tr>').attr('data-id', activity.id);
                         row.append($('<td></td>').text(activity.RequestTo));
                         row.append($('<td></td>').html(activity.status));
+                        row.append($('<td></td>').html('Rp '+activity.approved_amount));
                         row.append($('<td></td>').text(activity.notes));
                         $('#ApproverList').append(row);
                         $('#approval_notes').val(activity.notes);

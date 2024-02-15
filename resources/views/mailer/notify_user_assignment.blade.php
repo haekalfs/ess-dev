@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>You have been assigned to a project {{ $assignment }} by Service Director.</p>
 

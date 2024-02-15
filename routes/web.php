@@ -274,8 +274,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req');
     Route::get('/reimbursement/view/{id}', 'ReimburseController@view_details')->name('reimburse-view-req');
     Route::get('/retrieveReimburseData/{id}', 'ReimburseController@retrieveReimburseData');
+    Route::get('/retrieveReimburseDataApproval/{id}', 'ReimburseController@retrieveReimburseDataApproval');
     Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
-    Route::post('/reimbursement/edit/update/{item_id}', 'ReimburseController@updateReimburseDataFinance');
+
+    Route::post('/reimbursement/finance/approve/{item_id}', 'ReimburseController@approveReimburseDataFinance');
+    Route::post('/reimbursement/finance/reject/{item_id}', 'ReimburseController@rejectReimburseDataFinance');
     Route::delete('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
     Route::get('reimbursement/view/preview/{id}', 'ReimburseController@previewPdf')->name('pdf.preview');
     Route::get('/download-receipt/reimbursement/{id}', 'ReimburseController@downloadReceipt');
@@ -285,9 +288,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/approval/reimburse/view/{id}', 'ReimbursementApprovalController@view_details')->name('reimburse.approval-view-req');
 
     Route::get('/retrieveApproverList/{id}', 'ReimbursementApprovalController@listApprover')->name('list-approver');
+    Route::get('/retrieveApproverHistory/{id}', 'ReimbursementApprovalController@approvalFlow');
 
     Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement');
     Route::get('/reimbursement/export/all/{month}/{year}', 'ReimburseController@export_excel');
+    Route::get('/reimbursement/export/request/{id}', 'ReimburseController@export');
 
     Route::get('/getLocationProject/{id}', 'TimesheetController@getLocationProject')->name('list-location');
 

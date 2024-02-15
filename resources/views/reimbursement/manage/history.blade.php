@@ -7,10 +7,19 @@ active
 @endsection
 
 @section('content')
-<!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
     <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-hand-holding-usd"></i> Manage Reimbursement <small style="color: red;"><i> &nbsp;&nbsp;Finance Department</i></small></h1>
-    <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/reimbursement/export/all/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All (XLS)</a>
+    <div>
+        <div class="d-sm-flex justify-content-end" id="bulkPaid">
+        <form method="POST" action="/reimbursement/manage/disbursed/all">
+            @csrf
+            <button type="submit" class="btn btn-success btn-sm btn-edit mr-2 shadow-sm"><i class="fas fa-check"></i> Mark as Paid</button>
+            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/reimbursement/export/all/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All</a>
+            <input type="hidden" name="usersName" id="usersName" value="" />
+            <input type="hidden" name="formId" id="formId" value="" />
+        </form>
+        </div>
+    </div>
 </div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
@@ -36,12 +45,6 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Reimbursement</h6>
         <div class="text-right">
-            <form method="POST" action="/reimbursement/manage/disbursed/all">
-                @csrf
-                <button type="submit" id="bulkPaid" style="display: none;" class="btn btn-success btn-sm btn-edit"><i class="fas fa-check"></i> Mark as Paid</button>
-                <input type="hidden" name="usersName" id="usersName" value="" />
-                <input type="hidden" name="formId" id="formId" value="" />
-            </form>
         </div>
     </div>
     <form method="GET" action="/reimbursement/manage">
@@ -101,7 +104,7 @@ active
                     </div>
                     <div class="col-md-12"><br>
                         <div class="table-responsive">
-                            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
+                            <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
                                 <thead class="thead-light">
                                     <tr>
                                         <th class="text-center">
@@ -109,36 +112,40 @@ active
                                                 <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleCheckboxes()">
                                             </div>
                                         </th>
-                                        <th>Emp ID</th>
+                                        <th>Form ID</th>
                                         <th>Name</th>
                                         <th>Reimbursement Type</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @if ($approvals->isEmpty())
-                                        <tr style="border-bottom: 1px solid #dee2e6;">
-                                            <td colspan="6" class="text-center"><a><i>No Data Available</i></a></td>
-                                        </tr>
-                                    @else
-                                    @php $no = 1; @endphp
-                                        @foreach($approvals as $index => $approval)
+                                <tbody>@php $no = 1; @endphp
+                                    @foreach($approvals as $index => $approval)
                                         <tr>
                                             @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
                                             <td style="border-bottom: none; border-top: none;"></td>
                                             <td style="border-bottom: none; border-top: none;"></td>
                                             <td style="border-bottom: none; border-top: none;"></td>
                                             <td style="border-bottom: none; border-top: none;">{{ $approval->f_type }}</td>
-                                            <td style="border-bottom: none; border-top: none;"></td>
-                                            <td style="border-bottom: none; border-top: none;"></td>
+                                            <td style="border-bottom: none; border-top: none;">
+                                                @if($approval->status_id == 29)
+                                                <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Approved</span>
+                                                @elseif($approval->status_id == 2002)
+                                                <span class="m-0 font-weight-bold text-success"><i class="fas fa-check-circle" style="color: #01e476;"></i> Paid</span>
+                                                @else
+                                                <span class="m-0 font-weight-bold text-danger"><i class="fas fa-times-circle" style="color: #ff0000;"></i> Unknown</span>
+                                                @endif
+                                            </td>
+                                            <td style="border-bottom: none; border-top: none;" class="action text-center">
+                                                <a href="/reimbursement/manage/view/{{ $approval->id }}" class="mr-2 btn btn-primary btn-sm btn-edit"><i class="fas fa-hand-pointer"></i> View</a>
+                                            </td>
                                             @else
                                             <td class="text-center" style="border-bottom: none; border-top: none;">
                                                 <div class="form-check form-check-inline larger-checkbox">
                                                     <input class="form-check-input data-checkbox" type="checkbox" value="option1" onclick="toggleCheckboxes2()" data-username="{{ $approval->f_req_by }}" data-form-id="{{ $approval->id }}">
                                                 </div>
                                             </td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->user->users_detail->employee_id }}</td>
+                                            <td style="border-bottom: none; border-top: none;">{{ $approval->f_id }}</td>
                                             <td style="border-bottom: none; border-top: none;" id="{{ $no++ }}">
                                                 {{ $approval->user->name }}
                                             </td>
@@ -153,15 +160,11 @@ active
                                                 @endif
                                             </td>
                                             <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                                <a href="/reimbursement/manage/view/{{ $approval->id }}" class="mr-2 btn btn-primary btn-sm btn-edit"><i class="fas fa-hand-pointer"></i> View</a>
+                                                <a href="/reimbursement/manage/view/{{ $approval->id }}" class="mr-2 btn btn-primary btn-sm btn-edit"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                             @endif
                                         </tr>
                                         @endforeach
-                                    @endif
-                                    <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
-                                    </tr>
                                 </tbody>
                             </table>
 
@@ -227,12 +230,6 @@ function toggleCheckboxes2() {
     usersNameInput.value = checkedUserNames.join(', ');
     formIdInput.value = checkedFormId.join(', ');
 
-    // Show/hide the "Paid" button based on checked users
-    if (checkedUserNames.length > 0) {
-        bulkPaidButton.style.display = 'block'; // Show the "Paid" button
-    } else {
-        bulkPaidButton.style.display = 'none'; // Hide the "Paid" button
-    }
 }
 
 </script>

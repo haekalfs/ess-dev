@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\SendReimbursementReminderFinance;
+use App\Models\Reimbursement;
 use App\Models\Reimbursement_approval;
 use App\Models\User;
 use App\Models\Users_detail;
@@ -49,10 +50,14 @@ class SendReimbursementReminderFin extends Command
         $data = Users_detail::whereIn('position_id', [21,22,23])->pluck('user_id')->toArray();
 
         $userToApprove = $data;
-        $users = User::whereIn('id', $userToApprove)->get();
+        $employees = User::whereIn('id', ['haekals'])->get();
 
-        foreach ($users as $user) {
-            dispatch(new SendReimbursementReminderFinance($user));
+        $countForms = Reimbursement::where('status_id', 29)->whereYear('created_at', date('Y'))->count();
+
+        if($countForms > 0){
+            foreach ($employees as $employee) {
+                dispatch(new SendReimbursementReminderFinance($employee, $countForms));
+            }
         }
     }
 

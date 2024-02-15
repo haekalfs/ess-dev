@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>This is leave approval reminder, {{ $userName }} has requesting leave and require your approval. Kindly request your review for the documents.</p>
+<p>{{ $userName }} has requesting leave and require your approval. Kindly request your review for the documents.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>
