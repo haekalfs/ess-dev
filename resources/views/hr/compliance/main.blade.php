@@ -38,8 +38,8 @@ active
 <div class="row zoom90">
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
-            <div class="card-header d-flex flex-row align-items-center justify-content-between bg-primary">
-                <h6 class="m-0 font-weight-bold text-white mt-2 mb-2">System Configuration</h6>
+            <div class="card-header d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary mt-2 mb-2">System Configuration</h6>
             </div>
             <ul class="nav nav-tabs" id="pageTabs" role="tablist">
                 <li class="nav-item">

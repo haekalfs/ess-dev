@@ -34,8 +34,8 @@ active
 </div>
 @endif
 <div class="card shadow mb-4 zoom90">
-    <div class="card-header py-3 d-flex flex-row align-items-center bg-primary justify-content-between">
-        <h6 class="m-0 font-weight-bold text-light" id="judul">Commands List</h6>
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Commands List</h6>
         {{-- <div class="text-right">
             <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
         </div> --}}

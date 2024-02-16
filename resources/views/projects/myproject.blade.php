@@ -34,8 +34,8 @@ active
 </div>
 @endif
 <div class="card shadow mb-4 zoom90">
-    <div class="card-header py-3 d-flex flex-row align-items-center bg-primary justify-content-between">
-        <h6 class="m-0 font-weight-bold text-light" id="judul">MyProjects List</h6>
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">MyProjects List</h6>
         {{-- <div class="text-right">
             <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
         </div> --}}
@@ -84,9 +84,9 @@ active
 
 <div class="card shadow mb-4 zoom90">
     <!-- Card Header - Accordion -->
-    <a href="#collapseCardExample" class="d-block bg-dark card-header py-3" data-toggle="collapse"
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
         role="button" aria-expanded="false" aria-controls="collapseCardExample">
-        <h6 class="m-0 font-weight-bold text-light" id="judul">Requested Assignment</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Requested Assignment</h6>
     </a>
     <!-- Card Content - Collapse -->
     <div class="collapse" id="collapseCardExample">
