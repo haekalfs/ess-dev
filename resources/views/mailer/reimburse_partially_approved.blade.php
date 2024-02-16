@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>Your Reimbursement Request : {{ $formCreator->request->f_type }}, has been approved by {{ $formCreator->user->name }}. Please note that this approval is subject to final/director approval.</p>
 

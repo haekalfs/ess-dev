@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>This is Leave Request Status Reminder, {{ $userName }} has Approved your Leave Request. Kindly request your review for the documents.</p>
 

@@ -41,7 +41,7 @@ class ReimbursementApprovalController extends Controller
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
             //should add more position
-                if (in_array($checkUserPost, [8, 12, 6, 10, 22])) {
+                if (in_array($checkUserPost, [8, 12, 6, 22])) {
                     $Check = DB::table('reimbursement_approval')
                     ->select('reimb_item_id')
                     ->whereNotIn('RequestTo', $ts_approver)
@@ -96,6 +96,9 @@ class ReimbursementApprovalController extends Controller
     public function view_details($id)
     {
         $reimbursement = Reimbursement::find($id);
+        // if($reimbursement->status_id == 29){
+        //     return redirect('approval/reimburse/');
+        // }
         $checkUserPost = Auth::user()->users_detail->position->id;
         $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();
 
@@ -120,7 +123,6 @@ class ReimbursementApprovalController extends Controller
         } else {
             $Check = DB::table('reimbursement_approval')
             ->select('reimb_item_id')
-            ->whereNotIn('RequestTo', $ts_approver)
             ->whereNotIn('RequestTo', [Auth::id()])
             ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
             ->groupBy('reimb_item_id')
@@ -172,6 +174,38 @@ class ReimbursementApprovalController extends Controller
             $data = [
                 'RequestTo' => $as->user->name,
                 'status' => $status,
+                'approved_amount' => $as->approved_amount,
+                'notes' => $as->notes,
+            ];
+            $array[] = $data;
+        }
+
+        return response()->json($array);
+    }
+
+    public function approvalFlow($id)
+    {
+        $approverList = Reimbursement_approval::where('reimb_item_id', $id)->whereIn('status', [30,29,404])->groupBy('RequestTo')->get();
+
+        $array = [];
+
+        foreach ($approverList as $as) {
+            switch ($as->status){
+                case 404:
+                    $status = '<i class="fas fa-times-circle" style="color: #ff0000;"></i> Rejected';
+                    break;
+                case 29:
+                case 30:
+                    $status = '<i class="fas fa-check-circle" style="color: #005eff;"></i> Approved';
+                    break;
+                default:
+                    $status = '<i class="fas fa-spinner fa-spin"></i> Waiting for Approval';
+                break;
+            }
+            $data = [
+                'RequestTo' => $as->user->name,
+                'status' => $status,
+                'approved_amount' => $as->approved_amount,
                 'notes' => $as->notes,
             ];
             $array[] = $data;
@@ -217,7 +251,13 @@ class ReimbursementApprovalController extends Controller
             ->whereIn('status', [20])
             ->count();
 
-        $approved_amount = $item->amount;
+        $checkItemLeft = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)
+            ->where('reimb_item_id', $item_id)
+            ->whereIn('status', [20])
+            ->count();
+
+        $approved_amount = 0;
+        $grantedFunds = Reimbursement_approval::where('reimb_item_id', $item_id)->whereNotNull('approved_amount')->orderBy('updated_at', 'desc')->first();
         $rawAmount = $request->approved_amount;
         $numericAmount = (float) preg_replace('/[^0-9]/', '', $rawAmount);
 
@@ -226,25 +266,47 @@ class ReimbursementApprovalController extends Controller
             //set it to new value
             $item->approved_amount = $approved_amount;
         } else {
+            if($grantedFunds)
+            {
+                $approved_amount = $grantedFunds->approved_amount;
+            } else {
+                $approved_amount = $item->amount;
+            }
             $item->approved_amount = $approved_amount;
         }
 
-        $item->save();
-
+        if ($checkItemLeft == 1) {
+            $item->save();
+        }
         $statusToUpdate = $changeStatus ? 30 : 29;
 
-        Reimbursement_approval::where('reimb_item_id', $item->id)
-            ->where('RequestTo', Auth::user()->id)
-            ->update(['status' => $statusToUpdate, 'notes' => $request->approval_notes, 'approved_amount' => $approved_amount]);
+        $updateApprovals = Reimbursement_approval::where('reimb_item_id', $item->id)
+            ->where('RequestTo', Auth::user()->id);
+
+        $updateApprovals->update([
+            'status' => $statusToUpdate,
+            'notes' => $request->approval_notes,
+            'approved_amount' => $approved_amount
+        ]);
 
         $formApproval = Reimbursement_approval::where('reimb_item_id', $item->id)
         ->where('RequestTo', Auth::user()->id)->first();
+
+        $totalApprovedAmount = 0;
+        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->get();
+        foreach ($result as $item) {
+            // Remove the comma and convert the string to a float
+            $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
+
+            // Add the numeric value to the totalApprovedAmount
+            $totalApprovedAmount += $approvedAmount;
+        }
 
         if ($reimbursement && $item) {
             // Send mail
             foreach ($employees as $employee) {
                 if ($checkRowsLeft == 1) {
-                    Reimbursement::where('id', $item->reimbursement_id)->update(['status_id' => $statusToUpdate]);
+                    Reimbursement::where('id', $item->reimbursement_id)->update(['status_id' => $statusToUpdate, 'f_granted_funds' => $totalApprovedAmount, 'f_sign_prior_approver' => Auth::user()->name, 'f_sign_prior_approver_date' => date('Y-m-d')]);
                     //send email
                     $notification = new NotifyReimbursementApproved($employee, $reimbursement);
                     dispatch($notification);

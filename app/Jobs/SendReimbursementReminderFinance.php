@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Mail\ApprovalLeave;
 use App\Mail\ReimbursementFinanceReminder;
-use App\Models\Reimbursement;
+use App\Models\Leave;
+use App\Models\Leave_request;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,32 +18,19 @@ class SendReimbursementReminderFinance implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $user;
+    protected $employee;
+    protected $formCreator;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param  User  $user
-     * @return void
-     */
-    public function __construct(User $user)
+    public function __construct(User $employee, String $formCreator)
     {
-        $this->user = $user;
+        $this->employee = $employee;
+        $this->formCreator = $formCreator;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
-        $reimbReq = Reimbursement::where('status_id', 29)->get();
+        $notification = new ReimbursementFinanceReminder($this->employee, $this->formCreator);
 
-        $notification = new ReimbursementFinanceReminder($this->user, $reimbReq);
-        Mail::send('mailer.reimburse_approved_finance', $notification->data(), function ($message) use ($notification) {
-            $message->to($notification->emailTo())
-                    ->subject($notification->emailSubject());
-        });
+        Mail::send($notification);
     }
 }

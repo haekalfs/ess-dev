@@ -22,7 +22,7 @@ document.getElementById('confirmSubmit').addEventListener('click', function () {
     var expirationDate = $('input[name^="expiration"]').val();
     var currentDate = new Date();
     var sevenDaysBeforeNow = new Date(currentDate);
-    sevenDaysBeforeNow.setDate(currentDate.getDate() - 7);
+    sevenDaysBeforeNow.setDate(currentDate.getDate() - 60);
 
     if (new Date(expirationDate) < sevenDaysBeforeNow) {
         alert('Receipt date is expired & cannot be reimbursed!.');

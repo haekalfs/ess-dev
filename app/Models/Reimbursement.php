@@ -10,7 +10,7 @@ class Reimbursement extends Model
     use HasFactory;
     protected $table = "reimbursements";
 
-    protected $fillable = ["id", "f_id", "f_type", "f_req_by","f_payment_method", "f_approver", "notes", "status_id", "created_at", "updated_at"];
+    protected $fillable = ["id", "f_id", "f_type", "f_req_by","f_payment_method", 'f_sign_employee', 'f_sign_prior_approver', 'f_granted_funds', 'f_paid_on', 'f_sign_employee_date', 'f_sign_prior_approver_date', "f_approver", "notes", "status_id", "created_at", "updated_at"];
 
     public function items(){
     	return $this->hasMany('App\Models\Reimbursement_item', 'reimbursement_id', 'id');

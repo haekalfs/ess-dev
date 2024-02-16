@@ -39,7 +39,7 @@ active
 
     <div class="row zoom90">
         <!-- Area Chart -->
-        <div class="col-xl-12 col-lg-12">
+        <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -48,7 +48,7 @@ active
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-12">
                                     <label>Type of Reimbursement <span class="text-danger">*</span>:</label><br />
@@ -73,17 +73,18 @@ active
                                             <optgroup label="Others" style="display: none;" id="reimbursementType">
                                                 <option value="Travel Reimbursement">Travel Reimbursement</option>
                                                 <option value="Expense Reimbursement">Expense Reimbursement</option>
-                                                <option value="Healthcare Reimbursement">Healthcare Reimbursement</option>
-                                                <option value="Tuition Reimbursement">Tuition Reimbursement</option>
                                                 <option value="Mileage Reimbursement">Mileage Reimbursement</option>
                                                 <option value="Cell Phone Reimbursement">Cell Phone Reimbursement</option>
-                                                <option value="Business Meal Reimbursement">Business Meal Reimbursement</option>
-                                                <option value="Relocation Reimbursement">Relocation Reimbursement</option>
-                                                <option value="Vendor or Supplier Reimbursement">Vendor or Supplier Reimbursement</option>
-                                                <option value="Petty Cash Reimbursement">Petty Cash Reimbursement</option>
+                                                <option value="Sales & Marketing Reimbursement">Sales & Marketing Reimbursement</option>
                                                 <option value="Others Reimbursement">Others</option>
                                             </optgroup>
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="comment">Notes <span class="text-danger">*</span>:</label>
+                                        <textarea class="form-control" id="comment" rows="2" name="notes" required></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +119,7 @@ active
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group" style="display: none;" id="reqApproval">
+                            {{-- <div class="form-group" style="display: none;" id="reqApproval">
                                 <label for="password">Request Approval To <span class="text-danger">*</span>:</label>
                                 <select class="form-control" id="approver" name="approver">
                                     <option value="" disabled selected>Select Division...</option>
@@ -126,17 +127,35 @@ active
                                         <option value="{{$app->group_id}}">{{ $app->user->name}}</option>
                                     @endforeach
                                 </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="comment">Notes <span class="text-danger">*</span>:</label>
-                                <textarea class="form-control" id="comment" rows="2" name="notes" required></textarea>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-xl-6 col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger">Reimbursement Policy</span>
+                </div>
+                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul>
+                        <li>All reimbursement requests must comply with company policies and procedures.</li>
+                        <li>Employees are responsible for accurately documenting all expenses.</li>
+                        <li>Reimbursements will only be provided for approved business-related expenses.</li>
+                    </ul>
 
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
+                    <ol>
+                        <li>Complete the reimbursement form provided by the Finance Department.</li>
+                        <li>Attach all necessary receipts and supporting documentation.</li>
+                        <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
+                        <li>Hardcopy of the receipt must be given to finance within 2 weeks <a href="#">Read More.</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
         <!-- Area Chart -->
             <div class="col-xl-12 col-lg-12">
                 <div class="card shadow mb-4">
@@ -170,10 +189,10 @@ active
                                 <div class="row" id="targetContainer">
                                     <div class="col-md-4" id="originalForm">
                                         <div class="row">
-                                            <div class="col-lg-12">
+                                            <div class="col-lg-12 mr-2">
                                                 <div class="form-group">
                                                     <input type="file" accept="image/*" onchange="loadFile(event)" class="file-input" id="receipt" name="receipt[]" multiple required>
-                                                    <img id="output" style="margin-top: 10px;" width="100%" height="300"/>
+                                                    <img id="output" style="margin-top: 10px;" width="100%" height="200"/>
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">

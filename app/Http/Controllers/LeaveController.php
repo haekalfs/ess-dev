@@ -320,10 +320,9 @@ class LeaveController extends Controller
         }
 
         $employees = User::whereIn('id', $userToApprove)->get();
-        $userName = Auth::user()->name;
 
         foreach ($employees as $employee) {
-            dispatch(new NotifyLeaveApproval($employee, $userName));
+            dispatch(new NotifyLeaveApproval($employee, $formApproval));
         }
 
         Leave_request_approval::where('RequestTo', Auth::user()->id)->where('leave_request_id', $uniqueId)->delete();
@@ -547,7 +546,8 @@ class LeaveController extends Controller
 	// 	return view('leave.edit_leave_user', compact('empLeaveQuotaAnnual', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
 	// }
 
-    public function add_leave_quota(Request $request, $emp){
+    public function add_leave_quota(Request $request, $emp)
+    {
         date_default_timezone_set("Asia/Jakarta");
         $validator = Validator::make($request->all(), [
             'leaveStatus' => 'required',

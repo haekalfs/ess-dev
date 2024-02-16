@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/surat_penugasan
+/public/reimbursement
 /public/storage
 /storage/*.key
 /vendor

@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -82,7 +83,15 @@ class ReimburseController extends Controller
         $userDept = (empty(Company_project::find($project))) ? 1 : 4;
         $RequestTo = empty($request->approver) ? $userDept : $request->approver;
 
-        $approvalByGroup = Timesheet_approver::where('group_id', $RequestTo)
+
+        $checkUserDept = Auth::user()->users_detail->department->id;
+        $approvalFinance_GA = Timesheet_approver::whereIn('id', [10, 45])
+            ->get();
+        $approvalSales = Timesheet_approver::whereIn('id', [50, 45])
+            ->get();
+        $approvalHCM = Timesheet_approver::whereIn('id', [10, 60])
+            ->get();
+        $approvalService = Timesheet_approver::whereIn('id', [20, 40])
             ->get();
 
         $usersWithPMRole = Project_assignment_user::where('company_project_id', $companyProjectId)
@@ -111,6 +120,8 @@ class ReimburseController extends Controller
             'f_payment_method' => $request->payment_method,
             'f_type' => $typeOfReimbursement,
             'f_approver' => $RequestTo,
+            'f_sign_employee' => Auth::user()->name,
+            'f_sign_employee_date' => date('Y-m-d'),
             'notes' => $request->notes
     	]);
 
@@ -183,15 +194,55 @@ class ReimburseController extends Controller
                         $userToApprove[] = $approverPm->user_id;
                     }
                 }
-
-                foreach($approvalByGroup as $approverGroup){
-                    Reimbursement_approval::create([
-                        'status' => 20,
-                        'RequestTo' => $approverGroup->approver,
-                        'reimb_item_id' => $itemId,
-                        'reimbursement_id' => $uniqueId
-                    ]);
-                    $userToApprove[] = $approverGroup->approver;
+                switch (true) {
+                    case ($checkUserDept == 4):
+                        foreach($approvalFinance_GA as $approverGa){
+                            Reimbursement_approval::create([
+                                'status' => 20,
+                                'RequestTo' => $approverGa->approver,
+                                'reimb_item_id' => $itemId,
+                                'reimbursement_id' => $uniqueId
+                            ]);
+                            $userToApprove[] = $approverGa->approver;
+                        }
+                        break;
+                        // No break statement here, so it will continue to the next case
+                    case ($checkUserDept == 2):
+                        foreach($approvalService as $approverService){
+                            Reimbursement_approval::create([
+                                'status' => 20,
+                                'RequestTo' => $approverService->approver,
+                                'reimb_item_id' => $itemId,
+                                'reimbursement_id' => $uniqueId
+                            ]);
+                            $userToApprove[] = $approverService->approver;
+                        }
+                        break;
+                    case ($checkUserDept == 3):
+                        foreach($approvalHCM as $approverHCM){
+                            Reimbursement_approval::create([
+                                'status' => 20,
+                                'RequestTo' => $approverHCM->approver,
+                                'reimb_item_id' => $itemId,
+                                'reimbursement_id' => $uniqueId
+                            ]);
+                            $userToApprove[] = $approverHCM->approver;
+                        }
+                        break;
+                    case ($checkUserDept == 1):
+                        foreach($approvalSales as $approverSales){
+                            Reimbursement_approval::create([
+                                'status' => 20,
+                                'RequestTo' => $approverSales->approver,
+                                'reimb_item_id' => $itemId,
+                                'reimbursement_id' => $uniqueId
+                            ]);
+                            $userToApprove[] = $approverSales->approver;
+                        }
+                        break; // Add break statement here to exit the switch block after executing the case
+                    default:
+                        return redirect()->back()->with('failed', "You haven't assigned to any department! Ask HR Dept to correcting your account details");
+                    break;
                 }
             }
 
@@ -201,7 +252,7 @@ class ReimburseController extends Controller
             foreach ($employees as $employee) {
                 dispatch(new NotifyReimbursementCreation($employee, $form));
             }
-            Session::flash('success',"Request has been submitted!");
+            Session::flash('success',"Request has been submitted! You have to give a hard copies of the receipts to the finance department within 2 weeks");
             return redirect('/reimbursement/history');
         } else {
             Session::flash('failed',"Error Database has Occured! Failed to create request!");
@@ -218,6 +269,10 @@ class ReimburseController extends Controller
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
+        if ($reimbursement->created_at->diffInDays(now()) <= 14) {
+            Session::flash('warning',"You have to give a hard copies of the receipts to the finance department within 2 weeks otherwise the reimbursement will not be proceeds!");
+        }
+
         return view('reimbursement.view_details', ['reimbursement' => $reimbursement,'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
@@ -227,6 +282,23 @@ class ReimburseController extends Controller
         $itemData = Reimbursement_item::find($id);
 
         return response()->json($itemData);
+    }
+
+    public function retrieveReimburseDataApproval($id)
+    {
+        // Get the Timesheet records between the start and end dates
+        $itemData = Reimbursement_item::find($id);
+
+        // Fetch granted funds
+        $grantedFunds = Reimbursement_approval::where('reimb_item_id', $id)->whereNotNull('approved_amount')->orderBy('updated_at', 'desc')->first();
+
+        // Prepare data for response
+        $responseData = [
+            'itemData' => $itemData,
+            'grantedFunds' => $grantedFunds ? $grantedFunds->approved_amount : null
+        ];
+
+        return response()->json($responseData);
     }
 
     public function updateReimburseData(Request $request, $item_id)
@@ -277,10 +349,11 @@ class ReimburseController extends Controller
         return response()->json(['success' => 'Item updated successfully.']);
     }
 
-    public function updateReimburseDataFinance(Request $request, $item_id)
+    public function approveReimburseDataFinance(Request $request, $item_id)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required'
+            'amount' => 'required',
+            'notes' => 'sometimes'
         ]);
 
         if ($validator->fails()) {
@@ -291,13 +364,94 @@ class ReimburseController extends Controller
         $item->approved_amount = $request->amount;
         $item->save();
 
+        $itemIds = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)->whereNotIn('status', [404])->pluck('reimb_item_id')->toArray();
+
+        $totalApprovedAmount = 0;
+        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->whereIn('id', $itemIds)->get();
+        foreach ($result as $item) {
+            // Remove the comma and convert the string to a float
+            $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
+
+            // Add the numeric value to the totalApprovedAmount
+            $totalApprovedAmount += $approvedAmount;
+        }
+
+        Reimbursement_approval::updateOrCreate(
+            [
+                'reimb_item_id' => $item_id,
+                'RequestTo' => "Finance Dept."
+            ],
+            [
+                'status' => 29,
+                'approved_amount' => $request->amount,
+                'reimbursement_id' => $item->reimbursement_id,
+                'notes' => $request->notes
+            ]
+        );
+
+        $mainForm = Reimbursement::where('id', $item->reimbursement_id);
+        $mainForm->update(['f_granted_funds' => $totalApprovedAmount]);
+
         $employees = User::where('id', $item->request->f_req_by)->get();
 
         foreach ($employees as $employee) {
             dispatch(new NotifyChangesReimbursementbyFinance($employee, $item));
         }
 
-        return response()->json(['success' => 'Item updated successfully.']);
+        return redirect()->back()->with('success', 'You approved the leave request!');
+    }
+
+    public function rejectReimburseDataFinance(Request $request, $item_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required',
+            'notes' => 'sometimes'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $item = Reimbursement_item::find($item_id);
+        $item->approved_amount = $request->amount;
+        $item->save();
+
+        // Check if all items are rejected
+        $reimbItem = Reimbursement_item::find($item_id);
+        $checkRowsLeft = Reimbursement_approval::whereNotIn('reimb_item_id', [$reimbItem->id])
+            ->where('reimbursement_id', $reimbItem->reimbursement_id)
+            ->whereIn('status', [20, 30, 29])
+            ->count();
+
+        // Update reimbursement request status if all items are rejected
+        if ($checkRowsLeft === 0) {
+            Reimbursement::where('id', function ($query) use ($item_id) {
+                $query->select('reimbursement_id')->from('reimbursement_items')->where('id', $item_id);
+            })->update(['status_id' => 404]);
+        }
+
+        Reimbursement_approval::updateOrCreate(
+            [
+                'reimb_item_id' => $item_id,
+                'RequestTo' => Auth::id()
+            ],
+            [
+                'status' => 404,
+                'approved_amount' => $request->amount,
+                'reimbursement_id' => $item->reimbursement_id,
+                'notes' => $request->notes
+            ]
+        );
+        Reimbursement_approval::where('reimb_item_id', $item_id)
+            ->update(['status' => '404']);
+
+        $employees = User::where('id', $item->request->f_req_by)->get();
+
+        foreach ($employees as $employee) {
+            dispatch(new NotifyChangesReimbursementbyFinance($employee, $item));
+        }
+
+        return response()->json(['success' => 'Items rejected successfully.']);
     }
 
     public function cancel_request(Request $request, $id)
@@ -429,7 +583,7 @@ class ReimburseController extends Controller
             //loop the formId passed
             foreach($formId as $form){
                 // Update records in the Reimbursement table where id is in the $formId array
-                Reimbursement::whereIn('id', $formId)->update(['status_id' => 2002]);
+                Reimbursement::whereIn('id', $formId)->update(['status_id' => 2002, 'f_paid_on' => date('Y-m-d')]);
 
                 $getForm = Reimbursement::find($form);
 
@@ -444,7 +598,7 @@ class ReimburseController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', "Reimbursement has been marked to Paid! and system begin to sent notification to each users");
+        return redirect('/reimbursement/manage')->with('success', "Reimbursement has been marked to Paid! and system begin to sent notification to each users");
     }
 
     public function export_excel($Month, $Year)
@@ -456,7 +610,7 @@ class ReimburseController extends Controller
         $checkSettingExport = $settingExport->position_id;
 
         // Compare the hashed passwords
-        if (in_array($checkUserPost, [10])) {
+        if (in_array($checkUserPost, [10,9,21,22,23,8])) {
             $templatePath = public_path('template_reimbursement.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
@@ -566,10 +720,10 @@ class ReimburseController extends Controller
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
 
-        $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
-        $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
+        $reimbIds = Reimbursement_approval::where('reimbursement_id', $id)->whereNotIn('status', [404, 20])->pluck('reimb_item_id')->toArray();
+        $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->whereIn('id', $reimbIds)->get();
 
-        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'reimbursement_approval' => $reimbursement_approval, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function downloadReceipt($Id)
@@ -584,5 +738,119 @@ class ReimburseController extends Controller
 
         // File not found
         abort(404);
+    }
+
+    public function export($formId)
+    {
+        $checkUserPost = Auth::user()->users_detail->position->id;
+
+        //Tabel Setting Export Role
+        $settingExport = Setting::where('id', 2)->first();
+        $checkSettingExport = $settingExport->position_id;
+        $totalApprovedAmount = 0;
+
+        $mainForm = Reimbursement::find($formId);
+        $approvalForm = Reimbursement_approval::where('reimbursement_id', $formId)
+            ->whereNotIn('status', [404])
+            ->groupBy('reimb_item_id')
+            ->select('reimb_item_id') // Select the grouped column
+            ->pluck('reimb_item_id') // Pluck the grouped column
+            ->toArray();
+
+        // Compare the hashed passwords
+        if (in_array($checkUserPost, [10,9,21,22,23,8])) {
+            if($mainForm->status_id == 2002){
+                $templatePath = public_path('template_reimbursement_item_paid.xlsx');
+            } else {
+                $templatePath = public_path('template_reimbursement_item.xlsx');
+            }
+            $spreadsheet = IOFactory::load($templatePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            // Set up the starting row and column for the data
+            $startRow = 16;
+            $startCol = 2;
+
+            $result = Reimbursement_item::where('reimbursement_id', $formId)->whereIn('id', $approvalForm)->get();
+
+            $latestReceipt = Reimbursement_item::where('reimbursement_id', $formId)->orderBy('receipt_expiration', 'desc')->first();
+            $receiptExpiration = $latestReceipt->receipt_expiration;
+            $dateAfterTwoMonths = date('Y-m-d', strtotime($receiptExpiration . ' +2 months'));
+
+            $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();
+
+            $no = 1;
+            foreach ($result as $item) {
+                // Remove the comma and convert the string to a float
+                $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
+
+                // Add the numeric value to the totalApprovedAmount
+                $totalApprovedAmount += $approvedAmount;
+            }
+
+            foreach ($result as $index => $row) {
+
+                // Define the URL (you can change this to any URL or route you want)
+                $attachedFileUrl = url($row->file_path);
+
+                // Set the text for the hyperlink (e.g., 'Attachment')
+                $sheet->setCellValueByColumnAndRow(1, $startRow, 'View File');
+
+                // Add a hyperlink to the specific cell (e.g., cell in $startCol and $startRow)
+                $sheet->getCellByColumnAndRow(1, $startRow)
+                    ->getHyperlink()
+                    ->setUrl($attachedFileUrl);
+                $sheet->getCellByColumnAndRow(1, $startRow)
+                    ->getHyperlink()
+                    ->setTooltip('Click to download attachment');
+
+                // Apply formatting to make the text underlined and blue
+                $style = [
+                    'font' => ['color' => ['rgb' => '0000FF'], 'underline' => true],
+                ];
+
+                $sheet->getStyleByColumnAndRow(1, $startRow)->applyFromArray($style);
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 6, $latestReceipt->receipt_expiration);
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 7, $dateAfterTwoMonths);
+
+                $sheet->setCellValueByColumnAndRow(3, 3, $row->request->user->name);
+                $sheet->setCellValueByColumnAndRow(3, 4, $row->request->user->users_detail->employee_id);
+
+                $uniqueApprovers = array_unique($mainForm->approval->pluck('RequestTo')->toArray());
+                $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
+                $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
+                $sheet->setCellValueByColumnAndRow(3, 6, $commaDelimitedApprovers);
+                $sheet->setCellValueByColumnAndRow(3, 7, $row->request->dept->department_name);
+                $sheet->setCellValueByColumnAndRow(3, 10, $row->request->f_type);
+                $sheet->setCellValueByColumnAndRow(3, 13, $row->request->f_id);
+
+                $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->description);
+                $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, str_replace([',','.'], '', $row->amount));
+                $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, str_replace([',','.'], '', $row->approved_amount));
+
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 30, $totalApprovedAmount);
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 32, str_replace([',','.'], '', $mainForm->f_granted_funds));
+                $sheet->setCellValueByColumnAndRow($startCol + 2, 40, $mainForm->f_sign_prior_approver_date);
+                $sheet->setCellValueByColumnAndRow($startCol + 2, 37, $mainForm->f_sign_employee_date);
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 43, $mainForm->f_paid_on);
+                $sheet->setCellValueByColumnAndRow(1, 40, $mainForm->f_sign_prior_approver);
+                $sheet->setCellValueByColumnAndRow(1, 37, $mainForm->f_sign_employee);
+
+                $startRow++;
+                $no++; // Set the firstRow flag to false after the first row for each user
+            }
+
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save(storage_path('app/public/output.xlsx'));
+            // Download the file
+            $filePath = storage_path('app/public/output.xlsx');
+
+            $headers = [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ];
+            $fileName = $mainForm->f_id . '_' . $mainForm->f_type . '_' . $mainForm->user->id;
+            return response()->download($filePath, "$fileName.xlsx", $headers);
+        } else {
+            abort(403, 'Unauthorized');
+        }
     }
 }

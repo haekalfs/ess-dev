@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>This is assignment approval reminder, and there's an assignment that require your approval. Kindly request your review for the documents.</p>
 

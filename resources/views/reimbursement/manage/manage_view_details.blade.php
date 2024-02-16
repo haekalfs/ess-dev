@@ -74,6 +74,10 @@ active
                                         <td style="width: 150px;">Payment Method</td>
                                         <td>: {{ $reimbursement->f_payment_method }}</td>
                                     </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;" class="text-success font-weight-bold">Total Granted Funds :</td>
+                                        <td class="text-success font-weight-bold">: IDR {{ number_format($reimbursement->f_granted_funds, 0, ',', '.') }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -118,6 +122,10 @@ active
                                         <td style="width: 180px;">Last Updated</td>
                                         <td>: {{ $reimbursement->updated_at }}</td>
                                     </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;" class="text-success font-weight-bold">Paid On</td>
+                                        <td class="text-success font-weight-bold">: {{ $reimbursement->f_paid_on }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -130,7 +138,10 @@ active
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Items</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Reimbursement Items</h6>
+                <div class="text-right">
+                    <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Download</a>
+                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -140,8 +151,8 @@ active
                             <tr>
                                 <th>No</th>
                                 <th>Description</th>
-                                <th>Expense</th>
-                                <th>Payout</th>
+                                <th class="text-danger font-weight-bold">Emp. Request</th>
+                                <th class="text-success font-weight-bold">Granted Funds</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -153,8 +164,8 @@ active
                                 <tr>
                                     <td class="text-center" style="width: 20%;"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
                                     <td>{{ $usr->description }}</td>
-                                    <td>Rp. {{ $usr->amount }}</td>
-                                    <td>Rp. {{ $usr->approved_amount ?? '—' }}</td>
+                                    <td class="text-danger font-weight-bold">Rp. {{ $usr->amount }}</td>
+                                    <td class="text-success font-weight-bold">Rp. {{ $usr->approved_amount ?? '—' }}</td>
                                     <td class="text-center" style="width: 20%;">
                                         <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
                                         <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
@@ -205,6 +216,7 @@ active
                         <tr>
                             <th>Request To</th>
                             <th>Status</th>
+                            <th>Approved Amount</th>
                             <th>Notes</th>
                         </tr>
                     </thead>
@@ -238,26 +250,32 @@ active
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form method="post" id="editItemForm" enctype="multipart/form-data">
+			<form method="post" id="editItemForm" action="">
                 @csrf
                 <input type="hidden" name="item_id" id="item_id" value="">
-				<div class="modal-body" style="">
+                <div class="modal-body">
                     <div class="col-md-12 zoom90">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="to">Amount :</label>
-                                    <input type="text" class="form-control" name="amount" oninput="formatAmount(this)" id="amount" required>
+                        <div class="form-group">
+                            <label for="amount">Modify Granted Amount <span class="text-danger">*</span>:</label>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Rp.</div>
                                 </div>
+                                <input type="text" class="form-control" name="amount" oninput="formatAmount(this)" id="amount" required>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="comment">Notes <span class="text-danger">*</span>:</label>
+                            <textarea class="form-control" id="comment" rows="2" name="notes" required></textarea>
+                        </div>
+                        <small style="color: red;"><i>Changes will send notification to request owner.</i></small>
                     </div>
                 </div>
-				<div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="updateReimburseDataSubmit">Submit Request</button>
-                  </div>
-			</form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" id="rejectBtn" onclick="setFormAction('/reimbursement/finance/reject/')"><i class="fas fa-times"></i> Reject</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="approveBtn" onclick="setFormAction('/reimbursement/finance/approve/')"><i class="fas fa-save"></i> Approve</button>
+                </div>
+            </form>
 		</div>
 	</div>
 </div>
@@ -340,33 +358,6 @@ $(document).on('click', '.btn-edit', function() {
     });
 });
 
-$(document).on('click', '#updateReimburseDataSubmit', function() {
-    var formData = new FormData($('#editItemForm')[0]); // Use FormData to include the file
-    var itemId = $('#item_id').val();
-
-    // Make an AJAX request to update the project data
-    $.ajax({
-        url: '/reimbursement/edit/update/' + itemId,
-        method: 'POST', // Use POST instead of PUT
-        data: formData,
-        contentType: false, // Important for handling file uploads
-        processData: false, // Important for handling file uploads
-        success: function(response) {
-            // Handle success
-            console.log(response);
-
-            // Close the modal
-            $('#editAmountModal').modal('hide');
-            $('#editItemForm')[0].reset();
-            window.location.reload();
-        },
-        error: function(xhr) {
-            // Handle error
-            console.log(xhr.responseText);
-        }
-    });
-});
-
 $(document).on('click', '.btn-details', function() {
     var itemId = $(this).data('item-id');
     $('#item_id').val(itemId);
@@ -374,6 +365,11 @@ $(document).on('click', '.btn-details', function() {
     fetchApproverDetails(itemId);
 });
 
+function setFormAction(url) {
+    var itemId = $('#item_id').val();
+    document.getElementById('editItemForm').action = url + itemId;
+    document.getElementById('editItemForm').submit();
+}
 
 function fetchApproverDetails(id) {
     $.ajax({
@@ -392,6 +388,7 @@ function fetchApproverDetails(id) {
                     var row = $('<tr></tr>').attr('data-id', activity.id);
                     row.append($('<td></td>').text(activity.RequestTo));
                     row.append($('<td></td>').html(activity.status));
+                    row.append($('<td></td>').html('Rp ' + activity.approved_amount));
                     row.append($('<td></td>').text(activity.notes));
                     $('#ApproverList').append(row);
                     $('#approval_notes').val(activity.notes);

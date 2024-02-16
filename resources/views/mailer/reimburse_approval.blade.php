@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>{{ $userName }} has requesting reimbursement for : {{ $formCreator->f_type }}, and it requires your approvals. Kindly request your review for the documents.</p>
 

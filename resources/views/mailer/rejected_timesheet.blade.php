@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>Kindly inform that your timesheet of {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{ $year }} has been <a style="color: red;"><u style="color: red;"><i style="color: red;">Rejected</i></u></a>. Recomplete and resubmit your timesheet before the end of 7th. Failure to submit your timesheet on time may result in late payment.</p>
 

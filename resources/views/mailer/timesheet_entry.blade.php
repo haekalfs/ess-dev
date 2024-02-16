@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>Kindly remind you to fill up the timesheet entry of {{ date("F", mktime(0, 0, 0, $month, 1)) }} - {{ $year }}. Complete and submit your timesheet before the end of 7th. Failure to submit your timesheet on time may result in late payment.</p>
 

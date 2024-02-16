@@ -1,10 +1,10 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>This is timesheet approval reminder, and some user's timesheets require your approval. Kindly request your review for the documents.</p>
 
 <a>Month Periodes:</a><br>
 @foreach($month_periode as $mp)
-@php 
+@php
 $year = substr($mp->month_periode, 0, 4);
 $month = substr($mp->month_periode, 4, 2);
 

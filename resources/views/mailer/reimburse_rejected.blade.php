@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>An item from your request : {{ $formCreator->request->f_type }} has been <span style="color: red;"><i>Rejected</i></span> by {{ $formCreator->user->name }}. Please note that this is final and cannot be contested.</p>
 <p>Here are the notes provided: <br>{{ $formCreator->notes }}</p>

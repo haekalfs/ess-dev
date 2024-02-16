@@ -81,6 +81,10 @@ active
                                         <td style="width: 150px;">Payment Method</td>
                                         <td>: {{ $reimbursement->f_payment_method }}</td>
                                     </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;" class="text-success font-weight-bold">Total Granted Funds :</td>
+                                        <td class="text-success font-weight-bold">: IDR {{ number_format($reimbursement->f_granted_funds, 0, ',', '.') }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -119,11 +123,15 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Date Requested</td>
-                                        <td>: {{ $reimbursement->created_at }}</td>
+                                        <td>: {{ $reimbursement->created_at->format('Y-m-d') }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Last Updated</td>
-                                        <td>: {{ $reimbursement->updated_at }}</td>
+                                        <td>: {{ $reimbursement->updated_at->format('Y-m-d') }}</td>
+                                    </tr>
+                                    <tr class="table-sm">
+                                        <td style="width: 150px;" class="text-success font-weight-bold">Paid On</td>
+                                        <td class="text-success font-weight-bold">: {{ $reimbursement->f_paid_on }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -146,9 +154,9 @@ active
                         <thead class="thead-light">
                             <tr>
                                 <th>No</th>
-                                <th>Description</th>
-                                <th>Expense</th>
-                                <th>Payout</th>
+                                <th>Item Description</th>
+                                <th class="text-danger font-weight-bold">Emp. Request</th>
+                                <th class="text-success font-weight-bold">Granted Funds <small class="text-secondary">(by you)</small></th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -161,8 +169,8 @@ active
                                 <tr>
                                     <td>{{ $row_number++ }}</td>
                                     <td>{{ $usr->item->description }}</td>
-                                    <td>Rp. {{ $usr->item->amount }}</td>
-                                    <td>Rp. {{ $usr->item->approved_amount ?? '—' }}</td>
+                                    <td class="text-danger font-weight-bold">Rp. {{ $usr->item->amount }}</td>
+                                    <td class="text-success font-weight-bold">Rp. {{ $usr->approved_amount ?? '—' }}</td>
                                     <td>
                                         @if($usr->status == 20)
                                             <a><i class="fas fa-spinner fa-spin"></i></a>
@@ -191,7 +199,7 @@ active
 </div>
 
 <div class="modal fade" id="editAmountModal" tabindex="-1" role="dialog" aria-labelledby="modalPeriod" aria-hidden="true">
-	<div class="modal-dialog modal-lg" role="document">
+	<div class="modal-dialog modal-lg" role="document" style="max-width: 850px;">
 		<div class="modal-content">
 			<div class="modal-header border-bottom-1">
 				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="editAmountModalLabel">Preview Item</h5>
@@ -215,8 +223,8 @@ active
                                     </div>
                                 </div>
                                 <div class="col-md-12" style="display: none;" id="receiptContainer">
-                                    <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
-                                    <img id="imageframe" style="display: none;" src="" width="100%" height="400px"/>
+                                    <iframe id="pdfIframe" src="" style="width: 100%; height: 500px;"></iframe>
+                                    <img id="imageframe" style="display: none;" src="" width="100%" height="500px"/>
                                 </div>
                                 <div class="row" id="detailContainer">
                                     <div class="col-md-12">
@@ -229,13 +237,13 @@ active
                                                 </div>
                                             </div>
                                             <div class="col-md-2 d-flex justify-content-center align-items-center">
-                                                <i class="fas fa-arrow-right"></i>
+                                                <span class="h2"><i class="fas fa-random"></i></span>
                                             </div>
                                             <div class="col-md-5">
                                                 <div class="form-group">
                                                     <label for="to">Amount to be Processed :</label>
                                                     <input type="text" class="form-control" name="approved_amount" title="Leave it blank/null if you won't edit the value!" oninput="formatAmountPrefix(this)" id="approved_amount">
-                                                    <small style="color: red;"><i>Set the payout amount that will disbursed.</i></small>
+                                                    <small style="color: red;"><i>To maintain amount with the previous approver's, leave this blank.</i></small>
                                                 </div>
                                             </div>
                                         </div>
@@ -246,20 +254,12 @@ active
                                             <textarea type="text" class="form-control" rows="5" name="approval_notes" id="approval_notes"></textarea>
                                         </div>
                                     </div>
-                                    {{-- <div class="col-md-12 mt-4">
-                                        <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
-                                            <thead class="thead-light">
-                                                <tr>
-                                                    <th>Request To</th>
-                                                    <th>Status</th>
-                                                    <th>Notes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="ApproverList">
-                                                <!-- Ajax Data -->
-                                            </tbody>
-                                        </table>
-                                    </div> --}}
+                                    <div class="col-md-12">
+                                        <h6 class="h6 mb-2 font-weight-bold text-gray-800">Approvals Process</h6>
+                                        <ul id="ApproverList">
+                                            {{-- ajax --}}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -323,14 +323,14 @@ active
         }
 
         $.ajax({
-            url: '/retrieveReimburseData/' + itemId,
+            url: '/retrieveReimburseDataApproval/' + itemId,
             method: 'GET',
             success: function(response) {
-                $('#approved_amount').val("Rp. " + response.approved_amount);
-                $('#current_amount').val("Rp. " + response.amount);
+                $('#current_amount').val("Rp. " + response.itemData.amount);
+                $('#approved_amount').attr('placeholder', "Rp. " + response.grantedFunds);
                 // Assuming response.url contains the desired URL
-                var downloadUrl = "/download-receipt/reimbursement/" + response.id;
-                if (isImage(response.receipt_file)) {
+                var downloadUrl = "/download-receipt/reimbursement/" + response.itemData.id;
+                if (isImage(response.itemData.receipt_file)) {
                     // If it's an image, show image frame and hide PDF frame
                     $('#imageframe').attr('src', fileUrl);
                     $('#imageframe').show();
@@ -412,7 +412,7 @@ active
 
     function fetchApproverList(id) {
         $.ajax({
-            url: '/retrieveApproverList/' + id,
+            url: '/retrieveApproverHistory/' + id,
             type: 'GET',
             success: function(response) {
                 // Clear the table body
@@ -420,16 +420,13 @@ active
                 // Check if the response is empty or null
                 if (response.length === 0) {
                     // Display a message to the user
-                    $('#ApproverList').append($('<tr><td class="text-center" colspan="3">No data available in table.</td></tr>'));
+                    $('#ApproverList').append($('<li>No approvals have been processed yet.</li>'));
                 } else {
                     // Loop through the activities and append each row to the table
                     $.each(response, function(index, activity) {
-                        var row = $('<tr></tr>').attr('data-id', activity.id);
-                        row.append($('<td></td>').text(activity.RequestTo));
-                        row.append($('<td></td>').html(activity.status));
-                        row.append($('<td></td>').text(activity.notes));
-                        $('#ApproverList').append(row);
-                        $('#approval_notes').val(activity.notes);
+                        var listItem = $('<li></li>').attr('data-id', activity.id);
+                        listItem.append($('<span></span>').html('<span class="text-primary font-weight-bold">' + activity.RequestTo + '</span> has approved this item for IDR ' + activity.approved_amount + '<br> Notes : ' + activity.notes));
+                        $('#ApproverList').append(listItem);
                     });
                 }
             },
