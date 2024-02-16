@@ -310,6 +310,45 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Reimburse and Medical Admin</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="table-sm">
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="email">Reimburse Admin :</label>
+                                                                    <select class="form-control" name="reimburse_admin" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $reimburse_admin->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="password">Medical Admin :</label>
+                                                                    <select class="form-control" name="medical_admin" >
+                                                                        <option selected disabled>Choose...</option>
+                                                                        @foreach($user as $us)
+                                                                        <option value="{{ $us->id }}" @if( $us->id == $medical_admin->approver ) selected @endif >{{ $us->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
                                                     <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">Emails</th>
                                                 </tr>
                                             </thead>

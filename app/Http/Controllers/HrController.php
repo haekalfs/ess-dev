@@ -57,6 +57,9 @@ class HrController extends Controller
 		$Default_Approve1 = Timesheet_approver::where('id', 29)->first();
 		$Default_Approve2 = Timesheet_approver::where('id', 28)->first();
 
+		//Admin
+		$reimburse_admin = Timesheet_approver::where('id', 65)->first();
+		$medical_admin = Timesheet_approver::where('id', 99)->first();
 		//Position
 		$position = Position::all();
 
@@ -95,7 +98,9 @@ class HrController extends Controller
 		'export_ts' => $setting_export_ts,
 		'export_reimburse' => $setting_export_reimburse,
 		'position'	=> $position,
-		'cc_email' => $cc_email
+		'cc_email' => $cc_email,
+		'reimburse_admin' => $reimburse_admin,
+		'medical_admin' =>$medical_admin
 		]);
 	}
 
@@ -191,6 +196,15 @@ class HrController extends Controller
 			$input_Default_Approve2 = Timesheet_approver::where('id', 28)->first();
 			$input_Default_Approve2->approver = $request->Default_PA;
 			$input_Default_Approve2->save();
+
+			//Reimburse & Medical Admin
+			$input_admin_reimburse = Timesheet_approver::where('id', 65)->first();
+			$input_admin_reimburse->approver = $request->reimburse_admin;
+			$input_admin_reimburse->save();
+
+			$input_admin_medical = Timesheet_approver::where('id', 99)->first();
+			$input_admin_medical->approver = $request->medical_admin;
+			$input_admin_medical->save();
 
 		//Export TS
 			$input_export_ts = Setting::where('id', 1)->first();

@@ -84,7 +84,7 @@ class UserController extends Controller
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $request->email . "." . $profile_file->getClientOriginalExtension();
+            $nama_file_profile = $request->id . "_". "profile_pic". "." . $profile_file->getClientOriginalExtension();
             $tujuan_upload_profile = '/storage/profile_pic';
             $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
         }
@@ -97,7 +97,7 @@ class UserController extends Controller
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
-             $nama_file_cv = $request->email . "." . $cv_file->getClientOriginalExtension();
+             $nama_file_cv = $request->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
             $tujuan_upload_cv = '/storage/cv';
             $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
         } else {
