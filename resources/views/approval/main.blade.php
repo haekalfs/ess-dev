@@ -7,7 +7,10 @@ active
 @endsection
 
 @section('content')
-{{-- <h1 class="h3 mb-2 text-center text-gray-800">Approval Page</h1><br> --}}
+<!-- Page Heading -->
+<h1 class="h3 mb-2 zoom90 text-gray-800 font-weight-bold"><i class="fas fa-calendar"></i> Approvals & Submission</h1>
+<p class="mb-4">This section displays the approvals and submissions for various requests.</p>
+
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -116,18 +119,52 @@ active
             </div>
         </div>
     </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4 p_assign_mem">
-        <div class="card border-left-project_b shadow h-100 py-2">
+
+    <div class="col-xl-3 col-md-6 mb-4 approval_po">
+        <div class="card border-left-po shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-pink text-uppercase mb-1">
-                            Project Member</div>
+                        <div class="text-xs font-weight-bold text-green-tea text-uppercase mb-1">
+                            Purchase Orders</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                        <i class="fas fa-file-invoice-dollar fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4 approval_pr">
+        <div class="card border-left-pr shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-green-donker text-uppercase mb-1">
+                            Purchase Requsitions</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-invoice-dollar fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4 approval_rn">
+        <div class="card border-left-rn shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-orange text-uppercase mb-1">
+                            Receivable Notes</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-receipt fa-2x text-gray-300"></i>
                     </div>
                 </div>
             </div>
@@ -141,6 +178,20 @@ active
     const cardReimburse = document.querySelector('.reimburse');
     const cardP_assignment = document.querySelector('.p_assignment');
     const cardP_assign_mem = document.querySelector('.p_assign_mem');
+    const approval_po = document.querySelector('.approval_po');
+    const approval_pr = document.querySelector('.approval_pr');
+    const approval_rn = document.querySelector('.approval_rn');
+
+    approval_po.addEventListener('click', function() {
+    window.location.href = 'https://e-form.perdana.co.id/';
+    });
+    approval_pr.addEventListener('click', function() {
+    window.location.href = 'https://e-form.perdana.co.id/';
+    });
+    approval_rn.addEventListener('click', function() {
+    window.location.href = 'https://e-form.perdana.co.id/';
+    });
+
 
     cardTimesheet.addEventListener('click', function() {
     window.location.href = '/approval/timesheet/p';
@@ -149,7 +200,7 @@ active
     cardLeave.addEventListener('click', function() {
     window.location.href = '/approval/leave/';
     });
-    
+
     cardMed.addEventListener('click', function() {
     window.location.href = '/approval/medical/';
     });
@@ -165,6 +216,26 @@ active
     cardP_assignment.addEventListener('click', function() {
     window.location.href = '/approval/project/assignment/';
     });
+
+    approval_po.addEventListener('mouseover', function() {
+    approval_po.style.cursor = 'pointer';
+    });
+    approval_po.addEventListener('mouseout', function() {
+    approval_po.style.cursor = 'default';
+    });
+    approval_pr.addEventListener('mouseover', function() {
+    approval_pr.style.cursor = 'pointer';
+    });
+    approval_pr.addEventListener('mouseout', function() {
+    approval_pr.style.cursor = 'default';
+    });
+    approval_rn.addEventListener('mouseover', function() {
+    approval_rn.style.cursor = 'pointer';
+    });
+    approval_rn.addEventListener('mouseout', function() {
+        approval_rn.style.cursor = 'default';
+    });
+
 
     cardTimesheet.addEventListener('mouseover', function() {
     cardTimesheet.style.cursor = 'pointer';

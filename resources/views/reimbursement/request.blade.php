@@ -193,6 +193,7 @@ active
                                                 <div class="form-group">
                                                     <input type="file" accept="image/*" onchange="loadFile(event)" class="file-input" id="receipt" name="receipt[]" multiple required>
                                                     <img id="output" style="margin-top: 10px;" width="100%" height="200"/>
+
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">

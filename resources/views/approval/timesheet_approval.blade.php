@@ -104,7 +104,7 @@ active
                     </div>
                     <div class="col-md-12"><br>
                         <div class="table-responsive">
-                            <table class="table table-bordered zoom90" width="100%" cellspacing="0">
+                            <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Name</th>
@@ -114,12 +114,7 @@ active
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($approvals->isEmpty())
-                                        <tr style="border-bottom: 1px solid #dee2e6;">
-                                            <td colspan="4" class="text-center"><a><i>No Data Available</i></a></td>
-                                        </tr>
-                                    @else
-                                        @foreach($approvals as $index => $approval)
+                                    @foreach($approvals as $index => $approval)
                                         <tr>
                                             @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
                                             <td style="border-bottom: none; border-top: none;"></td>
@@ -135,11 +130,7 @@ active
                                             </td>
                                             @endif
                                         </tr>
-                                        @endforeach
-                                    @endif
-                                    <tr style="border-bottom: 1px solid #dee2e6;">
-                                        <td colspan="4" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
-                                    </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

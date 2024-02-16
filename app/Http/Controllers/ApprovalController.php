@@ -55,24 +55,23 @@ class ApprovalController extends Controller
         // $result = $accessController->usr_acc(202);
 
         $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
-            ->where(function ($query) {
-                $query->where('RequestTo', Auth::user()->id)
-                    ->groupBy('user_timesheet', 'month_periode');
-            })
+            ->where('RequestTo', Auth::user()->id)
             ->groupBy('user_timesheet', 'month_periode')
+            ->distinct('user_timesheet', 'month_periode')
             ->count();
 
         $pCount = Project_assignment::where('approval_status', 40)->count();
+
         $leaveCount = Leave_request_approval::whereNotIn('status', ['20', '30', '29', '404'])
-            ->where(function ($query) {
-                $query->where('RequestTo', Auth::user()->id);
-            })
+            ->where('RequestTo', Auth::user()->id)
+            ->groupBy('leave_request_id')
+            ->distinct('leave_request_id')
             ->count();
 
-        $reimbCount = Reimbursement_approval::whereNotIn('status', ['30', '29', '404'])->groupBy('reimbursement_id')
-            ->where(function ($query) {
-                $query->where('RequestTo', Auth::user()->id);
-            })
+        $reimbCount = Reimbursement_approval::where('status', 20)
+            ->where('RequestTo', Auth::user()->id)
+            ->groupBy('reimbursement_id')
+            ->distinct('reimbursement_id')
             ->count();
 
         $ts_approver = Timesheet_approver::where('id', [99])->pluck('approver')->toArray();
@@ -708,11 +707,11 @@ class ApprovalController extends Controller
         $medBalance = Emp_medical_balance::where('user_id', $med->user_id)->first();
 
         $position = Position::all();
-        return view('medical.medical_edit_approval', 
+        return view('medical.medical_edit_approval',
         [
-            'med' => $med, 
-            'medDet' => $medDet, 
-            'medAppUpdate' => $medAppUpdate, 
+            'med' => $med,
+            'medDet' => $medDet,
+            'medAppUpdate' => $medAppUpdate,
             'medBalance' => $medBalance,
             'position' => $position,
         ]);
@@ -757,7 +756,7 @@ class ApprovalController extends Controller
 
         $currentYear = Carbon::now()->year;
 
-       
+
 
 
             $MedId = $user_med->id;

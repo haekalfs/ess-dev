@@ -45,12 +45,7 @@ class SendReimbursementReminderFin extends Command
      */
     public function handle()
     {
-        // $users = User::where('id', 'haekals')->get();
-        $userToApprove = [];
-        $data = Users_detail::whereIn('position_id', [21,22,23])->pluck('user_id')->toArray();
-
-        $userToApprove = $data;
-        $employees = User::whereIn('id', ['haekals'])->get();
+        $employees = User::whereIn('id', ['djayanti'])->get();
 
         $countForms = Reimbursement::where('status_id', 29)->whereYear('created_at', date('Y'))->count();
 
