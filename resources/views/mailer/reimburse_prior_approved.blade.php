@@ -1,6 +1,6 @@
 <p>Dear {{ $name }},</p>
 
-<p>{{ $formCreator->user->name }} has requested reimbursement for: {{ $formCreator->request->f_type }}. We are awaiting your final approval.</p>
+<p>Previously, {{$formCreator->request->user->name }} has requesting reimbursement for : {{ $formCreator->request->f_type }} and it has been approved by {{ $formCreator->user->name }}. <span style="font-weight: bold;">Now we are awaiting your final approval.</span></p>
 
 <p>Please open the link below to review the request:</p>
 <p><a href="{{ $link }}"><strong>Click Here</strong></a></p>

@@ -1117,7 +1117,7 @@ class TimesheetController extends Controller
 
         $user_info = User::find(Auth::user()->id);
 
-        $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year . intval($month))->groupBy('ts_task', 'ts_location', 'RequestTo', 'activity')->orderBy('updated_at', 'asc')->orderBy('priority', 'desc')->orderBy('ts_task', 'asc')->get();
+        $workflow = Timesheet_detail::where('user_timesheet', Auth::user()->id)->where('month_periode', $year . intval($month))->groupBy('ts_task', 'ts_location', 'RequestTo', 'activity')->orderBy('created_at', 'asc')->orderBy('ts_task', 'asc')->orderBy('priority', 'desc')->orderBy('ts_task', 'asc')->get();
 
         $userId = Auth::user()->id;
 

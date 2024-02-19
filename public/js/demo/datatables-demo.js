@@ -77,6 +77,14 @@ $(document).ready(function() {
 } );
 
 $(document).ready(function() {
+  $('#tsPreviewFinance').DataTable({
+    "order": [[ 1, "desc" ]],
+    "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
+    "pageLength": 30
+  } );
+} );
+
+$(document).ready(function() {
   $('#myProjects').DataTable({
     "order": [[ 1, "asc" ]],
     "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],

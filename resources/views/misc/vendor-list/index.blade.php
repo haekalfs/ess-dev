@@ -69,7 +69,7 @@ active
                                     aria-haspopup='true' aria-expanded='false'>
                                     Action
                                 </a>
-                                <div class='dropdown-menu' aria-labelledby='dropdownMenu2'>
+                                <div class='dropdown-menu' style="zoom: 100%;" aria-labelledby='dropdownMenu2'>
                                     <a class='dropdown-item' target="_blank" href="{{$urlEform}}/po/create-from-vendor/{{ $record->id }}"><i class="fas fa-fw fa-print"></i> Create PO</a>
                                     <a class='dropdown-item' href="#"><i class="fas fa-fw fa-print"></i> Create PR</a>
                                     <hr>

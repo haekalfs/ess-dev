@@ -758,6 +758,13 @@ class ReimburseController extends Controller
             ->toArray();
 
         $getProjectCode = Company_project::where('project_name', $mainForm->f_type)->first();
+        if($getProjectCode){
+            $projectCode = $getProjectCode->project_code;
+            $client = $getProjectCode->client->client_name;
+        } else {
+            $projectCode = 'N/a';
+            $client = 'KIP';
+        }
         // Compare the hashed passwords
         if (in_array($checkUserPost, [10,9,21,22,23,8])) {
             if($mainForm->status_id == 2002){
@@ -822,8 +829,8 @@ class ReimburseController extends Controller
                 $sheet->setCellValueByColumnAndRow(3, 6, $commaDelimitedApprovers);
                 $sheet->setCellValueByColumnAndRow(3, 7, $row->request->dept->department_name);
                 $sheet->setCellValueByColumnAndRow(3, 10, $row->request->f_type);
-                $sheet->setCellValueByColumnAndRow($startCol + 2, 10, $getProjectCode->project_code);
-                $sheet->setCellValueByColumnAndRow($startCol + 2, 11, $getProjectCode->client->client_name);
+                $sheet->setCellValueByColumnAndRow($startCol + 2, 10, $projectCode);
+                $sheet->setCellValueByColumnAndRow($startCol + 2, 11, $client);
                 $sheet->setCellValueByColumnAndRow(3, 13, $row->request->f_id);
 
                 $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->description);
