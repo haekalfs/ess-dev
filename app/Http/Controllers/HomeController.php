@@ -146,7 +146,12 @@ class HomeController extends Controller
         // Transform the result into an array
         $activitiesArray = [];
         foreach ($activities as $activity) {
-            $earliestComeTime = Carbon::createFromFormat('H:i:s', $activity->earliest_come_time)->format('H:i');
+            try {
+                $earliestComeTime = Carbon::createFromFormat('H:i:s', $activity->earliest_come_time)->format('H:i');
+            } catch (\Exception $e) {
+                // Handle the error (e.g., log it, provide a default value, etc.)
+                $earliestComeTime = 'N/A';
+            }
             $data = [
                 'ts_user_id' => $activity->user->name,
                 'earliest_come_time' => $earliestComeTime,
