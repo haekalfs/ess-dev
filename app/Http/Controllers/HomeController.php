@@ -144,6 +144,8 @@ class HomeController extends Controller
             } elseif ($typeSelected == 2) {
                 $activitiesQuery->whereNotIn('ts_location', ['HO']); // Replace ['HO'] with your condition
             }
+        } else {
+            $activitiesQuery->whereIn('ts_location', ['HO']);
         }
 
         $activities = $activitiesQuery->whereNotIn('ts_user_id', $ts_approver)
