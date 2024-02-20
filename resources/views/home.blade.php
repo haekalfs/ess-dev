@@ -223,7 +223,8 @@ $total_years_of_service = $diff->y;
                                     </tr>
                                 @endforeach
                             </table>
-                        </div>
+                        </div><br>
+                        <span class="text-danger mt-2"><small>Congratulations! Your reward awaits you at the closest canteen. Bon appétit!</small></span>
                     </div>
                 </div>
             </div>
