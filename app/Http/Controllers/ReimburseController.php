@@ -6,6 +6,8 @@ use App\Jobs\NotifyChangesReimbursementbyFinance;
 use App\Jobs\NotifyReimburseCancelRequest;
 use App\Jobs\NotifyReimbursementCreation;
 use App\Jobs\NotifyReimbursementPaid;
+use App\Jobs\SendDisbursementOrder;
+use PhpOffice\PhpWord\TemplateProcessor;
 use App\Models\Company_project;
 use App\Models\Department;
 use App\Models\Financial_password;
@@ -591,6 +593,28 @@ class ReimburseController extends Controller
         return view('reimbursement.manage.history', compact('approvals', 'notify', 'notifyMonth', 'yearsBefore', 'Month', 'Year', 'employees'));
     }
 
+    public function disbursed_item($formId)
+    {
+        // Ensure both arrays are not empty before proceeding
+        if (!empty($formId)) {
+            // Update records in the Reimbursement table where id is in the $formId array
+            Reimbursement::where('id', $formId)->update(['status_id' => 2002, 'f_paid_on' => date('Y-m-d')]);
+
+            $getForm = Reimbursement::find($formId);
+
+            if ($getForm) {
+                $employees = User::where('id', $getForm->f_req_by)->get();
+
+                // Send mail
+                foreach ($employees as $employee) {
+                    dispatch(new NotifyReimbursementPaid($employee, $getForm));
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', "Reimbursement has been marked to Paid! and system begin to sent notification to users");
+    }
+
     public function disbursed_all(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1017,5 +1041,36 @@ class ReimburseController extends Controller
             Session::flash('failed', 'Failed to create zip file');
             return redirect()->back();
         }
+    }
+
+    public function create_order_letter(Request $request,$id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $data = Reimbursement::find($id);
+        $financeManager = Timesheet_approver::find(15);
+
+        $templateProcessor = new TemplateProcessor('disbursement_order_letter.docx');
+
+        $numericAmount = (float) preg_replace('/[^0-9]/', '', $data->f_granted_funds);
+        $grantedFunds = number_format($numericAmount);
+        $templateProcessor->setValue('date_sent', htmlentities(date('j-M-Y')));
+        $templateProcessor->setValue('f_type', htmlentities($data->f_type));
+        $templateProcessor->setValue('requestor', htmlentities($data->user->name));
+        $templateProcessor->setValue('f_id', htmlentities($data->f_id));
+        $templateProcessor->setValue('granted_funds', htmlentities('IDR '. $grantedFunds));
+        $templateProcessor->setValue('bank_account', htmlentities($data->user->users_detail->usr_bank_name));
+        $templateProcessor->setValue('account_number', htmlentities($data->user->users_detail->usr_bank_account));
+        $templateProcessor->setValue('finance_manager', htmlentities($financeManager->user->name));
+
+        $templateProcessor->saveAs("reimbursement/Result_$data->f_id.docx");
+        $dateCreated = date("Y-m-d", strtotime($data->created_at));
+        ob_end_clean();
+
+        $employees = User::where('id', $financeManager->approver)->get();
+
+        foreach ($employees as $employee) {
+            dispatch(new SendDisbursementOrder($employee, $data));
+        }
+        return response()->download(public_path("reimbursement/Result_$data->f_id.docx"), "Disbursement_Order_Letter_$data->f_id".'_'."$data->f_purpose_of_purchase"."_"."$dateCreated".".docx");
     }
 }

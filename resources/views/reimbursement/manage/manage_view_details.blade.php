@@ -140,10 +140,10 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Reimbursement Items</h6>
                 <div class="text-right">
-                    <a href="/reimbursement/manage" class="btn btn-danger btn-sm mr-2">
+                    <a href="/reimbursement/create_order_letter/{{ $reimbursement->id }}" class="btn btn-danger btn-sm mr-2">
                         <i class="fas fa-paper-plane"></i> Send Disbursement Order Letter
                     </a>
-                    <a href="/reimbursement/manage" class="btn btn-success btn-sm mr-2">
+                    <a href="/reimbursement/manage/disbursed-item/{{ $reimbursement->id }}" class="btn btn-success btn-sm mr-2">
                         <i class="fas fa-check"></i> Mark as Paid
                     </a>
                     <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="far fa-file-excel"></i> Export as Excel</a>
@@ -198,6 +198,9 @@ active
                 </button>
             </div>
             <div class="modal-body">
+                <div class="text-right">
+                    <a id="downloadBtn" class="btn btn-sm btn-primary"><i class="fas fa-download"></i> Download</a>
+                </div>
                 <!-- iframe to display the PDF -->
                 <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
                 <img id="imageframe" style="display: none;" src="" width="100%" height="400px"/>
@@ -318,6 +321,7 @@ $(document).ready(function () {
             url: '/retrieveReimburseData/' + userId,
             method: 'GET',
             success: function(response) {
+                var downloadUrl = "/download-receipt/reimbursement/" + response.id;
                 if (isImage(response.receipt_file)) {
                     // If it's an image, show image frame and hide PDF frame
                     $('#imageframe').attr('src', fileUrl);
@@ -329,6 +333,8 @@ $(document).ready(function () {
                     $('#pdfIframe').show();
                     $('#imageframe').hide();
                 }
+                // Set the href attribute of the download button
+                $('#downloadBtn').attr('href', downloadUrl);
             },
             error: function(xhr) {
                 // Handle error

@@ -318,7 +318,9 @@ Route::middleware(['auth'])->group(function () {
 
 
         Route::post('/reimbursement/manage/disbursed/all', 'ReimburseController@disbursed_all');
+        Route::get('/reimbursement/manage/disbursed-item/{formId}', 'ReimburseController@disbursed_item');
         Route::get('/reimbursement/manage/view/{id}', 'ReimburseController@manage_view_details');
+        Route::get('/reimbursement/create_order_letter/{id}', 'ReimburseController@create_order_letter');
 
         //Execution
         Route::get('/company-regulation/commands', 'CommandsController@index')->name('commands');
