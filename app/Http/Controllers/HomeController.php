@@ -36,7 +36,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index($typeSelected = null)
     {
         // Check if the quotes data is cached
         if (!Cache::has('quotes')) {
@@ -131,17 +131,24 @@ class HomeController extends Controller
         $new_approver_id = 'julyansyah'; // Replace with the actual ID of the new approver
         array_push($ts_approver, $new_approver_id);
 
-        $activities = Timesheet::select('ts_user_id',
+        $activitiesQuery = Timesheet::select('ts_user_id',
                  DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
                  DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count'))
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->whereNotIn('ts_task', ['Sick', 'Other'])
-        ->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']) // Filter for come times before 8 AM
-        ->whereNotIn('ts_user_id', $ts_approver)
+        ->whereNotIn('ts_task', ['Sick', 'Other'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Filter for come times before 8 AM
+        // Order by attendance_days_count
+
+        if ($typeSelected) {
+            if ($typeSelected == 1) {
+                $activitiesQuery->whereIn('ts_location', ['HO']); // Replace ['Task1', 'Task2'] with your condition
+            } elseif ($typeSelected == 2) {
+                $activitiesQuery->whereNotIn('ts_location', ['HO']); // Replace ['HO'] with your condition
+            }
+        }
+
+        $activities = $activitiesQuery->whereNotIn('ts_user_id', $ts_approver)
         ->groupBy('ts_user_id')
-        ->orderByDesc('attendance_days_count') // Order by attendance_days_count
-        ->take(5)
-        ->get();
+        ->orderByDesc('attendance_days_count')->take(5)->get();
 
         // Transform the result into an array
         $activitiesArray = [];
@@ -169,7 +176,7 @@ class HomeController extends Controller
             $activitiesArray[] = $data;
         }
 
-       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'countAssignments', 'activitiesArray', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
+       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'typeSelected', 'countAssignments', 'activitiesArray', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
     }
 
     public function notification_indev()

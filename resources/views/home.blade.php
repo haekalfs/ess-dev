@@ -195,6 +195,12 @@ $total_years_of_service = $diff->y;
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Leaderboard</h6>
+                <div class="text-right">
+                    <select class="form-control" id="type" name="type" required onchange="redirectToPage()">
+                        <option value="1" @if (1 == $typeSelected) selected @endif>Head Office</option>
+                        <option value="2" @if (2 == $typeSelected) selected @endif>Non-Head Office</option>
+                    </select>
+                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -481,4 +487,14 @@ $total_years_of_service = $diff->y;
         }
     }
         </style>
+        <script>
+            function redirectToPage() {
+                var selectedOption = document.getElementById("type").value;
+                var url = "{{ url('/home') }}"; // Specify the base URL
+
+                url += "/" + selectedOption;
+
+                window.location.href = url; // Redirect to the desired page
+            }
+        </script>
 @endsection
