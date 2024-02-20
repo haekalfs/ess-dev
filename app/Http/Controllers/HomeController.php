@@ -146,12 +146,21 @@ class HomeController extends Controller
         // Transform the result into an array
         $activitiesArray = [];
         foreach ($activities as $activity) {
-            try {
+            // Attempt to parse the earliest_come_time field with multiple formats
+            $earliestComeTime = null;
+            if (strpos($activity->earliest_come_time, '.') !== false) {
+                // Handle format like '07:00:00.000000'
+                $earliestComeTime = Carbon::createFromFormat('H:i:s.u', $activity->earliest_come_time)->format('H:i');
+            } else {
+                // Handle format like '07:00:00'
                 $earliestComeTime = Carbon::createFromFormat('H:i:s', $activity->earliest_come_time)->format('H:i');
-            } catch (\Exception $e) {
-                // Handle the error (e.g., log it, provide a default value, etc.)
+            }
+
+            // If parsing failed, provide a default value
+            if (!$earliestComeTime) {
                 $earliestComeTime = 'N/A';
             }
+
             $data = [
                 'ts_user_id' => $activity->user->name,
                 'earliest_come_time' => $earliestComeTime,
