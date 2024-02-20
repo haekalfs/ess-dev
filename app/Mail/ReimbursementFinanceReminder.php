@@ -28,7 +28,7 @@ class ReimbursementFinanceReminder extends Mailable
         return $this->markdown('mailer.reimburse_approved_finance')
                     ->subject($subject)
                     ->to($this->employee->email)
-                    ->cc('finance@perdana.co.id')
+                    ->cc('admin@perdana.co.id')
                     ->with([
                         'name' => $this->employee->name,
                         'email' => $this->employee->email,

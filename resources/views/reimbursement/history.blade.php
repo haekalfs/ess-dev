@@ -70,7 +70,7 @@ active
                             @elseif($reimb->status_id == 30)
                             <span class="m-0 font-weight-bold" style="color: #00d5ff;"><i class="fas fa-check-circle" style="color: #00d5ff;"></i> Partially Approved</span>
                             @elseif($reimb->status_id == 29)
-                            <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> All Approved</span>
+                            <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Completed</span>
                             @elseif($reimb->status_id == 2002)
                             <span class="m-0 font-weight-bold text-success"><i class="fas fa-check-circle" style="color: #01e476;"></i> Paid</span>
                             @else

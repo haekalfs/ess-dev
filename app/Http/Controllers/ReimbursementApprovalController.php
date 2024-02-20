@@ -167,6 +167,9 @@ class ReimbursementApprovalController extends Controller
                 case 30:
                     $status = '<i class="fas fa-check-circle" style="color: #005eff;"></i> Approved';
                     break;
+                case 403;
+                    $status = '—';
+                    break;
                 default:
                     $status = '<i class="fas fa-spinner fa-spin"></i> Waiting for Approval';
                 break;
@@ -176,6 +179,7 @@ class ReimbursementApprovalController extends Controller
                 'status' => $status,
                 'approved_amount' => $as->approved_amount,
                 'notes' => $as->notes,
+                'updated_at' => $as->updated_at->format('d-m-Y')
             ];
             $array[] = $data;
         }
@@ -207,6 +211,7 @@ class ReimbursementApprovalController extends Controller
                 'status' => $status,
                 'approved_amount' => $as->approved_amount,
                 'notes' => $as->notes,
+                'updated_at' => $as->updated_at
             ];
             $array[] = $data;
         }
@@ -256,24 +261,24 @@ class ReimbursementApprovalController extends Controller
             ->whereIn('status', [20])
             ->count();
 
-        $approved_amount = 0;
-        $grantedFunds = Reimbursement_approval::where('reimb_item_id', $item_id)->whereNotNull('approved_amount')->orderBy('updated_at', 'desc')->first();
-        $rawAmount = $request->approved_amount;
-        $numericAmount = (float) preg_replace('/[^0-9]/', '', $rawAmount);
+        $grantedFunds = Reimbursement_approval::where('reimb_item_id', $item_id)
+            ->whereNotNull('approved_amount')
+            ->whereNotIn('approved_amount', [0])
+            ->orderBy('updated_at', 'desc')
+            ->first();
 
-        if (!empty($numericAmount)) {
+
+        $rawAmount = $request->approved_amount;
+        if (!empty($request->approved_amount)) {
+            $numericAmount = (float) preg_replace('/[^0-9]/', '', $rawAmount);
             $approved_amount = number_format($numericAmount);
-            //set it to new value
-            $item->approved_amount = $approved_amount;
+        } elseif (!empty($grantedFunds) && $grantedFunds->approved_amount !== 0) {
+            $approved_amount = $grantedFunds->approved_amount;
         } else {
-            if($grantedFunds)
-            {
-                $approved_amount = $grantedFunds->approved_amount;
-            } else {
-                $approved_amount = $item->amount;
-            }
-            $item->approved_amount = $approved_amount;
+            $approved_amount = $item->amount;
         }
+
+        $item->approved_amount = $approved_amount;
 
         if ($checkItemLeft == 1) {
             $item->save();
@@ -293,7 +298,8 @@ class ReimbursementApprovalController extends Controller
         ->where('RequestTo', Auth::user()->id)->first();
 
         $totalApprovedAmount = 0;
-        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->get();
+        $reimbIds = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->pluck('reimb_item_id')->toArray();
+        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->whereNotIn('id', $reimbIds)->get();
         foreach ($result as $item) {
             // Remove the comma and convert the string to a float
             $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
@@ -360,23 +366,49 @@ class ReimbursementApprovalController extends Controller
             return response()->json(['error' => $validator->errors()]);
         }
 
-        // Update reimbursement approvals
-        Reimbursement_approval::where('reimb_item_id', $item_id)
-            ->update(['status' => '404', 'notes' => $request->approval_notes]);
-        $formApproval = Reimbursement_approval::where('reimb_item_id', $item_id)->where('RequestTo', Auth::id())->first();
-
         // Check if all items are rejected
         $reimbItem = Reimbursement_item::find($item_id);
+
+        // Update reimbursement approvals
+        Reimbursement_approval::where('reimb_item_id', $item_id)->where('RequestTo', Auth::id())
+            ->where('reimbursement_id', $reimbItem->reimbursement_id)
+            ->update(['status' => 404, 'notes' => $request->approval_notes]);
+        //Set the other to 403
+        Reimbursement_approval::where('reimb_item_id', $item_id)->whereNotIn('RequestTo', [Auth::id()])->where('status', 20)
+            ->where('reimbursement_id', $reimbItem->reimbursement_id)
+            ->update(['status' => 403]);
+
         $checkRowsLeft = Reimbursement_approval::whereNotIn('reimb_item_id', [$reimbItem->id])
             ->where('reimbursement_id', $reimbItem->reimbursement_id)
             ->whereIn('status', [20, 30, 29])
             ->count();
+
+        // Check if the formId is all or not // whereNotIn('reimb_item_id', [$item->id])
+        $checkRowsLefttoCompleting = Reimbursement_approval::whereNotIn('reimb_item_id', [$reimbItem->id])
+            ->where('reimbursement_id', $reimbItem->reimbursement_id)
+            ->whereIn('status', [404, 20, 403])
+            ->count();
+
+        $totalApprovedAmount = 0;
+        $reimbIds = Reimbursement_approval::where('reimbursement_id', $reimbItem->reimbursement_id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->pluck('reimb_item_id')->toArray();
+        $result = Reimbursement_item::where('reimbursement_id', $reimbItem->reimbursement_id)->whereNotIn('id', $reimbIds)->get();
+        foreach ($result as $item) {
+            // Remove the comma and convert the string to a float
+            $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
+
+            // Add the numeric value to the totalApprovedAmount
+            $totalApprovedAmount += $approvedAmount;
+        }
 
         // Update reimbursement request status if all items are rejected
         if ($checkRowsLeft === 0) {
             Reimbursement::where('id', function ($query) use ($item_id) {
                 $query->select('reimbursement_id')->from('reimbursement_items')->where('id', $item_id);
             })->update(['status_id' => 404]);
+        } elseif ($checkRowsLefttoCompleting === 0) {
+            Reimbursement::where('id', function ($query) use ($item_id) {
+                $query->select('reimbursement_id')->from('reimbursement_items')->where('id', $item_id);
+            })->update(['status_id' => 29, 'f_granted_funds' => $totalApprovedAmount, 'f_sign_prior_approver' => Auth::user()->name, 'f_sign_prior_approver_date' => date('Y-m-d')]);
         }
 
         // Notify the user who requested the reimbursement
@@ -384,7 +416,9 @@ class ReimbursementApprovalController extends Controller
             $query->where('id', $item_id);
         })->first();
 
+        //Mailer
         $employee = User::find($reimbReq->f_req_by);
+        $formApproval = Reimbursement_approval::where('reimb_item_id', $item_id)->where('RequestTo', Auth::id())->first();
         dispatch(new NotifyReimbursementRejected($employee, $formApproval));
 
         return response()->json(['success' => 'Items rejected successfully.']);

@@ -140,7 +140,13 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Reimbursement Items</h6>
                 <div class="text-right">
-                    <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Download</a>
+                    <a href="/reimbursement/manage" class="btn btn-danger btn-sm mr-2">
+                        <i class="fas fa-paper-plane"></i> Send Disbursement Order Letter
+                    </a>
+                    <a href="/reimbursement/manage" class="btn btn-success btn-sm mr-2">
+                        <i class="fas fa-check"></i> Mark as Paid
+                    </a>
+                    <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="far fa-file-excel"></i> Export as Excel</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -149,7 +155,7 @@ active
                     <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
                         <thead class="thead-light">
                             <tr>
-                                <th>No</th>
+                                <th>Receipt</th>
                                 <th>Description</th>
                                 <th class="text-danger font-weight-bold">Emp. Request</th>
                                 <th class="text-success font-weight-bold">Granted Funds</th>
@@ -162,12 +168,14 @@ active
                             @endphp
                             @foreach ($reimbursement_items as $usr)
                                 <tr>
-                                    <td class="text-center" style="width: 20%;"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
+                                    <td class="text-center"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
                                     <td>{{ $usr->description }}</td>
                                     <td class="text-danger font-weight-bold">Rp. {{ $usr->amount }}</td>
                                     <td class="text-success font-weight-bold">Rp. {{ $usr->approved_amount ?? '—' }}</td>
                                     <td class="text-center" style="width: 20%;">
+                                        @if($usr->edited_by_finance == false)
                                         <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                        @endif
                                         <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                     </td>
                                 </tr>
@@ -215,9 +223,10 @@ active
                     <thead class="thead-light">
                         <tr>
                             <th>Request To</th>
+                            <th>Granted Funds</th>
                             <th>Status</th>
-                            <th>Approved Amount</th>
                             <th>Notes</th>
+                            <th>Updated At</th>
                         </tr>
                     </thead>
                     <tbody id="ApproverList">
@@ -387,9 +396,10 @@ function fetchApproverDetails(id) {
                 $.each(response, function(index, activity) {
                     var row = $('<tr></tr>').attr('data-id', activity.id);
                     row.append($('<td></td>').text(activity.RequestTo));
+                    row.append($('<td></td>').html('IDR '+activity.approved_amount));
                     row.append($('<td></td>').html(activity.status));
-                    row.append($('<td></td>').html('Rp ' + activity.approved_amount));
                     row.append($('<td></td>').text(activity.notes));
+                    row.append($('<td></td>').text(activity.updated_at));
                     $('#ApproverList').append(row);
                     $('#approval_notes').val(activity.notes);
                 });

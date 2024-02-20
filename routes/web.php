@@ -293,7 +293,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/retrieveApproverHistory/{id}', 'ReimbursementApprovalController@approvalFlow');
 
         Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement');
-        Route::get('/reimbursement/export/all/{month}/{year}', 'ReimburseController@export_excel');
+        Route::post('/reimbursement/export/selected-items', 'ReimburseController@export_selected');
         Route::get('/reimbursement/export/request/{id}', 'ReimburseController@export');
 
         Route::get('/getLocationProject/{id}', 'TimesheetController@getLocationProject')->name('list-location');

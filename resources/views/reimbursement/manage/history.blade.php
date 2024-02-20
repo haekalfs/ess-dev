@@ -13,10 +13,15 @@ active
         <div class="d-sm-flex justify-content-end" id="bulkPaid">
         <form method="POST" action="/reimbursement/manage/disbursed/all">
             @csrf
-            <button type="submit" class="btn btn-success btn-sm btn-edit mr-2 shadow-sm"><i class="fas fa-check"></i> Mark as Paid</button>
-            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/reimbursement/export/all/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export All</a>
+            <button type="submit" class="btn btn-success btn-sm btn-edit mr-3 shadow-sm"><i class="fas fa-check"></i> Mark as Paid</button>
             <input type="hidden" name="usersName" id="usersName" value="" />
             <input type="hidden" name="formId" id="formId" value="" />
+        </form>
+        <form method="POST" action="/reimbursement/export/selected-items">
+            @csrf
+            <button type="submit" class="btn btn-secondary btn-sm btn-edit shadow-sm"><i class="far fa-file-excel"></i> Export Selected</button>
+            <input type="hidden" name="usersName2" id="usersName2" value="" />
+            <input type="hidden" name="formId2" id="formId2" value="" />
         </form>
         </div>
     </div>
@@ -122,35 +127,17 @@ active
                                 <tbody>@php $no = 1; @endphp
                                     @foreach($approvals as $index => $approval)
                                         <tr>
-                                            @if ($index > 0 && $approval->user->name === $approvals[$index-1]->user->name)
-                                            <td style="border-bottom: none; border-top: none;"></td>
-                                            <td style="border-bottom: none; border-top: none;"></td>
-                                            <td style="border-bottom: none; border-top: none;"></td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->f_type }}</td>
-                                            <td style="border-bottom: none; border-top: none;">
-                                                @if($approval->status_id == 29)
-                                                <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Approved</span>
-                                                @elseif($approval->status_id == 2002)
-                                                <span class="m-0 font-weight-bold text-success"><i class="fas fa-check-circle" style="color: #01e476;"></i> Paid</span>
-                                                @else
-                                                <span class="m-0 font-weight-bold text-danger"><i class="fas fa-times-circle" style="color: #ff0000;"></i> Unknown</span>
-                                                @endif
-                                            </td>
-                                            <td style="border-bottom: none; border-top: none;" class="action text-center">
-                                                <a href="/reimbursement/manage/view/{{ $approval->id }}" class="mr-2 btn btn-primary btn-sm btn-edit"><i class="fas fa-hand-pointer"></i> View</a>
-                                            </td>
-                                            @else
-                                            <td class="text-center" style="border-bottom: none; border-top: none;">
+                                            <td class="text-center">
                                                 <div class="form-check form-check-inline larger-checkbox">
                                                     <input class="form-check-input data-checkbox" type="checkbox" value="option1" onclick="toggleCheckboxes2()" data-username="{{ $approval->f_req_by }}" data-form-id="{{ $approval->id }}">
                                                 </div>
                                             </td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->f_id }}</td>
-                                            <td style="border-bottom: none; border-top: none;" id="{{ $no++ }}">
+                                            <td>{{ $approval->f_id }}</td>
+                                            <td id="{{ $no++ }}">
                                                 {{ $approval->user->name }}
                                             </td>
-                                            <td style="border-bottom: none; border-top: none;">{{ $approval->f_type }}</td>
-                                            <td style="border-bottom: none; border-top: none;">
+                                            <td>{{ $approval->f_type }}</td>
+                                            <td>
                                                 @if($approval->status_id == 29)
                                                 <span class="m-0 font-weight-bold text-primary"><i class="fas fa-check-circle" style="color: #005eff;"></i> Approved</span>
                                                 @elseif($approval->status_id == 2002)
@@ -159,10 +146,9 @@ active
                                                 <span class="m-0 font-weight-bold text-danger"><i class="fas fa-times-circle" style="color: #ff0000;"></i> Unknown</span>
                                                 @endif
                                             </td>
-                                            <td style="border-bottom: none; border-top: none;" class="action text-center">
+                                            <td class="action text-center">
                                                 <a href="/reimbursement/manage/view/{{ $approval->id }}" class="mr-2 btn btn-primary btn-sm btn-edit"><i class="fas fa-eye"></i> View</a>
                                             </td>
-                                            @endif
                                         </tr>
                                         @endforeach
                                 </tbody>
@@ -179,9 +165,10 @@ active
 function toggleCheckboxes() {
     var checkboxes = document.getElementsByClassName('data-checkbox');
     var checkAllCheckbox = document.getElementById('checkAll');
-    var bulkPaidButton = document.getElementById('bulkPaid');
     var usersNameInput = document.getElementById('usersName');
     var formIdInput = document.getElementById('formId');
+    var usersNameInput2 = document.getElementById('usersName2');
+    var formIdInput2 = document.getElementById('formId2');
 
     var checkedUserNames = [];
     var checkedFormId = [];
@@ -199,13 +186,8 @@ function toggleCheckboxes() {
     // Update the hidden input field with comma-separated user names
     usersNameInput.value = checkedUserNames.join(', ');
     formIdInput.value = checkedFormId.join(', ');
-
-    // Check the state of the checkAll checkbox and show/hide the "Paid" button accordingly
-    if (checkAllCheckbox.checked) {
-        bulkPaidButton.style.display = 'block'; // Show the "Paid" button
-    } else {
-        bulkPaidButton.style.display = 'none'; // Hide the "Paid" button
-    }
+    usersNameInput2.value = checkedUserNames.join(', ');
+    formIdInput2.value = checkedFormId.join(', ');
 }
 
 function toggleCheckboxes2() {
@@ -213,6 +195,8 @@ function toggleCheckboxes2() {
     var bulkPaidButton = document.getElementById('bulkPaid');
     var usersNameInput = document.getElementById('usersName');
     var formIdInput = document.getElementById('formId');
+    var usersNameInput2 = document.getElementById('usersName2');
+    var formIdInput2 = document.getElementById('formId2');
 
     var checkedUserNames = [];
     var checkedFormId = [];
@@ -229,6 +213,8 @@ function toggleCheckboxes2() {
     // Update the hidden input field with comma-separated user names
     usersNameInput.value = checkedUserNames.join(', ');
     formIdInput.value = checkedFormId.join(', ');
+    usersNameInput2.value = checkedUserNames.join(', ');
+    formIdInput2.value = checkedFormId.join(', ');
 
 }
 

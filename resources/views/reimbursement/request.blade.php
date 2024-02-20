@@ -141,17 +141,17 @@ active
                 <div class="card-body" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                     <ul>
-                        <li>All reimbursement requests must comply with company policies and procedures.</li>
+                        <li>All reimbursement requests must comply with company policies.</li>
                         <li>Employees are responsible for accurately documenting all expenses.</li>
                         <li>Reimbursements will only be provided for approved business-related expenses.</li>
                     </ul>
 
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
                     <ol>
-                        <li>Complete the reimbursement form provided by the Finance Department.</li>
                         <li>Attach all necessary receipts and supporting documentation.</li>
                         <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
-                        <li>Hardcopy of the receipt must be given to finance within 2 weeks <a href="#">Read More.</a></li>
+                        <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
+                        <li class="text-danger">Payment will be made 14 weeks after approval and receipt submission to the Finance Department <a href="#">Read More.</a></li>
                     </ol>
                 </div>
             </div>
