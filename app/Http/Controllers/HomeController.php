@@ -135,6 +135,7 @@ class HomeController extends Controller
                  DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
                  DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count'))
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->whereNotIn('ts_task', ['Sick', 'Other'])
         ->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']) // Filter for come times before 8 AM
         ->whereNotIn('ts_user_id', $ts_approver)
         ->groupBy('ts_user_id')
