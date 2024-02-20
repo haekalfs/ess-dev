@@ -218,10 +218,16 @@ $total_years_of_service = $diff->y;
                                 @foreach($activitiesArray as $key => $activity)
                                     <tr>
                                         <td class="number">{{ $key + 1 }}</td>
-                                        <td class="name">{{ $activity['ts_user_id'] }}</td>
+                                        <td class="name">
+                                            @if($key === 0)
+                                                {{ $activity['ts_user_id'] }}
+                                            @else
+                                                {{ $activity['ts_user_id'] }}
+                                            @endif
+                                        </td>
                                         <td class="points">
                                             @if($key === 0)
-                                                {{ $activity['earliest_come_time'] }} <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
+                                            <span class="text-danger"><small><i>{{ $activity['attendance_days_count'] }} days of office attendance < {{ $activity['earliest_come_time'] }}</i></small></span> <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
                                             @else
                                                 <span class="text-primary"><small><i>{{ $activity['attendance_days_count'] }} days of office attendance around {{ $activity['earliest_come_time'] }} - 08:00 AM</i></small></span>
                                             @endif
