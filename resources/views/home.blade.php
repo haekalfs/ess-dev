@@ -194,36 +194,36 @@ $total_years_of_service = $diff->y;
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Leaderboard</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <div class="row zoom80">
                     <div class="col-md-12">
                         <div id="header" style="padding-top:0%;">
-                            <h1>Employee of The Month</h1>
+                            <h1 class="h4 mb-0 font-weight-bold text-gray-800">Employee of The Month 🎉</h1>
                             <button class="share">
                                 <i class="fas fa-share fa-2x"></i>
                             </button>
                         </div>
-                          <div id="leaderboard">
+                        <div id="leaderboard">
                             <div class="ribbon"></div>
                             <table>
-                                @foreach($activities as $key => $activity)
+                                @foreach($activitiesArray as $key => $activity)
                                     <tr>
                                         <td class="number">{{ $key + 1 }}</td>
-                                        <td class="name">{{ $activity->ts_user_id }}</td>
+                                        <td class="name">{{ $activity['ts_user_id'] }}</td>
                                         <td class="points">
                                             @if($key === 0)
-                                                {{ $activity->earliest_come_time }} <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
+                                                {{ $activity['earliest_come_time'] }} <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
                                             @else
-                                                {{ $activity->earliest_come_time }}
+                                                <span class="text-primary"><small><i>{{ $activity['attendance_days_count'] }} days of office attendance around {{ $activity['earliest_come_time'] }} - 08:00 AM</i></small></span>
                                             @endif
                                         </td>
                                     </tr>
                                 @endforeach
                             </table>
-                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -308,7 +308,6 @@ $total_years_of_service = $diff->y;
     }
 
     h1 {
-      font-family: "Rubik", sans-serif;
       font-size: 1.7rem;
       color: #141a39;
       text-transform: uppercase;

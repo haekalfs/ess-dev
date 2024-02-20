@@ -9,6 +9,7 @@ use App\Models\Notification_alert;
 use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Timesheet;
+use App\Models\Timesheet_approver;
 use App\Models\Usr_role;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -126,19 +127,34 @@ class HomeController extends Controller
 
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
+        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();// Add new approver
+        $new_approver_id = 'julyansyah'; // Replace with the actual ID of the new approver
+        array_push($ts_approver, $new_approver_id);
 
-        $exclude = Usr_role::whereNotIn('role_id', [17])->groupBy('user_id')->pluck('user_id')->toArray();
+        $activities = Timesheet::select('ts_user_id',
+                 DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
+                 DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count'))
+        ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']) // Filter for come times before 8 AM
+        ->whereNotIn('ts_user_id', $ts_approver)
+        ->groupBy('ts_user_id')
+        ->orderByDesc('attendance_days_count') // Order by attendance_days_count
+        ->take(5)
+        ->get();
 
-        $activities = DB::table('timesheet')
-            ->select('ts_user_id', DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'))
-            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->groupBy('ts_user_id')
-            ->orderByRaw('AVG(TIME_TO_SEC(ts_from_time))')
-            ->whereIn('ts_user_id', $exclude)
-            ->take(5)
-            ->get();
+        // Transform the result into an array
+        $activitiesArray = [];
+        foreach ($activities as $activity) {
+            $earliestComeTime = Carbon::createFromFormat('H:i:s', $activity->earliest_come_time)->format('H:i');
+            $data = [
+                'ts_user_id' => $activity->user->name,
+                'earliest_come_time' => $earliestComeTime,
+                'attendance_days_count' => $activity->attendance_days_count,
+            ];
+            $activitiesArray[] = $data;
+        }
 
-       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'countAssignments', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
+       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'countAssignments', 'activitiesArray', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
     }
 
     public function notification_indev()

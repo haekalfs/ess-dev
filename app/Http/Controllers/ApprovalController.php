@@ -387,28 +387,28 @@ class ApprovalController extends Controller
         $getYear = date('Y');
         $expirationYear = $getYear + 1;
 
-        // if (!$weekendReplacementInCurrentMonth) {
-        //     Emp_leave_quota::updateOrCreate([
-        //         'user_id' => Auth::user()->id,
-        //         'leave_id' => 100,
-        //     ], [
-        //         'quota_left' => 0,
-        //         'active_periode' => date('Y-m-d'),
-        //         'expiration' => "$expirationYear-03-31", //this should be change to dynamic
-        //         'once_in_service_years' => false
-        //     ]);
-        // } else {
-        //     $totalWeekendReplacement = $weekendReplacementInCurrentMonth + $countWeekendReplacement;
-        //     Emp_leave_quota::updateOrCreate([
-        //         'user_id' => Auth::user()->id,
-        //         'leave_id' => 100,
-        //     ], [
-        //         'quota_left' => $totalWeekendReplacement,
-        //         'active_periode' => date('Y-m-d'),
-        //         'expiration' => "9999-01-01",
-        //         'once_in_service_years' => false
-        //     ]);
-        // }
+        if (!$weekendReplacementInCurrentMonth) {
+            Emp_leave_quota::updateOrCreate([
+                'user_id' => Auth::user()->id,
+                'leave_id' => 100,
+            ], [
+                'quota_left' => 0,
+                'active_periode' => date('Y-m-d'),
+                'expiration' => "$expirationYear-03-31", //this should be change to dynamic
+                'once_in_service_years' => false
+            ]);
+        } else {
+            $totalWeekendReplacement = $weekendReplacementInCurrentMonth + $countWeekendReplacement;
+            Emp_leave_quota::updateOrCreate([
+                'user_id' => Auth::user()->id,
+                'leave_id' => 100,
+            ], [
+                'quota_left' => $totalWeekendReplacement,
+                'active_periode' => date('Y-m-d'),
+                'expiration' => "9999-01-01",
+                'once_in_service_years' => false
+            ]);
+        }
 
         return redirect('/approval/timesheet/p')->with('success', "You approved $user_timesheet timereport!");
     }
