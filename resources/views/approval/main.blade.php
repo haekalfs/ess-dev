@@ -177,7 +177,6 @@ active
     const cardMed = document.querySelector('.medical');
     const cardReimburse = document.querySelector('.reimburse');
     const cardP_assignment = document.querySelector('.p_assignment');
-    const cardP_assign_mem = document.querySelector('.p_assign_mem');
     const approval_po = document.querySelector('.approval_po');
     const approval_pr = document.querySelector('.approval_pr');
     const approval_rn = document.querySelector('.approval_rn');
@@ -192,6 +191,9 @@ active
     window.location.href = 'https://e-form.perdana.co.id/';
     });
 
+    cardP_assignment.addEventListener('click', function() {
+    window.location.href = '/approval/project/assignment/';
+    });
 
     cardTimesheet.addEventListener('click', function() {
     window.location.href = '/approval/timesheet/p';
@@ -209,13 +211,6 @@ active
     window.location.href = '/approval/reimburse/';
     });
 
-    cardP_assign_mem.addEventListener('click', function() {
-    window.location.href = '/approval/reimburse/';
-    });
-
-    cardP_assignment.addEventListener('click', function() {
-    window.location.href = '/approval/project/assignment/';
-    });
 
     approval_po.addEventListener('mouseover', function() {
     approval_po.style.cursor = 'pointer';
@@ -260,13 +255,6 @@ active
     });
     cardReimburse.addEventListener('mouseout', function() {
     cardReimburse.style.cursor = 'default';
-    });
-
-    cardP_assign_mem.addEventListener('mouseover', function() {
-    cardP_assign_mem.style.cursor = 'pointer';
-    });
-    cardP_assign_mem.addEventListener('mouseout', function() {
-    cardP_assign_mem.style.cursor = 'default';
     });
 
     cardP_assignment.addEventListener('mouseover', function() {
