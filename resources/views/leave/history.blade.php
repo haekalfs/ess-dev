@@ -170,7 +170,7 @@ active
                                 @endforeach
 
                                 @unless ($approved)
-                                    <a class="btn btn-secondary btn-sm" data-toggle="modal" and data-target="#leaveRequestDetailModal" data-id="{{ $lr->id }}">
+                                    <a class="btn btn-secondary btn-sm mr-2" data-toggle="modal" and data-target="#leaveRequestDetailModal" data-id="{{ $lr->id }}">
                                         <i class="fas fa-fw fa-eye fa-sm text-white-50"></i> Details
                                     </a>
                                     <a href="/leave/history/cancel/{{ $lr->id }}" class="btn btn-danger btn-sm">

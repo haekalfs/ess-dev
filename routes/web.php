@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
         //Approval
         Route::get('/approval', 'ApprovalController@index')->name('approval.main');
         Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary');
-        Route::get('/approval/leave', 'LeaveApprovalController@leave_approval')->name('approval.leave');
+        Route::get('/approval/leave/{yearSelected?}', 'LeaveApprovalController@leave_approval')->name('approval.leave');
         Route::get('/approval/reimburse/{yearSelected?}', 'ReimbursementApprovalController@reimbursement_approval')->name('approval.reimburse');
         Route::get('/approval/medical', 'ApprovalController@medical_approval')->name('approval.medical');
 

@@ -18,9 +18,15 @@ use Illuminate\Support\Facades\Validator;
 
 class LeaveApprovalController extends Controller
 {
-    public function leave_approval()
+    public function leave_approval($yearSelected = null)
     {
+        $nowYear = date('Y');
+        $yearsBefore = range($nowYear - 4, $nowYear);
+
         $currentYear = date('Y');
+        if ($yearSelected) {
+            $currentYear = $yearSelected;
+        }
 
         // Get the current day of the month
         $currentDay = date('j');
@@ -42,7 +48,7 @@ class LeaveApprovalController extends Controller
                         ->toArray();
                         if (!empty($Check)) {
                             $approvals = Leave_request_approval::select('*')
-                            // ->whereYear('date_submitted', $currentYear)
+                            ->whereYear('created_at', $currentYear)
                             ->where('RequestTo', Auth::user()->id)
                             ->whereNotIn('status', [29, 404, 20])
                             ->whereIn('leave_request_id', $Check)
@@ -63,7 +69,7 @@ class LeaveApprovalController extends Controller
                         ->toArray();
                     if (!empty($Check)) {
                         $approvals = Leave_request_approval::select('*')
-                        // ->whereYear('date_submitted', $currentYear)
+                        ->whereYear('created_at', $currentYear)
                         ->where('RequestTo', Auth::user()->id)
                         ->whereNotIn('status', [29, 404, 20])
                         ->whereIn('leave_request_id', $Check)
@@ -76,7 +82,7 @@ class LeaveApprovalController extends Controller
                             ->get();
                     }
                 }
-            return view('approval.leave_approval', ['approvals' => $approvals]);
+            return view('approval.leave_approval', ['approvals' => $approvals, 'yearsBefore' => $yearsBefore, 'yearSelected' => $yearSelected]);
         } else {
             // Handle the case when the date is not within the range
             return redirect()->back()->with('failed', 'Today this page has been restricted, try again later...');

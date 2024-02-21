@@ -96,18 +96,18 @@ class LeaveController extends Controller
 
             foreach ($lr->leave_request_approval as $stat) {
                 if ($stat->status == 29) {
-                    $lr->approvalStatus = "<span class='m-0 text-primary'>Approved</span>";
+                    $lr->approvalStatus = "<span class='m-0 text-primary'><i class='fas fa-check-circle' style='color: #005eff;'></i> Approved</span>";
                     $approved = true;
                     break;
                 } elseif($stat->status == 404) {
-                    $lr->approvalStatus = "<span class='m-0 text-danger'>Rejected</span>";
+                    $lr->approvalStatus = "<span class='m-0 text-danger'><i class='fas fa-times-circle' style='color: #ff0000;'></i> Rejected</span>";
                     $approved = true;
                     break;
                 }
             }
 
             if (!$approved) {
-                $lr->approvalStatus = "<span class='m-0 text-secondary'>Waiting for Approval</span>";
+                $lr->approvalStatus = "<span class='m-0 text-secondary'><i class='fas fa-spinner fa-spin'></i> Waiting for Approval</span>";
             }
         }
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
@@ -143,8 +143,13 @@ class LeaveController extends Controller
             ->get();
         $approvalService = Timesheet_approver::whereIn('id', [20, 40])
             ->get();
+        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
+            ->pluck('approver')->toArray();
 
-        $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->pluck('project_assignment_id')->toArray();
+        $checkUserPost = Auth::user()->users_detail->position->id;
+        $statusId = in_array($checkUserPost, [7, 8, 12]) ? 29 : 15;
+
+        $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '>=', date('Y-m-d'))->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::whereIn('project_assignment_id', $findAssignment)->where('role', 'PM')->get();
         // Retrieve the relevant Emp_leave_quota rows ordered by active_periode in ascending order
         $checkQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
@@ -189,7 +194,7 @@ class LeaveController extends Controller
                         ]);
                         foreach($approvalFinance_GA as $approverGa){
                             Leave_request_approval::create([
-                                'status' => 15,
+                                'status' => $statusId,
                                 'RequestTo' => $approverGa->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
@@ -211,7 +216,7 @@ class LeaveController extends Controller
                         ]);
                         foreach($approvalService as $approverService){
                             Leave_request_approval::create([
-                                'status' => 15,
+                                'status' => $statusId,
                                 'RequestTo' => $approverService->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
@@ -219,8 +224,11 @@ class LeaveController extends Controller
                         }
                         if(!$usersWithPMRole->isEmpty()){
                             foreach($usersWithPMRole as $approverPM){
+                                if(in_array(Auth::id(), $isManager) || in_array($checkUserPost, [7, 8, 12]) || Auth::id() == $approverPM->user_id){
+                                    break;
+                                }
                                 Leave_request_approval::create([
-                                    'status' => 15,
+                                    'status' => $statusId,
                                     'RequestTo' => $approverPM->approver,
                                     'leave_request_id' => $uniqueId
                                 ]);
@@ -241,7 +249,7 @@ class LeaveController extends Controller
                         ]);
                         foreach($approvalHCM as $approverHCM){
                             Leave_request_approval::create([
-                                'status' => 15,
+                                'status' => $statusId,
                                 'RequestTo' => $approverHCM->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
@@ -261,7 +269,7 @@ class LeaveController extends Controller
                         ]);
                         foreach($approvalSales as $approverSales){
                             Leave_request_approval::create([
-                                'status' => 15,
+                                'status' => $statusId,
                                 'RequestTo' => $approverSales->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
@@ -355,11 +363,11 @@ class LeaveController extends Controller
 
         foreach ($leaveRequest as $lr) {
             if($lr->status == 29 || $lr->status == 20){
-                $status = "Approved";
+                $status = '<i class="fas fa-check-circle" style="color: #005eff;"></i> Approved';
             } elseif ($lr->status == 404){
-                $status = "Rejected";
+                $status = '<i class="fas fa-times-circle" style="color: #ff0000;"></i> Rejected';
             } else {
-                $status = "Waiting for Approval";
+                $status = '<i class="fas fa-spinner fa-spin"></i> Waiting for Approval';
             }
             $reqDateFormatted = Carbon::parse($lr->leave_request->req_date)->format('d-M-Y');
             $lastUpdated = Carbon::parse($lr->updated_at)->format('d-M-Y H:i');

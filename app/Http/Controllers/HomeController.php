@@ -10,6 +10,7 @@ use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Timesheet;
 use App\Models\Timesheet_approver;
+use App\Models\Timesheet_detail;
 use App\Models\Usr_role;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -38,6 +39,9 @@ class HomeController extends Controller
      */
     public function index($typeSelected = null)
     {
+        $year = date('Y');
+        $month = date('m') - 1;
+
         // Check if the quotes data is cached
         if (!Cache::has('quotes')) {
             // Read the contents of the JSON file if not cached
@@ -102,7 +106,36 @@ class HomeController extends Controller
         // Count the number of records
         $countAssignments = $findAssignment->count();
 
+        // Retrieve the employees with the most total assignments
+        $employeesWithMostAssignments = Project_assignment_user::select('user_id')
+        ->where(function ($query) use ($startDate, $endDate) {
+            $query->where('periode_start', '<=', $endDate->format('Y-m-d'))
+                ->where('periode_end', '>=', $startDate->format('Y-m-d'));
+        })
+        ->selectRaw('COUNT(*) as total_assignments')
+        ->groupBy('user_id')
+        ->orderByDesc('total_assignments')
+        ->take(5)
+        ->pluck('user_id');
 
+        // Retrieve the total mandays for the top 5 employees
+        $topEmployeesWithMandays = DB::table('timesheet_details')
+        ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
+        ->whereIn('user_timesheet', $employeesWithMostAssignments)
+        ->whereIn('created_at', function ($query) use ($year, $month) {
+            $query->select(DB::raw('MAX(created_at)'))
+                ->from('timesheet_details')
+                ->whereColumn('timesheet_details.user_timesheet', '=', 'user_timesheet')
+                ->where('ts_status_id', 29)
+                ->where('timesheet_details.month_periode', $year . intval($month))
+                ->groupBy('user_timesheet', 'ts_mandays');
+        })
+        ->whereNotIn('ts_task', ['Other', 'Sick', 'HO'])
+        ->where('ts_status_id', 29)
+        ->where('timesheet_details.month_periode', $year . intval($month))
+        ->groupBy('user_timesheet')
+        ->take(5)
+        ->get();
 
         $reimbursementCount = Reimbursement::where('f_req_by', Auth::id())->whereYear('created_at', $currentYear)->count();
 
@@ -121,9 +154,6 @@ class HomeController extends Controller
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
 
         $headline = Headline::orderBy('updated_at', 'desc')->take(3)->get();
-
-        $year = date('Y');
-        $month = date('m') - 1;
 
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
