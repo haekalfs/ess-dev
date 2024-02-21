@@ -497,7 +497,7 @@ class LeaveController extends Controller
         }
 
         $leaveType = Leave::all();
-        $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->get();
+        $empLeaves = Emp_leave_quota::where('user_id', $user_info->id)->orderBy('expiration', 'asc')->get();
 		return view('leave.manage_leave_user', compact('empLeaveQuotaAnnual', 'leaveType', 'empLeaveQuotaFiveYearTerm', 'empLeaveQuotaWeekendReplacement', 'totalQuota', 'user_info', 'empLeaves'));
 	}
 
