@@ -837,6 +837,13 @@ class LeaveController extends Controller
         return redirect()->back()->with('failed',"You Deleted the leave request approval!");
     }
 
+    public function delete_leave_emp($id)
+    {
+        Emp_leave_quota::where('id', $id)->delete();
+
+        return redirect()->back()->with('failed',"You Deleted the leave request approval!");
+    }
+
     public function update_by_admin(Request $request, $id)
     {
         foreach ($request->input('items') as $itemId => $itemData) {

@@ -129,6 +129,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/leave/manage/update/{id}', 'LeaveController@update_leave_emp');
         Route::post('/leave/manage/add_quota/{id}', 'LeaveController@add_leave_quota')->name('addLeaveEmp');
         Route::post('/leave/manage/add_employee', 'LeaveController@add_leave_employee')->name('addLeaveEmployee');
+        Route::get('/leave/manage/delete/{id}', 'LeaveController@delete_leave_emp');
 
 
 

@@ -130,6 +130,7 @@
 			</div>
 			<form method="post" id="update-leave">
                 @csrf
+                <input type="hidden" id="inputIdQuota" name="inputIdQuota" value="" />
 				<div class="modal-body">
                     <div class="col-md-12 zoom90">
                         <div class="row">
@@ -157,7 +158,7 @@
 				    </div>
                 </div>
 				<div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
+                    <button type="button" class="btn btn-danger" id="delete-leave-quota">Delete</button>
                     <button type="submit" id="update-leave-btn" class="btn btn-primary" data-dismiss="modal">Save changes</button>
                   </div>
 			</form>
