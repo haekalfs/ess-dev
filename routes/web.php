@@ -326,9 +326,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/company-regulation/commands', 'CommandsController@index')->name('commands');
         Route::get('/get-data/timesheet-absence', 'AttendanceController@downloadLogData')->name('getData');
         Route::get('/send-data/timesheet-absence', 'AttendanceController@sendData')->name('sendData');
+        Route::put('/myprofile/cv_upload/{id}', 'MyProfileController@upload_cv')->name('Upload CV');
     });
     //Non
     Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
     Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission');
-    Route::put('/myprofile/cv_upload/{id}', 'MyProfileController@upload_cv')->name('Upload CV');
 });

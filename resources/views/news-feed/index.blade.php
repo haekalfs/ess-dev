@@ -40,24 +40,26 @@ active
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
+                    <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
                         <thead class="thead-light">
                             <tr>
-                                <th>News ID</th>
-                                <th>Release Date</th>
+                                <th>No.</th>
+                                <th>File Name</th>
                                 <th>Title</th>
-                                <th>Created By</th>
+                                <th>Description</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($newsFeed as $feed)
+                            @foreach($headline as $pic)
                             <tr>
-                                <td>{{ $feed->id }}</td>
-                                <td>{{ $feed->date_released }}</td>
-                                <td title="{{ $feed->title }}"><span class="long-text-2">{{ $feed->title }}</span></td>
-                                <td>{{ $feed->created_by }}</td>
-                                <td class="text-center"><a class="btn btn-primary" href="/news-feed/manage/edit-post/{{$feed->id}}"><i class="fas fa-fw fa-edit"></i> Edit</a></td>
+                                <td>{{ $pic->id }}</td>
+                                <td>{{ $pic->filename }}</td>
+                                <td>{{ $pic->title }}</td>
+                                <td>{!! $pic->subtitle !!}</td>
+                                <td class="text-center">
+                                    <a data-toggle="modal" data-target="#setHeadline" data-item-id="{{ $pic->id }}" class="btn btn-primary btn-sm btn-edit">Action</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -65,7 +67,7 @@ active
                 </div>
             </div>
         </div>
-        <div class="card shadow mb-4">
+        {{-- <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Headline</h6>
@@ -111,38 +113,15 @@ active
                         </div>
                     </div>
                     <div class="col-md-6 zoom90" id="edit-headline" style="display: none;">
-                        <div class="table-responsive">
-                            <table class="table table-bordered zoom90" id="listAssignments" width="100%" cellspacing="0">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>File Name</th>
-                                        <th>File Path</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($headline as $pic)
-                                    <tr>
-                                        <td>{{ $pic->id }}</td>
-                                        <td>{{ $pic->filename }}</td>
-                                        <td>{{ $pic->filepath }}</td>
-                                        <td class="text-center">
-                                            <a data-toggle="modal" data-target="#setHeadline" data-item-id="{{ $pic->id }}" class="btn btn-primary btn-sm btn-edit"><i class="fas fa-fw fa-edit"></i> Action</a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>
 <div class="modal fade setHeadline" tabindex="-1" id="setHeadline" role="dialog" aria-labelledby="setHeadline" aria-hidden="true">
-    <div class="modal-dialog modal-xs modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header border-bottom-1">
 				<h5 class="modal-title m-0 font-weight-bold text-secondary" id="exampleModalLabel">Set Headline Image</h5>
@@ -153,13 +132,21 @@ active
             <form method="post" id="editItemForm" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="item_id" id="item_id" value="">
-                <div class="modal-body">
+                <div class="modal-body zoom90">
                     <div class="form-group">
-                        <label for="receipt">Receipt File :</label>
+                        <label for="receipt">Thumbnail :</label>
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="receiptInput" name="receipt" aria-describedby="inputreceipt" onchange="displayFileName()">
                             <label class="custom-file-label" for="receiptInput" id="receipt-label">Choose file</label>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Title :</label>
+                        <input type="text" id="title" name="title" style="border: none; background: none; font-size: 24px; width: 100%; outline: none; border-bottom: 0.25px solid rgb(215, 215, 215);">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Description :</label>
+                        <textarea id="editor" name="content"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -171,6 +158,18 @@ active
     </div>
 </div>
 <script>
+tinymce.init({
+    selector: 'textarea',
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    // tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+});
 $(document).ready(function() {
     var newsList = $('#news-list');
     var editHeadline = $('#edit-headline');

@@ -320,9 +320,10 @@ class LeaveController extends Controller
         }
 
         $employees = User::whereIn('id', $userToApprove)->get();
+        $leaveRequestForm = Leave_request::find($uniqueId);
 
         foreach ($employees as $employee) {
-            dispatch(new NotifyLeaveApproval($employee, $formApproval));
+            dispatch(new NotifyLeaveApproval($employee, $leaveRequestForm));
         }
 
         Leave_request_approval::where('RequestTo', Auth::user()->id)->where('leave_request_id', $uniqueId)->delete();

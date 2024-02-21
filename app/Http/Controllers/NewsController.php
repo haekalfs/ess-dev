@@ -16,7 +16,7 @@ class NewsController extends Controller
     public function index()
     {
         $newsFeed = News_feed::orderBy('created_at', 'desc')->get();
-        $headline = Headline::all();
+        $headline = Headline::orderBy('updated_at', 'desc')->take(3)->get();
         return view('news-feed.index', ['newsFeed' => $newsFeed, 'headline' => $headline]);
     }
 
@@ -29,6 +29,7 @@ class NewsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
+            'thumbnail' => 'required',
             'content' => 'required|string',
         ]);
 
@@ -43,23 +44,25 @@ class NewsController extends Controller
         }
 
         try {
-            // Store the file if it is provided
-            // if ($request->hasFile('img')) {
-            //     $headline = $request->file('img');
-            //     $fileExtension = $headline->getClientOriginalExtension();
-            //     $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            //     $filePath = 'img/' . $fileName;
-            //     $upload_folder = public_path('img/');
+            if ($request->hasFile('thumbnail')) {
 
-            //     // Move the uploaded file to the storage folder
-            //     $headline->move($upload_folder, $fileName);
+                $file = $request->file('thumbnail');
+                $receipt = $request->file('thumbnail');
+                $fileExtension = $receipt->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $filePath = 'headline/' . $fileName;
+                $upload_folder = public_path('headline/');
 
-            News_feed::create([
+                // Move the uploaded file to the storage folder
+                $file->move($upload_folder, $fileName);
+            }
+
+            Headline::create([
                 'id' => $uniqueId,
                 'title' => $request->title,
-                'content' => $request->content,
-                'date_released' => date('Y-m-d'),
-                'created_by' => Auth::id()
+                'subtitle' => $request->content,
+                'filename' => $fileName,
+                'filepath' => $filePath
             ]);
         } catch (Exception $e) {
             //do nothing
@@ -79,7 +82,9 @@ class NewsController extends Controller
     public function updateHeadlineData(Request $request, $item_id)
     {
         $validator = Validator::make($request->all(), [
-            'receipt' => 'required'
+            'receipt' => 'required',
+            'content' => 'required|string',
+            'title' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -87,6 +92,8 @@ class NewsController extends Controller
         }
 
         $item = Headline::find($item_id);
+        $item->title = $request->title;
+        $item->subtitle = $request->content;
 
         if ($request->hasFile('receipt')) {
 

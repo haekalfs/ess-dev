@@ -120,7 +120,7 @@ class HomeController extends Controller
             ->sum('quota_left');
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
 
-        $headline = Headline::all();
+        $headline = Headline::orderBy('updated_at', 'desc')->take(3)->get();
 
         $year = date('Y');
         $month = date('m') - 1;

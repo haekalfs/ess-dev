@@ -22,26 +22,13 @@ class ApprovalLeave extends Mailable
 
     public function build()
     {
-        $subject = 'Leave Approval Reminder : '. $this->formCreator->f_type;
+        $subject = 'Leave Approval Reminder : '. $this->formCreator->user->name;
         $link = 'https://timereport.perdana.co.id/approval/leave';
-
-        if($this->formCreator->ccTo){
-            // Split comma-delimited string into an array of email addresses
-            $ccEmails = explode(',', $this->formCreator->ccTo);
-
-            // Format email addresses individually
-            $formattedCcEmails = [];
-            foreach ($ccEmails as $email) {
-                $formattedCcEmails[] = ['email' => trim($email)];
-            }
-        } else {
-            $formattedCcEmails = NULL;
-        }
 
         return $this->markdown('mailer.approval_leave')
                     ->subject($subject)
                     ->to($this->employee->email)
-                    ->cc($formattedCcEmails)
+                    ->cc('hrd@perdana.co.id')
                     ->with([
                         'name' => $this->employee->name,
                         'email' => $this->employee->email,

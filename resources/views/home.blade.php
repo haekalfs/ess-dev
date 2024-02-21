@@ -282,10 +282,10 @@ $total_years_of_service = $diff->y;
                                         @foreach($headline as $index => $hl)
                                             <div class="col-md-4 mb-3">
                                                 <div class="card">
-                                                    <img class="img-fluid" alt="100%x280" src="{{ asset($hl->filepath) }}">
+                                                    <img class="img-fluid" alt="100%x280" style="max-height: 250px;" src="{{ asset($hl->filepath) }}">
                                                     <div class="card-body">
                                                         <h4 class="card-title">{{ $hl->title }}</h4>
-                                                        <p class="card-text">{{ $hl->subtitle }}</p>
+                                                        <p class="card-text">{!! $hl->subtitle !!}</p>
 
                                                     </div>
 
