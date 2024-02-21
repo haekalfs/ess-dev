@@ -63,35 +63,17 @@ active
 </style>
 <div class="row zoom80">
     <!-- Area Chart -->
-    <div class="col-xl-12 col-lg-12">
+    <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4" >
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Requested Information</h6>
-                <div class="text-right">
-                    <div class="mb-3 text-right ">
-                        @php
-                            $approved = false;
-                        @endphp
-                        @if ($med->medical_approval->status == 29)
-
-                        @elseif ($med->medical_approval->status == 404)
-                            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#resubmitModal"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
-                        @endif
-                        {{-- <a class="btn btn-secondary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/download" target="_blank" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a> --}}
-                    </div>
-                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-12">
                         <table class="table table-borderless">
-                            <thead>
-                                <tr>
-                                    <th style="padding-left: 0;" class="m-0 font-weight-bold text-primary" colspan="2">Medical Information</th>
-                                </tr>
-                            </thead>
                             <tbody>
                                 <tr class="table-sm">
                                     <td>Name</td>
@@ -110,63 +92,63 @@ active
                                     <td>: 
                                         @switch($med->medical_approval->status)
                                             @case(29)
-                                                <span class="badge  badge-success" style="font-size: 14px">Approved By {{ $med->medical_approval->user->name }}  <i class="fa fa-check" aria-hidden="true"></i></span>
+                                                <span>Approved By {{ $med->medical_approval->user->name }}  <i class="fa fa-check-circle" style="color: #005eff" aria-hidden="true"></i></span>
                                                 @break
                                             @case(15)
-                                                <span class="badge badge-secondary" style="font-size: 12px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                                <span>Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
                                                 @break
                                             @case(404)
-                                                <span class="badge badge-danger" style="font-size: 14px">Rejected By {{ $med->medical_approval->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
+                                                <span>Rejected By {{ $med->medical_approval->user->name }}  <i class="fa fa-exclamation-circle" style="color: red" aria-hidden="true"></i></span>
                                                 @break
                                             @default
-                                                <span class="badge badge-info" style="font-size: 12px">Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
+                                                <span>Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
                                         @endswitch
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-md-4">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4" >
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Payment Information</h6>
+                <div class="text-right">
+                    
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="row">                    
+                    <div class="col-md-12">
                         <table class="table table-borderless">
-							<thead>
-                                <tr>
-                                    <th style="padding-left: 0;" class="m-0  text-primary" colspan="2">Approval Information</th>
-                                </tr>
-                            </thead>
                                 <tr class="table-sm">
-                                    <th>Approval Name</th>
-                                    <td>: {{$med->medical_approval->user->name}}</td>
-                                </tr>
-                                <tr class="table-sm">
-                                    <th>Approval Date</th>
-                                    <td>: {{$med->medical_approval->approval_date}}</td>
-                                </tr>
-                                <tr class="table-sm">
-                                    <th>Total Amount Approved (Rp.)</th>
-                                    <td>: {{$med->medical_approval->total_amount_approved}}</td>
-                                </tr>
-                                <tr class="table-sm">
-                                    <th>Approval Notes</th>
-                                    <td>: {{$med->medical_approval->approval_notes}}</td>
-                                </tr>
-                        </table>
-                    </div>
-                    <div class="col-md-4">
-                        <table class="table table-borderless">
-							<thead>
-                                <tr>
-                                    <th style="padding-left: 0;" class="m-0  text-primary" colspan="2">Payement Information</th>
-                                </tr>
-                            </thead>
-                                <tr class="table-sm">
-                                    <th>Name</th>
-                                    <td>: {{$med->medical_payment->user->name}}</td>
+                                    <th>Status</th>
+                                    <td>:
+                                        @switch($med->medical_payment->paid_status)
+                                            @case(29)
+                                                <span>Approved <i class="fa fa-check-circle" style="color: #005eff" aria-hidden="true"></i></span>
+                                                @break
+                                            @case(20)
+                                                <span>Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                                @break
+                                            @case(404)
+                                                <span>Rejected<i class="fa fa-exclamation-circle" style="color: red" aria-hidden="true"></i></span>
+                                                @break
+                                            @default
+                                                <span>Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
+                                        @endswitch
+                                    </td>
                                 </tr>
                                 <tr class="table-sm">
                                     <th>Payment Date</th>
                                     <td>: {{$med->medical_payment->payment_date}}</td>
                                 </tr>
-                                <tr class="table-sm">
+                                <tr class="table-sm text-success font-weight-bold">
                                     <th>Total Payment (Rp.)</th>
                                     <td>: {{$med->medical_payment->total_payment}}</td>
                                 </tr>
@@ -188,9 +170,17 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
-                <div class="text-right">
-                    {{-- <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a> --}}
-                </div>
+                
+                @php
+                    $approved = false;
+                @endphp
+                @if ($med->medical_approval->status == 29)
+
+                @elseif ($med->medical_approval->status == 404)
+                    <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#resubmitModal"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
+                @endif
+                {{-- <a class="btn btn-secondary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/download" target="_blank" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a> --}}
+                
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -220,17 +210,22 @@ active
                                 </td>
 								<td>
                                     @if ($med->medical_approval->status == 29)
-                                        Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
+                                        Rp. <span class="amountApproved" id="amountApproved">{{ $med->medical_approval->total_amount_approved }}</span>
                                     @else
                                         Rp. 0
                                     @endif
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
                                     @if ($med->medical_approval->status == 29)
-                                           
+                                        <a data-toggle="modal" data-target="#ModalStatus{{ $md->mdet_id }}" title="Status" class="btn btn-secondary btn-sm" >
+                                            <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
+                                        </a> 
                                     @else
                                         <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
                                             <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
+                                        </a>
+                                        <a data-toggle="modal" data-target="#ModalStatus{{ $md->mdet_id }}" title="Status" class="btn btn-secondary btn-sm" >
+                                            <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
                                         </a>
                                     @endif
                                     {{-- @if(empty($medButton))
@@ -259,62 +254,6 @@ active
         </div>
     </div>
 </div>
-
-{{-- <div class="row">
-    <!-- Area Chart -->
-    <div class="col-xl-12 col-lg-12">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Medical Workflow</h6>
-                <div class="text-right">
-                    <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton">View Details</a>
-                </div>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm zoom90">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Approver</th>
-                                <th>Status</th>
-                                <th>Date Approved</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($medApp as $workflow)
-                                <tr>
-                                    <td>{{$workflow->user->name}}</td>
-                                    <td>@switch($workflow->status)
-                                             @case(29)
-                                                    <span class="badge  badge-success" style="font-size: 14px">Approved By Finance  <i class="fa fa-check" aria-hidden="true"></i></span>
-                                                    @break
-                                                @case(15)
-                                                    <span class="badge badge-secondary" style="font-size: 12px">Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
-                                                    @break
-                                                @case(404)
-                                                    <span class="badge badge-danger" style="font-size: 14px">Rejected By Finance  <i class="fa fa-exclamation" aria-hidden="true"></i></span>
-                                                    @break
-                                                @default
-                                                    <span class="badge badge-info" style="font-size: 12px">Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
-                                            @endswitch
-                                    </td>
-                                    <td>{{$workflow->approval_date}}</td>
-                                    <td>{{$workflow->approval_notes}}</td>
-                                </tr>
-                            @endforeach
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td colspan="6" class="text-center">Copyright @ Author of ESS Perdana Consulting</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> --}}
 
 {{-- Modal Resubmit --}}
 <form action="/medical/edit/{{ $med->id }}/resubmit" enctype="multipart/form-data"  method="POST">
@@ -346,6 +285,62 @@ active
 
 <!-- Modal Attachment -->
 @foreach($medDet as $md)
+
+    <div class="modal fade" id="ModalStatus{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title color" id="ModalStatusLabel">Status Medical</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered zoom80" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Granted Funds</th>
+                                <th>Date Approved</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{$med->medical_approval->user->name}}</td>
+                                <td>
+                                    @switch($med->medical_approval->status)
+                                            @case(29)
+                                                <span>Approved <i class="fas fa-check-circle" style="color: #005eff;"></i></i></span>
+                                                @break
+                                            @case(15)
+                                                <span>Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                                @break
+                                            @case(404)
+                                                <span>Rejected <i class="fa fa-exclamation" style="color: red;" aria-hidden="true"></i></span>
+                                                @break
+                                            @default
+                                                <span>Unknown <i class="fa fa-bug" style="color:yellow ;" aria-hidden="true"></i></span>
+                                        @endswitch
+                                </td>
+                                <td>
+                                    @if ($med->medical_approval->status == 29)
+                                        Rp. <span class="amountApprovedStatus" id="amountApprovedStatus">{{ $med->medical_approval->total_amount_approved }}</span>
+                                    @else
+                                        Rp. 0
+                                    @endif
+                                </td>
+                                <td>{{$med->medical_approval->approval_date}}</td>
+                                <td>{{$med->medical_approval->approval_notes}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="myModal{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
