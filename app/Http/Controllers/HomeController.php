@@ -9,6 +9,7 @@ use App\Models\Notification_alert;
 use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Timesheet;
+use App\Models\Timesheet_approver;
 use App\Models\Usr_role;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index($typeSelected = null)
     {
         // Check if the quotes data is cached
         if (!Cache::has('quotes')) {
@@ -126,19 +127,58 @@ class HomeController extends Controller
 
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
+        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();// Add new approver
+        $new_approver_id = 'julyansyah'; // Replace with the actual ID of the new approver
+        array_push($ts_approver, $new_approver_id);
 
-        $exclude = Usr_role::whereNotIn('role_id', [17])->groupBy('user_id')->pluck('user_id')->toArray();
+        $activitiesQuery = Timesheet::select('ts_user_id',
+                 DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
+                 DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count'))
+        ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+        ->whereNotIn('ts_task', ['Sick', 'Other'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Filter for come times before 8 AM
+        // Order by attendance_days_count
 
-        $activities = DB::table('timesheet')
-            ->select('ts_user_id', DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'))
-            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->groupBy('ts_user_id')
-            ->orderByRaw('AVG(TIME_TO_SEC(ts_from_time))')
-            ->whereIn('ts_user_id', $exclude)
-            ->take(5)
-            ->get();
+        if ($typeSelected) {
+            if ($typeSelected == 1) {
+                $activitiesQuery->whereIn('ts_location', ['HO']); // Replace ['Task1', 'Task2'] with your condition
+            } elseif ($typeSelected == 2) {
+                $activitiesQuery->whereNotIn('ts_location', ['HO']); // Replace ['HO'] with your condition
+            }
+        } else {
+            $activitiesQuery->whereIn('ts_location', ['HO']);
+        }
 
-       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'countAssignments', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
+        $activities = $activitiesQuery->whereNotIn('ts_user_id', $ts_approver)
+        ->groupBy('ts_user_id')
+        ->orderByDesc('attendance_days_count')->take(5)->get();
+
+        // Transform the result into an array
+        $activitiesArray = [];
+        foreach ($activities as $activity) {
+            // Attempt to parse the earliest_come_time field with multiple formats
+            $earliestComeTime = null;
+            if (strpos($activity->earliest_come_time, '.') !== false) {
+                // Handle format like '07:00:00.000000'
+                $earliestComeTime = Carbon::createFromFormat('H:i:s.u', $activity->earliest_come_time)->format('H:i');
+            } else {
+                // Handle format like '07:00:00'
+                $earliestComeTime = Carbon::createFromFormat('H:i:s', $activity->earliest_come_time)->format('H:i');
+            }
+
+            // If parsing failed, provide a default value
+            if (!$earliestComeTime) {
+                $earliestComeTime = 'N/A';
+            }
+
+            $data = [
+                'ts_user_id' => $activity->user->name,
+                'earliest_come_time' => $earliestComeTime,
+                'attendance_days_count' => $activity->attendance_days_count,
+            ];
+            $activitiesArray[] = $data;
+        }
+
+       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'typeSelected', 'countAssignments', 'activitiesArray', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
     }
 
     public function notification_indev()

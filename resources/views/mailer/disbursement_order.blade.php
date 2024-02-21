@@ -1,8 +1,10 @@
 <p>Dear {{ $name }},</p>
 
-<p>Previously, {{$formCreator->request->user->name }} has requesting reimbursement for : {{ $formCreator->request->f_type }} and it has been approved by {{ $formCreator->user->name }}. <span style="font-weight: bold;">Now we are awaiting your final approval.</span></p>
+<p>
+    We are pleased to inform you that the reimbursement request submitted by {{$formCreator->user->name}} has been reviewed by Dian Jayanti through our Employee Self-Service (ESS) system. Please expedite the disbursement process to ensure prompt reimbursement to the employee.
+</p>
 
-<p>Please open the link below to review the request:</p>
+<p>Please open the link below or review the attachment :</p>
 <p><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 
 <p>If you have any questions or need further assistance, please don't hesitate to contact us.</p>

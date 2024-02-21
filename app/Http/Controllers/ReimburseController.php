@@ -6,6 +6,8 @@ use App\Jobs\NotifyChangesReimbursementbyFinance;
 use App\Jobs\NotifyReimburseCancelRequest;
 use App\Jobs\NotifyReimbursementCreation;
 use App\Jobs\NotifyReimbursementPaid;
+use App\Jobs\SendDisbursementOrder;
+use PhpOffice\PhpWord\TemplateProcessor;
 use App\Models\Company_project;
 use App\Models\Department;
 use App\Models\Financial_password;
@@ -30,6 +32,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use ZipArchive;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -361,13 +364,13 @@ class ReimburseController extends Controller
         }
 
         $item = Reimbursement_item::find($item_id);
+        $item->edited_by_finance = TRUE;
         $item->approved_amount = $request->amount;
         $item->save();
 
-        $itemIds = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)->whereNotIn('status', [404])->pluck('reimb_item_id')->toArray();
-
         $totalApprovedAmount = 0;
-        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->whereIn('id', $itemIds)->get();
+        $reimbIds = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->pluck('reimb_item_id')->toArray();
+        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->whereNotIn('id', $reimbIds)->get();
         foreach ($result as $item) {
             // Remove the comma and convert the string to a float
             $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
@@ -376,18 +379,14 @@ class ReimburseController extends Controller
             $totalApprovedAmount += $approvedAmount;
         }
 
-        Reimbursement_approval::updateOrCreate(
-            [
-                'reimb_item_id' => $item_id,
-                'RequestTo' => "Finance Dept."
-            ],
-            [
-                'status' => 29,
-                'approved_amount' => $request->amount,
-                'reimbursement_id' => $item->reimbursement_id,
-                'notes' => $request->notes
-            ]
-        );
+        Reimbursement_approval::create([
+            'reimb_item_id' => $item_id,
+            'RequestTo' => Auth::id(),
+            'status' => 29,
+            'approved_amount' => $request->amount,
+            'reimbursement_id' => $item->reimbursement_id,
+            'notes' => $request->notes
+        ]);
 
         $mainForm = Reimbursement::where('id', $item->reimbursement_id);
         $mainForm->update(['f_granted_funds' => $totalApprovedAmount]);
@@ -404,7 +403,7 @@ class ReimburseController extends Controller
     public function rejectReimburseDataFinance(Request $request, $item_id)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required',
+            'amount' => 'sometimes',
             'notes' => 'sometimes'
         ]);
 
@@ -413,37 +412,68 @@ class ReimburseController extends Controller
         }
 
         $item = Reimbursement_item::find($item_id);
-        $item->approved_amount = $request->amount;
+        $item->edited_by_finance = TRUE;
+        $item->approved_amount = 0;
         $item->save();
 
         // Check if all items are rejected
         $reimbItem = Reimbursement_item::find($item_id);
-        $checkRowsLeft = Reimbursement_approval::whereNotIn('reimb_item_id', [$reimbItem->id])
+        //Set the other to 403
+        Reimbursement_approval::where('reimb_item_id', $item_id)
             ->where('reimbursement_id', $reimbItem->reimbursement_id)
-            ->whereIn('status', [20, 30, 29])
+            ->update(['status' => 403]);
+
+        $Check = DB::table('reimbursement_approval')
+            ->select('reimb_item_id')
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 404 THEN 0 ELSE 1 END)')
+            ->groupBy('reimb_item_id')
+            ->pluck('reimb_item_id')
+            ->toArray();
+
+        $checkRowsLeft = Reimbursement_approval::whereIn('reimb_item_id', $Check)
+            ->where('reimbursement_id', $reimbItem->reimbursement_id)
+            ->whereIn('status', [20])
             ->count();
+
+        // Check if the formId is all or not // whereNotIn('reimb_item_id', [$item->id])
+        $checkRowsLefttoCompleting = Reimbursement_approval::whereNotIn('reimb_item_id', [$reimbItem->id])
+            ->where('reimbursement_id', $reimbItem->reimbursement_id)
+            ->whereIn('status', [404, 20, 403])
+            ->count();
+
+        $totalApprovedAmount = 0;
+        $reimbIds = Reimbursement_approval::where('reimbursement_id', $item->reimbursement_id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->pluck('reimb_item_id')->toArray();
+        $result = Reimbursement_item::where('reimbursement_id', $item->reimbursement_id)->whereNotIn('id', $reimbIds)->get();
+        foreach ($result as $item) {
+            // Remove the comma and convert the string to a float
+            $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
+
+            // Add the numeric value to the totalApprovedAmount
+            $totalApprovedAmount += $approvedAmount;
+        }
 
         // Update reimbursement request status if all items are rejected
         if ($checkRowsLeft === 0) {
             Reimbursement::where('id', function ($query) use ($item_id) {
                 $query->select('reimbursement_id')->from('reimbursement_items')->where('id', $item_id);
             })->update(['status_id' => 404]);
+        } elseif ($checkRowsLefttoCompleting === 0) {
+            Reimbursement::where('id', function ($query) use ($item_id) {
+                $query->select('reimbursement_id')->from('reimbursement_items')->where('id', $item_id);
+            })->update(['status_id' => 29, 'f_granted_funds' => $totalApprovedAmount]);
         }
 
-        Reimbursement_approval::updateOrCreate(
-            [
-                'reimb_item_id' => $item_id,
-                'RequestTo' => Auth::id()
-            ],
-            [
-                'status' => 404,
-                'approved_amount' => $request->amount,
-                'reimbursement_id' => $item->reimbursement_id,
-                'notes' => $request->notes
-            ]
-        );
-        Reimbursement_approval::where('reimb_item_id', $item_id)
-            ->update(['status' => '404']);
+        Reimbursement_approval::create([
+            'reimb_item_id' => $item_id,
+            'RequestTo' => Auth::id(),
+            'status' => 404,
+            'approved_amount' => 0,
+            'reimbursement_id' => $item->reimbursement_id,
+            'notes' => $request->notes
+        ]);
+
+        $mainForm = Reimbursement::where('id', $item->reimbursement_id);
+        $mainForm->update(['f_granted_funds' => $totalApprovedAmount]);
 
         $employees = User::where('id', $item->request->f_req_by)->get();
 
@@ -451,7 +481,7 @@ class ReimburseController extends Controller
             dispatch(new NotifyChangesReimbursementbyFinance($employee, $item));
         }
 
-        return response()->json(['success' => 'Items rejected successfully.']);
+        return redirect()->back()->with('danger', 'You rejected the item!');
     }
 
     public function cancel_request(Request $request, $id)
@@ -561,6 +591,28 @@ class ReimburseController extends Controller
         }
 
         return view('reimbursement.manage.history', compact('approvals', 'notify', 'notifyMonth', 'yearsBefore', 'Month', 'Year', 'employees'));
+    }
+
+    public function disbursed_item($formId)
+    {
+        // Ensure both arrays are not empty before proceeding
+        if (!empty($formId)) {
+            // Update records in the Reimbursement table where id is in the $formId array
+            Reimbursement::where('id', $formId)->update(['status_id' => 2002, 'f_paid_on' => date('Y-m-d')]);
+
+            $getForm = Reimbursement::find($formId);
+
+            if ($getForm) {
+                $employees = User::where('id', $getForm->f_req_by)->get();
+
+                // Send mail
+                foreach ($employees as $employee) {
+                    dispatch(new NotifyReimbursementPaid($employee, $getForm));
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', "Reimbursement has been marked to Paid! and system begin to sent notification to users");
     }
 
     public function disbursed_all(Request $request)
@@ -720,8 +772,8 @@ class ReimburseController extends Controller
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
 
-        $reimbIds = Reimbursement_approval::where('reimbursement_id', $id)->whereNotIn('status', [404, 20])->pluck('reimb_item_id')->toArray();
-        $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->whereIn('id', $reimbIds)->get();
+        $reimbIds = Reimbursement_approval::where('reimbursement_id', $id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->select('reimb_item_id')->pluck('reimb_item_id')->toArray();
+        $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->whereNotIn('id', $reimbIds)->get();
 
         return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
@@ -751,26 +803,30 @@ class ReimburseController extends Controller
 
         $mainForm = Reimbursement::find($formId);
         $approvalForm = Reimbursement_approval::where('reimbursement_id', $formId)
-            ->whereNotIn('status', [404])
+            ->whereIn('status', [404,20,403])
             ->groupBy('reimb_item_id')
             ->select('reimb_item_id') // Select the grouped column
             ->pluck('reimb_item_id') // Pluck the grouped column
             ->toArray();
 
+        $getProjectCode = Company_project::where('project_name', $mainForm->f_type)->first();
+        if($getProjectCode){
+            $projectCode = $getProjectCode->project_code;
+            $client = $getProjectCode->client->client_name;
+        } else {
+            $projectCode = 'N/a';
+            $client = 'KIP';
+        }
         // Compare the hashed passwords
         if (in_array($checkUserPost, [10,9,21,22,23,8])) {
-            if($mainForm->status_id == 2002){
-                $templatePath = public_path('template_reimbursement_item_paid.xlsx');
-            } else {
-                $templatePath = public_path('template_reimbursement_item.xlsx');
-            }
+            $templatePath = public_path('template_reimbursement_item.xlsx');
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
             // Set up the starting row and column for the data
             $startRow = 16;
             $startCol = 2;
 
-            $result = Reimbursement_item::where('reimbursement_id', $formId)->whereIn('id', $approvalForm)->get();
+            $result = Reimbursement_item::where('reimbursement_id', $formId)->whereNotIn('id', $approvalForm)->get();
 
             $latestReceipt = Reimbursement_item::where('reimbursement_id', $formId)->orderBy('receipt_expiration', 'desc')->first();
             $receiptExpiration = $latestReceipt->receipt_expiration;
@@ -821,6 +877,8 @@ class ReimburseController extends Controller
                 $sheet->setCellValueByColumnAndRow(3, 6, $commaDelimitedApprovers);
                 $sheet->setCellValueByColumnAndRow(3, 7, $row->request->dept->department_name);
                 $sheet->setCellValueByColumnAndRow(3, 10, $row->request->f_type);
+                $sheet->setCellValueByColumnAndRow($startCol + 2, 10, $projectCode);
+                $sheet->setCellValueByColumnAndRow($startCol + 2, 11, $client);
                 $sheet->setCellValueByColumnAndRow(3, 13, $row->request->f_id);
 
                 $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->description);
@@ -829,11 +887,16 @@ class ReimburseController extends Controller
 
                 $sheet->setCellValueByColumnAndRow($startCol + 3, 30, $totalApprovedAmount);
                 $sheet->setCellValueByColumnAndRow($startCol + 3, 32, str_replace([',','.'], '', $mainForm->f_granted_funds));
-                $sheet->setCellValueByColumnAndRow($startCol + 2, 40, $mainForm->f_sign_prior_approver_date);
-                $sheet->setCellValueByColumnAndRow($startCol + 2, 37, $mainForm->f_sign_employee_date);
-                $sheet->setCellValueByColumnAndRow($startCol + 3, 43, $mainForm->f_paid_on);
-                $sheet->setCellValueByColumnAndRow(1, 40, $mainForm->f_sign_prior_approver);
-                $sheet->setCellValueByColumnAndRow(1, 37, $mainForm->f_sign_employee);
+                if($mainForm->status_id == 29){
+                    $status = "All Approved";
+                } else {
+                    $status = "Paid";
+                }
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 34, $mainForm->user->users_detail->usr_bank_name . " : " . $mainForm->user->users_detail->usr_bank_account);
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 37, $status);
+                $sheet->setCellValueByColumnAndRow($startCol + 3, 40, $mainForm->f_paid_on);
+                // $sheet->setCellValueByColumnAndRow(1, 40, $mainForm->f_sign_prior_approver);
+                // $sheet->setCellValueByColumnAndRow(1, 37, $mainForm->f_sign_employee);
 
                 $startRow++;
                 $no++; // Set the firstRow flag to false after the first row for each user
@@ -852,5 +915,162 @@ class ReimburseController extends Controller
         } else {
             abort(403, 'Unauthorized');
         }
+    }
+
+    public function export_selected(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'formId2' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            Session::flash('failed', 'Error Database has Occurred! Failed to create request! You need to fill all the required fields');
+            return redirect()->back();
+        }
+
+        $formIds = explode(',', $request->input('formId2'));
+
+        // Create a unique name for the zip file
+        $zipFileName = 'reimbursements_' . time() . '.zip';
+        $zipFilePath = storage_path('app/public/' . $zipFileName);
+
+        // Initialize a new ZipArchive instance
+        $zip = new ZipArchive;
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach ($formIds as $formId) {
+                // Fetch the reimbursement details for the current formId
+                $totalApprovedAmount = 0;
+                $mainForm = Reimbursement::find($formId);
+                $approvalForm = Reimbursement_approval::where('reimbursement_id', $formId)
+                    ->whereIn('status', [404,20,403])
+                    ->groupBy('reimb_item_id')
+                    ->select('reimb_item_id')
+                    ->pluck('reimb_item_id')
+                    ->toArray();
+
+                $getProjectCode = Company_project::where('project_name', $mainForm->f_type)->first();
+                if($getProjectCode){
+                    $projectCode = $getProjectCode->project_code;
+                    $client = $getProjectCode->client->client_name;
+                } else {
+                    $projectCode = 'N/a';
+                    $client = 'KIP';
+                }
+
+                $templatePath = public_path('template_reimbursement_item.xlsx');
+                $spreadsheet = IOFactory::load($templatePath);
+                $sheet = $spreadsheet->getActiveSheet();
+                $startRow = 16;
+                $startCol = 2;
+
+                $result = Reimbursement_item::where('reimbursement_id', $formId)->whereNotIn('id', $approvalForm)->get();
+                $latestReceipt = Reimbursement_item::where('reimbursement_id', $formId)->orderBy('receipt_expiration', 'desc')->first();
+                $receiptExpiration = $latestReceipt->receipt_expiration;
+                $dateAfterTwoMonths = date('Y-m-d', strtotime($receiptExpiration . ' +2 months'));
+
+                foreach ($result as $item) {
+                    $approvedAmount = floatval(str_replace([',','.'], '', $item->approved_amount));
+                    $totalApprovedAmount += $approvedAmount;
+                }
+
+                foreach ($result as $index => $row) {
+                    $attachedFileUrl = url($row->file_path);
+                    $sheet->setCellValueByColumnAndRow(1, $startRow, 'View File');
+                    $sheet->getCellByColumnAndRow(1, $startRow)->getHyperlink()->setUrl($attachedFileUrl);
+                    $sheet->getCellByColumnAndRow(1, $startRow)->getHyperlink()->setTooltip('Click to download attachment');
+
+                    $style = [
+                        'font' => ['color' => ['rgb' => '0000FF'], 'underline' => true],
+                    ];
+
+                    $sheet->getStyleByColumnAndRow(1, $startRow)->applyFromArray($style);
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 6, $latestReceipt->receipt_expiration);
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 7, $dateAfterTwoMonths);
+
+                    $sheet->setCellValueByColumnAndRow(3, 3, $row->request->user->name);
+                    $sheet->setCellValueByColumnAndRow(3, 4, $row->request->user->users_detail->employee_id);
+
+                    $uniqueApprovers = array_unique($mainForm->approval->pluck('RequestTo')->toArray());
+                    $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
+                    $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
+                    $sheet->setCellValueByColumnAndRow(3, 6, $commaDelimitedApprovers);
+                    $sheet->setCellValueByColumnAndRow(3, 7, $row->request->dept->department_name);
+                    $sheet->setCellValueByColumnAndRow(3, 10, $row->request->f_type);
+                    $sheet->setCellValueByColumnAndRow($startCol + 2, 10, $projectCode);
+                    $sheet->setCellValueByColumnAndRow($startCol + 2, 11, $client);
+                    $sheet->setCellValueByColumnAndRow(3, 13, $row->request->f_id);
+
+                    $sheet->setCellValueByColumnAndRow($startCol, $startRow, $row->description);
+                    $sheet->setCellValueByColumnAndRow($startCol + 2, $startRow, str_replace([',','.'], '', $row->amount));
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, $startRow, str_replace([',','.'], '', $row->approved_amount));
+
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 30, $totalApprovedAmount);
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 32, str_replace([',','.'], '', $mainForm->f_granted_funds));
+                    $status = ($mainForm->status_id == 29) ? "All Approved" : "Paid";
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 34, $mainForm->user->users_detail->usr_bank_name . " : " . $mainForm->user->users_detail->usr_bank_account);
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 37, $status);
+                    $sheet->setCellValueByColumnAndRow($startCol + 3, 40, $mainForm->f_paid_on);
+
+                    $startRow++;
+                }
+
+                // Generate a unique filename for the Excel file
+                $excelFileName = 'reimbursement_' . $formId . '.xlsx';
+                $excelFilePath = storage_path('app/public/' . $excelFileName);
+
+                // Save the spreadsheet to a temporary file
+                $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $writer->save($excelFilePath);
+
+                // Add the Excel file to the zip archive
+                $zip->addFile($excelFilePath, $excelFileName);
+            }
+
+            // Close the zip archive
+            $zip->close();
+
+            // Set headers for file download
+            $headers = [
+                'Content-Type' => 'application/zip',
+                'Content-Disposition' => 'attachment; filename="' . $zipFileName . '"',
+            ];
+
+            // Return the response with the ZIP file as an attachment
+            return response()->download($zipFilePath, $zipFileName, $headers);
+        } else {
+            Session::flash('failed', 'Failed to create zip file');
+            return redirect()->back();
+        }
+    }
+
+    public function create_order_letter(Request $request,$id)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $data = Reimbursement::find($id);
+        $financeManager = Timesheet_approver::find(15);
+
+        $templateProcessor = new TemplateProcessor('disbursement_order_letter.docx');
+
+        $numericAmount = (float) preg_replace('/[^0-9]/', '', $data->f_granted_funds);
+        $grantedFunds = number_format($numericAmount);
+        $templateProcessor->setValue('date_sent', htmlentities(date('j-M-Y')));
+        $templateProcessor->setValue('f_type', htmlentities($data->f_type));
+        $templateProcessor->setValue('requestor', htmlentities($data->user->name));
+        $templateProcessor->setValue('f_id', htmlentities($data->f_id));
+        $templateProcessor->setValue('granted_funds', htmlentities('IDR '. $grantedFunds));
+        $templateProcessor->setValue('bank_account', htmlentities($data->user->users_detail->usr_bank_name));
+        $templateProcessor->setValue('account_number', htmlentities($data->user->users_detail->usr_bank_account));
+        $templateProcessor->setValue('finance_manager', htmlentities($financeManager->user->name));
+
+        $templateProcessor->saveAs("reimbursement/Result_$data->f_id.docx");
+        $dateCreated = date("Y-m-d", strtotime($data->created_at));
+        ob_end_clean();
+
+        $employees = User::where('id', $financeManager->approver)->get();
+
+        foreach ($employees as $employee) {
+            dispatch(new SendDisbursementOrder($employee, $data));
+        }
+        return response()->download(public_path("reimbursement/Result_$data->f_id.docx"), "Disbursement_Order_Letter_$data->f_id".'_'."$data->f_purpose_of_purchase"."_"."$dateCreated".".docx");
     }
 }

@@ -23,7 +23,7 @@ active
 <div class="d-sm-flex align-items-center zoom90 justify-content-between">
     <div>
         <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-users"></i> Manage Users</h1>
-        <p class="mb-4">Manage Users Account.</p>
+        <p class="mb-3">Manage Users Account.</p>
     </div>
     <a class="btn btn-success btn-sm shadow-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Position & Department</a>
 </div>
@@ -37,16 +37,16 @@ active
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered zoom90 table-hover" width="100%" id="dataTableUser" cellspacing="0">
-                <thead>
-                    <tr style="font-size: 13px">
+                <thead class="thead-light">
+                    <tr>
                         <th>Emp ID</th>
                         <th>User ID</th>
                         <th>Nama</th>
-                        <th>Status Active</th>
-                        <th>Employee Status</th>
                         <th>Position</th>
                         <th>Department</th>
-                        <th>Option</th>
+                        <th>Employement Status</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,6 +55,9 @@ active
                         <td>{{$p->users_detail->employee_id}}</td>
                         <td>{{$p->id }}</td>
                         <td>{{$p->name}}</td>
+                        <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
+                        <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
+                        <td>{{$p->users_detail->employee_status}}</td>
                         <td class="text-center">
                             @if ($p->users_detail->status_active == "Active")
                                 <i class="fas fa-user-check" style="color: #0053fa;"></i>
@@ -62,9 +65,6 @@ active
                                 <i class="fas fa-user-times" style="color: #ff0000;"></i>
                             @endif
                         </td>
-                        <td>{{$p->users_detail->employee_status}}</td>
-                        <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
-                        <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
                         <td class="row-cols-2 justify-content-between">
                             <a href="/users/edit/{{ Crypt::encrypt($p->id) }}" title="Edit" class="btn btn-primary btn-sm" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>

@@ -7,6 +7,10 @@ active
 @endsection
 
 @section('content')
+<div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+    <h1 class="h4 mb-0 text-gray-800 font-weight-bold"><i class="fas fa-list"></i> News Feed Management</h1>
+    {{-- <a data-toggle="modal" data-target="#addMem" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-list"></i> Execute</a> --}}
+</div>
 @if ($message = Session::get('failed'))
 <div class="alert alert-danger alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -28,9 +32,43 @@ active
 <div class="row zoom90">
     <div class="col-xl-12 col-md-12">
         <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary" id="judul">News Feed History</h6>
+                <div class="text-right">
+                    <a href="/news-feed/manage/create" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add News</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>News ID</th>
+                                <th>Release Date</th>
+                                <th>Title</th>
+                                <th>Created By</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($newsFeed as $feed)
+                            <tr>
+                                <td>{{ $feed->id }}</td>
+                                <td>{{ $feed->date_released }}</td>
+                                <td title="{{ $feed->title }}"><span class="long-text-2">{{ $feed->title }}</span></td>
+                                <td>{{ $feed->created_by }}</td>
+                                <td class="text-center"><a class="btn btn-primary" href="/news-feed/manage/edit-post/{{$feed->id}}"><i class="fas fa-fw fa-edit"></i> Edit</a></td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary">
-                <h6 class="m-0 font-weight-bold text-light">News Information</h6>
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Headline</h6>
                 <div class="text-right">
                     <button class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" type="button" id="headlineButton"><i class="fas fa-plus fa-sm text-white-50"></i> Set Headline</button>
                 </div>
@@ -98,41 +136,6 @@ active
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary">
-                <h6 class="m-0 font-weight-bold text-light" id="judul">News Feed History</h6>
-                <div class="text-right">
-                    <a href="/news-feed/manage/create" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add News</a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>News ID</th>
-                                <th>Release Date</th>
-                                <th>Title</th>
-                                <th>Created By</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($newsFeed as $feed)
-                            <tr>
-                                <td>{{ $feed->id }}</td>
-                                <td>{{ $feed->date_released }}</td>
-                                <td title="{{ $feed->title }}"><span class="long-text-2">{{ $feed->title }}</span></td>
-                                <td>{{ $feed->created_by }}</td>
-                                <td class="text-center"><a class="btn btn-primary" href="/news-feed/manage/edit-post/{{$feed->id}}"><i class="fas fa-fw fa-edit"></i> Edit</a></td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>

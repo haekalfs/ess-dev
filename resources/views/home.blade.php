@@ -194,36 +194,49 @@ $total_years_of_service = $diff->y;
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Leaderboard</h6>
+                <div class="text-right">
+                    <select class="form-control" id="type" name="type" required onchange="redirectToPage()">
+                        <option value="1" @if (1 == $typeSelected) selected @endif>Head Office</option>
+                        <option value="2" @if (2 == $typeSelected) selected @endif>Non-Head Office</option>
+                    </select>
+                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <div class="row zoom80">
                     <div class="col-md-12">
                         <div id="header" style="padding-top:0%;">
-                            <h1>Employee of The Month</h1>
+                            <h1 class="h4 mb-0 font-weight-bold text-gray-800">Employee of The Month 🎉</h1>
                             <button class="share">
                                 <i class="fas fa-share fa-2x"></i>
                             </button>
                         </div>
-                          <div id="leaderboard">
+                        <div id="leaderboard">
                             <div class="ribbon"></div>
                             <table>
-                                @foreach($activities as $key => $activity)
+                                @foreach($activitiesArray as $key => $activity)
                                     <tr>
                                         <td class="number">{{ $key + 1 }}</td>
-                                        <td class="name">{{ $activity->ts_user_id }}</td>
+                                        <td class="name">
+                                            @if($key === 0)
+                                                {{ $activity['ts_user_id'] }}
+                                            @else
+                                                {{ $activity['ts_user_id'] }}
+                                            @endif
+                                        </td>
                                         <td class="points">
                                             @if($key === 0)
-                                                {{ $activity->earliest_come_time }} <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
+                                            <span class="text-danger"><small><i>{{ $activity['attendance_days_count'] }} days of office attendance < {{ $activity['earliest_come_time'] }}</i></small></span> <img class="gold-medal" src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true" alt="gold medal"/>
                                             @else
-                                                {{ $activity->earliest_come_time }}
+                                                <span class="text-primary"><small><i>{{ $activity['attendance_days_count'] }} days of office attendance around {{ $activity['earliest_come_time'] }} - 08:00 AM</i></small></span>
                                             @endif
                                         </td>
                                     </tr>
                                 @endforeach
                             </table>
-                          </div>
+                        </div><br>
+                        <span class="text-danger mt-2"><small>Congratulations! Your reward awaits you at the closest canteen. Bon appétit!</small></span>
                     </div>
                 </div>
             </div>
@@ -239,7 +252,7 @@ $total_years_of_service = $diff->y;
             <!-- Card Body -->
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <div class="lc-block position-relative">
                             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                                 <div class="carousel-inner">
@@ -259,8 +272,79 @@ $total_years_of_service = $diff->y;
                                 </a>
                             </div>
                         </div>
+                    </div> --}}
+                    <div class="col-md-12">
+                        <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <div class="row">
+                                        @foreach($headline as $index => $hl)
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card">
+                                                    <img class="img-fluid" alt="100%x280" src="{{ asset($hl->filepath) }}">
+                                                    <div class="card-body">
+                                                        <h4 class="card-title">{{ $hl->title }}</h4>
+                                                        <p class="card-text">{{ $hl->subtitle }}</p>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        @endforeach
+
+                                    </div>
+                                </div>
+                                {{-- <div class="carousel-item">
+                                    <div class="row">
+
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card">
+                                                <img class="img-fluid" alt="100%x280" src="https://images.unsplash.com/photo-1532771098148-525cefe10c23?ixlib=rb-0.3.5&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjMyMDc0fQ&amp;s=3f317c1f7a16116dec454fbc267dd8e4">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">Special title treatment</h4>
+                                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card">
+                                                <img class="img-fluid" alt="100%x280" src="https://images.unsplash.com/photo-1532715088550-62f09305f765?ixlib=rb-0.3.5&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjMyMDc0fQ&amp;s=ebadb044b374504ef8e81bdec4d0e840">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">Special title treatment</h4>
+                                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card">
+                                                <img class="img-fluid" alt="100%x280" src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-0.3.5&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjMyMDc0fQ&amp;s=0754ab085804ae8a3b562548e6b4aa2e">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">Special title treatment</h4>
+                                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div> --}}
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-right">
+                            <a class="btn btn-primary mb-3 mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
+                                <i class="fa fa-arrow-left"></i>
+                            </a>
+                            <a class="btn btn-primary mb-3 " href="#carouselExampleIndicators2" role="button" data-slide="next">
+                                <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-12">
                         <div style="height:350px;" class="transparent-scroll2">
                             <div class="card-body transparent-scroll">
                                 @foreach($newsFeed as $feed)
@@ -272,7 +356,7 @@ $total_years_of_service = $diff->y;
                                 @endforeach
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -308,7 +392,6 @@ $total_years_of_service = $diff->y;
     }
 
     h1 {
-      font-family: "Rubik", sans-serif;
       font-size: 1.7rem;
       color: #141a39;
       text-transform: uppercase;
@@ -481,4 +564,14 @@ $total_years_of_service = $diff->y;
         }
     }
         </style>
+        <script>
+            function redirectToPage() {
+                var selectedOption = document.getElementById("type").value;
+                var url = "{{ url('/home') }}"; // Specify the base URL
+
+                url += "/" + selectedOption;
+
+                window.location.href = url; // Redirect to the desired page
+            }
+        </script>
 @endsection

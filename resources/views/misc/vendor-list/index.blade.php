@@ -34,8 +34,8 @@ active
 </div>
 @endif
 <div class="card shadow mb-4 zoom90">
-    <div class="card-header py-3 d-flex flex-row align-items-center bg-primary justify-content-between">
-        <h6 class="m-0 font-weight-bold text-light" id="judul">Vendor List</h6>
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Vendor List</h6>
         {{-- <div class="text-right">
             <button class="btn @role('freelancer') btn-success @else btn-primary @endrole btn-sm" type="button" id="manButton" style="margin-right: 10px;">+ Request Assignment</button>
         </div> --}}
@@ -69,7 +69,7 @@ active
                                     aria-haspopup='true' aria-expanded='false'>
                                     Action
                                 </a>
-                                <div class='dropdown-menu' aria-labelledby='dropdownMenu2'>
+                                <div class='dropdown-menu' style="zoom: 100%;" aria-labelledby='dropdownMenu2'>
                                     <a class='dropdown-item' target="_blank" href="{{$urlEform}}/po/create-from-vendor/{{ $record->id }}"><i class="fas fa-fw fa-print"></i> Create PO</a>
                                     <a class='dropdown-item' href="#"><i class="fas fa-fw fa-print"></i> Create PR</a>
                                     <hr>
@@ -132,7 +132,7 @@ active
                                                     <option value="0">Corporate</option>
                                                     <option value="1">Individual</option>
                                                 </select>
-                                            </div>                                            
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -149,10 +149,10 @@ active
                                 $difference = floatval(str_replace([',','.'], '', $usr->amount)) - (floatval(str_replace([',','.'], '', $usr->approved_amount)) ?? 0);
                             @endphp
                                 <tr>
-                                    <td class="text-center" style="width: 20%;"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
+                                    <td class="text-center" style="width: 15%;"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
                                     <td>{{ $usr->description }}</td>
-                                    <td class="text-danger font-weight-bold">Rp. {{ $usr->amount }}</td>
-                                    <td class="text-success font-weight-bold">Rp. {{ $usr->approved_amount ?? '—' }}</td>
+                                    <td class="text-danger font-weight-bold">IDR {{ $usr->amount }}</td>
+                                    <td class="text-success font-weight-bold">IDR {{ $usr->approved_amount ?? '—' }}</td>
                                     <td>
                                         @php
                                             $approved = false;
@@ -280,7 +280,7 @@ active
 </div>
 
 <div class="modal fade zoom90" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="width: 1000px;" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="detailsModalLabel">Approval Flow</h5>
@@ -293,9 +293,10 @@ active
                     <thead class="thead-light">
                         <tr>
                             <th>Request To</th>
-                            <th>Status</th>
                             <th>Granted Funds</th>
+                            <th>Status</th>
                             <th>Notes</th>
+                            <th>Updated At</th>
                         </tr>
                     </thead>
                     <tbody id="ApproverList">
@@ -443,9 +444,10 @@ active
                     $.each(response, function(index, activity) {
                         var row = $('<tr></tr>').attr('data-id', activity.id);
                         row.append($('<td></td>').text(activity.RequestTo));
+                        row.append($('<td></td>').html('IDR '+activity.approved_amount));
                         row.append($('<td></td>').html(activity.status));
-                        row.append($('<td></td>').html('Rp '+activity.approved_amount));
                         row.append($('<td></td>').text(activity.notes));
+                        row.append($('<td></td>').text(activity.updated_at));
                         $('#ApproverList').append(row);
                         $('#approval_notes').val(activity.notes);
                     });

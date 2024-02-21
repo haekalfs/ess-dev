@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/notification-center/{id}', 'NotificationsController@index');
         Route::post('/notification/read/true/{id}', 'HomeController@changeStatus')->name('status.read');
 
-        Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        Route::get('/home/{yearSelected?}', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
         Route::get('/logout', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
         //testing
         // Route::get('/testing', 'TimesheetController@calendar');
@@ -113,7 +113,7 @@ Route::middleware(['auth'])->group(function () {
 
         //myprofile
         Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
-        
+
 
         //leave
         Route::get('/leave/history/{yearSelected?}', 'LeaveController@history')->name('leave');
@@ -272,30 +272,29 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
         Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')->middleware('auth');
 
+        Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history');
+        Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req');
+        Route::get('/reimbursement/view/{id}', 'ReimburseController@view_details')->name('reimburse-view-req');
+        Route::get('/retrieveReimburseData/{id}', 'ReimburseController@retrieveReimburseData');
+        Route::get('/retrieveReimburseDataApproval/{id}', 'ReimburseController@retrieveReimburseDataApproval');
+        Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
 
-    Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history');
-    Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req');
-    Route::get('/reimbursement/view/{id}', 'ReimburseController@view_details')->name('reimburse-view-req');
-    Route::get('/retrieveReimburseData/{id}', 'ReimburseController@retrieveReimburseData');
-    Route::get('/retrieveReimburseDataApproval/{id}', 'ReimburseController@retrieveReimburseDataApproval');
-    Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
-
-    Route::post('/reimbursement/finance/approve/{item_id}', 'ReimburseController@approveReimburseDataFinance');
-    Route::post('/reimbursement/finance/reject/{item_id}', 'ReimburseController@rejectReimburseDataFinance');
-    Route::delete('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
-    Route::get('reimbursement/view/preview/{id}', 'ReimburseController@previewPdf')->name('pdf.preview');
-    Route::get('/download-receipt/reimbursement/{id}', 'ReimburseController@downloadReceipt');
+        Route::post('/reimbursement/finance/approve/{item_id}', 'ReimburseController@approveReimburseDataFinance');
+        Route::post('/reimbursement/finance/reject/{item_id}', 'ReimburseController@rejectReimburseDataFinance');
+        Route::delete('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
+        Route::get('reimbursement/view/preview/{id}', 'ReimburseController@previewPdf')->name('pdf.preview');
+        Route::get('/download-receipt/reimbursement/{id}', 'ReimburseController@downloadReceipt');
 
         Route::match(['get', 'post'], '/approval/reimburse/view/approve/{id}', 'ReimbursementApprovalController@approve')->name('reimburse.approve');
         Route::match(['get', 'post'], '/approval/reimburse/view/reject/{id}', 'ReimbursementApprovalController@reject')->name('reimburse.reject');
         Route::get('/approval/reimburse/view/{id}', 'ReimbursementApprovalController@view_details')->name('reimburse.approval-view-req');
 
-    Route::get('/retrieveApproverList/{id}', 'ReimbursementApprovalController@listApprover')->name('list-approver');
-    Route::get('/retrieveApproverHistory/{id}', 'ReimbursementApprovalController@approvalFlow');
+        Route::get('/retrieveApproverList/{id}', 'ReimbursementApprovalController@listApprover')->name('list-approver');
+        Route::get('/retrieveApproverHistory/{id}', 'ReimbursementApprovalController@approvalFlow');
 
-    Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement');
-    Route::get('/reimbursement/export/all/{month}/{year}', 'ReimburseController@export_excel');
-    Route::get('/reimbursement/export/request/{id}', 'ReimburseController@export');
+        Route::get('/reimbursement/manage/', 'ReimburseController@manage')->name('manage.reimbursement');
+        Route::post('/reimbursement/export/selected-items', 'ReimburseController@export_selected');
+        Route::get('/reimbursement/export/request/{id}', 'ReimburseController@export');
 
         Route::get('/getLocationProject/{id}', 'TimesheetController@getLocationProject')->name('list-location');
 
@@ -319,7 +318,9 @@ Route::middleware(['auth'])->group(function () {
 
 
         Route::post('/reimbursement/manage/disbursed/all', 'ReimburseController@disbursed_all');
+        Route::get('/reimbursement/manage/disbursed-item/{formId}', 'ReimburseController@disbursed_item');
         Route::get('/reimbursement/manage/view/{id}', 'ReimburseController@manage_view_details');
+        Route::get('/reimbursement/create_order_letter/{id}', 'ReimburseController@create_order_letter');
 
         //Execution
         Route::get('/company-regulation/commands', 'CommandsController@index')->name('commands');

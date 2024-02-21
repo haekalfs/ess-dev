@@ -67,6 +67,7 @@ body {
   color: #858796;
   text-align: left;
   background-color: #fff;
+  cursor: url('/cursor.ico'), auto;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {
@@ -9635,6 +9636,18 @@ a.text-warning:hover, a.text-warning:focus {
   color: #fc30f6 !important;
 }
 
+.text-green-tea {
+  color: #BFEA7C !important;
+}
+
+.text-green-donker {
+  color: #2D9596 !important;
+}
+
+.text-orange {
+  color: #F57D1F !important;
+}
+
 .text-cyan {
   color: #30d5f2 !important;
 }
@@ -10102,6 +10115,18 @@ a:focus {
 
 .border-left-project_b {
   border-left: 0.25rem solid #fc30f6 !important;
+}
+
+.border-left-po {
+    border-left: 0.25rem solid #BFEA7C !important;
+  }
+
+.border-left-pr {
+  border-left: 0.25rem solid #2D9596 !important;
+}
+
+.border-left-rn {
+  border-left: 0.25rem solid #F57D1F !important;
 }
 
 .border-bottom-warning {
@@ -11466,6 +11491,22 @@ body.sidebar-toggled footer.sticky-footer {
 }
 
 .p_assignment:hover .card {
+  animation-name: zoomIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.approval_po:hover .card {
+  animation-name: zoomIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+.approval_pr:hover .card {
+  animation-name: zoomIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+.approval_rn:hover .card {
   animation-name: zoomIn;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
