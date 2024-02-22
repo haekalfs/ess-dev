@@ -39,6 +39,8 @@ class HomeController extends Controller
      */
     public function index($typeSelected = null)
     {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
         $year = date('Y');
         $month = date('m') - 1;
 
@@ -54,26 +56,32 @@ class HomeController extends Controller
             Cache::put('quotes', $quotesArray, now()->addHours(24));
         }
 
-        // Get quotes data from the cache
-        $quotesArray = Cache::get('quotes');
+        // Check if today is Monday (1) or Friday (5)
+        $currentDayOfWeek = date('N');
 
-        if ($quotesArray && is_array($quotesArray) && count($quotesArray) > 0) {
-            // Select a random quote from the fetched data
-            $randomQuote = $quotesArray[array_rand($quotesArray)];
+        if ($currentDayOfWeek == 1 || $currentDayOfWeek == 5) {
+            // Get quotes data from the cache
+            $quotesArray = Cache::get('quotes');
 
-            // Set the quote and author separately in the session
-            if (isset($randomQuote['quote']) && isset($randomQuote['author'])) {
-                Session::flash('quotes', 'Daily Qoutes : ' . $randomQuote['quote'] . ' 🎉✨🔢');
-                Session::flash('author', 'Daily Qoutes : ' . $randomQuote['author']);
+            if ($quotesArray && is_array($quotesArray) && count($quotesArray) > 0) {
+                // Select a random quote from the fetched data
+                $randomQuote = $quotesArray[array_rand($quotesArray)];
+
+                // Set the quote and author separately in the session
+                if (isset($randomQuote['quote']) && isset($randomQuote['author'])) {
+                    if ($currentDayOfWeek == 1) {
+                        Session::flash('quotes', 'Monday Quotes : ' . $randomQuote['quote'] .' - ' . $randomQuote['author']);
+                    } elseif ($currentDayOfWeek == 5){
+                        Session::flash('quotes', 'Friday Quotes : ' . $randomQuote['quote'] .' - ' . $randomQuote['author']);
+                    }
+                } else {
+                    // Handle missing quote or author data from the file
+                    Session::flash('quotes', 'No quote available');
+                }
             } else {
-                // Handle missing quote or author data from the file
-                Session::flash('quotes', 'No quote available');
-                Session::flash('author', 'Unknown author');
+                // Handle empty or invalid data from the file or cache
+                Session::flash('quotes', 'No quotes available');
             }
-        } else {
-            // Handle empty or invalid data from the file or cache
-            Session::flash('quotes', 'No quotes available');
-            Session::flash('author', 'Unknown author');
         }
 
         $newsFeed = News_feed::orderBy('created_at', 'desc')->get();

@@ -54,7 +54,13 @@ active
                             @foreach($headline as $pic)
                             <tr>
                                 <td>{{ $pic->id }}</td>
-                                <td>{{ $pic->filename }}</td>
+                                <td>
+                                    @if(file_exists(public_path($pic->filepath)))
+                                        <img class="img-fluid" alt="100%x280" style="max-height: 200px;" src="{{ asset($pic->filepath) }}">
+                                    @else
+                                        <span>File not found</span>
+                                    @endif
+                                </td>
                                 <td>{{ $pic->title }}</td>
                                 <td>{!! $pic->subtitle !!}</td>
                                 <td class="text-center">
