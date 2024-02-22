@@ -153,7 +153,7 @@ class HomeController extends Controller
             ->sum('quota_left');
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
 
-        $headline = Headline::orderBy('updated_at', 'desc')->take(3)->get();
+        $headline = Headline::orderBy('updated_at', 'desc')->take(min(Headline::count(), 12))->get();
 
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();

@@ -277,61 +277,23 @@ $total_years_of_service = $diff->y;
                         <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
 
                             <div class="carousel-inner">
-                                <div class="carousel-item active">
+                                @foreach($headline->chunk(3) as $index => $chunk)
+                                <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
                                     <div class="row">
-                                        @foreach($headline as $index => $hl)
-                                            <div class="col-md-4 mb-3">
-                                                <div class="card">
-                                                    <img class="img-fluid" alt="100%x280" style="max-height: 250px;" src="{{ asset($hl->filepath) }}">
-                                                    <div class="card-body">
-                                                        <h4 class="card-title">{{ $hl->title }}</h4>
-                                                        <p class="card-text">{!! $hl->subtitle !!}</p>
-
-                                                    </div>
-
+                                        @foreach($chunk as $hl)
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card">
+                                                <img class="img-fluid" alt="100%x280" style="max-height: 250px;" src="{{ asset($hl->filepath) }}">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">{{ $hl->title }}</h4>
+                                                    <p class="card-text">{!! $hl->subtitle !!}</p>
                                                 </div>
                                             </div>
+                                        </div>
                                         @endforeach
-
                                     </div>
                                 </div>
-                                {{-- <div class="carousel-item">
-                                    <div class="row">
-
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card">
-                                                <img class="img-fluid" alt="100%x280" src="https://images.unsplash.com/photo-1532771098148-525cefe10c23?ixlib=rb-0.3.5&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjMyMDc0fQ&amp;s=3f317c1f7a16116dec454fbc267dd8e4">
-                                                <div class="card-body">
-                                                    <h4 class="card-title">Special title treatment</h4>
-                                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card">
-                                                <img class="img-fluid" alt="100%x280" src="https://images.unsplash.com/photo-1532715088550-62f09305f765?ixlib=rb-0.3.5&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjMyMDc0fQ&amp;s=ebadb044b374504ef8e81bdec4d0e840">
-                                                <div class="card-body">
-                                                    <h4 class="card-title">Special title treatment</h4>
-                                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card">
-                                                <img class="img-fluid" alt="100%x280" src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-0.3.5&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=1080&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjMyMDc0fQ&amp;s=0754ab085804ae8a3b562548e6b4aa2e">
-                                                <div class="card-body">
-                                                    <h4 class="card-title">Special title treatment</h4>
-                                                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div> --}}
+                                @endforeach
                             </div>
                         </div>
 

@@ -6,6 +6,7 @@ use App\Jobs\ReminderApprovalReimbursement;
 use App\Jobs\SendReimbursementReminderFinance;
 use App\Models\Reimbursement;
 use App\Models\Reimbursement_approval;
+use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\Usr_role;
@@ -46,8 +47,11 @@ class SendReminderApproval extends Command
      */
     public function handle()
     {
+        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
+            ->pluck('approver')->toArray();
+
         // Retrieve user IDs to approve reimbursement
-        $userToApprove = Reimbursement_approval::where('status', 20)
+        $userToApprove = Reimbursement_approval::where('status', 20)->whereIn('RequestTo', $isManager)
             ->groupBy('RequestTo')
             ->pluck('RequestTo');
 

@@ -197,6 +197,8 @@ $(document).on('click', '.btn-edit', function() {
         method: 'GET',
         success: function(response) {
             label.innerText = response.filename;
+            $('#editor').val(response.subtitle);
+            $('#title').val(response.title);
         },
         error: function(xhr) {
             // Handle error

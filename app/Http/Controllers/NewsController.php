@@ -16,7 +16,8 @@ class NewsController extends Controller
     public function index()
     {
         $newsFeed = News_feed::orderBy('created_at', 'desc')->get();
-        $headline = Headline::orderBy('updated_at', 'desc')->take(3)->get();
+        $headline = Headline::orderBy('updated_at', 'desc')->get();
+
         return view('news-feed.index', ['newsFeed' => $newsFeed, 'headline' => $headline]);
     }
 
@@ -82,9 +83,9 @@ class NewsController extends Controller
     public function updateHeadlineData(Request $request, $item_id)
     {
         $validator = Validator::make($request->all(), [
-            'receipt' => 'required',
-            'content' => 'required|string',
-            'title' => 'required'
+            'receipt' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust file validation rules as needed
+            'content' => 'sometimes|string',
+            'title' => 'sometimes|string',
         ]);
 
         if ($validator->fails()) {
@@ -92,34 +93,40 @@ class NewsController extends Controller
         }
 
         $item = Headline::find($item_id);
-        $item->title = $request->title;
-        $item->subtitle = $request->content;
 
+        // Update title and content if they are present in the request
+        if ($request->filled('title')) {
+            $item->title = $request->title;
+        }
+        if ($request->filled('content')) {
+            $item->subtitle = $request->content;
+        }
+
+        // Handle file upload if a new file is provided
         if ($request->hasFile('receipt')) {
-
-            // Delete the file from the public folder if it exists
-            if ($item->exists()) {
-                $filePath = public_path($item->filepath);
-
-                // Delete the file
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-            }
-
             $file = $request->file('receipt');
-            $receipt = $request->file('receipt');
-            $fileExtension = $receipt->getClientOriginalExtension();
+            $fileExtension = $file->getClientOriginalExtension();
             $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            $filePath = 'img/' . $fileName;
-            $upload_folder = public_path('img/');
+            $filePath = 'headline/' . $fileName;
+            $upload_folder = public_path('headline/');
 
             // Move the uploaded file to the storage folder
             $file->move($upload_folder, $fileName);
 
+            // Delete the old file if it exists
+            if ($item->filename) {
+                $oldFilePath = public_path($item->filepath);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+            }
+
+            // Update item with new file information
             $item->filename = $fileName;
             $item->filepath = $filePath;
         }
+
+        // Save the changes
         $item->save();
 
         return response()->json(['success' => 'Item updated successfully.']);
