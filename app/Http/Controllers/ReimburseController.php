@@ -291,7 +291,9 @@ class ReimburseController extends Controller
             $form = Reimbursement::find($uniqueId);
 
             foreach ($employees as $employee) {
-                dispatch(new NotifyReimbursementCreation($employee, $form));
+                if(in_array($employee->id, $isManager)){
+                    dispatch(new NotifyReimbursementCreation($employee, $form));
+                }
             }
             Session::flash('success',"Request has been submitted! You have to give a hard copies of the receipts to the finance department within 2 weeks");
             return redirect('/reimbursement/history');
