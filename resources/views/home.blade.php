@@ -190,6 +190,56 @@ $total_years_of_service = $diff->y;
             </div>
         </div>
     </div> --}}
+
+    <div class="col-xl-12 col-md-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+
+                            <div class="carousel-inner">
+                                @foreach($headline->chunk(3) as $index => $chunk)
+                                <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
+                                    <div class="row">
+                                        @foreach($chunk as $hl)
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card">
+                                                <img class="img-fluid" alt="100%x280" style="max-height: 200px;" src="{{ asset($hl->filepath) }}">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">{{ $hl->title }}</h4>
+                                                    <div class="card-text short-news" data-id="{{ $hl->id }}">{!! substr($hl->subtitle, 0, 150) !!}</div>
+                                                    <div class="card-text expanded-news" data-id="{{ $hl->id }}" style="display: none;">{!! $hl->subtitle !!}</div>
+                                                    <button class="btn btn-secondary btn-sm read-more-button" data-id="{{ $hl->id }}">Read More</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-right">
+                            <a class="btn btn-primary mb-3 mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
+                                <i class="fa fa-arrow-left"></i>
+                            </a>
+                            <a class="btn btn-primary mb-3 " href="#carouselExampleIndicators2" role="button" data-slide="next">
+                                <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-xl-12 col-md-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
@@ -242,89 +292,19 @@ $total_years_of_service = $diff->y;
             </div>
         </div>
     </div>
-
-    <div class="col-xl-12 col-md-12">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">News Information</h6>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <div class="row">
-                    {{-- <div class="col-md-6">
-                        <div class="lc-block position-relative">
-                            <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-                                <div class="carousel-inner">
-                                    @foreach($headline as $index => $hl)
-                                        <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
-                                            <img class="d-block w-100 img-fluid rounded shadow" src="{{ asset($hl->filepath) }}" alt="Slide {{ $index + 1 }}">
-                                        </div>
-                                    @endforeach
-                                </div>
-                                <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="sr-only">Previous</span>
-                                </a>
-                                <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="sr-only">Next</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div> --}}
-                    <div class="col-md-12">
-                        <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
-
-                            <div class="carousel-inner">
-                                @foreach($headline->chunk(3) as $index => $chunk)
-                                <div class="carousel-item{{ $index === 0 ? ' active' : '' }}">
-                                    <div class="row">
-                                        @foreach($chunk as $hl)
-                                        <div class="col-md-4 mb-3">
-                                            <div class="card">
-                                                <img class="img-fluid" alt="100%x280" style="max-height: 250px;" src="{{ asset($hl->filepath) }}">
-                                                <div class="card-body">
-                                                    <h4 class="card-title">{{ $hl->title }}</h4>
-                                                    <p class="card-text">{!! $hl->subtitle !!}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="col-12 text-right">
-                            <a class="btn btn-primary mb-3 mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
-                                <i class="fa fa-arrow-left"></i>
-                            </a>
-                            <a class="btn btn-primary mb-3 " href="#carouselExampleIndicators2" role="button" data-slide="next">
-                                <i class="fa fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    {{-- <div class="col-md-12">
-                        <div style="height:350px;" class="transparent-scroll2">
-                            <div class="card-body transparent-scroll">
-                                @foreach($newsFeed as $feed)
-                                    <h5 class="card-title font-weight-bold">{{ $feed->title }}</h5>
-                                    {!! $feed->content !!}
-                                    <div class="mb-4">
-                                        <a class="btn btn-sm btn-primary mt-0" data-id="{{ $feed->id }}" class="card-link">Read more</a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div> --}}
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <style>
+.shorter-text {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 200px; /* adjust the max-width to fit your design */
+    transition: max-height 0.5s; /* add smooth transition */
+}
+.expanded-text {
+    max-height: none !important; /* override max-height to show full text */
+}
 
     #header {
       width: 100%;
@@ -525,15 +505,33 @@ $total_years_of_service = $diff->y;
           font-size: 45%;
         }
     }
-        </style>
-        <script>
-            function redirectToPage() {
-                var selectedOption = document.getElementById("type").value;
-                var url = "{{ url('/home') }}"; // Specify the base URL
+</style>
+<script>
+    function redirectToPage() {
+        var selectedOption = document.getElementById("type").value;
+        var url = "{{ url('/home') }}"; // Specify the base URL
 
-                url += "/" + selectedOption;
+        url += "/" + selectedOption;
 
-                window.location.href = url; // Redirect to the desired page
-            }
-        </script>
+        window.location.href = url; // Redirect to the desired page
+    }
+    $(document).ready(function() {
+    $('.read-more-button').click(function() {
+        var id = $(this).data('id');
+        var $shortNews = $('.short-news[data-id="' + id + '"]');
+        var $expandedNews = $('.expanded-news[data-id="' + id + '"]');
+
+        if ($shortNews.is(':visible')) {
+            $shortNews.hide();
+            $expandedNews.show();
+            $(this).text('Read Less');
+        } else {
+            $shortNews.show();
+            $expandedNews.hide();
+            $(this).text('Read More');
+        }
+    });
+});
+
+</script>
 @endsection

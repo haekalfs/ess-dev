@@ -208,16 +208,22 @@ $(document).on('click', '.btn-edit', function() {
 });
 
 $(document).on('click', '#updateDataSubmit', function() {
-    var formData = new FormData($('#editItemForm')[0]); // Use FormData to include the file
+    // Get the content of the TinyMCE editor
+    var content = tinymce.get('editor').getContent();
+
+    // Include the content in your FormData
+    var formData = new FormData($('#editItemForm')[0]);
+    formData.append('content', content);
+
     var itemId = $('#item_id').val();
 
     // Make an AJAX request to update the project data
     $.ajax({
         url: '/news-feed/update-headline/' + itemId,
-        method: 'POST', // Use POST instead of PUT
+        method: 'POST',
         data: formData,
-        contentType: false, // Important for handling file uploads
-        processData: false, // Important for handling file uploads
+        contentType: false,
+        processData: false,
         success: function(response) {
             // Handle success
             console.log(response);

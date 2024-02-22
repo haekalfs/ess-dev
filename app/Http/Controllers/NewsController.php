@@ -84,8 +84,8 @@ class NewsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'receipt' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust file validation rules as needed
-            'content' => 'sometimes|string',
-            'title' => 'sometimes|string',
+            'content' => 'sometimes',
+            'title' => 'sometimes',
         ]);
 
         if ($validator->fails()) {
@@ -94,11 +94,13 @@ class NewsController extends Controller
 
         $item = Headline::find($item_id);
 
-        // Update title and content if they are present in the request
-        if ($request->filled('title')) {
+        // Update title if present in the request
+        if ($request->has('title')) {
             $item->title = $request->title;
         }
-        if ($request->filled('content')) {
+
+        // Update content if present in the request
+        if ($request->has('content')) {
             $item->subtitle = $request->content;
         }
 
@@ -131,6 +133,7 @@ class NewsController extends Controller
 
         return response()->json(['success' => 'Item updated successfully.']);
     }
+
 
     public function edit_post($id)
     {
