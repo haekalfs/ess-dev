@@ -426,7 +426,7 @@ active
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_location }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_mandays }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->approval_status->status_desc }}</td>
+                                <td style="border-bottom: none; border-top: none;" class="text-center">{!! $wf->approval_status->icon_html !!}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @else
@@ -434,7 +434,7 @@ active
                                 <td style="border-bottom: none; border-top: none;"><span class="shorter-text">{{ $wf->ts_task }}</span></td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_location }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->ts_mandays }}</td>
-                                <td style="border-bottom: none; border-top: none;">{{ $wf->approval_status->status_desc }}</td>
+                                <td style="border-bottom: none; border-top: none;" class="text-center">{!! $wf->approval_status->icon_html !!}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->requestTo->name }}</td>
                                 <td style="border-bottom: none; border-top: none;">{{ $wf->note }}</td>
                                 @endif

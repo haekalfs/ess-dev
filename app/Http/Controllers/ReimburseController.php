@@ -276,6 +276,7 @@ class ReimburseController extends Controller
 
             if(in_array($checkUserPost, [7, 8, 12])){
                 Reimbursement_approval::whereNotIn('RequestTo', [Auth::id()])->where('reimbursement_id', $uniqueId)->delete();
+                Reimbursement_approval::whereIn('RequestTo', [Auth::id()])->where('reimbursement_id', $uniqueId)->update(['status', 29]);
                 $result = Reimbursement_item::where('reimbursement_id', $uniqueId)->get();
                 foreach ($result as $item) {
                     // Remove the comma and convert the string to a float
@@ -296,7 +297,7 @@ class ReimburseController extends Controller
                 }
             }
             Session::flash('success',"Request has been submitted! You have to give a hard copies of the receipts to the finance department within 2 weeks");
-            return redirect('/reimbursement/history');
+            return redirect('/reimbursement/view/'. $uniqueId);
         } else {
             Session::flash('failed',"Error Database has Occured! Failed to create request!");
             return redirect('/reimbursement/history');
