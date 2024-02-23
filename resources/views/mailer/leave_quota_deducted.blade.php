@@ -1,4 +1,4 @@
-<p>Dear, {{ $name }}</p>
+<p>Dear {{ $name }},</p>
 
 <p>This announcement serves to inform you about an upcoming adjustment to your leave quotas due to the recent joint holidays. As you know, these holidays were designated as non-working days for all government offices and private companies, including ours.</p>
 <p>To ensure fairness and maintain a balanced leave distribution throughout the year, the Human Resources department has decided to deduct the corresponding number of leave days from all employees' annual leave quotas. This deduction will be reflected in your individual leave balances starting on 1 January.</p>

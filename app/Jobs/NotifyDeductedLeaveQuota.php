@@ -40,9 +40,7 @@ class NotifyDeductedLeaveQuota implements ShouldQueue
     public function handle()
     {
         $notification = new CutLeaveQuotaEmp($this->employee, $this->totalHolidays);
-        Mail::send('mailer.leave_quota_deducted', $notification->data(), function ($message) use ($notification) {
-            $message->to($notification->emailTo())
-                ->subject($notification->emailSubject());
-        });
+
+        Mail::send($notification);
     }
 }

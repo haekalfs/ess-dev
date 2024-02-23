@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyCancelLeaveRequest;
 use App\Jobs\NotifyLeaveApproval;
 use App\Mail\ApprovalLeave;
 use App\Models\Approval_status;
@@ -415,31 +416,50 @@ class LeaveController extends Controller
     }
 
     public function cancel_request($id)
-	{
-        $leaveRequest = Leave_request::where('id', $id)->first();
+    {
+        // Find the leave request by ID
+        $leaveRequest = Leave_request::findOrFail($id);
 
-        $addQuota = Leave_request_history::where('leave_request_id', $id)->where('req_by', Auth::user()->id)->get();
-        foreach ($addQuota as $aq) {
-            $returnQuota = Emp_leave_quota::find($aq->emp_leave_quota_id);
-            $totalQuotaUsed = $aq->quota_used;
+        // Retrieve and process leave request history records
+        $addQuotas = Leave_request_history::where('leave_request_id', $id)
+            ->where('req_by', Auth::user()->id)
+            ->get();
 
-            $returnQuota->quota_used -= $totalQuotaUsed;
-            $returnQuota->quota_left += $totalQuotaUsed;
+        foreach ($addQuotas as $addQuota) {
+            $returnQuota = Emp_leave_quota::findOrFail($addQuota->emp_leave_quota_id);
+
+            // Update quota values
+            $returnQuota->quota_used -= $addQuota->quota_used;
+            $returnQuota->quota_left += $addQuota->quota_used;
             $returnQuota->save();
         }
 
-        //delete
-        Leave_request_history::where('leave_request_id', $id)->where('req_by', Auth::user()->id)->delete();
+        // Get user IDs associated with the leave request approvals
+        $approvalIds = Leave_request_approval::where('leave_request_id', $leaveRequest->id)->pluck('RequestTo')->toArray();
 
-        //delete Leave Request
-        Leave_request::where('id', $id)->where('req_by', Auth::user()->id)->where('req_date', $leaveRequest->req_date)->where('leave_id', $leaveRequest->leave_id)->delete();
-        $deleteLRA = Leave_request_approval::where('leave_request_id', $id)->get();
-        foreach ($deleteLRA as $del) {
-            $del->delete();
+        // Get users who are approvers
+        $approvers = User::whereIn('id', $approvalIds)->get();
+
+        // Dispatch notification jobs to users
+        foreach ($approvers as $approver) {
+            dispatch(new NotifyCancelLeaveRequest($approver, $leaveRequest->user->name));
         }
 
+        // Delete leave request history records
+        Leave_request_history::where('leave_request_id', $id)
+            ->where('req_by', Auth::user()->id)
+            ->delete();
+
+        // Delete the leave request
+        Leave_request::where('id', $id)
+            ->where('req_by', Auth::user()->id)
+            ->delete();
+
+        // Delete associated leave request approvals
+        Leave_request_approval::where('leave_request_id', $id)->delete();
+
         return redirect()->back()->with('success', "Leave Request has been canceled!");
-	}
+    }
 
     public function manage(Request $request)
 	{

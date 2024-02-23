@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\BlastNewsEmployees;
 use App\Models\Headline;
 use App\Models\News_feed;
+use App\Models\User;
+use App\Models\Users_detail;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +70,18 @@ class NewsController extends Controller
             ]);
         } catch (Exception $e) {
             //do nothing
+        }
+
+        // Get users who are approvers with an active status
+        $employees = User::whereIn('id', function ($query) {
+            $query->select('user_id')
+                ->from('users_details')
+                ->where('status_active', 'Active');
+        })->get();
+
+        // Dispatch notification jobs to users
+        foreach ($employees as $employee) {
+            dispatch(new BlastNewsEmployees($employee, $request->title));
         }
 
         return redirect()->route('manage-news')->with('success', 'News feed created successfully.');

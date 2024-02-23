@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\NotifyLeaveApproval;
 use App\Jobs\NotifyLeaveApproved;
+use App\Jobs\NotifyRejectedLeaveRequest;
 use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
@@ -97,130 +98,127 @@ class LeaveApprovalController extends Controller
             'approval_notes' => 'sometimes'
         ]);
 
-        $timesheetApproversDir = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver');
-        $checkUserDir = $timesheetApproversDir->toArray();
-
-        $tsStatusId = '20';
-        $activity = 'Approved';
-
-        switch (true) {
-            case in_array(Auth::user()->id, $checkUserDir):
-                $tsStatusId = '29';
-                $activity = 'All Approved';
-                break;
-            default:
-                $tsStatusId = '20';
-                break;
+        if ($validator->fails()) {
+            Session::flash('failed',"Error Database has Occured! Failed to create request! You need to fill all the required fields");
+            return redirect('/approval/leave')->with('success', "You approved the leave request!");
         }
 
-        $approve = Leave_request_approval::where('id', $id);
+        $timesheetApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver')->toArray();
 
-        if ($validator->passes()) {
-            $notes = $request->approval_notes;
-            $approve->update(['status' => $tsStatusId, 'notes' => $notes]);
-        } else {
-            $approve->update(['status' => $tsStatusId]);
+        $tsStatusId = in_array(Auth::user()->id, $timesheetApproversDir) ? '29' : '20';
+        $activity = in_array(Auth::user()->id, $timesheetApproversDir) ? 'All Approved' : 'Approved';
+
+        $approve = Leave_request_approval::findOrFail($id);
+
+        $notes = $request->input('approval_notes', '');
+
+        $approve->update([
+            'status' => $tsStatusId,
+            'notes' => $notes
+        ]);
+
+        $leaveRequestId = $approve->leave_request_id;
+
+        $getLeaveReq = Leave_request::findOrFail($leaveRequestId);
+
+        if (!in_array($getLeaveReq->leave_id, [10, 20])) {
+            Emp_leave_quota::updateOrCreate([
+                'user_id' => $getLeaveReq->req_by,
+                'leave_id' => $getLeaveReq->leave_id
+            ], [
+                'once_in_service_years' => true
+            ]);
         }
 
-        $getIdLeaveReq = Leave_request_approval::where('id', $id)->pluck('leave_request_id')->groupBy('leave_request_id')->first();
-        $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
+        Notification_alert::create([
+            'user_id' => $getLeaveReq->req_by,
+            'message' => "Your Leave Request has been Approved!",
+            'importance' => 1
+        ]);
 
-        switch($getLeaveReq->leave_id){
-            case 10:
-            case 20:
-
-                break;
-            default:
-                Emp_leave_quota::updateOrCreate([
-                    'user_id' => $getLeaveReq->req_by,
-                    'leave_id' => $getLeaveReq->leave_id
-                ], [
-                    'once_in_service_years' => TRUE
-                ]);
-            break;
-        }
-
-        $entry = new Notification_alert();
-        $entry->user_id = $getLeaveReq->req_by;
-        $entry->message = "Your Leave Request has been Approved!";
-        $entry->importance = 1;
-        $entry->save();
-
-        $employees = User::where('id', $getLeaveReq->req_by)->get();
         $userName = Auth::user()->name;
 
-        ///only director send the emails
-        switch (true) {
-            case in_array(Auth::user()->id, $checkUserDir):
-                foreach ($employees as $employee) {
-                    dispatch(new NotifyLeaveApproved($employee, $userName));
-                }
-                break;
-            default:
-                $getIdApprover = Leave_request_approval::where('id', $id)->whereIn('RequestTo', $checkUserDir)->groupBy('RequestTo')->pluck('RequestTo')->toArray();
-                $employees = User::whereIn('id', $getIdApprover)->get();
-                $userName = $getLeaveReq->req_by;
+        if (in_array(Auth::user()->id, $timesheetApproversDir)) {
+            $requestor = User::where('id', $getLeaveReq->req_by)->get();
 
-                foreach ($employees as $employee) {
-                    dispatch(new NotifyLeaveApproval($employee, $userName));
-                }
-                break;
+            foreach ($requestor as $req) {
+                dispatch(new NotifyLeaveApproved($req, $userName));
+            }
+        } else {
+            $getIdApprovers = Leave_request_approval::where('leave_request_id', $leaveRequestId)
+                ->where('status', 15)
+                ->groupBy('RequestTo')
+                ->pluck('RequestTo')
+                ->toArray();
+
+            $employees = User::whereIn('id', $getIdApprovers)->get();
+
+            foreach ($employees as $employee) {
+                NotifyLeaveApproval::dispatch($employee, $getLeaveReq);
+            }
         }
 
-        return redirect('/approval/leave')->with('success',"You approved the leave request!");
+        return redirect('/approval/leave')->with('success', "You approved the leave request!");
     }
 
     public function reject(Request $request, $id)
     {
+        // Set the default timezone to Asia/Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
+        // Validate the request data
         $validator = Validator::make($request->all(), [
             'reject_notes' => 'sometimes'
         ]);
 
+        // Set the status ID for rejection
         $tsStatusId = '404';
 
-        $approve = Leave_request_approval::where('id', $id);
+        // Find the leave request approval by ID
+        $approve = Leave_request_approval::findOrFail($id);
 
+        //Mailer
+        $employee = User::find($approve->leave_request->req_by);
+        dispatch(new NotifyRejectedLeaveRequest($employee, $approve));
+
+        // Update the status and rejection notes if present
+        $approve->status = $tsStatusId;
         if ($validator->passes()) {
-            $notes = $request->reject_notes;
-            $approve->update(['status' => $tsStatusId, 'notes' => $notes]);
-        } else {
-            $approve->update(['status' => $tsStatusId]);
+            $approve->notes = $request->reject_notes;
         }
+        $approve->save();
 
-        $getIdLeaveReq = Leave_request_approval::where('id', $id)->pluck('leave_request_id')->groupBy('leave_request_id')->first();
-        $getLeaveReq = Leave_request::where('id', $getIdLeaveReq)->first();
+        // Get the leave request associated with the approval
+        $leaveRequestId = $approve->leave_request_id;
+        $leaveRequest = Leave_request::findOrFail($leaveRequestId);
 
-        $addQuota = Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->get();
-        foreach ($addQuota as $aq) {
-            $returnQuota = Emp_leave_quota::find($aq->emp_leave_quota_id);
-            $totalQuotaUsed = $aq->quota_used;
+        // Retrieve and process leave request history records
+        $addQuotas = Leave_request_history::where('leave_request_id', $leaveRequestId)
+            ->where('req_by', $leaveRequest->req_by)
+            ->get();
 
-            $returnQuota->quota_used -= $totalQuotaUsed;
-            $returnQuota->quota_left += $totalQuotaUsed;
+        foreach ($addQuotas as $addQuota) {
+            $returnQuota = Emp_leave_quota::findOrFail($addQuota->emp_leave_quota_id);
+
+            // Update quota values
+            $returnQuota->quota_used -= $addQuota->quota_used;
+            $returnQuota->quota_left += $addQuota->quota_used;
             $returnQuota->save();
         }
 
-        //delete
-        Leave_request_history::where('leave_request_id', $getIdLeaveReq)->where('req_by', $getLeaveReq->req_by)->delete();
+        // Delete leave request history records
+        Leave_request_history::where('leave_request_id', $leaveRequestId)
+            ->where('req_by', $leaveRequest->req_by)
+            ->delete();
 
-        // $employees = User::where('id', $user_timesheet)->get();
-
-        // //add notes to reject notification email
-        // foreach ($employees as $employee) {
-        //     $notification = new RejectedTimesheet($employee, $year, $month);
-        //     Mail::send('mailer.rejected_timesheet', $notification->data(), function ($message) use ($notification) {
-        //         $message->to($notification->emailTo())
-        //                 ->subject($notification->emailSubject());
-        //     });
-        // }
+        // Create a notification entry for the user
         $entry = new Notification_alert();
-        $entry->user_id = $getLeaveReq->req_by;
+        $entry->user_id = $leaveRequest->req_by;
         $entry->message = "Your Leave Request has been rejected!";
         $entry->importance = 404;
         $entry->save();
 
-        return redirect('/approval/leave')->with('failed',"You rejected the leave request!");
+        // Redirect back with a message
+        return redirect('/approval/leave')->with('failed', "You rejected the leave request!");
     }
 }

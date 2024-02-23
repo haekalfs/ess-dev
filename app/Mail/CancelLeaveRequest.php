@@ -2,36 +2,36 @@
 
 namespace App\Mail;
 
-use App\Models\Leave_request;
+use App\Models\Reimbursement;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class CutLeaveQuotaEmp extends Mailable
+class CancelLeaveRequest extends Mailable
 {
     protected $employee;
-    protected $totalHolidays;
+    protected $formCreator;
 
-    public function __construct(User $employee, int $totalHolidays)
+    public function __construct(User $employee, String $formCreator)
     {
         $this->employee = $employee;
-        $this->totalHolidays = $totalHolidays;
+        $this->formCreator = $formCreator;
     }
 
     public function build()
     {
-        $subject = 'Your Leave Quota will be deducted : '. $this->totalHolidays . 'day(s)';
-        $link = 'https://timereport.perdana.co.id/leave/history';
+        $subject = 'Leave Request has been Canceled';
+        $link = 'https://timereport.perdana.co.id/approval/leave/';
 
-        return $this->markdown('mailer.leave_quota_deducted')
+        return $this->markdown('mailer.leave_cancel_request')
                     ->subject($subject)
                     ->to($this->employee->email)
                     ->with([
                         'name' => $this->employee->name,
                         'email' => $this->employee->email,
-                        'totalHolidays' => $this->totalHolidays,
+                        'userName' => $this->formCreator,
                         'link' => $link
                     ]);
     }
