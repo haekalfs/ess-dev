@@ -393,6 +393,15 @@ class ReimburseController extends Controller
         return response()->json(['success' => 'Item updated successfully.']);
     }
 
+    public function confirmReceivableReceipt($id)
+    {
+        $item = Reimbursement_item::find($id);
+        $item->receivable_receipt = TRUE;
+        $item->save();
+
+        return response()->json(['success' => 'Item updated successfully.']);
+    }
+
     public function approveReimburseDataFinance(Request $request, $item_id)
     {
         $validator = Validator::make($request->all(), [

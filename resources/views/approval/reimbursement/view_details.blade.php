@@ -269,6 +269,9 @@ active
                     <a href="#" class="btn btn-sm btn-danger mr-2" id="rejectButton" onclick='askConfirm();'>
                         <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject
                     </a>
+                    <div id="loadingIndicatorView" style="display: none;" class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                     <a href="#" class="btn btn-sm btn-primary" id="approveButton" onclick='askConfirm();'>
                         <i class="fas fa-fw fa-check fa-sm text-white-50"></i> Approve
                     </a>
@@ -375,9 +378,9 @@ active
 
             var url;
 
-            if (action === "approve") {
+            if (action === 1) {
                 url = '/approval/reimburse/view/approve/' + test;
-            } else if (action === "reject") {
+            } else if (action === 2) {
                 url = '/approval/reimburse/view/reject/' + test;
             }
 
@@ -400,13 +403,17 @@ active
         // Event handler for the Approve button
         $('#approveButton').on('click', function(e) {
             e.preventDefault(); // Prevent the default navigation behavior
-            askConfirm("approve");
+            $('#approveButton').hide();
+            $('#loadingIndicatorView').show();
+            submitForm(1);
         });
 
         // Event handler for the Reject button
         $('#rejectButton').on('click', function(e) {
             e.preventDefault(); // Prevent the default navigation behavior
-            askConfirm("reject");
+            $('#rejectButton').hide();
+            $('#loadingIndicatorView').show();
+            submitForm(2);
         });
     });
 

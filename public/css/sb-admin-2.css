@@ -67,7 +67,7 @@ body {
   color: #858796;
   text-align: left;
   background-color: #fff;
-  cursor: url('/cursor.ico'), auto;
+  cursor: url('/cursor_2.ico'), auto;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {

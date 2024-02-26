@@ -280,6 +280,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/retrieveReimburseDataApproval/{id}', 'ReimburseController@retrieveReimburseDataApproval');
         Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
 
+        Route::get('/reimbursement/finance/confirm-receivable/{id}', 'ReimburseController@confirmReceivableReceipt');
         Route::post('/reimbursement/finance/approve/{item_id}', 'ReimburseController@approveReimburseDataFinance');
         Route::post('/reimbursement/finance/reject/{item_id}', 'ReimburseController@rejectReimburseDataFinance');
         Route::delete('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
