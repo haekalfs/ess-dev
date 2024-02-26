@@ -86,8 +86,8 @@ active
                         <td style="text-align: start; font-weight:500">: {{$med->user->name}}</td>
                     </tr>
                     <tr>
-                        <th>Hired Date</th>
-                        <td style="text-align: start; font-weight:500">: {{$med->user->users_detail->hired_date}}</td>
+                        <th>Service Year</th>
+                        <td style="text-align: start; font-weight:500" >: {{ $total_years_of_service }} Years</td>
                     </tr>
                     <tr>
                         <th>Position</th>
@@ -241,21 +241,26 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-sm zoom90">
-                        <tbody>
-							<tr>
-								<td>
-                                    <label for="password">Description :</label>
-                                    <textarea class="form-control flex" name="input_mdet_desc" placeholder="Description..." style="height: auto">{{ $md->mdet_desc }}</textarea>
-                                </td>
-							</tr>
-                            <tr>
-                                <td><label for="password">Amount Approved :</label>
-                                    <input class="form-control flex" name="input_mdet_amount_approved" placeholder="Amount Approved..." value="{{ $md->amount_approved }}" oninput="formatAmount(this)"/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="zoom90 m-2">
+                        <div>
+                            <label for="password">Amount of Employee's Requested :</label>
+                            <div class="input-group flex-nowrap">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="addon-wrapping">Rp. </span>
+                                </div>
+                                <input class="form-control flex"  value="{{ $md->mdet_amount }}" oninput="formatAmount(this)" disabled/>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label for="password">Amount Approved :</label>
+                            <div class="input-group flex-nowrap">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="addon-wrapping">Rp. </span>
+                                </div>
+                                <input class="form-control flex" name="input_mdet_amount_approved" placeholder="Amount Approved..." value="{{ $md->amount_approved }}" oninput="formatAmount(this)"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-sm btn-danger" data-dismiss="modal" aria-label="Close">Cancel</button>
@@ -299,13 +304,13 @@ active
                             </td>
                             <td colspan="2" class="text-start" >
                                 <span id="totalAmountApproved2" name="totalAmountApproved"></span>
-                                <input type="text" id="totalAmountApprovedInput" name="totalAmountApprovedInput" value="" hidden>
+                                <input type="text" id="totalAmountApprovedInput" name="totalAmountApprovedInput" value="" hidden required>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="3">
-                                <label for="password">Notes :</label>
-                                <textarea class="form-control flex" name="input_approve_note" placeholder="Notes..." ></textarea>
+                                <label for="password">Notes :<small class="text-danger">*</small></label>
+                                <textarea class="form-control flex" name="input_approve_note" placeholder="Notes..." required ></textarea>
                             </td>
                         </tr>
                     </tbody>
@@ -313,7 +318,7 @@ active
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
-                <input type="submit" class="btn btn-success btn-sm" value="Submit" id="btn-submit">
+                <input type="button" class=" btn-success btn-sm" value="Submit" id="btn-submit" onclick="validateForm()">
             </div>
         </div>
     </div>
@@ -351,7 +356,7 @@ active
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <label for="password">Notes :</label>
+                                <label for="password">Notes :<small class="text-danger">*</small></label>
                                 <textarea class="form-control flex" name="input_reject_note" placeholder="Notes..." ></textarea>
                             </td>
                         </tr>
@@ -441,6 +446,18 @@ document.addEventListener("DOMContentLoaded", function() {
 // Simpan nilai totalApprovedAmount dalam input tersembunyi saat menghitungnya
 document.getElementById('totalAmountApprovedInput').value = totalApprovedAmountInput;
 
-
+function validateForm() {
+        // Mendapatkan nilai input
+        var totalAmountApproved = document.getElementById("totalAmountApprovedInput").value;
+        
+        // Memeriksa apakah nilai input adalah 0
+        if (parseInt(totalAmountApproved) === 0) {
+            // Jika nilai input adalah 0, tampilkan pesan kesalahan
+            alert("Please fill the approved amount first");
+        } else {
+            // Jika nilai input bukan 0, submit formulir
+            document.getElementById("approve").submit();
+        }
+    }
 </script>
 @endsection

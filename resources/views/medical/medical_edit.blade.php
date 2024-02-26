@@ -73,7 +73,7 @@ active
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-borderless">
+                        <table class="table table-borderless font-weight-bold">
                             <tbody>
                                 <tr class="table-sm">
                                     <td>Name</td>
@@ -103,6 +103,27 @@ active
                                             @default
                                                 <span>Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
                                         @endswitch
+                                        {{-- Ambil waktu terakhir diperbarui dari database --}}
+                                        @php
+                                            $lastUpdated = $med->medical_approval->updated_at;
+                                            
+                                            // Hitung selisih waktu antara sekarang dan waktu terakhir diperbarui
+                                            $timeDiff = now()->diffInSeconds($lastUpdated);
+                                        @endphp
+
+                                        {{-- Tampilkan informasi waktu terakhir diperbarui --}}
+                                        <small class="text-danger font-italic">
+                                             Updated At : 
+                                            @if ($timeDiff < 60)
+                                                Just now
+                                            @elseif ($timeDiff < 3600)
+                                                {{ floor($timeDiff / 60) }} minutes ago
+                                            @elseif ($timeDiff < 86400)
+                                                {{ floor($timeDiff / 3600) }} hours ago
+                                            @else
+                                                {{ floor($timeDiff / 86400) }} days ago
+                                            @endif
+                                        </small>
                                     </td>
                                 </tr>
                             </tbody>
@@ -128,13 +149,13 @@ active
                         <table class="table table-borderless">
                                 <tr class="table-sm">
                                     <th>Status</th>
-                                    <td>:
+                                    <td class="font-weight-bold">:
                                         @switch($med->medical_payment->paid_status)
                                             @case(29)
-                                                <span>Approved <i class="fa fa-check-circle" style="color: #005eff" aria-hidden="true"></i></span>
+                                                <span class="text-success font-weight-bold">Paid <i class="fa fa-check-circle" aria-hidden="true"></i></span>
                                                 @break
                                             @case(20)
-                                                <span>Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                                <span>Waiting For Your Payment <i class="fa fa-spinner" aria-hidden="true"></i></span>
                                                 @break
                                             @case(404)
                                                 <span>Rejected<i class="fa fa-exclamation-circle" style="color: red" aria-hidden="true"></i></span>
@@ -146,10 +167,16 @@ active
                                 </tr>
                                 <tr class="table-sm">
                                     <th>Payment Date</th>
-                                    <td>: {{$med->medical_payment->payment_date}}</td>
+                                    <td class="font-weight-bold">: 
+                                        @if($med->medical_payment->payment_date == NULL)
+                                        <span class="text-danger">Not paid yet !</span>
+                                        @else
+                                        {{ $med->medical_payment->payment_date }}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr class="table-sm text-success font-weight-bold">
-                                    <th>Total Payment (Rp.)</th>
+                                    <th class="text-success font-weight-bold">Total Funds Provided (Rp.)</th>
                                     <td>: {{$med->medical_payment->total_payment}}</td>
                                 </tr>
                                 <tr class="table-sm">
@@ -193,7 +220,7 @@ active
                                 <th>Reciept Date Expired</th>
                                 <th>Description</th>
                                 <th>Amount Request</th>
-                                <th>Amount Approved</th>
+                                <th>Estimated Funds</th>
                                 <th>Action</th>
                         </thead>
                         <tbody>
@@ -215,7 +242,7 @@ active
                                         Rp. 0
                                     @endif
                                 </td>
-                                <td class="row-cols-2 justify-content-betwen text-center">
+                                <td class="row-col-2 justify-content-betwen text-center">
                                     @if ($med->medical_approval->status == 29)
                                         <a data-toggle="modal" data-target="#ModalStatus{{ $md->mdet_id }}" title="Status" class="btn btn-secondary btn-sm" >
                                             <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
@@ -459,7 +486,7 @@ function updateAttachmentLabel(id) {
      // Update total amount approved in input field
     var totalAmountInput = document.getElementById("totalAmountInput");
     if (totalAmountInput) {
-        totalAmountInput.value = totalAmount.toLocaleString().replace(/\./g, ".");
+        totalAmountInput.value = totalAmount.toLocaleString('id-ID');
     }
 
 

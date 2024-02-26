@@ -18,6 +18,7 @@ use App\Models\Medical_approval;
 use App\Jobs\NotifyMedicalRejected;
 use App\Jobs\NotifyMedicalApproved;
 use App\Models\Cutoffdate;
+// use App\Http\Controllers\GlobalDateTime;
 //medical
 use App\Models\Notification_alert;
 use App\Models\Position;
@@ -30,6 +31,7 @@ use App\Models\Timesheet;
 use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
+use App\Models\Users_detail;
 use App\Models\Usr_role;
 use Carbon\Carbon;
 use DateTime;
@@ -166,15 +168,14 @@ class ApprovalController extends Controller
                                 ->groupBy('user_timesheet', 'month_periode')
                                 ->pluck('user_timesheet')
                                 ->toArray();
-                            if($checkRowsLeft)
-                            {
+                            if ($checkRowsLeft) {
                                 $approvals = Timesheet_detail::select('*')
-                                ->where('RequestTo', Auth::user()->id)
-                                ->whereNotIn('ts_status_id', [29, 404, 30, 15])
-                                ->whereIn('user_timesheet', $checkRowsLeft)
-                                ->where('month_periode', $Year . intval($Month))
-                                ->groupBy('user_timesheet', 'month_periode')
-                                ->get();
+                                    ->where('RequestTo', Auth::user()->id)
+                                    ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                    ->whereIn('user_timesheet', $checkRowsLeft)
+                                    ->where('month_periode', $Year . intval($Month))
+                                    ->groupBy('user_timesheet', 'month_periode')
+                                    ->get();
                             } else {
                                 $approvals = Timesheet_detail::select('*')
                                     ->where('RequestTo', Auth::user()->id)
@@ -186,12 +187,12 @@ class ApprovalController extends Controller
                             }
                         } else {
                             $checkApprovalNonPC = Timesheet_detail::select('*')
-                            ->whereIn('user_timesheet', $Check)
-                            ->where('month_periode', $Year . intval($Month))
-                            ->groupBy('user_timesheet', 'month_periode')
-                            ->pluck('user_timesheet')
-                            ->toArray();
-                            if(!empty($checkApprovalNonPC)){
+                                ->whereIn('user_timesheet', $Check)
+                                ->where('month_periode', $Year . intval($Month))
+                                ->groupBy('user_timesheet', 'month_periode')
+                                ->pluck('user_timesheet')
+                                ->toArray();
+                            if (!empty($checkApprovalNonPC)) {
                                 $approvals = Timesheet_detail::select('*')
                                     ->where('RequestTo', Auth::user()->id)
                                     ->whereNotIn('ts_status_id', [29, 404, 30, 15])
@@ -201,11 +202,11 @@ class ApprovalController extends Controller
                                     ->get();
                             } else {
                                 $approvals = Timesheet_detail::select('*')
-                                ->where('month_periode', $Year . intval($Month))
-                                ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
-                                ->whereNotIn('ts_status_id', [29, 404, 30, 15])
-                                ->groupBy('user_timesheet', 'month_periode')
-                                ->get();
+                                    ->where('month_periode', $Year . intval($Month))
+                                    ->where('RequestTo', "xxxxxxxxxhaekalsxxxxx")
+                                    ->whereNotIn('ts_status_id', [29, 404, 30, 15])
+                                    ->groupBy('user_timesheet', 'month_periode')
+                                    ->get();
                             }
                         }
                     } else {
@@ -692,6 +693,20 @@ class ApprovalController extends Controller
         $med = Medical::findOrFail($id);
         $userMedId = $med->user_id;
         $medDet = Medical_details::where('medical_id', $med->id)->get();
+        $user = Users_detail::where('user_id', $userMedId)->first();
+   
+        $hired_date = $user->hired_date; // assuming $hired_date is in Y-m-d format
+        $current_date = date('Y-m-d'); // get the current date
+
+        // create DateTime objects from the hired_date and current_date values
+        $hired_date_obj = new DateTime($hired_date);
+        $current_date_obj = new DateTime($current_date);
+
+        // calculate the difference between the hired_date and current_date
+        $diff = $current_date_obj->diff($hired_date_obj);
+
+        // get the total number of years from the difference object
+        $total_years_of_service = $diff->y;
 
         $medAppUpdate = Medical_approval::where('medical_id', $med->id)
             ->whereIn('RequestTo', [Auth::user()->id])
@@ -707,14 +722,17 @@ class ApprovalController extends Controller
         $medBalance = Emp_medical_balance::where('user_id', $med->user_id)->first();
 
         $position = Position::all();
-        return view('medical.medical_edit_approval',
-        [
-            'med' => $med,
-            'medDet' => $medDet,
-            'medAppUpdate' => $medAppUpdate,
-            'medBalance' => $medBalance,
-            'position' => $position,
-        ]);
+        return view(
+            'medical.medical_edit_approval',
+            [
+                'med' => $med,
+                'medDet' => $medDet,
+                'medAppUpdate' => $medAppUpdate,
+                'medBalance' => $medBalance,
+                'position' => $position,
+                'total_years_of_service' => $total_years_of_service
+            ]
+        );
     }
 
     public function update_approval(Request $request, $mdet_id, $medical_id)
@@ -723,10 +741,11 @@ class ApprovalController extends Controller
         $medDet = Medical_details::where('mdet_id', $medical_id)->first();
         $request->validate([
             'input_mdet_amount_approved' => 'sometimes',
-            'input_mdet_desc' => 'sometimes',
         ]);
         $medDet->amount_approved = $request->input_mdet_amount_approved;
-        $medDet->mdet_desc = $request->input_mdet_desc;
+        // $medDet->mdet_desc = $request->input_mdet_desc;
+
+        
         $medDet->save();
 
         return redirect()->back()->with('success', 'Medical Approval Edit Success');
@@ -754,21 +773,17 @@ class ApprovalController extends Controller
         $medApprove->total_amount_approved = $totalAmountApproved;
         $medApprove->save();
 
-        $currentYear = Carbon::now()->year;
 
+        $MedId = $user_med->id;
 
+        $employees = User::where('id', $userMedId)->get();
+        $userName = Auth::user()->name;
 
+        // foreach ($employees as $employee) {
+        //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
+        // }
 
-            $MedId = $user_med->id;
-            $employees = User::where('id', $userMedId)->get();
-            $userName = Auth::user()->name;
-
-            // foreach ($employees as $employee) {
-            //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
-            // }
-
-            return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId ");
-
+        return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId ");
     }
 
     public function reject_medical(Request $request, $id)

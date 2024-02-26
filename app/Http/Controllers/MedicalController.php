@@ -12,6 +12,7 @@ use App\Models\Medical_approval;
 use App\Models\Medical_details;
 use App\Models\Medical_payment;
 use App\Models\User;
+use App\Models\Users_detail;
 use App\Models\Timesheet_approver;
 use App\Models\Emp_medical_balance;
 use App\Models\Position;
@@ -55,21 +56,23 @@ class MedicalController extends Controller
         if ($yearSelected) {
             $currentYear = $yearSelected;
         }
-        
-        $med = Medical::where('user_id', $user->id)->whereYear('med_req_date', $currentYear)->get();
-// dd($med->medical_approval);
-        $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
-        ->first();
 
-        
-        return view('medical.medical', 
-        [
-            'med' => $med,
-            'emp_medical_balance' => $emp_medical_balance,
-            'total_years_of_service' => $total_years_of_service,
-            'yearSelected' => $yearSelected,
-            'yearsBefore' => $yearsBefore,
-        ]);
+        $med = Medical::where('user_id', $user->id)->whereYear('med_req_date', $currentYear)->get();
+        // dd($med->medical_approval);
+        $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
+            ->first();
+
+
+        return view(
+            'medical.medical',
+            [
+                'med' => $med,
+                'emp_medical_balance' => $emp_medical_balance,
+                'total_years_of_service' => $total_years_of_service,
+                'yearSelected' => $yearSelected,
+                'yearsBefore' => $yearsBefore,
+            ]
+        );
     }
     public function entry()
     {
@@ -162,7 +165,7 @@ class MedicalController extends Controller
         foreach ($attachments as $key => $attachment) {
 
             $extension = $attachment->getClientOriginalExtension();
-            $filename = $attachment_num . $request_date . $key .'.'. $extension;
+            $filename = $attachment_num . $request_date . $key . '.' . $extension;
 
             $amount = str_replace('.', '', $amounts[$key]); // Menghilangkan titik
             // $result = $amount * 0.8;
@@ -191,12 +194,12 @@ class MedicalController extends Controller
         $medical_approve->RequestTo = $userToApprove;
         $medical_approve->status = 15;
         $medical_approve->save();
-        
+
         $medical_payment = new Medical_payment();
         $medical_payment->medical_id = $nextId;
         $medical_payment->payment_approver = $payment_approval->approver;
         $medical_payment->paid_status = 15;
-        $medical_payment->save(); 
+        $medical_payment->save();
 
         $employees = User::where('id', $userToApprove)->get();
         $userName = Auth::user()->name;
@@ -208,7 +211,7 @@ class MedicalController extends Controller
         return redirect('/medical/history')->with('success', 'Medical Reimburse Add successfully, Dont forget to bring the original receipt to the Finance Department.');
     }
 
-    
+
     public function delete_med_all($id)
     {
         Medical::findOrFail($id)->delete();
@@ -217,13 +220,14 @@ class MedicalController extends Controller
 
         return redirect()->back()->with('success', 'Medical Reimburse Delete successfully');
     }
-    
+
     public function edit($id)
     {
         $user_info = User::find(Auth::user()->id);
         $med = Medical::findOrFail($id);
-        $medDet = Medical_details::where('medical_id', $med->id)->get();
-        $medApp = Medical_approval::where('medical_id', $med->id)->get();
+        $medDet = Medical_details::where('medical_id', $id)->get();
+        $medApp = Medical_approval::where('medical_id', $id)->get();
+        $medPay = Medical_payment::where('medical_id', $id)->get();
 
         // $medButton = Medical_approval::where('medical_id', $med->id)
         //     ->whereIn('status', [20, 29])
@@ -233,15 +237,15 @@ class MedicalController extends Controller
         return view(
             'medical.medical_edit',
             [
-                
                 'med' => $med,
                 'user_info' => $user_info,
                 'medDet' => $medDet,
-                'medApp' => $medApp
+                'medApp' => $medApp,
+                'medPay' => $medPay
             ]
         );
     }
-    
+
     public function update_medDetail(Request $request, $mdet_id, $medical_id)
     {
 
@@ -265,7 +269,6 @@ class MedicalController extends Controller
 
             $attach_tujuan = 'med_pic';
             $inputAttach->storeAs('public/' . $attach_tujuan, $filename);
-
         } elseif ($medDet->mdet_attachment) {
             $filename = $medDet->mdet_attachment;
         }
@@ -299,7 +302,7 @@ class MedicalController extends Controller
         $templatePath = public_path('medical_temp.docx');
         // $key = API_key::where('id', 1)->first();
         // dd($medDet);
-        
+
         $templateProcessor = new TemplateProcessor($templatePath);
         $templateProcessor->setValue('emp_id', $user_info->users_detail->employee_id);
         $templateProcessor->setValue('emp_name', $user_info->name);
@@ -366,22 +369,22 @@ class MedicalController extends Controller
     {
         $med = Medical::find($id);
         // $medDet = Medical_details::where('medical_id', $med->id)->get();
-        $medApp = Medical_approval::where('medical_id', $med->id)->get();
-        
+
         $med->med_total_amount = $request->totalAmountInput;
         $med->save();
 
-        foreach($medApp as $mA){
-            $mA->status = 15;
-            $mA->save();
-
-        }
+        $medApp = Medical_approval::where('medical_id', $id)->firstOrFail();
+        $medApp->status = 15;
+        $medApp->approval_notes = NULL;
+        $medApp->approval_date = NULL;
+        $medApp->total_amount_approved = NULL;
+        $medApp->save();
 
         return redirect('/medical/history')->with('success', 'Re-Submit Your Medical Successfully.');
     }
 
 
-// Medical Review By Finance Manager
+    // Medical Review By Finance Manager
     public function review_fm(Request $request)
     {
         $approve = Timesheet_approver::where('id', 15)->first();
@@ -399,9 +402,9 @@ class MedicalController extends Controller
         $statusPay = $request->input('status_pay', '20'); // Mengambil nilai status_pay dari permintaan, defaultnya '20' (Unpaid)
 
         $query = Medical::whereIn('id', $medReview)
-        ->with(['medical_payment' => function ($query) use ($approval) {
-            $query->where('payment_approver', $approval);
-        }])
+            ->with(['medical_payment' => function ($query) use ($approval) {
+                $query->where('payment_approver', $approval);
+            }])
             ->where(function ($query) use ($request) {
                 // Filter by user_id
                 if ($request->has('user_id') && $request->user_id !== '1') {
@@ -434,20 +437,64 @@ class MedicalController extends Controller
 
         // dd($med);
         $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
-        ->first();
-        return view('medical.review_medical', 
-        [
-            'med' => $med, 
-            'user' => $user, 
-            'years' => $years, 
-            'month' => $month, 
-            'currentMonth' => $currentMonth,
-            'emp_medical_balance' => $emp_medical_balance
-        ]);
-
+            ->first();
+        return view(
+            'medical.review.review_medical',
+            [
+                'med' => $med,
+                'user' => $user,
+                'years' => $years,
+                'month' => $month,
+                'currentMonth' => $currentMonth,
+                'emp_medical_balance' => $emp_medical_balance
+            ]
+        );
     }
 
-    public function paid($id)
+    public function detail_review($id)
+    {
+        $med = Medical::findOrFail($id);
+        $userMedId = $med->user_id;
+        $medDet = Medical_details::where('medical_id', $med->id)->get();
+        $user = Users_detail::where('user_id', $userMedId)->first();
+
+        $hired_date = $user->hired_date; // assuming $hired_date is in Y-m-d format
+        $current_date = date('Y-m-d'); // get the current date
+
+        // create DateTime objects from the hired_date and current_date values
+        $hired_date_obj = new GlobalDateTime($hired_date);
+        $current_date_obj = new GlobalDateTime($current_date);
+
+        // calculate the difference between the hired_date and current_date
+        $diff = $current_date_obj->diff($hired_date_obj);
+
+        // get the total number of years from the difference object
+        $total_years_of_service = $diff->y;
+
+        $medAppUpdate = Medical_approval::where('medical_id', $med->id)
+            ->whereIn('RequestTo', [Auth::user()->id])
+            ->whereNotIN('status', [15])
+            ->orderByDesc('updated_at')
+            ->orderBy('medical_id')
+            ->first();
+
+        $currentYear = Carbon::now()->year;
+        $medBalance = Emp_medical_balance::where('user_id', $userMedId)
+            ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
+            ->first();
+
+        $position = Position::all();
+        return view(
+            'medical.review.view_details_review',
+            [
+                'med' => $med,
+                'medBalance' => $medBalance,
+                'medDet' => $medDet,
+            ]
+        );
+    }
+
+    public function paid(Request $request, $id)
     {
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
         $userId = $user_med->user_id;
@@ -455,38 +502,40 @@ class MedicalController extends Controller
         $employees = User::where('id', $userId)->get();
         $userName = Auth::user()->name;
 
- // // Cari $medBalance yang masih aktif dan memiliki tahun yang sama
-        // $medBalance = Emp_medical_balance::where('user_id', $userMedId)
-        //     ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
-        //     ->first();
+        $totalAmountPaid = $request->input_total_paid;
+        $currentYear = Carbon::now()->year;
+        // Cari $medBalance yang masih aktif dan memiliki tahun yang sama
+        $medBalance = Emp_medical_balance::where('user_id', $userId)
+            ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
+            ->first();
 
-        //     $balance = $medBalance->medical_balance;
-        //     if (is_numeric($balance)) {
-        //         $balanceAmount = str_replace('.', '', $balance);
-        //         $AmountApproved = str_replace('.', '', $totalAmountApproved);
-        //         $total = $balanceAmount - $AmountApproved;
-        //         $formattedTotal = number_format($total, 0, ',', '.');
+        $balance = $medBalance->medical_balance;
+        if (is_numeric($balance)) {
+            $balanceAmount = str_replace('.', '', $balance);
+            $AmountApproved = str_replace('.', '', $totalAmountPaid);
+            $total = $balanceAmount - $AmountApproved;
+            $formattedTotal = number_format($total, 0, ',', '.');
 
-        //         $medBalance->medical_remaining = $formattedTotal;
-        //         $medBalance->save();
-        //     } else {
-        //         // Handle the case when $balance is non-numeric
-        //     }
+            $medBalance->medical_remaining = $formattedTotal;
+            $medBalance->save();
+        } else {
+            // Handle the case when $balance is non-numeric
+        }
 
-        //     $deducted = $medBalance->medical_deducted;
-        //     if (is_numeric($deducted) && is_numeric($totalAmountApproved)) {
-        //         $deductedAmount = str_replace('.', '', $deducted);
-        //        ggg $AmountApproved = str_replace('.', '', $totalAmountApproved);
-        //         $totalDeducted = $deductedAmount + $AmountApproved;
-        //         $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
+        $deducted = $medBalance->medical_deducted;
+        if (is_numeric($deducted) && is_numeric($totalAmountPaid)) {
+            $deductedAmount = str_replace('.', '', $deducted);
+            $AmountApproved = str_replace('.', '', $totalAmountPaid);
+            $totalDeducted = $deductedAmount + $AmountApproved;
+            $formattedDeductedTotal = number_format($totalDeducted, 0, ',', '.');
 
-        //         $medBalance->medical_deducted = $formattedDeductedTotal;
-        //         $medBalance->save();
-        //     } else {
-        //         // Handle the case when $deducted or $totalAmountApproved is non-numeric
-        //     }
+            $medBalance->medical_deducted = $formattedDeductedTotal;
+            $medBalance->save();
+        } else {
+            // Handle the case when $deducted or $totalAmountApproved is non-numeric
+        }
 
-        $med = Medical::where('id', $id)->first();
+        $med = Medical_payment::where('medical_id', $id)->firstOrFail();
         $med->paid_status = 29;
         $med->save();
 
@@ -494,11 +543,11 @@ class MedicalController extends Controller
         //     dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
         // }
         // $userName = $user_med->user->name; // Mengambil nama pengguna terkait
-        
+
         return redirect('/medical/review')->with('success', "You Have Paid $userName Medical Reimbursement ");
     }
 
-// Medical Manage
+    // Medical Manage
     public function index_manage(Request $request)
     {
         $query = Emp_medical_balance::query();
@@ -543,7 +592,7 @@ class MedicalController extends Controller
         $ExpirationDate = date($year . '-12-31');
 
         // Membuat entri baru dalam tabel Medicals
-        $medBalance = new Emp_medical_balance ();
+        $medBalance = new Emp_medical_balance();
         $medBalance->user_id = $request->input_user_id;
         $medBalance->medical_balance = $request->input_balance;
         $medBalance->medical_remaining = $request->input_balance;
@@ -554,7 +603,7 @@ class MedicalController extends Controller
 
         return redirect()->back()->with('success', 'Medical Balance Add Success.');
     }
-    
+
     public function edit_balance(Request $request, $id)
     {
         $request->validate([
