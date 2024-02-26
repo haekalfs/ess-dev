@@ -289,15 +289,28 @@ active
                 <div class="modal-body text-start d-flex justify-content-center">
                     <div class="row">
                         <div class="col-8 col-sm-6">
-                            {{-- @foreach($emp_medical_balance as $medBalance) --}}
                             <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                                
+                                <thead>
+                                    <tr colspan="2" class="text-center font-weight-bold">Total Request Amount</tr>
+                                </thead>
+                                <tr>
+                                    {{-- <td colspan="2" class="text-center font-weight-bold">Total</td> --}}
+                                    <td class="text-start text-danger font-weight-bold">
+                                        <span id="totalAmountDisplay" name="totalAmountDisplay"></span>
+                                    </td>
+                                </tr>
                             </table>
-                            {{-- @endforeach --}}
                         </div>
                         <div class="col-4 col-sm-6">
                             <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                                
+                                <thead>
+                                    <tr colspan="2" class="text-center font-weight-bold">Total Amount Approved</tr>
+                                </thead>
+                                <tr>
+                                    <td colspan="2" class="text-start text-success font-weight-bold" id="totalAmountApproved">
+                                    <span id="totalAmountApprovedDisplay" name="totalAmountApprovedDisplay"></span>
+                                </td>
+                                </tr>
                             </table>
                         </div>
                         <table class="table table-borderless table-sm" width="100%" cellspacing="0">
