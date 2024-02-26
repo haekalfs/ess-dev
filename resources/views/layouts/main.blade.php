@@ -128,11 +128,11 @@
                         <a class="collapse-item" href="/approval">Approval</a>
                         @else
                         @endusr_acc
-                        {{-- @usr_acc(203)
+                        @usr_acc(203)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/approval">Manage Approval</a>
+                        <a class="collapse-item" href="/approval-history/">Approval History</a>
                         @else
-                        @endusr_acc --}}
+                        @endusr_acc
                     </div>
                 </div>
             </li>

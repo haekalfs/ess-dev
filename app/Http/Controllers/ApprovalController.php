@@ -18,6 +18,7 @@ use App\Models\Medical_approval;
 use App\Jobs\NotifyMedicalRejected;
 use App\Jobs\NotifyMedicalApproved;
 use App\Models\Cutoffdate;
+use App\Models\Log;
 // use App\Http\Controllers\GlobalDateTime;
 //medical
 use App\Models\Notification_alert;
@@ -87,6 +88,15 @@ class ApprovalController extends Controller
             ->whereNotIn('status', [20, 29, 404])
             ->count();
         return view('approval.main', ['tsCount' => $tsCount, 'pCount' => $pCount, 'reimbCount' => $reimbCount, 'leaveCount' => $leaveCount, 'medCount' => $medCount]);
+    }
+
+    public function history($yearSelected = NULL)
+    {
+        $accessController = new AccessController();
+        $result = $accessController->usr_acc(204);
+
+        $history = Log::all();
+        return view('approval.history', ['history' => $history]);
     }
 
     public function timesheet_approval(Request $request)
@@ -383,6 +393,14 @@ class ApprovalController extends Controller
         $entry->type = "2A";
         $entry->save();
 
+        Log::create([
+            'user_id' => Auth::id(),
+            'type' => 2,
+            'message' => 'Timesheet has been approved by '. Auth::user()->name,
+            'intended_for' => $user_timesheet,
+            'importance' => 1
+        ]);
+
         //perlu dirombak karena jika reject salah satu, quota ini harus di deduct// removed 5 year term
         $weekendReplacementInCurrentMonth = Surat_penugasan::where('user_id', $user_timesheet)->whereMonth('ts_date', $month)->whereYear('ts_date', $year)->count();
         $countWeekendReplacement = Emp_leave_quota::where('user_id', $user_timesheet)
@@ -463,6 +481,14 @@ class ApprovalController extends Controller
         $entry->month_periode = $year . intval($month);
         $entry->type = "2A";
         $entry->save();
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'type' => 2,
+            'message' => 'Timesheet has been rejected by '. Auth::user()->name,
+            'intended_for' => $user_timesheet,
+            'importance' => 1
+        ]);
 
         return redirect('/approval/timesheet/p')->with('failed', "You rejected $user_timesheet timereport!");
     }
@@ -699,7 +725,7 @@ class ApprovalController extends Controller
         $userMedId = $med->user_id;
         $medDet = Medical_details::where('medical_id', $med->id)->get();
         $user = Users_detail::where('user_id', $userMedId)->first();
-   
+
         $hired_date = $user->hired_date; // assuming $hired_date is in Y-m-d format
         $current_date = date('Y-m-d'); // get the current date
 
@@ -750,7 +776,7 @@ class ApprovalController extends Controller
         $medDet->amount_approved = $request->input_mdet_amount_approved;
         // $medDet->mdet_desc = $request->input_mdet_desc;
 
-        
+
         $medDet->save();
 
         return redirect()->back()->with('success', 'Medical Approval Edit Success');

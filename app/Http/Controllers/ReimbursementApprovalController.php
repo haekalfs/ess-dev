@@ -7,6 +7,7 @@ use App\Jobs\NotifyReimbursementCreation;
 use App\Jobs\NotifyReimbursementPartiallyApproved;
 use App\Jobs\NotifyReimbursementPriorApproval;
 use App\Jobs\NotifyReimbursementRejected;
+use App\Models\Log;
 use App\Models\Notification_alert;
 use App\Models\Reimbursement;
 use App\Models\Reimbursement_approval;
@@ -362,6 +363,14 @@ class ReimbursementApprovalController extends Controller
         $entry->type = 5;
         $entry->save();
 
+        Log::create([
+            'user_id' => Auth::id(),
+            'type' => 4,
+            'message' => 'Reimbursement Request has been approved by '. Auth::user()->name,
+            'intended_for' => $reimbursement->f_req_by,
+            'importance' => 1
+        ]);
+
         return redirect()->back()->with('success', 'You approved the leave request!');
     }
 
@@ -431,6 +440,14 @@ class ReimbursementApprovalController extends Controller
         $employee = User::find($reimbReq->f_req_by);
         $formApproval = Reimbursement_approval::where('reimb_item_id', $item_id)->where('RequestTo', Auth::id())->first();
         dispatch(new NotifyReimbursementRejected($employee, $formApproval));
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'type' => 4,
+            'message' => 'Reimbursement Request has been rejected by '. Auth::user()->name,
+            'intended_for' => $reimbItem->request->f_req_by,
+            'importance' => 1
+        ]);
 
         return response()->json(['success' => 'Items rejected successfully.']);
     }

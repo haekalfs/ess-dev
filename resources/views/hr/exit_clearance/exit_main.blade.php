@@ -35,9 +35,9 @@ active
 <div class="card shadow mb-4 zoom90">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Users Resign List</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Users' Resignation List</h6>
         <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#addModal"><i class="fas fa-plus fa-sm text-white-50"></i> Add Resign User</a>
+            <a class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#addModal"><i class="fas fa-plus fa-sm text-white-50"></i> Add Resigned User</a>
         </div>
     </div>
     <!-- Card Body -->
@@ -46,30 +46,20 @@ active
             <table class="table table-bordered table-hover" id="dataTableUser">
                 <thead class="thead-light">
                     <tr>
+                        <th>No.</th>
                         <th>Emp ID</th>
-                        <th>User ID</th>
-                        <th>Nama</th>
-                        <th>Status Active</th>
-                        <th>Position</th>
+                        <th>Name</th>
                         <th>Hired Date</th>
                         <th>Resign Date</th>
                         <th width="80px">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody>@php $no = 1; @endphp
                     @foreach($data as $p)
                     <tr>
+                        <td>{{ $no++ }}</td>
                         <td>{{$p->users_detail->employee_id}}</td>
-                        <td>{{$p->id }}</td>
                         <td>{{$p->name}}</td>
-                        <td class="text-center">
-                            @if ($p->users_detail->status_active == "Active")
-                                <i class="fas fa-user-check" style="color: #0053fa;"></i>
-                            @else
-                                <i class="fas fa-user-times" style="color: #ff0000;"></i>
-                            @endif
-                        </td>
-                        <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
                         <td>{{$p->users_detail->hired_date}}</td>
                         <td>{{$p->users_detail->resignation_date}}</td>
                         <td>
