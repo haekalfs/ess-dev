@@ -127,10 +127,10 @@ active
                                     <td>
                                     @switch($m->medical_payment->paid_status)
                                         @case(20)
-                                            Unpaid <i class="fa fa-times-circle" aria-hidden="true"></i>
+                                            <span class="text-danger font-weight-bold">Unpaid <i class="fa fa-times-circle" aria-hidden="true"></i></span>
                                             @break
                                         @case(29)
-                                            Paid <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                            <span class="text-success font-weight-bold">Paid  <i class="fa fa-check-circle" aria-hidden="true"></i></span>
                                             @break
                                         @default
                                             Status Tidak Dikenal</span>
@@ -139,7 +139,7 @@ active
                                     <td>{{ $m->med_payment }}</td>
                                     <td>Rp. {{ $m->medical_approval->total_amount_approved }}</td>
                                     <td class="text-center">
-                                        <button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $m->id }}"><i class="fa fa-eye" aria-hidden="true"></i> View</button>
+                                        <a title="View" class="btn btn-primary btn-sm" type="button" href="/medical/review/view/{{ $m->id }}"><i class="fa fa-eye" aria-hidden="true"></i> View</a>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -153,85 +153,7 @@ active
 </div>
 </form>
 
-{{-- Modal Add Balance --}}
-@foreach ($med as $m)
-<form method="POST" action="/medical/review/{{ $m->id }}" enctype="multipart/form-data" >
-@method('PUT')
-@csrf
-    <div class="modal fade" id="viewModal{{ $m->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="balanceEditModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg zoom90" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title  text-white" id="staticBackdropLabel">Medical Request MED_{{ $m->id }}</h5>
-                    <button type="button" class="close" style="color: white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-start d-flex justify-content-center">
-                    <div class="row">
-                        <div class="col-8 col-sm-6">
-                            {{-- @foreach($emp_medical_balance as $medBalance) --}}
-                            <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                                <tr>
-                                    <th>Medical Balance</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->medical_balance }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Medical Remaining</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->medical_remaining }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Medical Deducted</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->medical_deducted }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Active Periode</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->active_periode }}</td>
-                                </tr>
-                            </table>
-                            {{-- @endforeach --}}
-                        </div>
-                        <div class="col-4 col-sm-6">
-                            <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                                <tr>
-                                    <th>Name</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $m->user->name }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Request Date</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $m->med_req_date }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Total</th>
-                                    <td style="text-align: start; font-weight:500">: Rp. {{ $m->medical_approval->total_amount_approved }}</td>
-                                </tr>
-                                <tr>
-                                    <th>No Account Bank</th>
-                                    <td style="text-align: start; font-weight:500">: {{ $m->user->users_detail->usr_bank_account }}  An. {{ $m->user->users_detail->usr_bank_account_name }} </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                            <tr>
-                                <td style="text-align: center;">
-                                    <div class="form-group justify-content-center" style="display: flex; align-items: center;">
-                                        <label  for="password" style="height: 15px; text-align: center; margin-right: 10px;">Total Payable (Rp.) :</label>
-                                        <input class="form-control flex" name="input_total_paid" id="total_paid" value="{{ $m->medical_approval->total_amount_approved }}" style="width: 200px; height: 25px;" oninput="formatCurrency(this)"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-sm btn-danger" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-sm btn-success">Paid</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-@endforeach
+
 <script>
     function formatCurrency(input) {
     // Mengambil nilai input

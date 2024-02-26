@@ -265,6 +265,7 @@ Route::middleware(['auth'])->group(function () {
 
         // medical review FM
         Route::get('/medical/review', 'MedicalController@review_fm')->middleware('auth');
+        Route::get('/medical/review/view/{id}', 'MedicalController@detail_review')->middleware('auth');
         Route::put('/medical/review/{id}', 'MedicalController@paid')->middleware('auth');
 
         //medical approval

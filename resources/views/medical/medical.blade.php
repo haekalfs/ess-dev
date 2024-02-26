@@ -100,8 +100,18 @@ active
                             <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->medical_deducted }}</td>
                         </tr>
                         <tr>
-                          <th>Active Periode</th>
-                          <td style="text-align: start; font-weight:500">: {{ $emp_medical_balance->active_periode }}</td>
+                          <th>Remaining Active Period</th>
+                           <td style="text-align: start; font-weight:500">: 
+                                @php
+                                    // Mendapatkan tanggal aktif dan tanggal sekarang
+                                    $activePeriode = \Carbon\Carbon::parse($emp_medical_balance->expiration);
+                                    $now = \Carbon\Carbon::now();
+                                    
+                                    // Menghitung selisih bulan
+                                    $diffInMonths = $activePeriode->diffInMonths($now);
+                                @endphp
+                                <span class="text-success font-weight-bold">{{ $diffInMonths }} Months Left </span>
+                            </td>
                         </tr>
                     </tr>
                 </table>
@@ -121,7 +131,7 @@ active
     <!-- Card Body -->
     <div class="card-body">
         <table class="table table-bordered table-hover " id="dataTable">
-                <thead>
+                <thead class="thead-light">
                     <tr class="text-center">
                         <th>Request Number</th>
                         <th>Request Date</th>
@@ -140,13 +150,13 @@ active
                         <td class="text-center">
                             @switch($q->medical_approval->status)
                                 @case(29)
-                                    Approved By {{ $q->medical_approval->user->name }}  <i class="fa fa-check" aria-hidden="true"></i>
+                                    Approved By {{ $q->medical_approval->user->name }}  <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                                     @break
                                 @case(15)
                                     Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i>
                                     @break
                                 @case(404)
-                                    Rejected By {{ $q->medical_approval->user->name }}  <i class="fa fa-exclamation" aria-hidden="true"></i>
+                                    Rejected By {{ $q->medical_approval->user->name }}  <i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i>
                                     @break
                                 @default
                                     Status Tidak Dikenal
@@ -161,23 +171,25 @@ active
                                     Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i>
                                     @break
                                 @case(29)
-                                    Paid <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    <span class="text-success font-weight-bold">Paid <i class="fa fa-check-circle" aria-hidden="true"></i></span>
                                     @break
                                 @case(404)
-                                    Rejected <i class="fa fa-exclamation" aria-hidden="true"></i>
+                                    <span class="text-success font-weight-bold">Rejected <i class="fa fa-exclamation-circle" aria-hidden="true"></i></span>
                                     @break
                                 @default
                                     Unknown</span>
                             @endswitch
                         </td>
-                        <td class="cols-2 justify-content-betwen text-center">
+                        <td class="col-2 justify-content-betwen text-center">
                             @if ($q->medical_approval->status == 29 || $q->medical_approval->status == 404)
                                 <a class="btn btn-primary btn-sm" type="button" href="/medical/edit/{{ $q->id }}" id="manButton"><i class="fa fa-eye" aria-hidden="true"></i> View</i></a>
                             @else
                                 <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                <i class="fas fa-fw fa-edit justify-content-center"></i>
-                            </a>
-                                <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                                    <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
+                                </a>
+                                <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" >
+                                    <i class="fas fa-fw fa-trash justify-content"></i> Cancel
+                                </a>
                             @endif
                         </td>
                     </tr>
