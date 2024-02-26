@@ -145,11 +145,22 @@ class ReimbursementApprovalController extends Controller
             ->groupBy('reimb_item_id')
             ->count();
 
+
+        $approverRows = Reimbursement_approval::where('reimbursement_id', $id)
+            ->groupBy('RequestTo')
+            ->select('RequestTo')
+            ->get(); // Fetch the rows from the database
+
+        $approversArrayName = [];
+        foreach ($approverRows as $approver) {
+            $approversArrayName[] = $approver->user->name;
+        }
+
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
-        return view('approval.reimbursement.view_details', ['reimbursement' => $reimbursement, 'reimbursement_items_count' => $reimbursement_items_count, 'reimbursement_approval' => $reimbursement_approval,'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('approval.reimbursement.view_details', ['reimbursement' => $reimbursement, 'approversArrayName' => $approversArrayName, 'reimbursement_items_count' => $reimbursement_items_count, 'reimbursement_approval' => $reimbursement_approval,'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function listApprover($id)

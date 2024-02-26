@@ -22,7 +22,7 @@ class NotifyNewsEmployees extends Mailable
 
     public function build()
     {
-        $subject = 'Breaking News : '. $this->titleOfNews;
+        $subject = 'News Update : '. $this->titleOfNews;
         $link = 'https://timereport.perdana.co.id/home';
 
         return $this->markdown('mailer.news_information')

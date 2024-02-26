@@ -292,10 +292,9 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">HR Access:</h6>
                         <a class="collapse-item" href="/hr/compliance/">B1. Compliance</a>
-                        <a class="collapse-item" href="/manage/api_key">B2. API Key Setting</a>
-                        <a class="collapse-item" href="/vendor-list">B3. Vendor List</a>
-                        <a class="collapse-item" href="/news-feed/manage">B4. News Feed</a>
-                        <a class="collapse-item" href="/company-regulation/commands">B5. Commands</a>
+                        <a class="collapse-item" href="/vendor-list">B2. Vendor List</a>
+                        <a class="collapse-item" href="/news-feed/manage">B3. News Feed</a>
+                        <a class="collapse-item" href="/company-regulation/commands">B4. Commands</a>
                         {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>

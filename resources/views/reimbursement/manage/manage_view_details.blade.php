@@ -99,14 +99,14 @@ active
                         <div class="col-md-12">
                             <table class="table table-borderless">
                                 <tbody>
+                                    <?php
+                                        $commaDelimitedApprovers = implode(', ', $approversArrayName);
+                                    ?>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Requesting Approval to</td>
-                                        <td>:
+                                        <td class="long-text" title="{{ $commaDelimitedApprovers }}">:
                                             <?php
-                                                $uniqueApprovers = array_unique($reimbursement->approval->pluck('RequestTo')->toArray());
-                                                $commaDelimitedApprovers = implode(', ', $uniqueApprovers);
-                                                $commaDelimitedApprovers = ucwords($commaDelimitedApprovers);
-                                                echo $commaDelimitedApprovers;
+                                            echo $commaDelimitedApprovers;
                                             ?>
                                         </td>
                                     </tr>

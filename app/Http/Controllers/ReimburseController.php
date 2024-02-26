@@ -819,13 +819,23 @@ class ReimburseController extends Controller
         $reimbursement = Reimbursement::find($id);
         $f_id = $reimbursement->f_id;
 
+        $approverRows = Reimbursement_approval::where('reimbursement_id', $id)
+            ->groupBy('RequestTo')
+            ->select('RequestTo')
+            ->get(); // Fetch the rows from the database
+
+        $approversArrayName = [];
+        foreach ($approverRows as $approver) {
+            $approversArrayName[] = $approver->user->name;
+        }
+
         $emp = User::all();
         $financeManager = Timesheet_approver::find(15);
 
         $reimbIds = Reimbursement_approval::where('reimbursement_id', $id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->select('reimb_item_id')->pluck('reimb_item_id')->toArray();
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->whereNotIn('id', $reimbIds)->get();
 
-        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'approversArrayName' => $approversArrayName,'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function downloadReceipt($Id)
