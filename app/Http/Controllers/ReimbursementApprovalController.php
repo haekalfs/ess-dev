@@ -41,7 +41,7 @@ class ReimbursementApprovalController extends Controller
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
             //should add more position
-                if (in_array($checkUserPost, [8, 12, 6, 22])) {
+                if (in_array($checkUserPost, [8, 12, 7, 6, 22])) {
                     $Check = DB::table('reimbursement_approval')
                     ->select('reimb_item_id')
                     ->whereNotIn('RequestTo', $ts_approver)

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\BlastNewsEmployees;
 use App\Models\Headline;
 use App\Models\News_feed;
+use App\Models\User;
+use App\Models\Users_detail;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +19,8 @@ class NewsController extends Controller
     public function index()
     {
         $newsFeed = News_feed::orderBy('created_at', 'desc')->get();
-        $headline = Headline::all();
+        $headline = Headline::orderBy('updated_at', 'desc')->get();
+
         return view('news-feed.index', ['newsFeed' => $newsFeed, 'headline' => $headline]);
     }
 
@@ -29,6 +33,7 @@ class NewsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
+            'thumbnail' => 'required',
             'content' => 'required|string',
         ]);
 
@@ -43,26 +48,40 @@ class NewsController extends Controller
         }
 
         try {
-            // Store the file if it is provided
-            // if ($request->hasFile('img')) {
-            //     $headline = $request->file('img');
-            //     $fileExtension = $headline->getClientOriginalExtension();
-            //     $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            //     $filePath = 'img/' . $fileName;
-            //     $upload_folder = public_path('img/');
+            if ($request->hasFile('thumbnail')) {
 
-            //     // Move the uploaded file to the storage folder
-            //     $headline->move($upload_folder, $fileName);
+                $file = $request->file('thumbnail');
+                $receipt = $request->file('thumbnail');
+                $fileExtension = $receipt->getClientOriginalExtension();
+                $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
+                $filePath = 'headline/' . $fileName;
+                $upload_folder = public_path('headline/');
 
-            News_feed::create([
+                // Move the uploaded file to the storage folder
+                $file->move($upload_folder, $fileName);
+            }
+
+            Headline::create([
                 'id' => $uniqueId,
                 'title' => $request->title,
-                'content' => $request->content,
-                'date_released' => date('Y-m-d'),
-                'created_by' => Auth::id()
+                'subtitle' => $request->content,
+                'filename' => $fileName,
+                'filepath' => $filePath
             ]);
         } catch (Exception $e) {
             //do nothing
+        }
+
+        // Get users who are approvers with an active status
+        $employees = User::whereIn('id', function ($query) {
+            $query->select('user_id')
+                ->from('users_details')
+                ->where('status_active', 'Active');
+        })->get();
+
+        // Dispatch notification jobs to users
+        foreach ($employees as $employee) {
+            dispatch(new BlastNewsEmployees($employee, $request->title));
         }
 
         return redirect()->route('manage-news')->with('success', 'News feed created successfully.');
@@ -79,7 +98,9 @@ class NewsController extends Controller
     public function updateHeadlineData(Request $request, $item_id)
     {
         $validator = Validator::make($request->all(), [
-            'receipt' => 'required'
+            'receipt' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust file validation rules as needed
+            'content' => 'sometimes',
+            'title' => 'sometimes',
         ]);
 
         if ($validator->fails()) {
@@ -88,35 +109,46 @@ class NewsController extends Controller
 
         $item = Headline::find($item_id);
 
+        // Update title if present in the request
+        if ($request->has('title')) {
+            $item->title = $request->title;
+        }
+
+        // Update content if present in the request
+        if ($request->has('content')) {
+            $item->subtitle = $request->content;
+        }
+
+        // Handle file upload if a new file is provided
         if ($request->hasFile('receipt')) {
-
-            // Delete the file from the public folder if it exists
-            if ($item->exists()) {
-                $filePath = public_path($item->filepath);
-
-                // Delete the file
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-            }
-
             $file = $request->file('receipt');
-            $receipt = $request->file('receipt');
-            $fileExtension = $receipt->getClientOriginalExtension();
+            $fileExtension = $file->getClientOriginalExtension();
             $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            $filePath = 'img/' . $fileName;
-            $upload_folder = public_path('img/');
+            $filePath = 'headline/' . $fileName;
+            $upload_folder = public_path('headline/');
 
             // Move the uploaded file to the storage folder
             $file->move($upload_folder, $fileName);
 
+            // Delete the old file if it exists
+            if ($item->filename) {
+                $oldFilePath = public_path($item->filepath);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+            }
+
+            // Update item with new file information
             $item->filename = $fileName;
             $item->filepath = $filePath;
         }
+
+        // Save the changes
         $item->save();
 
         return response()->json(['success' => 'Item updated successfully.']);
     }
+
 
     public function edit_post($id)
     {

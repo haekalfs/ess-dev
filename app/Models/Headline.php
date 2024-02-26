@@ -9,5 +9,5 @@ class Headline extends Model
 {
     use HasFactory;
     protected $table = "headline";
-    protected $fillable = ['id', 'filename', 'filepath'];
+    protected $fillable = ['id', 'title', 'subtitle', 'filename', 'filepath'];
 }

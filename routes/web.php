@@ -91,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
         //Approval
         Route::get('/approval', 'ApprovalController@index')->name('approval.main');
         Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary');
-        Route::get('/approval/leave', 'LeaveApprovalController@leave_approval')->name('approval.leave');
+        Route::get('/approval/leave/{yearSelected?}', 'LeaveApprovalController@leave_approval')->name('approval.leave');
         Route::get('/approval/reimburse/{yearSelected?}', 'ReimbursementApprovalController@reimbursement_approval')->name('approval.reimburse');
         Route::get('/approval/medical', 'ApprovalController@medical_approval')->name('approval.medical');
 
@@ -129,6 +129,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/leave/manage/update/{id}', 'LeaveController@update_leave_emp');
         Route::post('/leave/manage/add_quota/{id}', 'LeaveController@add_leave_quota')->name('addLeaveEmp');
         Route::post('/leave/manage/add_employee', 'LeaveController@add_leave_employee')->name('addLeaveEmployee');
+        Route::get('/leave/manage/delete/{id}', 'LeaveController@delete_leave_emp');
 
 
 
@@ -280,6 +281,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/retrieveReimburseDataApproval/{id}', 'ReimburseController@retrieveReimburseDataApproval');
         Route::post('/reimbursement/edit/save/{usr_id}', 'ReimburseController@updateReimburseData');
 
+        Route::get('/reimbursement/finance/confirm-receivable/{id}', 'ReimburseController@confirmReceivableReceipt');
         Route::post('/reimbursement/finance/approve/{item_id}', 'ReimburseController@approveReimburseDataFinance');
         Route::post('/reimbursement/finance/reject/{item_id}', 'ReimburseController@rejectReimburseDataFinance');
         Route::delete('reimbursement/history/cancel/{id}', 'ReimburseController@cancel_request')->name('cancel_reimburse');
@@ -327,9 +329,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/company-regulation/commands', 'CommandsController@index')->name('commands');
         Route::get('/get-data/timesheet-absence', 'AttendanceController@downloadLogData')->name('getData');
         Route::get('/send-data/timesheet-absence', 'AttendanceController@sendData')->name('sendData');
+        Route::put('/myprofile/cv_upload/{id}', 'MyProfileController@upload_cv')->name('Upload CV');
     });
     //Non
     Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
     Route::post('/reimbursement/create/submit', 'ReimburseController@submit_request')->name('reimburse-submission');
-    Route::put('/myprofile/cv_upload/{id}', 'MyProfileController@upload_cv')->name('Upload CV');
 });

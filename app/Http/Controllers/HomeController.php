@@ -10,6 +10,7 @@ use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Timesheet;
 use App\Models\Timesheet_approver;
+use App\Models\Timesheet_detail;
 use App\Models\Usr_role;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -38,6 +39,11 @@ class HomeController extends Controller
      */
     public function index($typeSelected = null)
     {
+        // Set the default time zone to Jakarta
+        date_default_timezone_set("Asia/Jakarta");
+        $year = date('Y');
+        $month = date('m') - 1;
+
         // Check if the quotes data is cached
         if (!Cache::has('quotes')) {
             // Read the contents of the JSON file if not cached
@@ -50,26 +56,32 @@ class HomeController extends Controller
             Cache::put('quotes', $quotesArray, now()->addHours(24));
         }
 
-        // Get quotes data from the cache
-        $quotesArray = Cache::get('quotes');
+        // Check if today is Monday (1) or Friday (5)
+        $currentDayOfWeek = date('N');
 
-        if ($quotesArray && is_array($quotesArray) && count($quotesArray) > 0) {
-            // Select a random quote from the fetched data
-            $randomQuote = $quotesArray[array_rand($quotesArray)];
+        if ($currentDayOfWeek == 1 || $currentDayOfWeek == 5) {
+            // Get quotes data from the cache
+            $quotesArray = Cache::get('quotes');
 
-            // Set the quote and author separately in the session
-            if (isset($randomQuote['quote']) && isset($randomQuote['author'])) {
-                Session::flash('quotes', 'Daily Qoutes : ' . $randomQuote['quote'] . ' 🎉✨🔢');
-                Session::flash('author', 'Daily Qoutes : ' . $randomQuote['author']);
+            if ($quotesArray && is_array($quotesArray) && count($quotesArray) > 0) {
+                // Select a random quote from the fetched data
+                $randomQuote = $quotesArray[array_rand($quotesArray)];
+
+                // Set the quote and author separately in the session
+                if (isset($randomQuote['quote']) && isset($randomQuote['author'])) {
+                    if ($currentDayOfWeek == 1) {
+                        Session::flash('quotes', 'Monday Quotes : ' . $randomQuote['quote'] .' - ' . $randomQuote['author']);
+                    } elseif ($currentDayOfWeek == 5){
+                        Session::flash('quotes', 'Friday Quotes : ' . $randomQuote['quote'] .' - ' . $randomQuote['author']);
+                    }
+                } else {
+                    // Handle missing quote or author data from the file
+                    Session::flash('quotes', 'No quote available');
+                }
             } else {
-                // Handle missing quote or author data from the file
-                Session::flash('quotes', 'No quote available');
-                Session::flash('author', 'Unknown author');
+                // Handle empty or invalid data from the file or cache
+                Session::flash('quotes', 'No quotes available');
             }
-        } else {
-            // Handle empty or invalid data from the file or cache
-            Session::flash('quotes', 'No quotes available');
-            Session::flash('author', 'Unknown author');
         }
 
         $newsFeed = News_feed::orderBy('created_at', 'desc')->get();
@@ -102,7 +114,36 @@ class HomeController extends Controller
         // Count the number of records
         $countAssignments = $findAssignment->count();
 
+        // Retrieve the employees with the most total assignments
+        $employeesWithMostAssignments = Project_assignment_user::select('user_id')
+        ->where(function ($query) use ($startDate, $endDate) {
+            $query->where('periode_start', '<=', $endDate->format('Y-m-d'))
+                ->where('periode_end', '>=', $startDate->format('Y-m-d'));
+        })
+        ->selectRaw('COUNT(*) as total_assignments')
+        ->groupBy('user_id')
+        ->orderByDesc('total_assignments')
+        ->take(5)
+        ->pluck('user_id');
 
+        // Retrieve the total mandays for the top 5 employees
+        $topEmployeesWithMandays = DB::table('timesheet_details')
+        ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
+        ->whereIn('user_timesheet', $employeesWithMostAssignments)
+        ->whereIn('created_at', function ($query) use ($year, $month) {
+            $query->select(DB::raw('MAX(created_at)'))
+                ->from('timesheet_details')
+                ->whereColumn('timesheet_details.user_timesheet', '=', 'user_timesheet')
+                ->where('ts_status_id', 29)
+                ->where('timesheet_details.month_periode', $year . intval($month))
+                ->groupBy('user_timesheet', 'ts_mandays');
+        })
+        ->whereNotIn('ts_task', ['Other', 'Sick', 'HO'])
+        ->where('ts_status_id', 29)
+        ->where('timesheet_details.month_periode', $year . intval($month))
+        ->groupBy('user_timesheet')
+        ->take(5)
+        ->get();
 
         $reimbursementCount = Reimbursement::where('f_req_by', Auth::id())->whereYear('created_at', $currentYear)->count();
 
@@ -120,10 +161,7 @@ class HomeController extends Controller
             ->sum('quota_left');
         $totalQuota = $empLeaveQuotaAnnual + $empLeaveQuotaFiveYearTerm + $empLeaveQuotaWeekendReplacement;
 
-        $headline = Headline::all();
-
-        $year = date('Y');
-        $month = date('m') - 1;
+        $headline = Headline::orderBy('updated_at', 'desc')->take(min(Headline::count(), 12))->get();
 
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();

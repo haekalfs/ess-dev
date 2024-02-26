@@ -7,8 +7,19 @@ active
 @endsection
 
 @section('content')
-<h1 class="h3 mb-2 zoom90 font-weight-bold text-gray-800"><i class="fas fa-plane-departure"></i> Leave Approval</h1>
-<p class="zoom90 mb-4">Approval Page.</p>
+<div class="zoom90 d-sm-flex align-items-center justify-content-between">
+    <div>
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-plane-departure"></i> Leave Approval</h1>
+        <p class="mb-4">Approval Page.</p>
+    </div>
+    <div>
+        <select class="form-control" id="year" name="year" required onchange="redirectToPage()">
+            @foreach (array_reverse($yearsBefore) as $year)
+                <option value="{{ $year }}" @if ($year == $yearSelected) selected @endif>{{ $year }}</option>
+            @endforeach
+        </select>
+    </div>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -39,7 +50,7 @@ active
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
-                <thead>
+                <thead class="thead-light">
                     <tr>
                         <th>Name</th>
                         <th>Request Date</th>
@@ -53,10 +64,10 @@ active
                 <tbody>
                     @foreach ($approvals as $approval)
                     <tr>
-                        <td>{{ $approval->leave_request->req_by }}</td>
+                        <td>{{ $approval->leave_request->user->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($approval->created_at)->format('d-M-Y') }}</td>
-                        <td>{{ $approval->leave_request->leave->description }}</td>
-                        <td>
+                        <td class="font-weight-bold text-primary">{{ $approval->leave_request->leave->description }}</td>
+                        <td class="font-weight-bold text-danger">
                             @php
                                 $dates = explode(',', $approval->leave_request->leave_dates);
                                 $currentMonth = null;
@@ -100,14 +111,14 @@ active
                                 <div class="dropdown-menu" aria-labelledby="approveDropdown">
                                     <form action="/approval/leave/approve/{{ $approval->id }}" method="post">
                                         @csrf
-                                        <div class="col-md-12 zoom90">
+                                        <div class="col-md-12">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <div class="form-group">
                                                                 <label for="approval_notes">Notes :</label>
-                                                                <textarea type="text" class="form-control" style="width: 300px;" name="approval_notes"></textarea>
+                                                                <textarea type="text" class="form-control" style="width: 500px;" name="approval_notes"></textarea>
                                                             </div>
                                                             <div class="text-right">
                                                                 <button type="submit" id="approve" class="btn btn-sm btn-primary">Send & Approve</button>
@@ -128,7 +139,7 @@ active
                                 <div class="dropdown-menu" aria-labelledby="rejectDropdown">
                                     <form action="/approval/leave/reject/{{ $approval->id }}" method="post">
                                         @csrf
-                                        <div class="col-md-12 zoom90">
+                                        <div class="col-md-12">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="row">
@@ -161,4 +172,14 @@ active
     width: 300px;
 }
 </style>
+<script>
+    function redirectToPage() {
+        var selectedOption = document.getElementById("year").value;
+        var url = "{{ url('/approval/leave') }}"; // Specify the base URL
+
+        url += "/" + selectedOption;
+
+        window.location.href = url; // Redirect to the desired page
+    }
+</script>
 @endsection

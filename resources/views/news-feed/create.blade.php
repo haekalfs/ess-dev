@@ -37,10 +37,19 @@ active
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-9">
                             <div class="form-group">
                                 <label for="comment">Title :</label>
                                 <input type="text" id="title" name="title" style="border: none; background: none; font-size: 24px; width: 100%; outline: none; border-bottom: 0.25px solid rgb(215, 215, 215);">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="receipt">Thumbnail :</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="thumbnailInput" name="thumbnail" aria-describedby="inputthumbnail" onchange="displayFileName()">
+                                    <label class="custom-file-label" for="receiptInput" id="thumbnail-label">Choose file</label>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -65,6 +74,12 @@ active
     ],
     ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
   });
+  function displayFileName() {
+        const fileInput = document.getElementById("thumbnailInput");
+        const fileName = fileInput.files[0].name;
+        const label = document.getElementById("thumbnail-label");
+        label.innerText = fileName;
+    }
 </script>
 @endsection
 

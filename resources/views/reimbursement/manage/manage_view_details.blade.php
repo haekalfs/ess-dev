@@ -116,11 +116,11 @@ active
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;">Date Requested</td>
-                                        <td>: {{ $reimbursement->created_at }}</td>
+                                        <td>: {{ $reimbursement->created_at->format('d-M-Y') }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 180px;">Last Updated</td>
-                                        <td>: {{ $reimbursement->updated_at }}</td>
+                                        <td>: {{ $reimbursement->updated_at->format('d-M-Y') }}</td>
                                     </tr>
                                     <tr class="table-sm">
                                         <td style="width: 150px;" class="text-success font-weight-bold">Paid On</td>
@@ -173,10 +173,24 @@ active
                                     <td class="text-danger font-weight-bold">Rp. {{ $usr->amount }}</td>
                                     <td class="text-success font-weight-bold">Rp. {{ $usr->approved_amount ?? '—' }}</td>
                                     <td class="text-center" style="width: 20%;">
-                                        @if($usr->edited_by_finance == false)
-                                        <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                        <div id="btnContainer{{ $usr->id }}" style="display: none;">
+                                            <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
+                                        </div>
+                                        @if($usr->receivable_receipt == false)
+                                            <div id="errorMsgView{{ $usr->id }}" class="alert alert-danger" style="display: none;" role="alert">
+                                                <small>An Error Occured! Refresh the Page!</small>
+                                            </div>
+                                            <div id="loadingIndicatorView{{ $usr->id }}" style="display: none;" class="spinner-border" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                            <button id="confirmBtn{{ $usr->id }}" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm mr-2 confirm-button"><i class="fas fa-fw fa-check"></i> Confirm Receipt</button>
+                                        @else
+                                            @if($usr->edited_by_finance == false && $usr->receivable_receipt == true)
+                                            <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
+                                            @endif
+                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                         @endif
-                                        <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -297,6 +311,33 @@ active
 }
 </style>
 <script>
+
+$(document).ready(function() {
+    $('.confirm-button').click(function(e) {
+        e.preventDefault();
+        var id = $(this).data('item-id');
+        $('#loadingIndicatorView'+ id).show();
+        $('#confirmBtn'+ id).hide();
+        $('#errorMsgView'+ id).hide();
+
+        $.ajax({
+            url: '/reimbursement/finance/confirm-receivable/' + id,
+            type: 'GET',
+            timeout: 5000,
+            success: function(response) {
+                $('#loadingIndicatorView'+ id).hide();
+                $('#confirmBtn'+ id).hide();
+                $('#btnContainer'+ id).show();
+            },
+            error: function() {
+                $('#loadingIndicatorView'+ id).hide();
+                $('#confirmBtn'+ id).hide();
+                $('#errorMsgView'+ id).show();
+            }
+        });
+    });
+});
+
 $(document).ready(function () {
     // When a button with class 'preview-pdf' is clicked
     $('.preview-pdf').click(function () {

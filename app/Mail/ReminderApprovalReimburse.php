@@ -9,12 +9,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ApprovalLeave extends Mailable
+class ReminderApprovalReimburse extends Mailable
 {
     protected $employee;
     protected $formCreator;
 
-    public function __construct(User $employee, Leave_request $formCreator)
+    public function __construct(User $employee, String $formCreator)
     {
         $this->employee = $employee;
         $this->formCreator = $formCreator;
@@ -22,13 +22,13 @@ class ApprovalLeave extends Mailable
 
     public function build()
     {
-        $subject = 'Leave Approval Reminder : '. $this->formCreator->user->name;
-        $link = 'https://timereport.perdana.co.id/approval/leave';
+        $subject = 'Reimbursement Requests awaiting for your Approval : '. $this->formCreator . 'Item(s)';
+        $link = 'https://timereport.perdana.co.id/approval/reimburse/';
 
-        return $this->markdown('mailer.approval_leave')
+        return $this->markdown('mailer.reimburse_approved_finance')
                     ->subject($subject)
                     ->to($this->employee->email)
-                    ->cc('hrd@perdana.co.id')
+                    ->cc('admin@perdana.co.id')
                     ->with([
                         'name' => $this->employee->name,
                         'email' => $this->employee->email,

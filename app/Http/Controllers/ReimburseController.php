@@ -97,6 +97,12 @@ class ReimburseController extends Controller
         $approvalService = Timesheet_approver::whereIn('id', [20, 40])
             ->get();
 
+        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
+            ->pluck('approver')->toArray();
+
+        $checkUserPost = Auth::user()->users_detail->position->id;
+        $statusId = in_array($checkUserPost, [7, 8, 12]) ? 29 : 20;
+
         $usersWithPMRole = Project_assignment_user::where('company_project_id', $companyProjectId)
         ->where('periode_end', '>=', date('Y-m-d'))
         ->where('role', 'PM')
@@ -119,7 +125,7 @@ class ReimburseController extends Controller
             'id' => $uniqueId,
     		'f_id' => $nextID,
     		'f_req_by' => Auth::id(),
-            'status_id' => 20,
+            'status_id' => $statusId,
             'f_payment_method' => $request->payment_method,
             'f_type' => $typeOfReimbursement,
             'f_approver' => $RequestTo,
@@ -188,8 +194,11 @@ class ReimburseController extends Controller
 
                 if ($usersWithPMRole->isNotEmpty()) {
                     foreach ($usersWithPMRole as $approverPm) {
+                        if(in_array(Auth::id(), $isManager) || in_array($checkUserPost, [7, 8, 12]) || Auth::id() == $approverPm->user_id){
+                            break;
+                        }
                         Reimbursement_approval::create([
-                            'status' => 20,
+                            'status' => $statusId,
                             'RequestTo' => $approverPm->user_id,
                             'reimb_item_id' => $itemId,
                             'reimbursement_id' => $uniqueId
@@ -200,8 +209,11 @@ class ReimburseController extends Controller
                 switch (true) {
                     case ($checkUserDept == 4):
                         foreach($approvalFinance_GA as $approverGa){
+                            if(in_array(Auth::id(), $isManager) && in_array($approverGa->approver, $isManager)){
+                                continue;
+                            }
                             Reimbursement_approval::create([
-                                'status' => 20,
+                                'status' => $statusId,
                                 'RequestTo' => $approverGa->approver,
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
@@ -212,8 +224,11 @@ class ReimburseController extends Controller
                         // No break statement here, so it will continue to the next case
                     case ($checkUserDept == 2):
                         foreach($approvalService as $approverService){
+                            if(in_array(Auth::id(), $isManager) && in_array($approverService->approver, $isManager)){
+                                continue;
+                            }
                             Reimbursement_approval::create([
-                                'status' => 20,
+                                'status' => $statusId,
                                 'RequestTo' => $approverService->approver,
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
@@ -223,8 +238,11 @@ class ReimburseController extends Controller
                         break;
                     case ($checkUserDept == 3):
                         foreach($approvalHCM as $approverHCM){
+                            if(in_array(Auth::id(), $isManager) && in_array($approverHCM->approver, $isManager)){
+                                continue;
+                            }
                             Reimbursement_approval::create([
-                                'status' => 20,
+                                'status' => $statusId,
                                 'RequestTo' => $approverHCM->approver,
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
@@ -234,8 +252,11 @@ class ReimburseController extends Controller
                         break;
                     case ($checkUserDept == 1):
                         foreach($approvalSales as $approverSales){
+                            if(in_array(Auth::id(), $isManager) && in_array($approverSales->approver, $isManager)){
+                                continue;
+                            }
                             Reimbursement_approval::create([
-                                'status' => 20,
+                                'status' => $statusId,
                                 'RequestTo' => $approverSales->approver,
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
@@ -249,14 +270,34 @@ class ReimburseController extends Controller
                 }
             }
 
+            // //Delete Self-rows
+            // Reimbursement_approval::where('RequestTo', Auth::id())->where('reimbursement_id', $uniqueId)->delete();
+            $totalApprovedAmount = 0;
+
+            if(in_array($checkUserPost, [7, 8, 12])){
+                Reimbursement_approval::whereNotIn('RequestTo', [Auth::id()])->where('reimbursement_id', $uniqueId)->delete();
+                Reimbursement_approval::whereIn('RequestTo', [Auth::id()])->where('reimbursement_id', $uniqueId)->update(['status', 29]);
+                $result = Reimbursement_item::where('reimbursement_id', $uniqueId)->get();
+                foreach ($result as $item) {
+                    // Remove the comma and convert the string to a float
+                    $approvedAmount = floatval(str_replace([',','.'], '', $item->amount));
+
+                    // Add the numeric value to the totalApprovedAmount
+                    $totalApprovedAmount += $approvedAmount;
+                }
+                $findForm = Reimbursement::find($uniqueId)->update(['f_granted_funds' => $totalApprovedAmount]);
+            }
+
             $employees = User::whereIn('id', $userToApprove)->get();
             $form = Reimbursement::find($uniqueId);
 
             foreach ($employees as $employee) {
-                dispatch(new NotifyReimbursementCreation($employee, $form));
+                if(in_array($employee->id, $isManager)){
+                    dispatch(new NotifyReimbursementCreation($employee, $form));
+                }
             }
             Session::flash('success',"Request has been submitted! You have to give a hard copies of the receipts to the finance department within 2 weeks");
-            return redirect('/reimbursement/history');
+            return redirect('/reimbursement/view/'. $uniqueId);
         } else {
             Session::flash('failed',"Error Database has Occured! Failed to create request!");
             return redirect('/reimbursement/history');
@@ -347,6 +388,15 @@ class ReimburseController extends Controller
             $item->receipt_file = $fileName;
             $item->file_path = $filePath;
         }
+        $item->save();
+
+        return response()->json(['success' => 'Item updated successfully.']);
+    }
+
+    public function confirmReceivableReceipt($id)
+    {
+        $item = Reimbursement_item::find($id);
+        $item->receivable_receipt = TRUE;
         $item->save();
 
         return response()->json(['success' => 'Item updated successfully.']);

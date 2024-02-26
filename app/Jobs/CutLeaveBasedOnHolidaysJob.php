@@ -84,8 +84,9 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
             ->where('leave_request_id', 99)
             ->get();
 
+        $getUsers = Emp_leave_quota::pluck('user_id')->toArray();
         if($checkIfAlreadyCut->isEmpty()){
-            $users = User::all();
+            $users = User::whereIn('id', $getUsers)->get();
 
             foreach ($users as $user) {
                 $checkQuota = Emp_leave_quota::where('user_id', $user->id)
@@ -94,9 +95,9 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                     ->orderBy('expiration', 'asc')
                     ->get();
 
-                if ($totalHolidays > 12) { // Set the maximum cut to only 8
-                    $totalHolidays = 12;
-                }
+                // if ($totalHolidays > 12) { // Set the maximum cut to only 8
+                //     $totalHolidays = 12;
+                // }
 
                 $countQuota = $totalHolidays; // Initialize the count
 
@@ -145,7 +146,6 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                     $entry->save();
                 }
 
-                dispatch(new NotifyDeductedLeaveQuota($user, $totalHolidays));
             }
         }
     }

@@ -1,8 +1,7 @@
 <p>Dear {{ $name }},</p>
 
-<p>{{ $formCreator->user->name }} has requesting leave for {{ $formCreator->total_days }} days, and require your approval. Kindly request your review for the documents.</p>
+<p>{{ $userName }} has canceled the request. Please ignore this message.</p>
 
-<p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>
 <p>Regards,<br><img src="{{ asset('img/PC-01Mailer.png') }}" style="height: 40px; width: 90px;" /> <br><strong>ESS Admin</strong></p><br>
 <a style="color: grey;"><u><i>Isi email ini bersifat rahasia dan hanya ditujukan untuk penerima yang ditentukan dalam pesan. Dilarang keras membagikan bagian mana pun dari pesan ini dengan pihak ketiga mana pun, tanpa persetujuan tertulis dari pengirim. Jika Anda menerima pesan ini karena kesalahan, harap balas pesan ini dan ikuti penghapusannya, sehingga kami dapat memastikan kesalahan seperti itu tidak terjadi lagi di masa mendatang.</i></u></a><br><br>

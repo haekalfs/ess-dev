@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Leave_request;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +14,7 @@ class CutLeaveQuotaEmp extends Mailable
     protected $employee;
     protected $totalHolidays;
 
-    public function __construct(User $employee, $totalHolidays)
+    public function __construct(User $employee, int $totalHolidays)
     {
         $this->employee = $employee;
         $this->totalHolidays = $totalHolidays;
@@ -21,35 +22,17 @@ class CutLeaveQuotaEmp extends Mailable
 
     public function build()
     {
-        $data = [
-            'name' => $this->employee->name,
-            'totalHolidays' => $this->totalHolidays,
-            'link' => 'https://timereport.perdana.co.id/'
-        ];
+        $subject = 'Your Leave Quota will be deducted : '. $this->totalHolidays . 'day(s)';
+        $link = 'https://timereport.perdana.co.id/leave/history';
 
-        $subject = 'Leave Quota Information';
-
-        return $this->markdown('mailer.leave_quota_deducted', $data)
-            ->subject($subject)
-            ->to($this->employee->email);
-    }
-
-    public function emailSubject()
-    {
-        return 'Leave Quota Information';
-    }
-
-    public function emailTo()
-    {
-        return $this->employee->email;
-    }
-
-    public function data()
-    {
-        return [
-            'name' => $this->employee->name,
-            'totalHolidays' => $this->totalHolidays,
-            'link' => 'https://timereport.perdana.co.id/medical/history/'
-        ];
+        return $this->markdown('mailer.leave_quota_deducted')
+                    ->subject($subject)
+                    ->to($this->employee->email)
+                    ->with([
+                        'name' => $this->employee->name,
+                        'email' => $this->employee->email,
+                        'totalHolidays' => $this->totalHolidays,
+                        'link' => $link
+                    ]);
     }
 }

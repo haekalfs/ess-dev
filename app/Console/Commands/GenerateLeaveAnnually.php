@@ -98,7 +98,7 @@ class GenerateLeaveAnnually extends Command
                     }
 
                     $lastQuotaExpiration = Carbon::createFromFormat('Y-m-d', $checkUsersQuotaAnnual->expiration); //validation for creating so it does not multiplies
-                    if ($lastQuotaExpiration->isCurrentYear() || $lastQuotaExpiration->isNextYear()) {
+                    if ($lastQuotaExpiration->isCurrentYear() || $lastQuotaExpiration->year < $currentDate->year) {
                         if ($totalMonths > 0) {
                             // Check if the current date is greater than or equal to one year after hired date
                             if ($currentDate->greaterThanOrEqualTo($oneYearAfterHired)) {

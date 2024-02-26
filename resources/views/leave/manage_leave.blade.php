@@ -23,9 +23,8 @@ active
                         <label for="email">Show :</label>
                         <select class="form-control" name="showOpt" required>
                             <option value="1">All</option>
-                            @foreach ($employees as $emp)
-                                <option value="{{ $emp->id }}" @if ($emp->id == $showName) selected @endif>{{ $emp->name }}</option>
-                            @endforeach
+                            <option value="10">Annual Leave</option>
+                            <option value="100">Weekend Replacement</option>
                         </select>
                     </div>
                 </div>
@@ -36,7 +35,7 @@ active
                             @foreach ($yearsBefore as $year)
                                 <option value="{{ $year }}" @if ($year == $Year) selected @endif>{{ $year }}</option>
                             @endforeach
-                        </select>                            
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -60,7 +59,7 @@ active
                 </div>
                 <div class="col-md-12"><br>
                     <div class="table-responsive">
-                        <table class="table table-bordered zoom90" cellspacing="0" id="dataLeave">
+                        <table class="table table-bordered zoom90" cellspacing="0">
                             <thead class="thead-light">
                                 <tr>
                                     <th>Emp ID</th>

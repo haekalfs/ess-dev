@@ -39,7 +39,7 @@ active
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
-                <thead>
+                <thead class="thead-light">
                     <tr>
                         <th>No. Assignment</th>
                         <th>Request Date</th>

@@ -55,7 +55,12 @@ class ApprovalController extends Controller
     {
         // $accessController = new AccessController();
         // $result = $accessController->usr_acc(202);
-
+        $dateCut = Cutoffdate::find(1);
+        $currentDay = date('j');
+        if ($currentDay >= $dateCut->start_date && $currentDay <= $dateCut->closed_date) {
+            $text = "Timesheet Submission has begin, remember timesheet approvals is only available on $dateCut->start_date & $dateCut->closed_date";
+            Session::flash('marquee', $text);
+        }
         $tsCount = Timesheet_detail::whereNotIn('ts_status_id', ['30', '404', '29', '10'])
             ->where('RequestTo', Auth::user()->id)
             ->groupBy('user_timesheet', 'month_periode')
