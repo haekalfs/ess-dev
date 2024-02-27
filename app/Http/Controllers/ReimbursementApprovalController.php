@@ -9,6 +9,7 @@ use App\Jobs\NotifyReimbursementPriorApproval;
 use App\Jobs\NotifyReimbursementRejected;
 use App\Models\Log;
 use App\Models\Notification_alert;
+use App\Models\Position;
 use App\Models\Reimbursement;
 use App\Models\Reimbursement_approval;
 use App\Models\Reimbursement_item;
@@ -35,14 +36,15 @@ class ReimbursementApprovalController extends Controller
         $currentDay = date('j');
 
         $checkUserPost = Auth::user()->users_detail->position->id;
+        $getHighPosition = Position::where('position_level', 1)->pluck('id')->toArray();
 
         //code above is to check if those with id 40,45,55,60 are able to approve or not
-        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();
+        $ts_approver = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
             //should add more position
-                if (in_array($checkUserPost, [8, 12, 7, 6, 22])) {
+                if (in_array($checkUserPost, $getHighPosition)) {
                     $Check = DB::table('reimbursement_approval')
                     ->select('reimb_item_id')
                     ->whereNotIn('RequestTo', $ts_approver)
@@ -101,9 +103,11 @@ class ReimbursementApprovalController extends Controller
         //     return redirect('approval/reimburse/');
         // }
         $checkUserPost = Auth::user()->users_detail->position->id;
-        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();
+        $getHighPosition = Position::where('position_level', 1)->pluck('id')->toArray();
 
-        if (in_array($checkUserPost, [8, 12, 6, 22])) {
+        $ts_approver = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
+
+        if (in_array($checkUserPost, $getHighPosition)) {
             $Check = DB::table('reimbursement_approval')
             ->select('reimb_item_id')
             ->whereNotIn('RequestTo', $ts_approver)

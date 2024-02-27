@@ -233,6 +233,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet');
         Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save');
         Route::put("/hr/compliance/update/regulations", 'HrController@update_regulation');
+        Route::put("/hr/compliance/update/cutoff-date", 'HrController@update_cutoffdate');
         // Exit Clearance
         Route::get('/hr/exit_clearance/', 'HrController@exit_clear');
         Route::get('/hr/exit_clearance/print/{id}', 'HrController@print');

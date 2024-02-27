@@ -10,6 +10,7 @@ use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Leave_request_history;
 use App\Models\Notification_alert;
+use App\Models\Position;
 use App\Models\Timesheet_approver;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -33,13 +34,14 @@ class LeaveApprovalController extends Controller
         $currentDay = date('j');
 
         $checkUserPost = Auth::user()->users_detail->position->id;
+        $getHighPosition = Position::where('position_level', 1)->pluck('id')->toArray();
 
         //code above is to check if those with id 40,45,55,60 are able to approve or not
-        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60])->pluck('approver')->toArray();
+        $ts_approver = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         // Check if the current day is within the range 5-8
         if ($currentDay >= 1 && $currentDay <= 31) {
-                if (in_array($checkUserPost, [7, 8, 12])) {
+                if (in_array($checkUserPost, $getHighPosition)) {
                     $Check = DB::table('leave_request_approval')
                         ->select('leave_request_id')
                         ->whereNotIn('RequestTo', $ts_approver)

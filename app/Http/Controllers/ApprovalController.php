@@ -121,8 +121,9 @@ class ApprovalController extends Controller
         $currentDay = date('j');
 
         $checkUserPost = Auth::user()->users_detail->position->id;
+        $getHighPosition = Position::where('position_level', 1)->pluck('id')->toArray();
 
-        $ts_approver = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver')->toArray();
+        $ts_approver = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
         // var_dump($checkUserPost);
         if ($validator->passes()) {
             $Year = $request->yearOpt;
@@ -132,7 +133,7 @@ class ApprovalController extends Controller
 
         // Check if the current day is within the range 5-8
         if ($currentDay >= $dateCut->start_date && $currentDay <= $dateCut->closed_date) {
-            if (in_array($checkUserPost, [7, 8, 12])) {
+            if (in_array($checkUserPost, $getHighPosition)) {
                 $Check = Timesheet_detail::select('*')
                     ->where('month_periode', $Year . intval($Month))
                     ->whereNotIn('ts_status_id', [10])

@@ -273,7 +273,7 @@
                         <a class="collapse-item" href="/manage/users">A1. Manage Users</a>
                         <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>A2. User Access C. (UAC)</i></a>
                         <h6 class="collapse-header" style="font-size: 9px;">Employement Administration:</h6>
-                        <a class="collapse-item" href="/manage/list/employees">A3. Employees Database</a>
+                        <a class="collapse-item" href="/manage/list/employees">A3. Emp. Database & CV</a>
                         <a class="collapse-item" href="/hr/exit_clearance/">A4. Exit Clearance</a>
                     </div>
                 </div>

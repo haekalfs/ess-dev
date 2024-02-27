@@ -12,6 +12,7 @@ use App\Models\Company_project;
 use App\Models\Department;
 use App\Models\Financial_password;
 use App\Models\Notification_alert;
+use App\Models\Position;
 use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Reimbursement_approval;
@@ -20,6 +21,7 @@ use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\Setting;
+use App\Models\Usr_role;
 use Carbon\Carbon;
 use DateTime;
 use Exception;
@@ -68,7 +70,6 @@ class ReimburseController extends Controller
         $validator = Validator::make($request->all(), [
             'payment_method' => 'required',
             'project' => 'required',
-            'approver' => 'sometimes',
             'notes' => 'sometimes'
         ]);
 
@@ -80,33 +81,27 @@ class ReimburseController extends Controller
         $nowYear = date('Y');
         $project = $request->project;
 
-        $typeOfReimbursement = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->project_name;
-        $companyProjectId = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->id;
+        $UserDept = Auth::user()->users_detail->department;
 
-        $userDept = (empty(Company_project::find($project))) ? 1 : 4;
-        $RequestTo = empty($request->approver) ? $userDept : $request->approver;
-
-
-        $checkUserDept = Auth::user()->users_detail->department->id;
-        $approvalFinance_GA = Timesheet_approver::whereIn('id', [10, 45])
-            ->get();
-        $approvalSales = Timesheet_approver::whereIn('id', [50, 45])
-            ->get();
-        $approvalHCM = Timesheet_approver::whereIn('id', [10, 60])
-            ->get();
-        $approvalService = Timesheet_approver::whereIn('id', [20, 40])
-            ->get();
-
-        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
+        //for validation
+        $isManager = Timesheet_approver::where('group_id', 2)
             ->pluck('approver')->toArray();
 
+        //for status
         $checkUserPost = Auth::user()->users_detail->position->id;
-        $statusId = in_array($checkUserPost, [7, 8, 12]) ? 29 : 20;
+        $getHighPosition = Position::where('position_level', 1)->pluck('id')->toArray();
 
+        $statusId = in_array($checkUserPost, $getHighPosition) ? 29 : 20;
+
+        //PM roles approvals
+        $companyProjectId = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->id;
         $usersWithPMRole = Project_assignment_user::where('company_project_id', $companyProjectId)
         ->where('periode_end', '>=', date('Y-m-d'))
         ->where('role', 'PM')
         ->get();
+
+        //form Type
+        $typeOfReimbursement = (empty(Company_project::find($project))) ? $project : Company_project::find($project)->project_name;
 
         $uniqueId = hexdec(substr(uniqid(), 0, 8));
 
@@ -128,7 +123,7 @@ class ReimburseController extends Controller
             'status_id' => $statusId,
             'f_payment_method' => $request->payment_method,
             'f_type' => $typeOfReimbursement,
-            'f_approver' => $RequestTo,
+            'f_approver' => $UserDept->department_name,
             'f_sign_employee' => Auth::user()->name,
             'f_sign_employee_date' => date('Y-m-d'),
             'notes' => $request->notes
@@ -194,7 +189,7 @@ class ReimburseController extends Controller
 
                 if ($usersWithPMRole->isNotEmpty()) {
                     foreach ($usersWithPMRole as $approverPm) {
-                        if(in_array(Auth::id(), $isManager) || in_array($checkUserPost, [7, 8, 12]) || Auth::id() == $approverPm->user_id){
+                        if(in_array(Auth::id(), $isManager) || in_array($checkUserPost, $getHighPosition) || Auth::id() == $approverPm->user_id){
                             break;
                         }
                         Reimbursement_approval::create([
@@ -206,62 +201,47 @@ class ReimburseController extends Controller
                         $userToApprove[] = $approverPm->user_id;
                     }
                 }
+                //HARDCODE FOR ROLES
+                $getFM = Usr_role::where('role_id', 7)->pluck('user_id')->toArray();
+                $getHR = Usr_role::where('role_id', 11)->pluck('user_id')->toArray();
+                $getPC = Usr_role::where('role_id', 13)->pluck('user_id')->first();
+
+                if ($UserDept->id !== 2 && Company_project::where('id', $project)->exists()) {
+                    // Create Reimbursement_approval record
+                    Reimbursement_approval::create([
+                        'status' => $statusId,
+                        'RequestTo' => $getPC,
+                        'reimb_item_id' => $itemId,
+                        'reimbursement_id' => $uniqueId
+                    ]);
+                }
                 switch (true) {
-                    case ($checkUserDept == 4):
-                        foreach($approvalFinance_GA as $approverGa){
-                            if(in_array(Auth::id(), $isManager) && in_array($approverGa->approver, $isManager)){
+                    case ($UserDept->approvers->isNotEmpty()):
+                        foreach ($UserDept->approvers as $approver) {
+                            // Skip if the user is a manager and the approver is also a manager
+                            if (in_array(Auth::id(), $isManager) && in_array($approver->approver, $isManager)) {
                                 continue;
                             }
+
+                            // Skip if the user is finance staff and the approver is 'desy'
+                            if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) && in_array($approver->approver, $getHR)) {
+                                continue;
+                            }
+
+                            // Skip if the user is not finance staff and the approver is 'suryadi'
+                            if (!in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) && in_array($approver->approver, $getFM)) {
+                                continue;
+                            }
+
+                            // Create Reimbursement_approval record
                             Reimbursement_approval::create([
                                 'status' => $statusId,
-                                'RequestTo' => $approverGa->approver,
+                                'RequestTo' => $approver->approver,
                                 'reimb_item_id' => $itemId,
                                 'reimbursement_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverGa->approver;
-                        }
-                        break;
-                        // No break statement here, so it will continue to the next case
-                    case ($checkUserDept == 2):
-                        foreach($approvalService as $approverService){
-                            if(in_array(Auth::id(), $isManager) && in_array($approverService->approver, $isManager)){
-                                continue;
-                            }
-                            Reimbursement_approval::create([
-                                'status' => $statusId,
-                                'RequestTo' => $approverService->approver,
-                                'reimb_item_id' => $itemId,
-                                'reimbursement_id' => $uniqueId
-                            ]);
-                            $userToApprove[] = $approverService->approver;
-                        }
-                        break;
-                    case ($checkUserDept == 3):
-                        foreach($approvalHCM as $approverHCM){
-                            if(in_array(Auth::id(), $isManager) && in_array($approverHCM->approver, $isManager)){
-                                continue;
-                            }
-                            Reimbursement_approval::create([
-                                'status' => $statusId,
-                                'RequestTo' => $approverHCM->approver,
-                                'reimb_item_id' => $itemId,
-                                'reimbursement_id' => $uniqueId
-                            ]);
-                            $userToApprove[] = $approverHCM->approver;
-                        }
-                        break;
-                    case ($checkUserDept == 1):
-                        foreach($approvalSales as $approverSales){
-                            if(in_array(Auth::id(), $isManager) && in_array($approverSales->approver, $isManager)){
-                                continue;
-                            }
-                            Reimbursement_approval::create([
-                                'status' => $statusId,
-                                'RequestTo' => $approverSales->approver,
-                                'reimb_item_id' => $itemId,
-                                'reimbursement_id' => $uniqueId
-                            ]);
-                            $userToApprove[] = $approverSales->approver;
+
+                            $userToApprove[] = $approver->approver;
                         }
                         break; // Add break statement here to exit the switch block after executing the case
                     default:
@@ -274,7 +254,7 @@ class ReimburseController extends Controller
             // Reimbursement_approval::where('RequestTo', Auth::id())->where('reimbursement_id', $uniqueId)->delete();
             $totalApprovedAmount = 0;
 
-            if(in_array($checkUserPost, [7, 8, 12])){
+            if(in_array($checkUserPost, $getHighPosition)){
                 Reimbursement_approval::whereNotIn('RequestTo', [Auth::id()])->where('reimbursement_id', $uniqueId)->delete();
                 Reimbursement_approval::whereIn('RequestTo', [Auth::id()])->where('reimbursement_id', $uniqueId)->update(['status', 29]);
                 $result = Reimbursement_item::where('reimbursement_id', $uniqueId)->get();

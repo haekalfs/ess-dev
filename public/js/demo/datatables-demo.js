@@ -49,6 +49,13 @@ $(document).ready(function() {
     "pageLength": 25
   } );
 } );
+$(document).ready(function() {
+  $('#dataTableRoleList').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 25
+  } );
+} );
 
 // Call the dataTables jQuery plugin
 $(document).ready(function() {
@@ -140,3 +147,11 @@ $(document).ready(function() {
       "pageLength": 10
     } );
   } );
+
+$(document).ready(function() {
+  $('#dataTableAttendance').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    "pageLength": 10
+  } );
+} );

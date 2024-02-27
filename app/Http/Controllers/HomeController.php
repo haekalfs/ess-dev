@@ -165,7 +165,7 @@ class HomeController extends Controller
 
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
-        $ts_approver = Timesheet_approver::whereIn('id', [40,45,55,60,28])->pluck('approver')->toArray();// Add new approver
+        $ts_approver = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
         $new_approver_id = 'julyansyah'; // Replace with the actual ID of the new approver
         array_push($ts_approver, $new_approver_id);
 

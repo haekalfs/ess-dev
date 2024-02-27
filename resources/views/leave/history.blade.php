@@ -97,7 +97,7 @@ active
                           <th>Leave Quota Used</th>
                           <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaFiveYearTerm }}</td>
                       </tr>
-                      <tr>
+                      <tr class="text-danger">
                           <th>Weekend Replacement</th>
                           <td style="text-align: start; font-weight:500">: {{ $empLeaveQuotaWeekendReplacement }}</td>
                       </tr>
@@ -261,13 +261,13 @@ active
 			</div>
             <ul class="nav nav-tabs" id="pageTabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="page1-tab" data-toggle="tab" href="#page1" role="tab" aria-controls="page1" aria-selected="true"><i class="fas fa-calendar-day"></i> Quota</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="page2-tab" data-toggle="tab" href="#page2" role="tab" aria-controls="page2" aria-selected="false"><i class="fas fa-plane-departure"></i> Usage</a>
+                    <a class="nav-link active" id="page1-tab" data-toggle="tab" href="#page1" role="tab" aria-controls="page1" aria-selected="true"><i class="fas fa-calendar-day"></i> MyQuota</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-calendar-week" style="color: #ff0000;"></i> Replacement</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="page2-tab" data-toggle="tab" href="#page2" role="tab" aria-controls="page2" aria-selected="false"><i class="fas fa-plane-departure"></i> Usage</a>
                 </li>
             </ul>
             <div class="modal-body" style="height: 400px; overflow-y: auto;">
@@ -361,7 +361,7 @@ active
                                         <table class="table table-bordered zoom90" id="weekendReplacement" width="100%" cellspacing="0">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Leave ID</th>
+                                                    <th>Replacement For</th>
                                                     <th>Active Periode</th>
                                                     <th>Expired On</th>
                                                     <th>Status</th>
@@ -414,7 +414,7 @@ active
           </button>
         </div>
             <div class="modal-body zoom90" style="height: 400px; overflow-y: auto;">
-                <h6 class="h5 mb-2 text-gray-800">Approval Status : <span class="text-primary" id="approver"></span></i></h6>
+                {{-- <h6 class="h5 mb-2 text-gray-800">Approval Status : <span class="text-primary" id="approver"></span></i></h6> --}}
                 <div class="table-responsive">
                     <div class="col-md-12">
                         <div class="row">

@@ -29,7 +29,7 @@ active
 </div>
 <div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary" id="judul">Manage Department</h6>
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Users Accounts</h6>
         <div class="text-right">
             <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" href="/manage/users/new-user-registration" ><i class="fas fa-plus fa-sm text-white-50"></i> Add User</a>
         </div>
@@ -52,8 +52,8 @@ active
                 <tbody>
                     @foreach($data as $p)
                     <tr>
-                        <td>{{$p->users_detail->employee_id}}</td>
-                        <td>{{$p->id }}</td>
+                        <td class="text-primary font-weight-bold">{{$p->users_detail->employee_id}}</td>
+                        <td class="text-secondary font-weight-bold">{{$p->id }}</td>
                         <td>{{$p->name}}</td>
                         <td>@if($p->users_detail->position_id){{ $p->users_detail->position->position_name }}@endif</td>
                         <td>@if($p->users_detail->department_id){{ $p->users_detail->department->department_name }}@endif</td>
@@ -65,8 +65,8 @@ active
                                 <i class="fas fa-user-times" style="color: #ff0000;"></i>
                             @endif
                         </td>
-                        <td class="row-cols-2 justify-content-between">
-                            <a href="/users/edit/{{ Crypt::encrypt($p->id) }}" title="Edit" class="btn btn-primary btn-sm" >
+                        <td class="text-center" style="width: 10%;">
+                            <a href="/users/edit/{{ Crypt::encrypt($p->id) }}" title="Edit" class="btn btn-primary btn-sm mr-2" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>
                             </a>
                             <a href="/users/hapus/{{ Crypt::encrypt($p->id) }}" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
