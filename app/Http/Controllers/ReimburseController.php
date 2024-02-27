@@ -203,8 +203,8 @@ class ReimburseController extends Controller
                 }
                 //HARDCODE FOR ROLES
                 $getFM = Usr_role::where('role_id', 7)->pluck('user_id')->toArray();
-                $getHR = Usr_role::where('role_id', 11)->pluck('user_id')->toArray();
-                $getPC = Usr_role::where('role_id', 13)->pluck('user_id')->first();
+                $getHR = Usr_role::where('role_id', 3)->pluck('user_id')->toArray();
+                $getPC = Usr_role::where('role_id', 12)->pluck('user_id')->first();
 
                 if ($UserDept->id !== 2 && Company_project::where('id', $project)->exists()) {
                     // Create Reimbursement_approval record
@@ -223,12 +223,12 @@ class ReimburseController extends Controller
                                 continue;
                             }
 
-                            // Skip if the user is finance staff and the approver is 'desy'
+                            // Skip if the user is finance staff and the approver is HR
                             if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) && in_array($approver->approver, $getHR)) {
                                 continue;
                             }
 
-                            // Skip if the user is not finance staff and the approver is 'suryadi'
+                            // Skip if the user is not finance staff and the approver is FM
                             if (!in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) && in_array($approver->approver, $getFM)) {
                                 continue;
                             }

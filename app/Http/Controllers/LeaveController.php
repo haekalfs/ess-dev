@@ -173,7 +173,7 @@ class LeaveController extends Controller
 
         //HARDCODE FOR ROLES
         $getFM = Usr_role::where('role_id', 7)->pluck('user_id')->toArray();
-        $getHR = Usr_role::where('role_id', 11)->pluck('user_id')->toArray();
+        $getHR = Usr_role::where('role_id', 3)->pluck('user_id')->toArray();
 
         switch ($checkIfOnce) {
             case false:
