@@ -97,7 +97,7 @@ class UserController extends Controller
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
             $nama_file_cv = $request->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = '/storage/cv';
+            $tujuan_upload_cv = '/cv';
             $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
         } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
@@ -265,7 +265,7 @@ class UserController extends Controller
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
             $nama_file_profile = $request->email . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = 'profile_pic';
+            $tujuan_upload_profile = '/profile_pic';
 
             // Menghapus file profil lama jika ada
             $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
@@ -274,7 +274,7 @@ class UserController extends Controller
             }
 
             // Memindahkan file profil yang baru diunggah
-            $profile_file->storeAs('public/' . $tujuan_upload_profile, $nama_file_profile);
+            $profile_file->storeAs($tujuan_upload_profile, $nama_file_profile);
         } elseif ($user->users_detail->profile_pic) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $nama_file_profile = $user->users_detail->profile_pic;
@@ -288,7 +288,7 @@ class UserController extends Controller
             $cv_file = $request->file('cv');
 
             $nama_file_cv = $request->usr_id . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = 'cv';
+            $tujuan_upload_cv = '/cv';
 
             // Menghapus file profil lama jika ada
             $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
@@ -296,7 +296,7 @@ class UserController extends Controller
                 unlink($oldCV);
             }
 
-            $cv_file->storeAs('public/' . $tujuan_upload_cv, $nama_file_cv);
+            $cv_file->storeAs($tujuan_upload_cv, $nama_file_cv);
         } elseif ($user->users_detail->cv) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $nama_file_cv = $user->users_detail->cv;
