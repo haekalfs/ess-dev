@@ -85,7 +85,7 @@ class UserController extends Controller
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
             $nama_file_profile = $request->id . "_" . "profile_pic" . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = '/storage/profile_pic';
+            $tujuan_upload_profile = '/profile_pic';
             $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
         } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
