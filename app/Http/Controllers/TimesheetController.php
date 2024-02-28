@@ -295,7 +295,7 @@ class TimesheetController extends Controller
         $userId = Auth::user()->id;
 
         $leaveApproved = [];
-        $checkLeaveApproval = Leave_request::where('req_by', Auth::user()->id)->whereMonth('req_date', $month)->get();
+        $checkLeaveApproval = Leave_request::where('req_by', Auth::user()->id)->whereMonth('created_at', intval($month))->get();
         foreach ($checkLeaveApproval as $chk) {
             $checkApp = Leave_request_approval::where('leave_request_id', $chk->id)->where('status', 29)->pluck('leave_request_id');
             if (!$checkApp->isEmpty()) {
