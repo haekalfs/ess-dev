@@ -25,7 +25,7 @@ class ReimbursementPriorApproval extends Mailable
     public function build()
     {
         $subject = 'Reimbursement Request Approvals : '. $this->formCreator->request->f_type;
-        $link = 'https://timereport.perdana.co.id/approval/reimburse/view/' + $this->formCreator->request->id;
+        $link = 'https://timereport.perdana.co.id/approval/reimburse/view/'. $this->formCreator->request->id;
 
         if($this->formCreator->ccTo){
             // Split comma-delimited string into an array of email addresses
