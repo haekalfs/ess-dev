@@ -18,6 +18,7 @@ use App\Models\Medical_approval;
 use App\Jobs\NotifyMedicalRejected;
 use App\Jobs\NotifyMedicalApproved;
 use App\Models\Cutoffdate;
+use App\Models\Medical_payment;
 // use App\Http\Controllers\GlobalDateTime;
 //medical
 use App\Models\Notification_alert;
@@ -778,6 +779,9 @@ class ApprovalController extends Controller
         $medApprove->total_amount_approved = $totalAmountApproved;
         $medApprove->save();
 
+        $medPay = Medical_payment::where('medical_id', $id)->firstorFail();
+        $medPay->paid_status = 20;
+        $medPay->save();
 
         $MedId = $user_med->id;
 
@@ -788,7 +792,7 @@ class ApprovalController extends Controller
         //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
         // }
 
-        return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId ");
+        return redirect('/approval/medical')->with('success', "You've Approved <b>$userNameRequestor</b> Medical Reimburse No. MED_$MedId");
     }
 
     public function reject_medical(Request $request, $id)
@@ -811,7 +815,7 @@ class ApprovalController extends Controller
         $medApprove->approval_date = $request->date_approved;
         $medApprove->save();
 
-        $medical = Medical::findOrFail($id);
+        $medical = Medical_payment::where('medical_id', $id)->firstorFail();
         $medical->paid_status = 404;
         $medical->save();
 

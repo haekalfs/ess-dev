@@ -69,7 +69,7 @@ active
                             <a href="/users/edit/{{ Crypt::encrypt($p->id) }}" title="Edit" class="btn btn-primary btn-sm" >
                                 <i class="fas fa-fw fa-edit justify-content-center"></i>
                             </a>
-                            <a href="/users/hapus/{{ Crypt::encrypt($p->id) }}" title="Hapus" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                            <a title="delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ $p->id }}"><i class="fas fa-fw fa-trash justify-content"></i></a>
                         </td>
                     </tr>
                     @endforeach
@@ -78,4 +78,28 @@ active
         </div>
     </div>
 </div>
+<!-- Modal -->
+@foreach($data as $p)
+<!-- Modal Deelete -->
+<div class="modal fade" id="deleteModal{{ $p->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title  text-white" id="staticBackdropLabel">Alert !!</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <img class="mb-2" width="96" height="96" src="https://img.icons8.com/color/96/general-warning-sign.png" alt="general-warning-sign"/>
+        <h6>Are You Sure Want Delete This Record !!!</h6>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn-sm btn-primary" data-dismiss="modal">Cancel</button>
+        <a href="/users/delete/{{ Crypt::encrypt($p->id) }}" title="Delete" class="btn btn-danger btn-sm" >Yes Im Sure</a>
+      </div>
+    </div>
+  </div>
+</div>
+@endforeach
 @endsection

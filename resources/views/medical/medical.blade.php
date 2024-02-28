@@ -187,7 +187,7 @@ active
                                 <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
                                     <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
                                 </a>
-                                <a title="Hapus" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" >
+                                <a title="Delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" >
                                     <i class="fas fa-fw fa-trash justify-content"></i> Cancel
                                 </a>
                             @endif

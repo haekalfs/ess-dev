@@ -156,7 +156,7 @@ class MedicalController extends Controller
         $medical = new Medical();
         $medical->id = $nextId;
         $medical->user_id = Auth::user()->id;
-        $medical->med_req_date = date('Y-m-d');;
+        $medical->med_req_date = date('Y-m-d');
         $medical->med_payment = $request->payment_method;
         $medical->med_total_amount = $request->totalAmountInput;
         $medical->save();
@@ -502,12 +502,13 @@ class MedicalController extends Controller
         $employees = User::where('id', $userId)->get();
         $userName = Auth::user()->name;
 
-        $totalAmountPaid = $request->input_total_paid;
         $currentYear = Carbon::now()->year;
         // Cari $medBalance yang masih aktif dan memiliki tahun yang sama
         $medBalance = Emp_medical_balance::where('user_id', $userId)
             ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
             ->first();
+
+        $totalAmountPaid = $request->input_total_paid;
 
         $balance = $medBalance->medical_balance;
         if (is_numeric($balance)) {
@@ -535,9 +536,11 @@ class MedicalController extends Controller
             // Handle the case when $deducted or $totalAmountApproved is non-numeric
         }
 
-        $med = Medical_payment::where('medical_id', $id)->firstOrFail();
-        $med->paid_status = 29;
-        $med->save();
+        $medPay = Medical_payment::where('medical_id', $id)->firstOrFail();
+        $medPay->payment_date = date('Y-m-d');
+        $medPay->paid_status = 29;
+        $medPay->total_payment = $totalAmountPaid;
+        $medPay->save();
 
         // foreach ($employees as $employee) {
         //     dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));

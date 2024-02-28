@@ -58,24 +58,24 @@ class UserController extends Controller
             return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi nama bank
         }, $banks);
 
-    	return view('manage.users_tambah', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'bankNames' => $bankNames]);
+        return view('manage.users_creation', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'bankNames' => $bankNames]);
     }
 
     public function store(Request $request)
     {
-    	$this->validate($request,[
+        $this->validate($request, [
             'name' => 'required',
             'password' => 'required',
-            'usr_id' => ['required','unique:users,id','regex:/^[a-z0-9]+$/'],
+            'usr_id' => ['required', 'unique:users,id', 'regex:/^[a-z0-9]+$/'],
             'email' => 'required',
             'status' => 'required',
             'employee_status' => 'required',
             'position' => 'required',
             'department' => 'required',
-            'hired_date'=> 'required',
-            'employee_id'=> 'required',
+            'hired_date' => 'required',
+            'employee_id' => 'required',
             'profile_pic' => 'sometimes|file|image|mimes:jpeg,png,jpg|max:2048'
-            ]);
+        ]);
 
         $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
         $nextId = intval(substr($lastId, 4)) + 1;
@@ -84,11 +84,10 @@ class UserController extends Controller
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $request->id . "_". "profile_pic". "." . $profile_file->getClientOriginalExtension();
+            $nama_file_profile = $request->id . "_" . "profile_pic" . "." . $profile_file->getClientOriginalExtension();
             $tujuan_upload_profile = '/storage/profile_pic';
             $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
-        }
-        else {
+        } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
             $nama_file_profile = null;
         }
@@ -97,7 +96,7 @@ class UserController extends Controller
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
-             $nama_file_cv = $request->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
+            $nama_file_cv = $request->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
             $tujuan_upload_cv = '/storage/cv';
             $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
         } else {
@@ -110,7 +109,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $hash_pwd,
-    	]);
+        ]);
 
         Users_detail::create([
             'id' => $nextId,
@@ -120,26 +119,26 @@ class UserController extends Controller
             'department_id' => $request->department,
             'status_active' => $request->status,
             'employee_status' => $request->employee_status,
-            'hired_date'=> $request->hired_date,
-            'usr_address'=> $request->usr_address,
-            'current_address'=> $request->current_address,
-            'usr_address_city'=> $request->usr_address_city,
-            'usr_address_postal'=> $request->usr_address_postal,
-            'usr_phone_home'=> $request->usr_phone_home,
-            'usr_phone_mobile'=> $request->usr_phone_mobile,
-            'usr_npwp'=> $request->usr_npwp,
-            'usr_id_type'=> $request->usr_id_type,
-            'usr_id_no'=> $request->usr_id_no,
-            'usr_id_expiration'=> $request->usr_id_expiration,
-            'usr_dob'=> $request->usr_dob,
-            'usr_birth_place'=> $request->usr_birth_place,
-            'usr_gender'=> $request->usr_gender,
-            'usr_religion'=> $request->usr_religion,
-            'usr_merital_status'=> $request->usr_merital_status,
-            'usr_children'=> $request->usr_children,
-            'usr_bank_name'=> $request->usr_bank_name,
-            'usr_bank_branch'=> $request->usr_bank_branch,
-            'usr_bank_account'=> $request->usr_bank_account,
+            'hired_date' => $request->hired_date,
+            'usr_address' => $request->usr_address,
+            'current_address' => $request->current_address,
+            'usr_address_city' => $request->usr_address_city,
+            'usr_address_postal' => $request->usr_address_postal,
+            'usr_phone_home' => $request->usr_phone_home,
+            'usr_phone_mobile' => $request->usr_phone_mobile,
+            'usr_npwp' => $request->usr_npwp,
+            'usr_id_type' => $request->usr_id_type,
+            'usr_id_no' => $request->usr_id_no,
+            'usr_id_expiration' => $request->usr_id_expiration,
+            'usr_dob' => $request->usr_dob,
+            'usr_birth_place' => $request->usr_birth_place,
+            'usr_gender' => $request->usr_gender,
+            'usr_religion' => $request->usr_religion,
+            'usr_merital_status' => $request->usr_merital_status,
+            'usr_children' => $request->usr_children,
+            'usr_bank_name' => $request->usr_bank_name,
+            'usr_bank_branch' => $request->usr_bank_branch,
+            'usr_bank_account' => $request->usr_bank_account,
             'usr_bank_account_name' => $request->usr_bank_account_name,
             'profile_pic' => $nama_file_profile,
             'cv' => $nama_file_cv,
@@ -188,18 +187,22 @@ class UserController extends Controller
 
         // dispatch(new NotifyUserCreation($emailUser, $userName));
 
-    	return redirect('/manage/users')->with('success', 'User Create successfully');
+        return redirect('/manage/users')->with('success', 'User Create successfully');
     }
 
     public function delete($id)
     {
-        $data = DB::table('users')->where('id', $id)->delete();
-        $data2 = DB::table('users_details')->where('user_id', $id)->delete();
-        $leave = Emp_leave_quota::where('user_id', $id)->delete();
-        $med = Emp_medical_balance::where('user_id', $id)->delete();
-        $user_role = Usr_role::where('user_id', $id)->delete();
+        $user = Crypt::decrypt($id);
+        $user_id = User::find($user);
+        $name = $user_id->name;
 
-        return redirect()->back()->with('success', "You've Deleted User $id Successfully");
+        $data = DB::table('users')->where('id', $user)->delete();
+        $data2 = DB::table('users_details')->where('user_id', $user)->delete();
+        $leave = Emp_leave_quota::where('user_id', $user)->delete();
+        $med = Emp_medical_balance::where('user_id', $user)->delete();
+        $user_role = Usr_role::where('user_id', $user)->delete();
+
+        return redirect()->back()->with('success', "You've Deleted User $name Successfully");
     }
 
 
@@ -233,7 +236,7 @@ class UserController extends Controller
 
             return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi nama bank
         }, $banks);
-        return view('manage.users_edit', ['user'=> $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'bankNames' => $bankNames]);
+        return view('manage.users_edit', ['user' => $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'bankNames' => $bankNames]);
     }
 
     public function update(Request $request, $id)
@@ -261,7 +264,7 @@ class UserController extends Controller
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $request->email.".".$profile_file->getClientOriginalExtension();
+            $nama_file_profile = $request->email . "." . $profile_file->getClientOriginalExtension();
             $tujuan_upload_profile = 'profile_pic';
 
             // Menghapus file profil lama jika ada
@@ -272,7 +275,6 @@ class UserController extends Controller
 
             // Memindahkan file profil yang baru diunggah
             $profile_file->storeAs('public/' . $tujuan_upload_profile, $nama_file_profile);
-
         } elseif ($user->users_detail->profile_pic) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $nama_file_profile = $user->users_detail->profile_pic;
@@ -302,47 +304,46 @@ class UserController extends Controller
             // Tidak ada foto profil di database dan tidak ada unggahan baru, set nilai menjadi null
             $nama_file_cv = null;
         }
-            $user = User::find($id);
-            $user->id = $request->usr_id;
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->save();
+        $user = User::find($id);
+        $user->id = $request->usr_id;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->save();
 
-            $user_detail = Users_detail::where('user_id',$id)->first();
-            $user_detail->user_id = $request->usr_id;
-            $user_detail->status_active = $request->status;
-            $user_detail->department_id = $request->department;
-            $user_detail->position_id = $request->position;
-            $user_detail->employee_id = $request->employee_id;
-            $user_detail->usr_dob = $request->usr_dob;
-            $user_detail->usr_birth_place = $request->usr_birth_place;
-            $user_detail->usr_gender = $request->usr_gender;
-            $user_detail->usr_npwp  = $request->usr_npwp;
-            $user_detail->usr_religion = $request->usr_religion;
-            $user_detail->usr_merital_status = $request->usr_merital_status;
-            $user_detail->usr_children = $request->usr_children;
-            $user_detail->usr_id_type = $request->usr_id_type;
-            $user_detail->usr_id_no= $request->usr_id_no;
-            $user_detail->usr_id_expiration = $request->usr_id_expiration;
-            $user_detail->employee_status = $request->employee_status;
-            $user_detail->hired_date = $request->hired_date;
-            $user_detail->resignation_date = $request->resignation_date;
-            $user_detail->usr_address = $request->usr_address;
-            $user_detail->usr_address_city = $request->usr_address_city;
-            $user_detail->usr_address_postal = $request->usr_address_postal;
-            $user_detail->usr_phone_home = $request->usr_phone_home;
-            $user_detail->usr_phone_mobile = $request->usr_phone_mobile;
-            $user_detail->usr_bank_name = $request->usr_bank_name;
-            $user_detail->usr_bank_branch = $request->usr_bank_branch;
-            $user_detail->usr_bank_account = $request->usr_bank_account;
-            $user_detail->usr_bank_account_name = $request->usr_bank_account_name;
-            $user_detail->current_address = $request->current_address;
-            $user_detail->profile_pic = $nama_file_profile;
-            $user_detail->cv = $nama_file_cv;
-            $user_detail->save();
+        $user_detail = Users_detail::where('user_id', $id)->first();
+        $user_detail->user_id = $request->usr_id;
+        $user_detail->status_active = $request->status;
+        $user_detail->department_id = $request->department;
+        $user_detail->position_id = $request->position;
+        $user_detail->employee_id = $request->employee_id;
+        $user_detail->usr_dob = $request->usr_dob;
+        $user_detail->usr_birth_place = $request->usr_birth_place;
+        $user_detail->usr_gender = $request->usr_gender;
+        $user_detail->usr_npwp  = $request->usr_npwp;
+        $user_detail->usr_religion = $request->usr_religion;
+        $user_detail->usr_merital_status = $request->usr_merital_status;
+        $user_detail->usr_children = $request->usr_children;
+        $user_detail->usr_id_type = $request->usr_id_type;
+        $user_detail->usr_id_no = $request->usr_id_no;
+        $user_detail->usr_id_expiration = $request->usr_id_expiration;
+        $user_detail->employee_status = $request->employee_status;
+        $user_detail->hired_date = $request->hired_date;
+        $user_detail->resignation_date = $request->resignation_date;
+        $user_detail->usr_address = $request->usr_address;
+        $user_detail->usr_address_city = $request->usr_address_city;
+        $user_detail->usr_address_postal = $request->usr_address_postal;
+        $user_detail->usr_phone_home = $request->usr_phone_home;
+        $user_detail->usr_phone_mobile = $request->usr_phone_mobile;
+        $user_detail->usr_bank_name = $request->usr_bank_name;
+        $user_detail->usr_bank_branch = $request->usr_bank_branch;
+        $user_detail->usr_bank_account = $request->usr_bank_account;
+        $user_detail->usr_bank_account_name = $request->usr_bank_account_name;
+        $user_detail->current_address = $request->current_address;
+        $user_detail->profile_pic = $nama_file_profile;
+        $user_detail->cv = $nama_file_cv;
+        $user_detail->save();
 
 
         return redirect()->back()->with('success', "You've Edited $user->name Successfully");
     }
-
 }

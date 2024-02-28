@@ -184,7 +184,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users/store', 'UserController@store')->middleware(['checkRole:admin,manager']);
         Route::get('/users/edit/{id}', 'UserController@edit');
         Route::put('/users/update/{id}', 'UserController@update');
-        Route::get('/users/hapus/{id}', 'UserController@delete');
+        Route::get('/users/delete/{id}', 'UserController@delete');
         Route::post(
             '/check-user-id',
             function () {
