@@ -59,7 +59,7 @@ active
                                 <tr class="table-sm text-center">
                                     <td style="d-flex align-items-center text-center">
                                         @if($user_info->users_detail->profile_pic)
-                                            <img class="img-profile rounded-circle" height="150px"width="140px" style="object-fit:fill;" src="{{ asset('storage/profile_pic/' . $user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                            <img class="img-profile rounded-circle" height="150px"width="140px" style="object-fit:fill;" src="{{ url('/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                         @else
                                             <div class="img-profile rounded-circle no-image"><i class="no-image-text">No Image Available</i></div>
                                         @endif

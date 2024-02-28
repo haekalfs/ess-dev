@@ -2,6 +2,8 @@
 /public/hot
 /public/surat_penugasan
 /public/reimbursement
+/public/profile_pic
+/public/med_pic
 /public/headline
 /public/storage
 /storage/*.key
