@@ -12,8 +12,10 @@ use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Leave_request_history;
 use App\Models\Notification_alert;
+use App\Models\Position;
 use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
+use App\Models\Surat_penugasan;
 use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
@@ -46,10 +48,7 @@ class LeaveController extends Controller
 
         $leaveQuotaUsage = Leave_request_history::where('req_by', Auth::user()->id)->get();
 
-        $weekendReplacementQuota = Emp_leave_quota::where('user_id', Auth::user()->id)
-        ->where('leave_id', 100)
-        ->where('expiration', '>=', date('Y-m-d'))
-        ->get();
+        $weekendReplacementQuota = Surat_penugasan::where('isWeekend', TRUE)->where('isTaken', FALSE)->get();
         $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->where('leave_id', 100)
         ->where('expiration', '>=', date('Y-m-d'))
@@ -134,21 +133,15 @@ class LeaveController extends Controller
         ->where('expiration', '>=', date('Y-m-d'))
         ->sum('quota_left');
 
-        $checkUserDept = Auth::user()->users_detail->department->id;
+        $UserDept = Auth::user()->users_detail->department;
 
-        $approvalFinance_GA = Timesheet_approver::whereIn('id', [10, 45])
-            ->get();
-        $approvalSales = Timesheet_approver::whereIn('id', [50, 45])
-            ->get();
-        $approvalHCM = Timesheet_approver::whereIn('id', [10, 60])
-            ->get();
-        $approvalService = Timesheet_approver::whereIn('id', [20, 40])
-            ->get();
-        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
-            ->pluck('approver')->toArray();
+        //for validation
+        $isManager = Timesheet_approver::where('group_id', 2)->pluck('approver')->toArray();
 
         $checkUserPost = Auth::user()->users_detail->position->id;
-        $statusId = in_array($checkUserPost, [7, 8, 12]) ? 29 : 15;
+        $getHighPosition = Position::where('position_level', 1)->pluck('id')->toArray();
+
+        $statusId = in_array($checkUserPost, $getHighPosition) ? 29 : 15;
 
         $findAssignment = Project_assignment_user::where('user_id', Auth::user()->id)->where('periode_end', '>=', date('Y-m-d'))->pluck('project_assignment_id')->toArray();
         $usersWithPMRole = Project_assignment_user::whereIn('project_assignment_id', $findAssignment)->where('role', 'PM')->get();
@@ -178,33 +171,15 @@ class LeaveController extends Controller
             break;
         }
 
+        //HARDCODE FOR ROLES
+        $getFM = Usr_role::where('role_id', 7)->pluck('user_id')->toArray();
+        $getHR = Usr_role::where('role_id', 3)->pluck('user_id')->toArray();
+
         switch ($checkIfOnce) {
             case false:
             case NULL:
                 switch (true) {
-                    case ($checkUserDept == 4):
-                        Leave_request::create([
-                            'id' => $uniqueId,
-                            'req_date' => date('Y-m-d'),
-                            'req_by' => Auth::user()->id,
-                            'leave_dates' => $request->datepickLeave,
-                            'total_days' => $request->total_days,
-                            'reason' => $request->reason,
-                            'leave_id' => $request->quota_used,
-                            'contact_number' => $request->cp_number,
-                        ]);
-                        foreach($approvalFinance_GA as $approverGa){
-                            Leave_request_approval::create([
-                                'status' => $statusId,
-                                'RequestTo' => $approverGa->approver,
-                                'leave_request_id' => $uniqueId
-                            ]);
-                            $userToApprove[] = $approverGa->approver;
-
-                        }
-                        break;
-                        // No break statement here, so it will continue to the next case
-                    case ($checkUserDept == 2):
+                    case ($UserDept->approvers->isNotEmpty()): // Check if there are any department approvers
                         Leave_request::create([
                             'id' => $uniqueId,
                             'req_date' => date('Y-m-d'),
@@ -215,76 +190,48 @@ class LeaveController extends Controller
                             'leave_id' => $request->quota_used,
                             'contact_number' => $request->cp_number,
                         ]);
-                        foreach($approvalService as $approverService){
-                            Leave_request_approval::create([
-                                'status' => $statusId,
-                                'RequestTo' => $approverService->approver,
-                                'leave_request_id' => $uniqueId
-                            ]);
-                            $userToApprove[] = $approverService->approver;
-                        }
                         if(!$usersWithPMRole->isEmpty()){
                             foreach($usersWithPMRole as $approverPM){
-                                if(in_array(Auth::id(), $isManager) || in_array($checkUserPost, [7, 8, 12]) || Auth::id() == $approverPM->user_id){
+                                if(in_array(Auth::id(), $isManager) || in_array($checkUserPost, $getHighPosition) || Auth::id() == $approverPM->user_id){
                                     break;
                                 }
                                 Leave_request_approval::create([
                                     'status' => $statusId,
-                                    'RequestTo' => $approverPM->approver,
+                                    'RequestTo' => $approverPM->user_id,
                                     'leave_request_id' => $uniqueId
                                 ]);
-                                $userToApprove[] = $approverPM->approver;
+                                $userToApprove[] = $approverPM->user_id;
                             }
                         }
-                        break;
-                    case ($checkUserDept == 3):
-                        Leave_request::create([
-                            'id' => $uniqueId,
-                            'req_date' => date('Y-m-d'),
-                            'req_by' => Auth::user()->id,
-                            'leave_dates' => $request->datepickLeave,
-                            'total_days' => $totalDays,
-                            'reason' => $request->reason,
-                            'leave_id' => $request->quota_used,
-                            'contact_number' => $request->cp_number,
-                        ]);
-                        foreach($approvalHCM as $approverHCM){
+                        foreach ($UserDept->approvers as $approver) {
+                            // Skip if the user is a manager and the approver is also a manager
+                            if (in_array(Auth::id(), $isManager) && in_array($approver->approver, $isManager)) {
+                                continue;
+                            }
+
+                            // Skip if the user is finance staff and the approver is 'desy'
+                            if (in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) && in_array($approver->approver, $getHR)) {
+                                continue;
+                            }
+
+                            // Skip if the user is not finance staff and the approver is 'suryadi'
+                            if (!in_array('finance_staff', Auth::user()->role_id()->pluck('role_name')->toArray()) && in_array($approver->approver, $getFM)) {
+                                continue;
+                            }
                             Leave_request_approval::create([
                                 'status' => $statusId,
-                                'RequestTo' => $approverHCM->approver,
+                                'RequestTo' => $approver->approver,
                                 'leave_request_id' => $uniqueId
                             ]);
-                            $userToApprove[] = $approverHCM->approver;
+                            $userToApprove[] = $approver->approver;
                         }
                         break;
-                    case ($checkUserDept == 1):
-                        Leave_request::create([
-                            'id' => $uniqueId,
-                            'req_date' => date('Y-m-d'),
-                            'req_by' => Auth::user()->id,
-                            'leave_dates' => $request->datepickLeave,
-                            'total_days' => $totalDays,
-                            'reason' => $request->reason,
-                            'leave_id' => $request->quota_used,
-                            'contact_number' => $request->cp_number,
-                        ]);
-                        foreach($approvalSales as $approverSales){
-                            Leave_request_approval::create([
-                                'status' => $statusId,
-                                'RequestTo' => $approverSales->approver,
-                                'leave_request_id' => $uniqueId
-                            ]);
-                            $userToApprove[] = $approverSales->approver;
-                        }
-                        break; // Add break statement here to exit the switch block after executing the case
                     default:
-                        return redirect()->back()->with('failed', "You haven't assigned to any department! Ask HR Dept to correcting your account details");
-                    break;
+                        return redirect()->back()->with('failed', "You haven't been assigned to any department! Please contact the HR Department to correct your account details.");
                 }
                 break;
             default:
-                return redirect()->back()->with('failed', "You already used the qouta, or requested days is exceed from quota!");
-            break;
+                return redirect()->back()->with('failed', "You have already used your quota, or the requested days exceed your quota!");
         }
 
         // $getUsedQuota = Emp_leave_quota::where
@@ -337,11 +284,9 @@ class LeaveController extends Controller
             }
         }
 
-        Leave_request_approval::where('RequestTo', Auth::user()->id)->where('leave_request_id', $uniqueId)->delete();
-
         $checkUserPost = Auth::user()->users_detail->position->id;
 
-        if (in_array($checkUserPost, [7, 8, 12])) {
+        if (in_array($checkUserPost, $getHighPosition)) {
             //truncate
             Leave_request_approval::where('leave_request_id', $uniqueId)->delete();
             //recreate

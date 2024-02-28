@@ -128,11 +128,11 @@
                         <a class="collapse-item" href="/approval">Approval</a>
                         @else
                         @endusr_acc
-                        {{-- @usr_acc(203)
+                        @usr_acc(203)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/approval">Manage Approval</a>
+                        <a class="collapse-item" href="/approval-history/">Approval History</a>
                         @else
-                        @endusr_acc --}}
+                        @endusr_acc
                     </div>
                 </div>
             </li>
@@ -273,7 +273,7 @@
                         <a class="collapse-item" href="/manage/users">A1. Manage Users</a>
                         <a class="collapse-item" style="font-size: 12px;" href="/management/security_&_roles/"><i>A2. User Access C. (UAC)</i></a>
                         <h6 class="collapse-header" style="font-size: 9px;">Employement Administration:</h6>
-                        <a class="collapse-item" href="/manage/list/employees">A3. Employees Database</a>
+                        <a class="collapse-item" href="/manage/list/employees">A3. Emp. Database & CV</a>
                         <a class="collapse-item" href="/hr/exit_clearance/">A4. Exit Clearance</a>
                     </div>
                 </div>

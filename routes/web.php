@@ -90,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
 
         //Approval
         Route::get('/approval', 'ApprovalController@index')->name('approval.main');
+        Route::get('/approval-history', 'ApprovalController@history')->name('approval.history');
         Route::get('/approval/timesheet/p', 'ApprovalController@timesheet_approval')->name('approval_primary');
         Route::get('/approval/leave/{yearSelected?}', 'LeaveApprovalController@leave_approval')->name('approval.leave');
         Route::get('/approval/reimburse/{yearSelected?}', 'ReimbursementApprovalController@reimbursement_approval')->name('approval.reimburse');
@@ -232,6 +233,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/hr/compliance/timesheet/settings', 'HrController@timesheet');
         Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save');
         Route::put("/hr/compliance/update/regulations", 'HrController@update_regulation');
+        Route::put("/hr/compliance/update/cutoff-date", 'HrController@update_cutoffdate');
         // Exit Clearance
         Route::get('/hr/exit_clearance/', 'HrController@exit_clear');
         Route::get('/hr/exit_clearance/print/{id}', 'HrController@print');

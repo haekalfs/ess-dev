@@ -15,4 +15,7 @@ class Department extends Model
         return $this->hasOne('App\Models\Users');
     }
 
+    public function approvers(){
+    	return $this->hasMany('App\Models\Timesheet_approver', 'department_id', 'id');
+    }
 }

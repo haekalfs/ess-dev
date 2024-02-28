@@ -11,6 +11,7 @@ use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
 use App\Models\API_key;
+use App\Models\Department;
 use App\Models\Setting;
 use App\Models\Position;
 use App\Models\Users_fingerprint;
@@ -27,31 +28,14 @@ class HrController extends Controller
 {
 	public function index()
 	{
+        $department = Department::all();
 		//Cutoff Date Timesheet Submission
-		$Cutoffdate = Cutoffdate::find(1);
-		$CutoffdateTimesheetApproval = Cutoffdate::find(2);
-		$leaveApprovalCutoffdate = Cutoffdate::find(3);
-		$reimburseApprovalCutoffdate = Cutoffdate::find(4);
+		$Cutoffdate = Cutoffdate::all();
 
+		//Position, Users & Approvers
 		$users = User::all();
+		$position = Position::all();
 		$approvers = Timesheet_approver::all();
-
-		//Finance And GA
-		$FGA_Approve1 = Timesheet_approver::where('id', 10)->first();
-		$FGA_Approve2 = Timesheet_approver::where('id', 45)->first();
-		$FGA_Approve3 = Timesheet_approver::where('id', 15)->first();
-
-		//Technology And HCM
-		$THC_Approve1 = Timesheet_approver::where('id', 25)->first();
-		$THC_Approve2 = Timesheet_approver::where('id', 60)->first();
-
-		//Sales And Marketing
-		$SM_Approve1 = Timesheet_approver::where('id', 50)->first();
-		$SM_Approve2 = Timesheet_approver::where('id', 55)->first();
-
-		//Services
-		$Service_Approve1 = Timesheet_approver::where('id', 20)->first();
-		$Service_Approve2 = Timesheet_approver::where('id', 40)->first();
 
 		//DEFAULT
 		$Default_Approve1 = Timesheet_approver::where('id', 29)->first();
@@ -60,8 +44,7 @@ class HrController extends Controller
 		//Admin
 		$reimburse_admin = Timesheet_approver::where('id', 65)->first();
 		$medical_admin = Timesheet_approver::where('id', 99)->first();
-		//Position
-		$position = Position::all();
+
 
 		//export TS
 		$setting_export_ts = Setting::where('id', 1)->first();
@@ -79,20 +62,8 @@ class HrController extends Controller
 			'hr.compliance.main',
 			[
 				'cutoffDate' => $Cutoffdate,
-				'tsCutoffdate' => $CutoffdateTimesheetApproval,
-				'leaveCutoffdate' => $leaveApprovalCutoffdate,
-				'reimburseCutoffdate' => $reimburseApprovalCutoffdate,
 				'approver' => $approvers,
 				'user' => $users,
-				'FGA1' => $FGA_Approve1,
-				'FGA2' => $FGA_Approve2,
-				'Finance' => $FGA_Approve3,
-				'THC1' => $THC_Approve1,
-				'THC2' => $THC_Approve2,
-				'SM1' => $SM_Approve1,
-				'SM2' => $SM_Approve2,
-				'Service1' => $Service_Approve1,
-				'Service2' => $Service_Approve2,
 				'Default1' => $Default_Approve1,
 				'Default2' => $Default_Approve2,
 				'usersFingerprint' => $usersFingerprint,
@@ -102,133 +73,63 @@ class HrController extends Controller
 				'position'	=> $position,
 				'cc_email' => $cc_email,
 				'reimburse_admin' => $reimburse_admin,
-				'medical_admin' => $medical_admin
+				'medical_admin' => $medical_admin,
+                'department' => $department
 			]
 		);
 	}
 
 	public function update_regulation(Request $request)
-	{
+    {
+        // Validate the incoming request data
+        $request->validate([
+            // Add your validation rules here
+        ]);
 
-		$request->validate([
-			'FGA_FA' => 'sometimes',
-			'FGA_PA' => 'sometimes',
-			'THC_FA' => 'sometimes',
-			'THC_PA' => 'sometimes',
+        // Processing department approvers
+        foreach ($request->all() as $key => $value) {
+            // Check if the key starts with 'approvers' indicating it's a department approver
+            if (strpos($key, 'approvers') === 0) {
+                $approverId = substr($key, strlen('approvers')); // Extract the ID from the key
+                // Update the Timesheet_approver record with the extracted ID
+                Timesheet_approver::where('id', $approverId)->update(['approver' => $value]);
+            }
+        }
 
-		]);
+        // Update default approvers
+        Timesheet_approver::where('id', 29)->update(['approver' => $request->Default_FA]);
+        Timesheet_approver::where('id', 28)->update(['approver' => $request->Default_PA]);
 
-		//Password Finance
-		$Newpassword = $request->input('confirmPassword');
-		$hash = Hash::make($Newpassword);
+        // Update Reimburse & Medical Admin
+        Timesheet_approver::where('id', 65)->update(['approver' => $request->reimburse_admin]);
+        Timesheet_approver::where('id', 99)->update(['approver' => $request->medical_admin]);
 
-		$password_finance = Financial_password::where('id', 1)->first();
-		$password_finance->password = $hash;
-		$password_finance->save();
+        // Update Export TS
+        Setting::where('id', 1)->update(['position_id' => $request->export_ts]);
 
-		// Cutoff Date
-		// Cutoff Date Submit TS
-		$Cutoffdate_input = Cutoffdate::where('id', 1)->first();
-		$Cutoffdate_input->start_date = $request->ts_submit_start_date;
-		$Cutoffdate_input->closed_date = $request->ts_submit_closed_date;
-		$Cutoffdate_input->save();
+        // Update Export Reimburse
+        Setting::where('id', 2)->update(['position_id' => $request->export_reimburse]);
 
-		// Cutoff Date Approve TS
-		$CutoffdateTimesheetApproval_input = Cutoffdate::where('id', 2)->first();
-		$CutoffdateTimesheetApproval_input->start_date = $request->ts_approve_start_date;
-		$CutoffdateTimesheetApproval_input->closed_date = $request->ts_approve_closed_date;
-		$CutoffdateTimesheetApproval_input->save();
+        // Update CC Emails
+        Setting::where('id', 3)->update(['user_id' => $request->email_cc]);
 
-		// Cutoff Date Approve Leave
-		$leaveApprovalCutoffdate_input = Cutoffdate::where('id', 3)->first();
-		$leaveApprovalCutoffdate_input->start_date = $request->leave_approve_start_date;
-		$leaveApprovalCutoffdate_input->closed_date = $request->leave_approve_closed_date;
-		$leaveApprovalCutoffdate_input->save();
+        return redirect()->back()->with('success', 'Compliance Edit Success');
+    }
 
-		// Cutoff Date Approve Reimburse
-		$reimburseApprovalCutoffdate_input = Cutoffdate::where('id', 4)->first();
-		$reimburseApprovalCutoffdate_input->start_date = $request->reimburse_approve_start_date;
-		$reimburseApprovalCutoffdate_input->closed_date = $request->reimburse_approve_closed_date;
-		$reimburseApprovalCutoffdate_input->save();
+    public function update_cutoffdate(Request $request)
+    {
+        foreach ($request->input('cutoff_dates', []) as $key => $value) {
+            $cutoffDate = CutoffDate::find($key); // Assuming $key is the ID of the CutoffDate record
 
-		// Approver
-		// Finance & GA
-		$input_FGA_Approve1 = Timesheet_approver::where('id', 10)->first();
-		$input_FGA_Approve1->approver = $request->FGA_FA;
-		$input_FGA_Approve1->save();
+            if ($cutoffDate) {
+                $cutoffDate->start_date = $value['start_date'];
+                $cutoffDate->closed_date = $value['closed_date'];
+                $cutoffDate->save();
+            }
+        }
 
-		$input_FGA_Approve2 = Timesheet_approver::where('id', 45)->first();
-		$input_FGA_Approve2->approver = $request->FGA_PA;
-		$input_FGA_Approve2->save();
-
-		$input_FGA_Approve3 = Timesheet_approver::where('id', 15)->first();
-		$input_FGA_Approve3->approver = $request->Finance_approver;
-		$input_FGA_Approve3->save();
-
-		//Technology And HCM
-		$input_THC_Approve1 = Timesheet_approver::where('id', 25)->first();
-		$input_THC_Approve1->approver = $request->THM_FA;
-		$input_THC_Approve1->save();
-
-		$input_THC_Approve2 = Timesheet_approver::where('id', 60)->first();
-		$input_THC_Approve2->approver = $request->THM_PA;
-		$input_THC_Approve2->save();
-
-		//Sales And Marketing
-		$input_SM_Approve1 = Timesheet_approver::where('id', 50)->first();
-		$input_SM_Approve1->approver = $request->SM_FA;
-		$input_SM_Approve1->save();
-
-		$input_SM_Approve2 = Timesheet_approver::where('id', 55)->first();
-		$input_SM_Approve2->approver = $request->SM_PA;
-		$input_SM_Approve2->save();
-
-		//Services
-		$input_Service_Approve1 = Timesheet_approver::where('id', 20)->first();
-		$input_Service_Approve1->approver = $request->Service_FA;
-		$input_Service_Approve1->save();
-
-		$input_Service_Approve2 = Timesheet_approver::where('id', 40)->first();
-		$input_Service_Approve2->approver = $request->Service_PA;
-		$input_Service_Approve2->save();
-
-		//DEFAULT
-		$input_Default_Approve1 = Timesheet_approver::where('id', 29)->first();
-		$input_Default_Approve1->approver = $request->Default_FA;
-		$input_Default_Approve1->save();
-
-		$input_Default_Approve2 = Timesheet_approver::where('id', 28)->first();
-		$input_Default_Approve2->approver = $request->Default_PA;
-		$input_Default_Approve2->save();
-
-		//Reimburse & Medical Admin
-		$input_admin_reimburse = Timesheet_approver::where('id', 65)->first();
-		$input_admin_reimburse->approver = $request->reimburse_admin;
-		$input_admin_reimburse->save();
-
-		$input_admin_medical = Timesheet_approver::where('id', 99)->first();
-		$input_admin_medical->approver = $request->medical_admin;
-		$input_admin_medical->save();
-
-		//Export TS
-		$input_export_ts = Setting::where('id', 1)->first();
-		$input_export_ts->position_id = $request->export_ts;
-		$input_export_ts->save();
-
-		//Export Reimburse
-
-		$input_export_reimburse = Setting::where('id', 2)->first();
-		$input_export_reimburse->position_id = $request->export_reimburse;
-		$input_export_reimburse->save();
-
-		//CC Emails
-
-		$input_email_cc = Setting::where('id', 3)->first();
-		$input_email_cc->user_id = $request->email_cc;
-		$input_email_cc->save();
-
-		return redirect()->back()->with('success', 'Compilance Edit Success');
-	}
+        return redirect()->back()->with('success', 'Compliance Edit Success');
+    }
 
 	public function exit_clear()
 	{

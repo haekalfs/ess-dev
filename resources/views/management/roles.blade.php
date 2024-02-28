@@ -101,7 +101,7 @@ active
                                                 <th>No.</th>
                                                 <th>User ID</th>
                                                 <th>Role Name</th>
-                                                <th width="80px">Action</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -111,7 +111,7 @@ active
                                                     <td>{{ $no++ }}</td>
                                                     <td>{{ $user['name'] }}</td>
                                                     <td>{{ $user['roles'] }}</td>
-                                                    <td>
+                                                    <td style="width: 10%;" class="text-center">
                                                         <a class="btn btn-danger btn-sm" onclick='isconfirm();' href="/management/security_&_roles/remove/roles/{{ $user['us_Dat'] }}"><i class='fas fa-fw fa-undo-alt'></i> Reset</a>
                                                     </td>
                                                 </tr>
@@ -160,10 +160,11 @@ active
                                     An error occurred while saving your entry. Please try again.
                                 </div>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
+                                    <table class="table table-bordered zoom90" width="100%" id="dataTableRoleList" cellspacing="0">
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>No</th>
+                                                <th>Role ID</th>
                                                 <th>Role Code</th>
                                                 <th>Description</th>
                                                 <th width="80px">Action</th>
@@ -173,10 +174,11 @@ active
                                             @php $no = 1; @endphp
                                             @foreach ($r_name as $rn)
                                                 <tr>
-                                                    <td>{{ $no++ }}</td>
-                                                    <td>{{ $rn['role'] }}</td>
-                                                    <td>{{ $rn['description'] }}</td>
-                                                    <td>
+                                                    <td style="width: 5%;">{{ $no++ }}</td>
+                                                    <td style="width: 10%;" class="text-danger font-weight-bold text-center">{{ $rn->id }}</td>
+                                                    <td>{{ $rn->role }}</td>
+                                                    <td>{{ $rn->description }}</td>
+                                                    <td style="width: 10%;">
                                                       <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
                                                     </td>
                                                 </tr>
@@ -241,16 +243,16 @@ active
                                                 <th>ID</th>
                                                 <th>Page</th>
                                                 <th>Grant Access</th>
-                                                <th width="80px">Action</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($access as $userAc)
                                                 <tr>
-                                                    <td>{{ $userAc['id'] }}</td>
+                                                    <td style="width: 5%;">{{ $userAc['id'] }}</td>
                                                     <td>{{ $userAc['page'] }}</td>
                                                     <td>{{ $userAc['grantTo'] }}</td>
-                                                    <td>
+                                                    <td class="text-center" style="width: 10%;">
                                                         <a class="btn btn-danger btn-sm" onclick='isconfirm();' href="/management/security_&_roles/remove/access/{{ $userAc['page_id'] }}"><i class='fas fa-fw fa-undo-alt'></i> Reset</a>
                                                     </td>
                                                 </tr>
