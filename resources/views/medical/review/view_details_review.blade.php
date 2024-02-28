@@ -121,7 +121,7 @@ active
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
-                <button class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $med->id }}"><i class="fa fa-check" aria-hidden="true"></i> Mark As PAid</button>
+                <button class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $med->id }}"><i class="fa fa-check" aria-hidden="true"></i> Pay</button>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -278,7 +278,7 @@ active
 @method('PUT')
 @csrf
     <div class="modal fade" id="viewModal{{ $med->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="balanceEditModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg zoom90" role="document">
+        <div class="modal-dialog modal-dialog-centered  zoom90" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <h5 class="modal-title  text-white" id="staticBackdropLabel">Medical Request MED_{{ $med->id }}</h5>
@@ -288,31 +288,6 @@ active
                 </div>
                 <div class="modal-body text-start d-flex justify-content-center">
                     <div class="row">
-                        <div class="col-8 col-sm-6">
-                            <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr colspan="2" class="text-center font-weight-bold">Total Request Amount</tr>
-                                </thead>
-                                <tr>
-                                    {{-- <td colspan="2" class="text-center font-weight-bold">Total</td> --}}
-                                    <td class="text-start text-danger font-weight-bold">
-                                        <span id="totalAmountDisplay" name="totalAmountDisplay"></span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-4 col-sm-6">
-                            <table class="table table-borderless table-sm" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr colspan="2" class="text-center font-weight-bold">Total Amount Approved</tr>
-                                </thead>
-                                <tr>
-                                    <td colspan="2" class="text-start text-success font-weight-bold" id="totalAmountApproved">
-                                    <span id="totalAmountApprovedDisplay" name="totalAmountApprovedDisplay"></span>
-                                </td>
-                                </tr>
-                            </table>
-                        </div>
                         <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                             <tr>
                                 <td style="text-align: center;">
@@ -326,8 +301,8 @@ active
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-sm btn-danger" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-sm btn-success">Paid</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-success">Paid</button>
                 </div>
             </div>
         </div>

@@ -157,6 +157,9 @@ active
                                             @case(20)
                                                 <span>Waiting For Your Payment <i class="fa fa-spinner" aria-hidden="true"></i></span>
                                                 @break
+                                            @case(15)
+                                            <span>Waiting For Approval <i class="fa fa-spinner" aria-hidden="true"></i></span>
+                                            @break
                                             @case(404)
                                                 <span>Rejected<i class="fa fa-exclamation-circle" style="color: red" aria-hidden="true"></i></span>
                                                 @break
