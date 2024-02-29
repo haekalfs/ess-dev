@@ -81,11 +81,14 @@ class UserController extends Controller
         $nextId = intval(substr($lastId, 4)) + 1;
         $hash_pwd = Hash::make($request->password);
 
+        $employeeID = $request->employee_id;
+        $year = Carbon::now()->year;
+
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $request->id . "_" . "profile_pic" . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = '/profile_pic';
+            $nama_file_profile = $employeeID . $year . "_profile" . "." . $profile_file->getClientOriginalExtension();
+            $tujuan_upload_profile = 'images_storage';
             $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
         } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
@@ -96,8 +99,8 @@ class UserController extends Controller
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
-            $nama_file_cv = $request->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = '/cv';
+            $nama_file_cv = $employeeID . $year . "_cv" . "." . $cv_file->getClientOriginalExtension();
+            $tujuan_upload_cv = 'images_storage';
             $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
         } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
@@ -114,7 +117,7 @@ class UserController extends Controller
         Users_detail::create([
             'id' => $nextId,
             'user_id' => $request->usr_id,
-            'employee_id' => $request->employee_id,
+            'employee_id' => $employeeID,
             'position_id' => $request->position,
             'department_id' => $request->department,
             'status_active' => $request->status,
@@ -243,29 +246,15 @@ class UserController extends Controller
     {
 
         $user = User::find($id);
-        // $this->validate($request,[
-        //     'name' => 'required',
-        //     'email' => 'required',
-        //     'status' => 'required',
-        //     'position' => 'required',
-        //     'department' => 'required',
-        //     'hired_date'=> 'required',
-        //     'employee_id' => 'required',
-        //     'employee_status' => 'required',
-        //     'usr_id_type'=> 'required',
-        //     'usr_id_no'=> 'required',
-        //     'usr_id_expiration'=> 'required',
-        //     'usr_dob'=> 'required',
-        //     'usr_birth_place'=> 'required',
-        //     'usr_gender'=> 'required',
-        //     'usr_religion'=> 'required',
-        // ]);
+        
+        $employeeID = $user->users_detail->employee_id;
+        $year = Carbon::now()->year;
 
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $request->email . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = '/profile_pic';
+            $nama_file_profile = $employeeID . $year . "_profile" . "." . $profile_file->getClientOriginalExtension();
+            $tujuan_upload_profile = 'images_storage';
 
             // Menghapus file profil lama jika ada
             $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
@@ -287,8 +276,8 @@ class UserController extends Controller
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
 
-            $nama_file_cv = $request->usr_id . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = '/cv';
+            $nama_file_cv = $employeeID . $year . "_cv" . "." . $cv_file->getClientOriginalExtension();
+            $tujuan_upload_cv = 'images_storage';
 
             // Menghapus file profil lama jika ada
             $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
@@ -304,7 +293,7 @@ class UserController extends Controller
             // Tidak ada foto profil di database dan tidak ada unggahan baru, set nilai menjadi null
             $nama_file_cv = null;
         }
-        $user = User::find($id);
+
         $user->id = $request->usr_id;
         $user->name = $request->name;
         $user->email = $request->email;
