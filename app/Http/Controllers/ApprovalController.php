@@ -570,6 +570,17 @@ class ApprovalController extends Controller
             }
         }
 
+        //WeekendReplacement
+        $weekendReplacement = Surat_penugasan::where('user_id', Auth::user()->id)
+            ->where('isTaken', TRUE)
+            ->pluck('date_to_replace')
+            ->toArray();
+
+        $formattedDatesWeekendRepl = [];
+        foreach ($weekendReplacement as $dateString) {
+            $formattedDatesWeekendRepl[] = date('Y-m-d', strtotime($dateString));
+        }
+
         $surat_penugasan = Surat_penugasan::where('user_id', $user_id)->pluck('ts_date')->toArray();
         $srtDate = [];
         foreach ($surat_penugasan as $ts_date_srt) {
@@ -676,7 +687,7 @@ class ApprovalController extends Controller
             ->get()
             ->count();
         // return response()->json($activities);
-        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'assignmentNames', 'user_id', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'formattedDatesWeekendRepl', 'assignmentNames', 'user_id', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
 

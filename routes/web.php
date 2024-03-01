@@ -120,6 +120,7 @@ Route::middleware(['auth'])->group(function () {
         //leave
         Route::get('/leave/history/{yearSelected?}', 'LeaveController@history')->name('leave');
         Route::post('/leave/request/entry', 'LeaveController@leave_request_entry')->name('leave.entry');
+        Route::post('/weekend-replacement/entry', 'LeaveController@weekend_replacement_entry')->name('weekend.replacement.entry');
         Route::get('/leave/request/details/{id}', 'LeaveController@leave_request_details')->name('leave_req_details')->where('id', '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}');
         Route::get('/leave/history/cancel/{id}', 'LeaveController@cancel_request')->name('cancel_leave');
         Route::get('/leave/request/manage/all', 'LeaveController@manage_request')->name('manage_leave_requests');
@@ -333,6 +334,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/get-data/timesheet-absence', 'AttendanceController@downloadLogData')->name('getData');
         Route::get('/send-data/timesheet-absence', 'AttendanceController@sendData')->name('sendData');
         Route::put('/myprofile/cv_upload/{id}', 'MyProfileController@upload_cv')->name('Upload CV');
+        Route::get('/checkIsHoliday', 'TimesheetController@checkIsHoliday');
     });
     //Non
     Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');

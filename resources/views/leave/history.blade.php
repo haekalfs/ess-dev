@@ -116,7 +116,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole" id="judul">Leave History</h6>
         <div class="text-right">
-            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#leaveRequest" id="leaveRequestBtn">Create Request</a>
+            <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#leaveRequest" id="leaveRequestBtn">+ Create Request</a>
         </div>
     </div>
     <div class="card-body">
@@ -202,26 +202,33 @@ active
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="email">Date :</label>
-                                    <input type="text" class="form-control date" name="datepickLeave" id="datepickLeave" autocomplete="off" placeholder="mm/dd/YYYY" onblur="calculateTotalDays()"/>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
                                     <label for="password">Quota Used :</label>
-                                    <select class="form-control" name="quota_used" required>
+                                    <select class="form-control" name="quota_used" id="quota_used" required>
+                                        <option disabled selected>Select Type...</option>
                                         @foreach($leaveType as $l)
                                         <option value="{{$l->id}}">{{ $l->description}}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="email">Date :</label>
+                                    <input type="text" class="form-control date" name="datepickLeave" id="datepickLeave" autocomplete="off" placeholder="mm/dd/YYYY" onblur="calculateTotalDays()"/>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 isWR">
                                 <div class="form-group">
                                     <label for="email">CP During Leave :</label>
-                                    <input type="text" class="form-control" required autocomplete="off" name="cp_number" id="cp_number" placeholder="083818XXXX">
+                                    <input type="text" class="form-control" autocomplete="off" name="cp_number" id="cp_number" placeholder="083818XXXX">
+                                </div>
+                            </div>
+                            <div class="col-md-6 hidWR" style="display: none;">
+                                <div class="form-group">
+                                    <label for="password">Available :</label>
+                                    <input type="number" class="form-control" autocomplete="off" name="avail_wr" id="avail_wr" value="{{ $empLeaveQuotaWeekendReplacement }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -231,15 +238,16 @@ active
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row isWR">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Reason :</label>
-                                    <textarea type="text" class="form-control" name="reason" required></textarea>
+                                    <textarea type="text" class="form-control" name="reason"></textarea>
                                 </div>
                             </div>
                         </div>
-				    </div>
+                        <span style="display: none;" class="text-danger hidWR"><small>Be careful, once submitted, it cannot be undone.</small></span>
+                    </div>
                 </div>
 				<div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -361,31 +369,24 @@ active
                                         <table class="table table-bordered zoom90" id="weekendReplacement" width="100%" cellspacing="0">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Replacement For</th>
-                                                    <th>Active Periode</th>
-                                                    <th>Expired On</th>
-                                                    <th>Status</th>
-                                                    <th>Quota</th>
-                                                    <th>Quota Used</th>
-                                                    <th>Quota Left</th>
+                                                    <th>You Worked on</th>
+                                                    <th>Replacement can be taken within</th>
+                                                    <th class="text-danger">Your replacement will be on</th>
+                                                    <th>Availability</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($weekendReplacementQuota as $wrq)
                                                     <tr>
-                                                        <td>{{ $wrq->leave->description }}</td>
-                                                        <td>{{ $wrq->active_periode }}</td>
-                                                        <td>{{ $wrq->expiration }}</td>
-                                                        <td><?php
-                                                            if($wrq->expiration < date('Y-m-d')){
-                                                                echo '<h6 class="h6 text-danger mb-2"><i>Expired</i></h6>';
-                                                            } else {
-                                                                echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
-                                                            }
-                                                        ?></td>
-                                                        <td>{{ $wrq->quota_left }}</td>
-                                                        <td>{{ $wrq->quota_used }}</td>
-                                                        <td>{{ $wrq->quota_left }}</td>
+                                                        <td style="width: 20%;"><span class="text-danger font-weight-bold">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $wrq->ts_date)->format('d-M-Y') }}</span></td>
+                                                        <td><span class="text-secondary font-weight-bold">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $wrq->ts_date)->format('d-M-Y') }}</span> — <span class="text-secondary font-weight-bold">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $wrq->expiration)->format('d-M-Y') }}</span></td>
+                                                        <td>
+                                                            @if($wrq->date_to_replace)
+                                                            {{ \Carbon\Carbon::createFromFormat('Y-m-d', $wrq->date_to_replace)->format('d-M-Y') }}
+                                                            @else
+                                                            @endif
+                                                        </td>
+                                                        <td style="width: 10%;" class="text-center">@if($wrq->isTaken == TRUE) <i class="fas fa-ban"></i> @else <i class='fas fa-check-circle' style='color: #005eff;'></i> @endif</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -502,18 +503,30 @@ $('.date').datepicker({
     startDate: startDate,
     daysOfWeekDisabled: "0,6"
 });
-function calculateTotalDays() {
-        var dateInput = document.getElementById('datepickLeave');
-        var selectedDates = dateInput.value.split(',');
+$(document).ready(function() {
+    $('#quota_used').change(function() {
+        var selectedQuota = $(this).val();
 
-        var totalDays = 0;
-        for (var i = 0; i < selectedDates.length; i++) {
-            var currentDate = new Date(selectedDates[i]);
-            totalDays++;
+        if (selectedQuota === "100") {
+            $('.isWR').hide();
+            $('.hidWR').show();
+            $('#leave-request').attr('action', '{{ route('weekend.replacement.entry') }}');
+        } else {
+            // Restore original form action
+            $('#leave-request').attr('action', '{{ route('leave.entry') }}');
+            $('.isWR').show();
+            $('.hidWR').hide();
         }
+    });
+});
+function calculateTotalDays() {
+    var dateInput = document.getElementById('datepickLeave');
+    var selectedDates = dateInput.value.split(',');
 
-        document.getElementById('total_days').value = totalDays;
-    }
+    var totalDays = selectedDates.length; // Initialize total days with the number of selected dates
+
+    document.getElementById('total_days').value = totalDays;
+}
 </script>
 <style>
 .action{

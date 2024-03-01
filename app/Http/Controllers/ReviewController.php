@@ -205,6 +205,17 @@ class ReviewController extends Controller
             }
         }
 
+        //WeekendReplacement
+        $weekendReplacement = Surat_penugasan::where('user_id', Auth::user()->id)
+            ->where('isTaken', TRUE)
+            ->pluck('date_to_replace')
+            ->toArray();
+
+        $formattedDatesWeekendRepl = [];
+        foreach ($weekendReplacement as $dateString) {
+            $formattedDatesWeekendRepl[] = date('Y-m-d', strtotime($dateString));
+        }
+
         $json = null;
         $array = null;
         $cachedData = Cache::get('holiday_data');
@@ -311,7 +322,7 @@ class ReviewController extends Controller
         ->count();
 
         // return response()->json($activities);
-        return view('review.ts_preview', compact('year', 'month','info', 'formattedDatesHoliday', 'getTotalDays', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('review.ts_preview', compact('year', 'month','info', 'formattedDatesHoliday', 'getTotalDays', 'formattedDatesWeekendRepl', 'totalHours', 'assignmentNames', 'user_id', 'srtDate', 'startDate','endDate', 'formattedDates'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function print_selected($year, $month, $user_timesheet)

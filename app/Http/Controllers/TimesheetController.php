@@ -176,6 +176,16 @@ class TimesheetController extends Controller
             }
         }
 
+        //WeekendReplacement
+        $weekendReplacement = Surat_penugasan::where('user_id', Auth::user()->id)
+            ->where('isTaken', TRUE)
+            ->pluck('date_to_replace')
+            ->toArray();
+
+        $formattedDatesWeekendRepl = [];
+        foreach ($weekendReplacement as $dateString) {
+            $formattedDatesWeekendRepl[] = date('Ymd', strtotime($dateString));
+        }
 
         // Get the hired_date
         $hired_date = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first();
@@ -214,7 +224,9 @@ class TimesheetController extends Controller
                 return 2907;
             } elseif(in_array($dateToCheck2, $formattedDatesHired)){
                 return 404;
-            }else {
+            }elseif(in_array($dateToCheck2, $formattedDatesWeekendRepl)){
+                return 100;
+            } else {
                 return "";
             }
         }
@@ -541,10 +553,24 @@ class TimesheetController extends Controller
                 // Move the uploaded file to the storage folder
                 $file->move($upload_folder, $fileName);
 
+                $dateString = $request->clickedDate;
+                $getDayStat = null;
+                $originalDate = Carbon::createFromFormat('Y-m-d', $dateString);
+                $threeMonthsLater = $originalDate->addMonths(3)->format('Y-m-d');
+
+                // Check if conversion was successful
+                if ($originalDate !== false) {
+                    $getDayStat = $this->getDayStatus($originalDate);
+                }
+
                 // Save the file details in the database
                 $fileEntry = new Surat_penugasan;
                 $fileEntry->user_id = Auth::user()->id;
                 $fileEntry->ts_date = $request->clickedDate;
+                if($getDayStat == "red"){
+                    $fileEntry->isWeekend = TRUE;
+                }
+                $fileEntry->expiration = $threeMonthsLater;
                 $fileEntry->file_name = $fileName;
                 $fileEntry->file_path = $filePath;
                 $fileEntry->timesheet_id = str_replace('-', '', $request->clickedDate);
@@ -719,10 +745,24 @@ class TimesheetController extends Controller
                 // Move the uploaded file to the storage folder
                 $file->move($upload_folder, $fileName);
 
+                $dateString = $request->clickedDateRed;
+                $getDayStat = null;
+                $originalDate = Carbon::createFromFormat('Y-m-d', $dateString);
+                $threeMonthsLater = $originalDate->addMonths(3)->format('Y-m-d');
+
+                // Check if conversion was successful
+                if ($originalDate !== false) {
+                    $getDayStat = $this->getDayStatus($originalDate);
+                }
+
                 // Save the file details in the database
                 $fileEntry = new Surat_penugasan;
                 $fileEntry->user_id = Auth::user()->id;
                 $fileEntry->ts_date = $request->clickedDateRed;
+                if($getDayStat == "red"){
+                    $fileEntry->isWeekend = TRUE;
+                }
+                $fileEntry->expiration = $threeMonthsLater;
                 $fileEntry->file_name = $fileName;
                 $fileEntry->file_path = $filePath;
                 $fileEntry->timesheet_id = str_replace('-', '', $request->clickedDateRed);
@@ -1191,6 +1231,17 @@ class TimesheetController extends Controller
             }
         }
 
+        //WeekendReplacement
+        $weekendReplacement = Surat_penugasan::where('user_id', Auth::user()->id)
+            ->where('isTaken', TRUE)
+            ->pluck('date_to_replace')
+            ->toArray();
+
+        $formattedDatesWeekendRepl = [];
+        foreach ($weekendReplacement as $dateString) {
+            $formattedDatesWeekendRepl[] = date('Y-m-d', strtotime($dateString));
+        }
+
         $json = null;
         $array = null;
         $cachedData = Cache::get('holiday_data');
@@ -1297,7 +1348,7 @@ class TimesheetController extends Controller
         ->get()
         ->count();
         // return response()->json($activities);
-        return view('timereport.preview', compact('year', 'month', 'getTotalDays', 'removeBtnSubmit', 'totalHours', 'info', 'assignmentNames', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
+        return view('timereport.preview', compact('year', 'month', 'getTotalDays', 'removeBtnSubmit', 'totalHours', 'info', 'assignmentNames', 'formattedDatesWeekendRepl', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
     public function submit_timesheet($year, $month)
@@ -1909,5 +1960,32 @@ class TimesheetController extends Controller
             }
 
         return response()->json($getLoc);
+    }
+
+
+    public function checkIsHoliday()
+    {
+        $getData = Surat_penugasan::all();
+        foreach($getData as $wr){
+            $dateString = $wr->ts_date;
+            $getDayStat = null;
+            $originalDate = Carbon::createFromFormat('Y-m-d', $dateString);
+            $threeMonthsLater = $originalDate->addMonths(3)->format('Y-m-d');
+
+            // Check if conversion was successful
+            if ($originalDate !== false) {
+                $getDayStat = $this->getDayStatus($originalDate);
+            }
+            if($getDayStat == "red"){
+                $wr->isWeekend = TRUE;
+            } else {
+                $wr->isWeekend = FALSE;
+            }
+            if(!$wr->isTaken){
+                $wr->isTaken = FALSE;
+            }
+            $wr->expiration = $threeMonthsLater;
+            $wr->save();
+        }
     }
 }

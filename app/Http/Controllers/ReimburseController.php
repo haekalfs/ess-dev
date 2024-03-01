@@ -56,13 +56,13 @@ class ReimburseController extends Controller
 
     public function create_request($yearSelected = null)
     {
-        $projects = Company_project::all();
+        $getProject = Project_assignment_user::where('user_id', Auth::id())->get();
         $approver = Timesheet_approver::whereIn('id', [40, 45, 55, 60, 28])->get();
 
         $existingID = Reimbursement::whereNull('deleted_at')->orderBy('f_id', 'desc')->pluck('f_id')->first();
         $nextID = $existingID + 1;
 
-        return view('reimbursement.request', compact('projects', 'approver', 'nextID'));
+        return view('reimbursement.request', compact('getProject', 'approver', 'nextID'));
     }
 
     public function submit_request(Request $request)
@@ -293,8 +293,16 @@ class ReimburseController extends Controller
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->get();
         $reimbursement_approval = Reimbursement_approval::where('reimbursement_id', $id)->groupBy('RequestTo')->get();
 
+        $isReceived = Reimbursement_item::select('id')
+                    ->where('reimbursement_id', $id)
+                    ->havingRaw('COUNT(*) = SUM(CASE WHEN receivable_receipt = 1 THEN 1 ELSE 0 END)')
+                    ->groupBy('reimbursement_id')
+                    ->pluck('id')
+                    ->toArray();
         if ($reimbursement->created_at->diffInDays(now()) <= 14) {
-            Session::flash('warning',"You have to give a hard copies of the receipts to the finance department within 2 weeks otherwise the reimbursement will not be proceeds!");
+            if(empty($isReceived)){
+                Session::flash('failed',"You have to give all hard copies of the receipts to the finance department within 2 weeks otherwise the reimbursement will not be proceeds!");
+            }
         }
 
         return view('reimbursement.view_details', ['reimbursement' => $reimbursement,'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);

@@ -228,7 +228,11 @@ active
                                         @elseif ($isHoliday)
                                             <span class="text-danger">{{ $date->format('D') }}</span>
                                         @else
-                                            {{ $date->format('D') }}
+                                            @if(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
+                                                <span class="text-danger">{{ $date->format('D') }}</span>
+                                            @else
+                                                {{ $date->format('D') }}
+                                            @endif
                                         @endif
                                     </td>
                                     <td>
@@ -236,6 +240,8 @@ active
                                             @if (in_array($date->format('Y-m-d'), $srtDate))
                                                 <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>/{{Auth::id()}}"><span class="text-danger">{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-danger"></i></a>
                                             @elseif ($isHoliday)
+                                                <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
+                                            @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
                                                 <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                             @else
                                                 <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
@@ -245,6 +251,8 @@ active
                                                 <a href="/timesheet/entry/preview/surat_penugasan/download/<?php echo $date->format('Ymd'); ?>/{{Auth::id()}}"><span>{{ $date->format('d-M-Y') }}</span>&nbsp;&nbsp;&nbsp;<i class="fas fa-fw fa-download fa-sm text-primary"></i></a>
                                             @elseif ($isHoliday)
                                                 <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
+                                            @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
+                                                <span class="text-danger">{{ $date->format('d-M-Y') }}</span>
                                             @else
                                                 {{ $date->format('d-M-Y') }}
                                             @endif
@@ -253,6 +261,8 @@ active
                                     <td>
                                         @if (in_array($date->format('Y-m-d'), $formattedDates))
                                             <span><i>Leave Day</i></span>
+                                        @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
+                                            <span class="text-danger"><i>Weekend Replacement</i></span>
                                         @elseif ($isHoliday)
                                             @php
                                                 $timesheetFound = false;
@@ -280,6 +290,8 @@ active
                                     <td>
                                         @if (in_array($date->format('Y-m-d'), $formattedDates))
                                             -
+                                        @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
+                                            -
                                         @else
                                             @foreach ($activities as $timesheet)
                                                 @if ($timesheet->ts_date == $date->format('Y-m-d'))
@@ -290,6 +302,8 @@ active
                                     </td>
                                     <td>
                                         @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                            -
+                                        @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
                                             -
                                         @else
                                             @foreach ($activities as $timesheet)
@@ -302,6 +316,8 @@ active
                                     <td>
                                         @if (in_array($date->format('Y-m-d'), $formattedDates))
                                             -
+                                        @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
+                                            -
                                         @else
                                             @foreach ($activities as $timesheet)
                                                 @if ($timesheet->ts_date == $date->format('Y-m-d'))
@@ -313,6 +329,8 @@ active
                                     <td>
                                         @if (in_array($date->format('Y-m-d'), $formattedDates))
                                             -
+                                        @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
+                                            -
                                         @else
                                             @foreach ($activities as $timesheet)
                                                 @if ($timesheet->ts_date == $date->format('Y-m-d'))
@@ -323,6 +341,8 @@ active
                                     </td>
                                     <td class="text-center">
                                         @if (in_array($date->format('Y-m-d'), $formattedDates))
+                                            -
+                                        @elseif(in_array($date->format('Y-m-d'), $formattedDatesWeekendRepl))
                                             -
                                         @else
                                         <?php
