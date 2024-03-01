@@ -149,7 +149,10 @@ active
                                 $difference = floatval(str_replace([',','.'], '', $usr->amount)) - (floatval(str_replace([',','.'], '', $usr->approved_amount)) ?? 0);
                             @endphp
                                 <tr>
-                                    <td class="text-center" style="width: 15%;"><a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a></td>
+                                    <td class="text-center" style="width: 15%;">
+                                        @if($usr->receivable_receipt == FALSE) &#x2757; @endif
+                                        <a href="#" class="btn btn-outline-secondary btn-sm btn-sm preview-pdf" data-id="{{ $usr->id }}" style="margin-right: 3%;">Preview</a>
+                                    </td>
                                     <td>{{ $usr->description }}</td>
                                     <td class="text-danger font-weight-bold">IDR {{ $usr->amount }}</td>
                                     <td class="text-success font-weight-bold">IDR {{ $usr->approved_amount ?? '—' }}</td>
@@ -185,7 +188,7 @@ active
 
                                         @foreach ($usr->approval as $status)
                                             @if ($status->status == 29 || $status->status == 30 || $status->status == 404)
-                                                <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
+                                                <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-outline-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                                 @php
                                                     $approved = true;
                                                     break;
@@ -195,7 +198,7 @@ active
 
                                         @unless ($approved)
                                             <a data-toggle="modal" data-target="#editAmountModal" data-item-id="{{ $usr->id }}" class="btn btn-primary btn-sm mr-2 btn-edit"><i class="fas fa-fw fa-edit"></i> Update</a>
-                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
+                                            <a data-toggle="modal" data-target="#detailsModal" data-item-id="{{ $usr->id }}" class="btn btn-outline-secondary btn-sm btn-details"><i class="fas fa-info-circle"></i> Status</a>
                                         @endunless
                                     </td>
                                 </tr>
@@ -268,6 +271,10 @@ active
                 </button>
             </div>
             <div class="modal-body">
+                <div class="alert alert-danger alert-receipt alert-block text-center">
+                    <button type="button" class="close" data-dismiss="alert"></button>
+                    <strong><span id="notify">Receipt is not confirmed yet for receivable from Finance Dept.</span></strong>
+                </div>
                 <!-- iframe to display the PDF -->
                 <iframe id="pdfIframe" src="" style="width: 100%; height: 400px;"></iframe>
                 <img id="imageframe" style="display: none;" src="" width="100%" height="400px"/>
@@ -351,6 +358,13 @@ active
                         $('#pdfIframe').attr('src', fileUrl);
                         $('#pdfIframe').show();
                         $('#imageframe').hide();
+                    }
+                    if(response.receivable_receipt == true) {
+                        // Show the alert if receipt is not confirmed for receivable at Finance Dept.
+                        $('.alert-receipt').hide();
+                    } else {
+                        // Hide the alert if receipt is confirmed for receivable
+                        $('.alert-receipt').show();
                     }
                 },
                 error: function(xhr) {

@@ -58,17 +58,21 @@ active
                                     </label>
                                     <label class="col-md-5">
                                         <input class="form-radio-input" type="radio" name="type_reimburse" id="othersRadio" value="Others">
-                                        <span class="form-radio-sign">Others</span>
+                                        <span class="form-radio-sign">Non-Project</span>
                                     </label>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group" id="projectSelect">
                                         <select class="form-control" name="project" required>
                                             <option value="Others" disabled selected>Select a type</option>
-                                            <optgroup label="Projects" id="project">
-                                                @foreach($projects as $project)
-                                                <option value="{{$project->id}}">{{ $project->project_name}}</option>
-                                                @endforeach
+                                            <optgroup label="Your Projects" id="project">
+                                                @if ($getProject->isEmpty())
+                                                    <option disabled><i>No Project Assigned</i></option>
+                                                @else
+                                                    @foreach($getProject as $assignment)
+                                                        <option value="{{$assignment->company_project->id}}">{{ $assignment->company_project->project_name}}</option>
+                                                    @endforeach
+                                                @endif
                                             </optgroup>
                                             <optgroup label="Others" style="display: none;" id="reimbursementType">
                                                 <option value="Travel Reimbursement">Travel Reimbursement</option>
@@ -138,7 +142,7 @@ active
                 <div class="card-header">
                     <span class="text-danger">Reimbursement Policy</span>
                 </div>
-                <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                <div class="card-body rules" style="background-color: rgb(247, 247, 247);">
                     <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                     <ul>
                         <li>All reimbursement requests must comply with company policies.</li>
@@ -151,7 +155,10 @@ active
                         <li>Attach all necessary receipts and supporting documentation.</li>
                         <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
                         <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
-                        <li class="text-danger">Payment will be made 14 weeks after approval and receipt submission to the Finance Department <a href="#">Read More.</a></li>
+                        <li class="text-danger">
+                            Payment will be made 14 weeks after approval and receipt submission to the Finance Department
+                            <a href="#" data-toggle="modal" data-target="#additionalRulesModal">Read More.</a>
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -248,7 +255,40 @@ active
         </div>
     </div>
 </form>
+<div class="modal fade" id="additionalRulesModal" tabindex="-1" aria-labelledby="additionalRulesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="additionalRulesModalLabel">Additional Rules</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="additionalRulesContent">
+                <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                <ul>
+                    <li>All reimbursement requests must comply with company policies.</li>
+                    <li>Employees are responsible for accurately documenting all expenses.</li>
+                    <li>Reimbursements will only be provided for approved business-related expenses.</li>
+                </ul>
 
+                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
+                <ol>
+                    <li>Attach all necessary receipts and supporting documentation.</li>
+                    <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
+                    <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
+                    <li class="text-danger">
+                        Payment will be made 14 weeks after approval and receipt submission to the Finance Department.
+                    </li>
+                    <li>Reimbursement will take 2 weeks or more.</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('javascript')

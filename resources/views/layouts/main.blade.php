@@ -130,7 +130,7 @@
                         @endusr_acc
                         @usr_acc(203)
                         <h6 class="collapse-header text-danger">Restricted Access:</h6>
-                        <a class="collapse-item" href="/approval-history/">Approval History</a>
+                        <a class="collapse-item" href="/approval-history/">Approval History <span class="text-danger"><i><small>New</small></i></span></a>
                         @else
                         @endusr_acc
                     </div>

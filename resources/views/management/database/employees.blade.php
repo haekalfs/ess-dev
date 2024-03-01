@@ -55,8 +55,8 @@ active
                                         <option value="4,18,19" {{ request('position_id') == '4,18,19' ? 'selected' : '' }}>Consultant</option>
                                     </select>
                                 </div>
-                            </div> 
-                            <div class="col-md-6">  
+                            </div>
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="status">Status:</label>
                                     <select name="status" class="form-control" id="status">
@@ -72,7 +72,7 @@ active
                                         <input type="submit" class="btn btn-primary" value="Filter"/>
                                     </div>
                                 </div>
-                            </div>   
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-12"><br>
@@ -80,27 +80,19 @@ active
                             <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="text-center">
-                                            <div class="form-check form-check-inline larger-checkbox">
-                                                <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleCheckboxes()">
-                                            </div>
-                                        </th>
                                         <th>User ID</th>
                                         <th>Name</th>
                                         <th>Email</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($users as $user)
                                     <tr>
-                                        <td class="text-center">
-                                            <div class="form-check form-check-inline larger-checkbox">
-                                                <input class="form-check-input data-checkbox" type="checkbox" value="option1">
-                                            </div>
-                                        </td>
                                         <td>{{ $user->user_id }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
+                                        <td class="text-center"><a class="btn btn-sm btn-primary"> Download</a></td>
                                     </tr>
                                     @endforeach
                                  </tbody>
@@ -113,7 +105,7 @@ active
     </form>
 </div>
 {{-- <div class="card shadow mb-4">
-    
+
     <div class="card-body">
     <!-- Form filter -->
     <form action="/manage/list/employees/" method="GET">
@@ -133,14 +125,4 @@ active
     </form>
     </div>
 </div> --}}
-<script>
-function toggleCheckboxes() {
-    var checkboxes = document.getElementsByClassName('data-checkbox');
-    var checkAllCheckbox = document.getElementById('checkAll');
-
-    for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = checkAllCheckbox.checked;
-    }
-}
-</script>
 @endsection

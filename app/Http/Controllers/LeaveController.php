@@ -48,11 +48,9 @@ class LeaveController extends Controller
 
         $leaveQuotaUsage = Leave_request_history::where('req_by', Auth::user()->id)->get();
 
-        $weekendReplacementQuota = Surat_penugasan::where('isWeekend', TRUE)->where('isTaken', FALSE)->get();
-        $empLeaveQuotaWeekendReplacement = Emp_leave_quota::where('user_id', Auth::user()->id)
-        ->where('leave_id', 100)
-        ->where('expiration', '>=', date('Y-m-d'))
-        ->sum('quota_left');
+        $weekendReplacementQuota = Surat_penugasan::where('isWeekend', TRUE)->where('user_id', Auth::id())->orderBy('ts_date', 'asc')->get();
+        $empLeaveQuotaWeekendReplacement = Surat_penugasan::where('isWeekend', TRUE)->where('user_id', Auth::id())->where('isTaken', FALSE)->count();
+
         $empLeaveQuotaAnnualSum = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
             ->where('expiration', '>=', date('Y-m-d'))
@@ -848,5 +846,52 @@ class LeaveController extends Controller
         $leaveAdd->save();
 
         return redirect()->back()->with('success', "You Add New Leave For Employee");
+    }
+
+    public function weekend_replacement_entry(Request $request)
+    {
+        $this->validate($request, [
+            'datepickLeave' => 'sometimes',
+            'quota_used' => 'required',
+            'total_days' => 'required|numeric|min:1', // Ensure total days is numeric and at least 1
+        ]);
+
+        $pickedDates = explode(',', $request->datepickLeave);
+        $totalDays = count($pickedDates);
+
+        // Fetch weekend replacement records that are not taken yet and have expiration dates greater than or equal to today
+        $weekendReplacements = Surat_penugasan::where('isTaken', FALSE)
+            ->where('isWeekend', TRUE)
+            ->where('user_id', Auth::id())
+            ->where('expiration', '>=', now()->toDateString())
+            ->orderBy('ts_date', 'asc')
+            ->get();
+
+        // Validate if enough weekend replacements are available
+        if ($weekendReplacements->count() < $totalDays) {
+            Session::flash('failed',"400 - Not enough available weekend replacements!");
+        }
+
+        // Take the required number of weekend replacements
+        foreach ($pickedDates as $pickedDate) {
+            $pickedDate = \Carbon\Carbon::createFromFormat('m/d/Y', $pickedDate)->toDateString();
+
+            // Find the suitable weekend replacement
+            $suitableReplacement = $weekendReplacements->first(function ($wr) use ($pickedDate) {
+                return $wr->expiration >= $pickedDate;
+            });
+
+            if ($suitableReplacement) {
+                $suitableReplacement->date_to_replace = $pickedDate;
+                $suitableReplacement->isTaken = TRUE;
+                $suitableReplacement->save();
+                Session::flash('success','200 - Weekend replacements taken successfully');
+            } else {
+                Session::flash('failed','400 - No suitable weekend replacement found for the picked date: ' . $pickedDate);
+            }
+        }
+
+        // Return success response
+        return redirect('/leave/history');
     }
 }

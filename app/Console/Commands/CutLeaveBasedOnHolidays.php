@@ -83,9 +83,9 @@ class CutLeaveBasedOnHolidays extends Command
         $getUsers = Emp_leave_quota::pluck('user_id')->toArray();
         $users = User::whereIn('id', $getUsers)->get();
 
-        foreach ($users as $user) {
-            dispatch(new NotifyDeductedLeaveQuota($user, $totalHolidays));
-        }
+        // foreach ($users as $user) {
+        //     dispatch(new NotifyDeductedLeaveQuota($user, $totalHolidays));
+        // }
         $this->info('Cut Leave data processing job dispatched!');
     }
 }
