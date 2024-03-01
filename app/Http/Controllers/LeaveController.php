@@ -48,8 +48,8 @@ class LeaveController extends Controller
 
         $leaveQuotaUsage = Leave_request_history::where('req_by', Auth::user()->id)->get();
 
-        $weekendReplacementQuota = Surat_penugasan::where('isWeekend', TRUE)->orderBy('ts_date', 'asc')->get();
-        $empLeaveQuotaWeekendReplacement = Surat_penugasan::where('isWeekend', TRUE)->where('isTaken', FALSE)->count();
+        $weekendReplacementQuota = Surat_penugasan::where('isWeekend', TRUE)->where('user_id', Auth::id())->orderBy('ts_date', 'asc')->get();
+        $empLeaveQuotaWeekendReplacement = Surat_penugasan::where('isWeekend', TRUE)->where('user_id', Auth::id())->where('isTaken', FALSE)->count();
 
         $empLeaveQuotaAnnualSum = Emp_leave_quota::where('user_id', Auth::user()->id)
             ->where('leave_id', 10)
