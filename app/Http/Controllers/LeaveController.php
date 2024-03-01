@@ -862,6 +862,7 @@ class LeaveController extends Controller
         // Fetch weekend replacement records that are not taken yet and have expiration dates greater than or equal to today
         $weekendReplacements = Surat_penugasan::where('isTaken', FALSE)
             ->where('isWeekend', TRUE)
+            ->where('user_id', Auth::id())
             ->where('expiration', '>=', now()->toDateString())
             ->orderBy('ts_date', 'asc')
             ->get();
