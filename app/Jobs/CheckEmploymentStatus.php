@@ -20,8 +20,6 @@ class CheckEmploymentStatus implements ShouldQueue
 
     public function handle()
     {
-        // Fetch users with their employment details
-        $status = ['Contract', 'Probation', 'MT'];
         $getData = Users_detail::whereNotNull('hired_date')->where('status_active', 'Active')->pluck('user_id')->toArray();
         // Fetch users with details
         $users = User::with('users_detail')
@@ -71,7 +69,7 @@ class CheckEmploymentStatus implements ShouldQueue
         if ($endDate->isAfter($notificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Contract', $hiredDate, $HrName);
-            Mail::to('hrd@perdana.co.id')->cc($recipients)->send($notification);
+            Mail::to('haekal@perdana.co.id')->send($notification);
         }
     }
 
@@ -86,7 +84,7 @@ class CheckEmploymentStatus implements ShouldQueue
         if (now()->isAfter($notificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Probation', $hiredDate, $HrName);
-            Mail::to('hrd@perdana.co.id')->cc($recipients)->send($notification);
+            Mail::to('haekal@perdana.co.id')->send($notification);
         }
     }
 
@@ -103,14 +101,14 @@ class CheckEmploymentStatus implements ShouldQueue
         if (now()->isAfter($firstNotificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Probation of Management Trainee Program', $hiredDate, $HrName);
-            Mail::to('hrd@perdana.co.id')->cc($recipients)->send($notification);
+            Mail::to('haekal@perdana.co.id')->send($notification);
         }
 
         // Check for the second notification
         if (now()->isAfter($secondNotificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Management Trainee', $hiredDate, $HrName);
-            Mail::to('hrd@perdana.co.id')->cc($recipients)->send($notification);
+            Mail::to('haekal@perdana.co.id')->send($notification);
         }
     }
 }
