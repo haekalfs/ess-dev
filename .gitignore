@@ -6,6 +6,8 @@
 /public/med_pic
 /public/headline
 /public/storage
+/public/images_storage
+/public/cv_storage
 /storage/*.key
 /vendor
 .env

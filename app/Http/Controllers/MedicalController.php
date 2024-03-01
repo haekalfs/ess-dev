@@ -62,6 +62,12 @@ class MedicalController extends Controller
         $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
             ->first();
 
+        // Mendapatkan tanggal aktif dan tanggal sekarang
+        $activePeriode = Carbon::parse($emp_medical_balance->expiration);
+        $now = Carbon::now();
+
+        // Menghitung selisih bulan
+        $monthPeriode = $activePeriode->diffInMonths($now);
 
         return view(
             'medical.medical',
@@ -71,6 +77,7 @@ class MedicalController extends Controller
                 'total_years_of_service' => $total_years_of_service,
                 'yearSelected' => $yearSelected,
                 'yearsBefore' => $yearsBefore,
+                'monthPeriode' => $monthPeriode,
             ]
         );
     }
@@ -229,6 +236,11 @@ class MedicalController extends Controller
         $medApp = Medical_approval::where('medical_id', $id)->get();
         $medPay = Medical_payment::where('medical_id', $id)->get();
 
+        $lastUpdated = $med->medical_approval->updated_at;
+
+        // Hitung selisih waktu antara sekarang dan waktu terakhir diperbarui
+        $timeDiff = now()->diffInSeconds($lastUpdated);
+
         // $medButton = Medical_approval::where('medical_id', $med->id)
         //     ->whereIn('status', [20, 29])
         //     ->pluck('medical_id', 'status')
@@ -241,7 +253,8 @@ class MedicalController extends Controller
                 'user_info' => $user_info,
                 'medDet' => $medDet,
                 'medApp' => $medApp,
-                'medPay' => $medPay
+                'medPay' => $medPay,
+                'timeDiff' => $timeDiff,
             ]
         );
     }

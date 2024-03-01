@@ -88,8 +88,8 @@ class UserController extends Controller
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
             $nama_file_profile = $employeeID . $year . "_profile" . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = 'images_storage';
-            $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile);
+            $tujuan_upload_profile = '/images_storage';
+            $profile_file->move(public_path($tujuan_upload_profile, $nama_file_profile));
         } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
             $nama_file_profile = null;
@@ -100,7 +100,7 @@ class UserController extends Controller
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
             $nama_file_cv = $employeeID . $year . "_cv" . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = 'images_storage';
+            $tujuan_upload_cv = '/cv_storage';
             $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
         } else {
             // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
@@ -246,7 +246,7 @@ class UserController extends Controller
     {
 
         $user = User::find($id);
-        
+
         $employeeID = $user->users_detail->employee_id;
         $year = Carbon::now()->year;
 
@@ -254,7 +254,7 @@ class UserController extends Controller
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
             $nama_file_profile = $employeeID . $year . "_profile" . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = 'images_storage';
+            $tujuan_upload_profile = '/images_storage';
 
             // Menghapus file profil lama jika ada
             $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
@@ -263,7 +263,7 @@ class UserController extends Controller
             }
 
             // Memindahkan file profil yang baru diunggah
-            $profile_file->storeAs($tujuan_upload_profile, $nama_file_profile);
+            $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile); // Gunakan move() dengan path relatif dan nama file
         } elseif ($user->users_detail->profile_pic) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $nama_file_profile = $user->users_detail->profile_pic;
@@ -277,7 +277,7 @@ class UserController extends Controller
             $cv_file = $request->file('cv');
 
             $nama_file_cv = $employeeID . $year . "_cv" . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = 'images_storage';
+            $tujuan_upload_cv = '/cv_storage';
 
             // Menghapus file profil lama jika ada
             $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
@@ -285,7 +285,7 @@ class UserController extends Controller
                 unlink($oldCV);
             }
 
-            $cv_file->storeAs($tujuan_upload_cv, $nama_file_cv);
+            $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);;
         } elseif ($user->users_detail->cv) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
             $nama_file_cv = $user->users_detail->cv;

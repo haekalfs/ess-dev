@@ -103,13 +103,6 @@ active
                                             @default
                                                 <span>Unknown <i class="fa fa-bug" aria-hidden="true"></i></span>
                                         @endswitch
-                                        {{-- Ambil waktu terakhir diperbarui dari database --}}
-                                        @php
-                                            $lastUpdated = $med->medical_approval->updated_at;
-                                            
-                                            // Hitung selisih waktu antara sekarang dan waktu terakhir diperbarui
-                                            $timeDiff = now()->diffInSeconds($lastUpdated);
-                                        @endphp
 
                                         {{-- Tampilkan informasi waktu terakhir diperbarui --}}
                                         <small class="text-danger font-italic">
