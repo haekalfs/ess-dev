@@ -45,7 +45,11 @@ active
                 <div class="row">
                     <div class="col-md-3 align-items-center text-center">
                         <div class="col-md-3 text-center">
+                            @if($user_info->users_detail->profile_pic)
+                                <img class="img-profile rounded-circle" height="150px"width="150px" style="object-fit:fill;" src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                            @else
                             <img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 220px;" />
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-4">
