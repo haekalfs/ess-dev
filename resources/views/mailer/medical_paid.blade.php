@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>Your Medical Reimbursement Request No : <span style="font-weight: bold;">MED_0000{{ $MedId }}</span> has been Paid, Kindly check the details for the documents.</p>
+<p>Your Medical Reimbursement Request No : <span style="font-weight: bold;">MED_{{ $MedId }}</span> has been Pay, then the existing Medical Balance will be automatically deducted.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>

@@ -277,6 +277,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/medical/approval/{id}/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
         Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
         Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')->middleware('auth');
+        Route::get('/medical/approval/receipt/{mdet_id}', 'MedicalController@receipt');
 
         Route::get('/reimbursement/history/{yearSelected?}', 'ReimburseController@history')->name('reimburse-history');
         Route::get('/reimbursement/create/request', 'ReimburseController@create_request')->name('reimburse-new-req');

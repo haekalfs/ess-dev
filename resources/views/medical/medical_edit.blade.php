@@ -172,12 +172,12 @@ active
                                     </td>
                                 </tr>
                                 <tr class="table-sm text-success font-weight-bold">
-                                    <th class="text-success font-weight-bold">Total Funds Provided (Rp.)</th>
-                                    <td>: {{$med->medical_payment->total_payment}}</td>
+                                    <th>Total Funds Provided</th>
+                                    <td>: {{ 'Rp. '. $med->medical_payment->total_payment }}</td>
                                 </tr>
-                                <tr class="table-sm">
-                                    <th>Payment Notes</th>
-                                    <td>: {{$med->medical_payment->notes}}</td>
+                                <tr class="table-sm text-danger font-weight-bold"">
+                                    <th>Medical Deducted</th>
+                                    <td>: {{ 'Rp. '.$med->medical_payment->total_payment }}</td>
                                 </tr>
                         </table>
                     </div>
@@ -233,7 +233,7 @@ active
                                 </td>
 								<td>
                                     @if ($med->medical_approval->status == 29)
-                                        Rp. <span class="amountApproved" id="amountApproved">{{ $med->medical_approval->total_amount_approved }}</span>
+                                        Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                     @else
                                         Rp. 0
                                     @endif
@@ -375,9 +375,9 @@ active
                 </div>
                 <div class="modal-body">
                     @if(pathinfo($md->mdet_attachment, PATHINFO_EXTENSION) == 'pdf')
-                        <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
+                        <iframe src="{{ url('/medical/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
                     @else
-                        <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
+                        <img src="{{ url('/medical/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
                     @endif
                 </div>
             </div>

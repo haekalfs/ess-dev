@@ -827,9 +827,9 @@ class ApprovalController extends Controller
         $employees = User::where('id', $userMedId)->get();
         $userName = Auth::user()->name;
 
-        // foreach ($employees as $employee) {
-        //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
-        // }
+        foreach ($employees as $employee) {
+            dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
+        }
 
         return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId");
     }
@@ -859,10 +859,11 @@ class ApprovalController extends Controller
         $medical->save();
 
         $employees = User::where('id', $userMedId)->get();
+        $approverName = Auth::user()->name;
         $MedId = $medical->med_number;
 
         foreach ($employees as $employee) {
-            dispatch(new NotifyMedicalRejected($employee, $MedId));
+            dispatch(new NotifyMedicalRejected($employee, $MedId, $approverName));
         }
 
         return redirect('/approval/medical')->with('success', "You rejected $userName Medical Reimburse !");

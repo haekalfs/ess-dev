@@ -70,7 +70,7 @@ active
                     <div class="col-md-3 align-items-center text-center">
                         <div class="col-md text-center">
                             @if($user_info->users_detail->profile_pic)
-                                <img class="img-profile rounded-circle" height="150px"width="150px" style="object-fit:fill;" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                <img class="img-profile rounded-circle" height="150px"width="150px" style="object-fit:fill;" src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                             @else
                                 <div class="img-profile rounded-circle no-image"><i class="no-image-text">No Image Available</i></div>
                             @endif
@@ -464,7 +464,7 @@ active
                 <div class="close-icon">
                     <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
                 </div>
-                <img src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+                <img src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
             </div>
         </div>
     </div>

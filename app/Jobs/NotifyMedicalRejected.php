@@ -19,6 +19,7 @@ class NotifyMedicalRejected implements ShouldQueue
 
     protected $employee;
     protected $MedId;
+    protected $approverName;
 
     /**
      * Create a new job instance.
@@ -27,10 +28,11 @@ class NotifyMedicalRejected implements ShouldQueue
      * @param  string  $MedId
      * @return void
      */
-    public function __construct(User $employee, string $MedId)
+    public function __construct(User $employee, string $MedId, string $approverName)
     {
         $this->employee = $employee;
         $this->MedId = $MedId;
+        $this->approverName = $approverName;
     }
 
     /**
@@ -40,7 +42,7 @@ class NotifyMedicalRejected implements ShouldQueue
      */
     public function handle()
     {
-        $notification = new MedicalRejected($this->employee, $this->MedId);
+        $notification = new MedicalRejected($this->employee, $this->MedId, $this->approverName);
         Mail::send('mailer.medical_rejected', $notification->data(), function ($message) use ($notification) {
             $message->to($notification->emailTo())
                 ->subject($notification->emailSubject());

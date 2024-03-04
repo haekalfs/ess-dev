@@ -30,13 +30,27 @@ class MyProfileController extends Controller
             'cv' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
+        $employeeID = $user->users_detail->employee_id;
+        // $cv_file = $request->file('cv');
+        // $name_file_cv = $user->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
+        // $folder_upload_cv = '/storage/cv';
+        // $cv_file->move(public_path($folder_upload_cv), $name_file_cv);
+
         $cv_file = $request->file('cv');
-        $nama_file_cv = $user->id . "_" . "cv" . "." . $cv_file->getClientOriginalExtension();
-        $tujuan_upload_cv = '/storage/cv';
-        $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
+
+        $name_file_cv = $employeeID . "_cv" . "." . $cv_file->getClientOriginalExtension();
+        $folder_upload_cv = '/cv_storage';
+
+        // Menghapus file cv lama jika ada
+        $oldCV = public_path($folder_upload_cv . '/' . $name_file_cv);
+        if (file_exists($oldCV)) {
+            unlink($oldCV);
+        }
+
+        $cv_file->move(public_path($folder_upload_cv), $name_file_cv);
 
         $cv = Users_detail::where('user_id', $id)->first();
-        $cv->cv = $nama_file_cv;
+        $cv->cv = $name_file_cv;
         $cv->save();
 
         return redirect()->back()->with('success', "Your CV has been uploaded Successfully");

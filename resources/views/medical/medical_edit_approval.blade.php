@@ -135,8 +135,8 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
                 <div class="text-right">
-                    <a class="btn btn-success btn-sm" type="button"  data-toggle="modal" data-target="#approveModal" id="addButton">Approve</a>
-                    <a class="btn btn-danger btn-sm" type="button"  data-toggle="modal" data-target="#rejectModal" id="addButton">Reject</a>
+                    <a class="btn btn-success btn-sm" type="button"  data-toggle="modal" data-target="#approveModal" id="addButton"><i class="fas fa-check"></i> Approve</a>
+                    <a class="btn btn-danger btn-sm" type="button"  data-toggle="modal" data-target="#rejectModal" id="addButton"><i class="fas fa-times"></i> Reject</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -174,9 +174,15 @@ active
                                     Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
                                 <td class="row-cols-2 justify-content-betwen text-center">
-                                    <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                        <i class="fas fa-fw fa-edit justify-content-center"></i>Edit
+                                    @if($md->receipt_real == false)
+                                    <a id="confirmReceiptBtn{{$md->mdet_id}}" title="Confirm" class="btn btn-secondary btn-sm confirm-receipt-btn">
+                                        <i class="fas fa-fw fa-notes-medical justify-content-center"></i><span class="text-sm"> Confirm Receipt</span>
                                     </a>
+                                    @else
+                                    <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Update" class="btn btn-primary btn-sm" >
+                                        <i class="fas fa-fw fa-edit justify-content-center"></i>Update
+                                    </a>
+                                    @endif
                                     {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
                                 </td>
 							</tr>
@@ -221,9 +227,9 @@ active
                 </div>
                 <div class="modal-body">
                     @if(pathinfo($md->mdet_attachment, PATHINFO_EXTENSION) == 'pdf')
-                        <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
+                        <iframe src="{{ url('/medical/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
                     @else
-                        <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
+                        <img src="{{ url('/medical/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
                     @endif
                 </div>
             </div>
@@ -459,5 +465,31 @@ function validateForm() {
             document.getElementById("approve").submit();
         }
     }
+</script>
+
+<script>
+    // Loop melalui setiap tombol dan menambahkan event listener untuk setiap klik
+    var buttons = document.querySelectorAll('.confirm-receipt-btn');
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            // Mendapatkan ID dari tombol yang diklik
+            var mdet_id = button.getAttribute('id').replace('confirmReceiptBtn', '');
+
+            // Mengirimkan permintaan Ajax untuk memanggil fungsi receipt di MedicalController
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/medical/approval/receipt/' + mdet_id , true); // Ganti URL sesuai kebutuhan Anda
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('Receipt confirmed successfully');
+                    location.reload();
+                } else {
+                    // Gagal, tampilkan pesan kesalahan jika perlu
+                    alert('Failed to confirm receipt');
+                    console.log(xhr.responseText);
+                }
+            };
+            xhr.send();
+        });
+    });
 </script>
 @endsection

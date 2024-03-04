@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>This is Medical Reimbursement approval reminder,<b> {{ $userName }} </b>has requesting Medical reimbursement and require your approval. Kindly request your review for the documents.</p>
+<p>This is Medical Reimbursement Approval Reminder,<b> {{ $userName }} </b>has requesting Medical Reimbursement <b>No. MED_{{ $medical_id }}</b> and require your approval. Kindly request your review for the documents.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>

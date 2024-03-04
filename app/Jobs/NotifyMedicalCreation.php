@@ -18,6 +18,7 @@ class NotifyMedicalCreation implements ShouldQueue
 
     protected $employee;
     protected $userName;
+    protected $medical_id;
 
     /**
      * Create a new job instance.
@@ -26,10 +27,11 @@ class NotifyMedicalCreation implements ShouldQueue
      * @param  string  $userName
      * @return void
      */
-    public function __construct(User $employee, string $userName)
+    public function __construct(User $employee, string $userName, string $medical_id)
     {
         $this->employee = $employee;
         $this->userName = $userName;
+        $this->medical_id = $medical_id;
     }
 
     /**
@@ -39,7 +41,7 @@ class NotifyMedicalCreation implements ShouldQueue
      */
     public function handle()
     {
-        $notification = new MedicalCreation($this->employee, $this->userName);
+        $notification = new MedicalCreation($this->employee, $this->userName, $this->medical_id);
         Mail::send('mailer.medical_approval', $notification->data(), function ($message) use ($notification) {
             $message->to($notification->emailTo())
                 ->subject($notification->emailSubject());

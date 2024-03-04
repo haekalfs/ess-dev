@@ -179,7 +179,7 @@ active
                                 <a href="/medical/edit/{{ $q->id }}" title="Edit" class="btn btn-warning btn-sm" >
                                     <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
                                 </a>
-                                <a title="Delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#staticBackdrop" >
+                                <a title="Delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete{{ $q->id }}" >
                                     <i class="fas fa-fw fa-trash justify-content"></i> Cancel
                                 </a>
                             @endif
@@ -193,7 +193,7 @@ active
 
 @foreach($med as $q)
 <!-- Modal Deelete -->
-<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="delete{{ $q->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-warning">

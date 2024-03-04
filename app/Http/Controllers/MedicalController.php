@@ -28,6 +28,7 @@ use function GuzzleHttp\Promise\all;
 use App\Http\Controllers\DateTime;
 use App\Models\Timesheet;
 use DateTime as GlobalDateTime;
+use Illuminate\Support\Facades\File;
 
 class MedicalController extends Controller
 {
@@ -179,8 +180,8 @@ class MedicalController extends Controller
             // $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
             // $format_angka = number_format($roundedAmount, 0, ',', '.');
             // Menyimpan file attach ke dalam folder yang diinginkan
-            $attach_tujuan = '/storage/med_pic';
-            $attachment->move(public_path($attach_tujuan), $filename);
+            $attach_folder = '/medical';
+            $attachment->move(public_path($attach_folder), $filename);
 
             // Membuat entri baru dalam tabel medical details
             $meddet = new Medical_details();
@@ -191,6 +192,7 @@ class MedicalController extends Controller
             $meddet->mdet_desc = $descriptions[$key];
             $meddet->amount_approved =  $amounts[$key];
             $meddet->mdet_date_exp = $date_exp[$key];
+            $meddet->real_receipt = 0;
             $meddet->save();
         }
 
@@ -210,21 +212,40 @@ class MedicalController extends Controller
 
         $employees = User::where('id', $userToApprove)->get();
         $userName = Auth::user()->name;
+        $medical_id = $nextId;
+        foreach ($employees as $employee) {
+            dispatch(new NotifyMedicalCreation($employee, $userName, $medical_id));
+        }
 
-        // foreach ($employees as $employee) {
-        //     dispatch(new NotifyMedicalCreation($employee, $userName));
-        // }
-
-        return redirect('/medical/history')->with('success', 'Medical Reimburse Add successfully, Dont forget to bring the original receipt to the Finance Department.');
+        return redirect('/medical/history')->with('success', 'You have successfully submitted the Medical Reimbursement, Dont forget to bring the original receipt to the Finance Department.');
     }
 
 
     public function delete_med_all($id)
     {
-        Medical::findOrFail($id)->delete();
-        Medical_details::where('medical_id', $id)->delete();
-        Medical_approval::where('medical_id', $id)->delete();
+        $med = Medical::findOrFail($id);
+        $medDets = Medical_details::where('medical_id', $id)->get();
+        $med_App = Medical_approval::where('medical_id', [$id])->first();
+        $med_Pay = Medical_payment::where('medical_id', [$id])->first();
 
+        foreach ($medDets as $medDet) {
+            
+            $fileNameOld = $medDet->mdet_attachment;
+
+            $attach_folder = '/medical';
+            $fileOld = public_path($attach_folder . '/' . $fileNameOld);
+
+            if (File::exists($fileOld)) {
+                File::delete($fileOld);
+            }
+
+            $medDet->delete();
+        }
+
+        $med->delete();
+        $medDets->delete();
+        $med_App->delete();
+        $med_Pay->delete();
         return redirect()->back()->with('success', 'Medical Reimburse Delete successfully');
     }
 
@@ -273,15 +294,18 @@ class MedicalController extends Controller
             $inputAttach = $request->file('attach_edit');
             $fileOld = $medDet->mdet_attachment;
 
-            // Hapus file menggunakan Storage
-            Storage::delete(public_path('med_pic/' . $fileOld));
-
             $filenameOld = pathinfo($fileOld, PATHINFO_FILENAME);
             $extension = $inputAttach->getClientOriginalExtension();
             $filename = $filenameOld . '.' . $extension;
 
-            $attach_tujuan = 'med_pic';
-            $inputAttach->storeAs('public/' . $attach_tujuan, $filename);
+            $attach_folder = '/medical';
+            $fileOld = public_path($attach_folder . '/' . $filename);
+            if (file_exists($fileOld)) {
+                unlink($fileOld);
+            }
+
+
+            $inputAttach->move(public_path($attach_folder, $filename));
         } elseif ($medDet->mdet_attachment) {
             $filename = $medDet->mdet_attachment;
         }
@@ -294,15 +318,22 @@ class MedicalController extends Controller
         $medDet->mdet_desc = $request->input_mdet_desc;
         $medDet->save();
 
-        return redirect()->back()->with('success', 'Medical Detail Edit Success.');
+        return redirect()->back()->with('success', 'Medical Detail Edit Successfully.');
     }
 
-    public function delete_medDetail($mdet_id, $medical_id)
+    public function delete_medDetail($medical_id)
     {
-        DB::table('medicals_detail')
-            ->where('mdet_id', $medical_id)
-            ->delete();
+        $medDet = Medical_details::findorFail($medical_id)->first();
+        $fileNameOld = $medDet->mdet_attachment;
 
+        $attach_folder = '/medical';
+        $fileOld = public_path($attach_folder . '/' . $fileNameOld);
+
+        if (File::exists($fileOld)) {
+            File::delete($fileOld);
+        }
+
+        $medDet->delete();
         return redirect()->back()->with('success', 'Medical Detail Delete Success.');
     }
 
@@ -396,6 +427,12 @@ class MedicalController extends Controller
         return redirect('/medical/history')->with('success', 'Re-Submit Your Medical Successfully.');
     }
 
+    public function receipt($mdet_id)
+    {
+        $medical = Medical_details::findorFail($mdet_id);
+        $medical->receipt_real = 1;
+        $medical->save();
+    }
 
     // Medical Review By Finance Manager
     public function review_fm(Request $request)
@@ -555,10 +592,10 @@ class MedicalController extends Controller
         $medPay->total_payment = $totalAmountPaid;
         $medPay->save();
 
-        // foreach ($employees as $employee) {
-        //     dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
-        // }
-        // $userName = $user_med->user->name; // Mengambil nama pengguna terkait
+        foreach ($employees as $employee) {
+            dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
+        }
+        $userName = $user_med->user->name; // Mengambil nama pengguna terkait
 
         return redirect('/medical/review')->with('success', "You Have Paid $userName Medical Reimbursement ");
     }
