@@ -816,7 +816,7 @@ class ReimburseController extends Controller
         $isReceived = Reimbursement_item::select('id')
             ->where('reimbursement_id', $id)
             ->havingRaw('COUNT(*) = SUM(CASE WHEN receivable_receipt = 1 THEN 1 ELSE 0 END)')
-            ->groupBy('reimbursement_id')
+            ->groupBy('id')
             ->pluck('id')
             ->count();
 

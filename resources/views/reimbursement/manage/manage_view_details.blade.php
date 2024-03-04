@@ -292,6 +292,7 @@ active
 			<form method="post" id="editItemForm" action="">
                 @csrf
                 <input type="hidden" name="item_id" id="item_id" value="">
+                <input type="hidden" id="requested_amount" value="">
                 <div class="modal-body">
                     <div class="col-md-12 zoom90">
                         <div class="form-group">
@@ -324,7 +325,20 @@ active
 }
 </style>
 <script>
+$('#amount').on('input', function() {
+    // Get the value of current amount
+    var currentAmount = parseFloat($('#requested_amount').val().replace(/[^0-9]/g, ''));
 
+    // Get the value entered in the "Amount to be Processed" field
+    var inputAmount = parseFloat($(this).val().replace(/[^0-9]/g, ''));
+
+    // Check if the input amount is greater than the current amount
+    if (inputAmount > currentAmount) {
+        // Clear the input and show an alert
+        $(this).val('');
+        alert('Amount to be processed cannot be more than the current amount!');
+    }
+});
 $(document).ready(function() {
     $('.confirm-button').click(function(e) {
         e.preventDefault();
@@ -420,6 +434,7 @@ $(document).on('click', '.btn-edit', function() {
         success: function(response) {
             // Populate the form fields with the received data
             $('#amount').val(response.approved_amount);
+            $('#requested_amount').val(response.amount);
         },
         error: function(xhr) {
             // Handle error
