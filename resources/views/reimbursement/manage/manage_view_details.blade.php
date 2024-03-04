@@ -141,20 +141,20 @@ active
                 <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Reimbursement Items</h6>
                 <div class="text-right">
                     <div id="proccessContainer" style="display: none;">
-                        <a href="/reimbursement/create_order_letter/{{ $reimbursement->id }}" class="btn btn-danger btn-sm mr-2">
+                        <a href="/reimbursement/create_order_letter/{{ $reimbursement->id }}" class="btn btn-danger btn-sm mr-2" onclick='isconfirm();'>
                             <i class="fas fa-paper-plane"></i> Send Disbursement Order Letter
                         </a>
-                        <a href="/reimbursement/manage/disbursed-item/{{ $reimbursement->id }}" class="btn btn-success btn-sm mr-2">
+                        <a href="/reimbursement/manage/disbursed-item/{{ $reimbursement->id }}" class="btn btn-success btn-sm mr-2" onclick='isconfirm();'>
                             <i class="fas fa-check"></i> Mark as Paid
                         </a>
                         <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="far fa-file-excel"></i> Export as Excel</a>
                     </div>
                     @if($isReceived == TRUE)
                         <div>
-                            <a href="/reimbursement/create_order_letter/{{ $reimbursement->id }}" class="btn btn-danger btn-sm mr-2">
+                            <a href="/reimbursement/create_order_letter/{{ $reimbursement->id }}" class="btn btn-danger btn-sm mr-2" onclick='isconfirm();'>
                                 <i class="fas fa-paper-plane"></i> Send Disbursement Order Letter
                             </a>
-                            <a href="/reimbursement/manage/disbursed-item/{{ $reimbursement->id }}" class="btn btn-success btn-sm mr-2">
+                            <a href="/reimbursement/manage/disbursed-item/{{ $reimbursement->id }}" class="btn btn-success btn-sm mr-2" onclick='isconfirm();'>
                                 <i class="fas fa-check"></i> Mark as Paid
                             </a>
                             <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="far fa-file-excel"></i> Export as Excel</a>

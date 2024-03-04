@@ -155,7 +155,7 @@
                         @else
                         @endusr_acc
                         @usr_acc(304)
-                        <a class="collapse-item" href="/leave/manage/all">Manage</a>
+                        <a class="collapse-item" href="/leave/manage/all">Manage Quota</a>
                         @else
                         @endusr_acc
                         @usr_acc(303)

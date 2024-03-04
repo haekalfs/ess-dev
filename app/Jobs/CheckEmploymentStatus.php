@@ -20,10 +20,12 @@ class CheckEmploymentStatus implements ShouldQueue
 
     public function handle()
     {
-        $getData = Users_detail::whereNotNull('hired_date')->where('status_active', 'Active')->pluck('user_id')->toArray();
+        $getData = Users_detail::whereNotNull('hired_date')->whereIn('employee_status', ['Probation', 'Contract', 'MT'])
+        ->where('status_active', 'Active')->pluck('user_id')->toArray();
         // Fetch users with details
         $users = User::with('users_detail')
         ->whereIn('id', $getData)
+        ->take(5)
         ->get();
 
         $Hr = Timesheet_approver::find(10);
@@ -69,7 +71,7 @@ class CheckEmploymentStatus implements ShouldQueue
         if ($endDate->isAfter($notificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Contract', $hiredDate, $HrName);
-            Mail::to('haekal@perdana.co.id')->send($notification);
+            Mail::to('asriany@perdana.co.id')->cc($recipients)->send($notification);
         }
     }
 
@@ -84,7 +86,7 @@ class CheckEmploymentStatus implements ShouldQueue
         if (now()->isAfter($notificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Probation', $hiredDate, $HrName);
-            Mail::to('haekal@perdana.co.id')->send($notification);
+            Mail::to('asriany@perdana.co.id')->cc($recipients)->send($notification);
         }
     }
 
@@ -101,14 +103,14 @@ class CheckEmploymentStatus implements ShouldQueue
         if (now()->isAfter($firstNotificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Probation of Management Trainee Program', $hiredDate, $HrName);
-            Mail::to('haekal@perdana.co.id')->send($notification);
+            Mail::to('asriany@perdana.co.id')->cc($recipients)->send($notification);
         }
 
         // Check for the second notification
         if (now()->isAfter($secondNotificationDate))
         {
             $notification = new EmploymentStatusNotification($user, 'Management Trainee', $hiredDate, $HrName);
-            Mail::to('haekal@perdana.co.id')->send($notification);
+            Mail::to('asriany@perdana.co.id')->cc($recipients)->send($notification);
         }
     }
 }
