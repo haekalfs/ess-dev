@@ -310,6 +310,20 @@ active
 }
 </style>
 <script>
+    $('#approved_amount').on('input', function() {
+        // Get the value of current amount
+        var currentAmount = parseFloat($('#current_amount').val().replace(/[^0-9]/g, ''));
+
+        // Get the value entered in the "Amount to be Processed" field
+        var inputAmount = parseFloat($(this).val().replace(/[^0-9]/g, ''));
+
+        // Check if the input amount is greater than the current amount
+        if (inputAmount > currentAmount) {
+            // Clear the input and show an alert
+            $(this).val('');
+            alert('Amount to be processed cannot be more than the current amount!');
+        }
+    });
     $(document).on('click', '.btn-edit', function() {
         var itemId = $(this).data('item-id');
         $('#item_id').val(itemId);

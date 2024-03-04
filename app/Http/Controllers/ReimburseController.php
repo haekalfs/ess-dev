@@ -812,6 +812,14 @@ class ReimburseController extends Controller
             ->select('RequestTo')
             ->get(); // Fetch the rows from the database
 
+
+        $isReceived = Reimbursement_item::select('id')
+            ->where('reimbursement_id', $id)
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN receivable_receipt = 1 THEN 1 ELSE 0 END)')
+            ->groupBy('reimbursement_id')
+            ->pluck('id')
+            ->count();
+
         $approversArrayName = [];
         foreach ($approverRows as $approver) {
             $approversArrayName[] = $approver->user->name;
@@ -823,7 +831,7 @@ class ReimburseController extends Controller
         $reimbIds = Reimbursement_approval::where('reimbursement_id', $id)->whereIn('status', [404, 20, 403])->groupBy('reimb_item_id')->select('reimb_item_id')->pluck('reimb_item_id')->toArray();
         $reimbursement_items = Reimbursement_item::where('reimbursement_id', $id)->whereNotIn('id', $reimbIds)->get();
 
-        return view('reimbursement.manage.manage_view_details', ['reimbursement' => $reimbursement, 'approversArrayName' => $approversArrayName,'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
+        return view('reimbursement.manage.manage_view_details', [ 'isReceived' => $isReceived,'reimbursement' => $reimbursement, 'approversArrayName' => $approversArrayName,'fm' => $financeManager, 'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
     }
 
     public function downloadReceipt($Id)

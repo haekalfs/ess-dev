@@ -6,6 +6,7 @@ use App\Jobs\CutLeaveBasedOnHolidaysJob;
 use App\Jobs\NotifyDeductedLeaveQuota;
 use App\Models\Emp_leave_quota;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -69,12 +70,21 @@ class CutLeaveBasedOnHolidays extends Command
             // Use the cached data
         }
         $year = date('Y'); // Specify the year you want to retrieve data for
+        $month = date('m');
         $holidayKeyword = "Cuti Bersama"; // Specify the keyword you want to filter
 
         $totalHolidays = 0;
 
-        foreach ($array as $date => $holiday) {
-            if (substr($date, 0, 4) === $year && isset($holiday['summary'][0]) && strpos($holiday['summary'][0], $holidayKeyword) !== false) {
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
+
+        // Iterate over each day in the month
+        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            $dateToCheck = $date->format('Y-m-d');
+
+            // Check if the date is a holiday and matches the keyword
+            if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true && isset($array[$dateToCheck]['summary'][0]) && strpos($array[$dateToCheck]['summary'][0], $holidayKeyword) !== false) {
                 $totalHolidays++;
             }
         }
@@ -83,9 +93,9 @@ class CutLeaveBasedOnHolidays extends Command
         $getUsers = Emp_leave_quota::pluck('user_id')->toArray();
         $users = User::whereIn('id', $getUsers)->get();
 
-        // foreach ($users as $user) {
-        //     dispatch(new NotifyDeductedLeaveQuota($user, $totalHolidays));
-        // }
-        $this->info('Cut Leave data processing job dispatched!');
+        foreach ($users as $user) {
+            dispatch(new NotifyDeductedLeaveQuota($user, $totalHolidays));
+        }
+        $this->info('Cut Leave data processing job dispatched!'. $totalHolidays);
     }
 }

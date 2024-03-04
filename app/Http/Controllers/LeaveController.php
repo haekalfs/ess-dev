@@ -41,7 +41,14 @@ class LeaveController extends Controller
         if($yearSelected){
             $currentYear = $yearSelected;
         }
+
         $leaveType = Leave::all();
+
+        if (!$leaveType->isEmpty()) {
+            $leaveType = $leaveType->reject(function ($leaveType) {
+                return $leaveType->id === 100; // Replace 'WFH' with the specific value you want to remove
+            });
+        }
 
         $leaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
         ->whereIn('leave_id', [10, 20])->orderBy('expiration', 'asc')->get();
