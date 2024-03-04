@@ -99,7 +99,7 @@ active
                                         </tr>
                                         <tr class="table-sm">
                                             <td style="width: 200px;">Hired Date</td>
-                                            <td>: {{$user_info->users_detail->hired_date}}</td>
+                                            <td>: {{ \Carbon\Carbon::createFromFormat('Y-m-d', $user_info->users_detail->hired_date)->format('d-M-Y') }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -168,23 +168,23 @@ active
                                                 <tr class="table-sm">
                                                     <td>Religion</td>
                                                     <td>: @switch($user_info->users_detail->usr_religion)
-                                                        @case('Islam') Islam @break 
-                                                        @case('Kristen') Kristen Protestan @break 
-                                                        @case('Katholik') Kristen Katholik @break 
-                                                        @case('Hindu') Hindu @break 
-                                                        @case('Buddha') Buddha @break 
-                                                        @case('Konghucu') Konghucu @break 
-                                                        @case('O') Other @break 
+                                                        @case('Islam') Islam @break
+                                                        @case('Kristen') Kristen Protestan @break
+                                                        @case('Katholik') Kristen Katholik @break
+                                                        @case('Hindu') Hindu @break
+                                                        @case('Buddha') Buddha @break
+                                                        @case('Konghucu') Konghucu @break
+                                                        @case('O') Other @break
                                                         @default Unknown Religion @endswitch
                                                     </td>
                                                 </tr>
                                                 <tr class="table-sm">
                                                     <td>Marital Status</td>
                                                     <td>: @switch($user_info->users_detail->usr_merital_status)
-                                                        @case('S') Single @break 
-                                                        @case('M') Married @break 
-                                                        @case('Widow') Widow / Janda @break 
-                                                        @case('Widower') Widower / Duda @break 
+                                                        @case('S') Single @break
+                                                        @case('M') Married @break
+                                                        @case('Widow') Widow / Janda @break
+                                                        @case('Widower') Widower / Duda @break
                                                         @case('Divorced') Divorced @break
                                                         @default Unknown Merital Status @endswitch
                                                     </td>
@@ -213,7 +213,7 @@ active
                                                 <tr class="table-sm">
                                                     <td style="width: 150px;">Identity Type</td>
                                                     <td>: @switch($user_info->users_detail->usr_id_type)
-                                                        @case('KTP') KTP @break 
+                                                        @case('KTP') KTP @break
                                                         @case('SIM') SIM @break
                                                         @case('Passport') Passport @break
                                                         @default Unknown Identity Type @endswitch
@@ -286,7 +286,7 @@ active
                                     <label for="email">{{ __('Your E-Mail Address :') }}</label>
                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
                                     value="{{ old('email') }}" required autocomplete="email" autofocus>
-        
+
                                 @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -301,11 +301,11 @@ active
                     <div class="col-md-12 zoom90">
                         <div class="row mb-3">
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-        
+
                             <div class="col-md-8">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
                                     value="{{ old('email') }}" required autocomplete="email" autofocus>
-        
+
                                 @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -359,7 +359,7 @@ active
                     <div class="row">
                         <div class="form-group">
                             <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="changeFileName('cv', 'cv-label')">
-                            <label class="custom-file-label" for="cv" id="cv-label">Choose file</label> 
+                            <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center">
@@ -369,7 +369,7 @@ active
                         </a>
                         @endif
                     </div>
-                </div>              
+                </div>
             </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
