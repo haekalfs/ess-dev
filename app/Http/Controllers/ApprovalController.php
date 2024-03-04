@@ -97,7 +97,7 @@ class ApprovalController extends Controller
         $accessController = new AccessController();
         $result = $accessController->usr_acc(204);
 
-        $history = Log::groupBy(['user_id', 'intended_for', 'created_at'])->get();
+        $history = Log::groupBy(['user_id', 'intended_for', 'created_at'])->orderBy('created_at', 'desc')->get();
 
         return view('approval.history', ['history' => $history]);
     }
