@@ -13,11 +13,13 @@ class MedicalCreation extends Mailable
     use Queueable, SerializesModels;
     protected $employee;
     protected $userName;
+    protected $medical_id;
 
-    public function __construct(User $employee, $userName)
+    public function __construct(User $employee, $userName, $medical_id)
     {
         $this->employee = $employee;
         $this->userName = $userName;
+        $this->medical_id = $medical_id;
     }
 
     public function build()
@@ -26,6 +28,7 @@ class MedicalCreation extends Mailable
             'name' => $this->employee->name,
             'email' => $this->employee->email,
             'userName' => $this->userName,
+            'medical_id' => $this->medical_id,
             'link' => 'https://timereport.perdana.co.id/approval/medical/'
         ];
 
@@ -52,6 +55,7 @@ class MedicalCreation extends Mailable
             'name' => $this->employee->name,
             'email' => $this->employee->email,
             'userName' => $this->userName,
+            'medical_id' => $this->medical_id,
             'link' => 'https://timereport.perdana.co.id/approval/medical/'
         ];
     }

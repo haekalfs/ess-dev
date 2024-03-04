@@ -12,11 +12,13 @@ class MedicalRejected extends Mailable
 {
     protected $employee;
     protected $MedId;
+    protected $approverName;
 
-    public function __construct(User $employee, $MedId)
+    public function __construct(User $employee, $MedId, $approverName)
     {
         $this->employee = $employee;
         $this->MedId = $MedId;
+        $this->approverName = $approverName;
     }
 
     public function build()
@@ -25,10 +27,11 @@ class MedicalRejected extends Mailable
             'name' => $this->employee->name,
             'email' => $this->employee->email,
             'MedId' => $this->MedId,
+            'approverName'=> $this->approverName,
             'link' => 'https://timereport.perdana.co.id/medical/history/'
         ];
 
-        $subject = 'Medical Request Status';
+        $subject = 'Medical Request Rejected';
 
         return $this->markdown('mailer.medical_rejected', $data)
             ->subject($subject)
@@ -37,7 +40,7 @@ class MedicalRejected extends Mailable
 
     public function emailSubject()
     {
-        return 'Medical Request Status';
+        return 'Medical Request Rejected';
     }
 
     public function emailTo()
@@ -51,6 +54,7 @@ class MedicalRejected extends Mailable
             'name' => $this->employee->name,
             'email' => $this->employee->email,
             'MedId' => $this->MedId,
+            'approverName' => $this->approverName,
             'link' => 'https://timereport.perdana.co.id/medical/history/'
         ];
     }

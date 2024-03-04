@@ -59,7 +59,7 @@ active
                                 <tr class="table-sm text-center">
                                     <td style="d-flex align-items-center text-center">
                                         @if($user_info->users_detail->profile_pic)
-                                            <img class="img-profile rounded-circle" height="150px"width="140px" style="object-fit:fill;" src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                            <img class="img-profile rounded-circle" height="150px"width="140px" style="object-fit:fill;" src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                         @else
                                             <div class="img-profile rounded-circle no-image"><i class="no-image-text">No Image Available</i></div>
                                         @endif
@@ -336,14 +336,14 @@ active
                 <div class="close-icon">
                     <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
                 </div>
-                <img src="{{ url('/storage/profile_pic/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+                <img src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
             </div>
         </div>
     </div>
 </div>
 <!-- Modal CV -->
 <div class="modal fade" id="cvModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
     <form method="POST" action="/myprofile/cv_upload/{{ $user_info->id }}" enctype="multipart/form-data" id="profilForm">
         @csrf
@@ -362,14 +362,10 @@ active
                             <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        @if($user_info->users_detail->cv)
-                        <a href="{{ url('/storage/cv/'.$user_info->users_detail->cv) }}" target="_blank">
-                            <img class="img-thumbnail" width="110px" src="https://img.icons8.com/cute-clipart/64/pdf.png" alt="CV Image">
-                        </a>
-                        @endif
-                    </div>
                 </div>
+                @if($user_info->users_detail->cv)
+                    <iframe width="100%" height="600px" src="{{ url('/cv_storage/'.$user_info->users_detail->cv )}}"></iframe>
+                @endif
             </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -1,6 +1,6 @@
 <p>Dear, {{ $name }}</p>
 
-<p>Your Medical Reimbursement No : <span style="font-weight: bold;">MED_0000{{ $MedId }}</span> has been Rejected. Kindly request your review for the documents.</p>
+<p>Your Medical Reimbursement No : <span style="font-weight: bold;">MED_{{ $MedId }}</span> has been Rejected by {{ $approverName }}. Kindly request your review for the documents.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>

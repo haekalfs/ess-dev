@@ -95,6 +95,7 @@ active
                                     <th>User ID</th>
                                     <th>Name</th>
                                     <th>Balance</th>
+                                    <th>Remaining</th>
                                     <th>Deducted</th>
                                     <th>Active Periode</th>
                                     <th>Expiration</th>
@@ -104,14 +105,10 @@ active
                             <tbody>
                                 @foreach ($medBalance as $mB)
                                 <tr>
-                                    {{-- <td class="text-center">
-                                        <div class="form-check form-check-inline larger-checkbox">
-                                            <input class="form-check-input data-checkbox" type="checkbox" value="option1">
-                                        </div>
-                                    </td> --}}
                                     <td>{{ $mB->user->users_detail->employee_id }}</td>
                                     <td>{{ $mB->user->name }}</td>
                                     <td>{{ $mB->medical_balance }}</td>
+                                    <td>{{ $mB->medical_remaining }}</td>
                                     <td>{{ $mB->medical_deducted }}</td>
                                     <td>{{ $mB->active_periode }}</td>
                                     <td>{{ $mB->expiration }}</td>

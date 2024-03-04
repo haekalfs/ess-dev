@@ -40,10 +40,10 @@ class UserController extends Controller
         $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
         $banks = $response->json();
 
-        // Mengubah nama bank menjadi huruf kapital pada huruf pertama
+        // Mengubah name bank menjadi huruf kapital pada huruf pertama
         $bankNames = array_map(function ($bank) {
-            $name = ucwords(strtolower($bank['name'])); // Mengubah nama bank menjadi huruf kapital pada huruf pertama
-            $words = explode(' ', $name); // Memisahkan kata dalam nama bank
+            $name = ucwords(strtolower($bank['name'])); // Mengubah name bank menjadi huruf kapital pada huruf pertama
+            $words = explode(' ', $name); // Memisahkan kata dalam name bank
 
             // Mengecek panjang kata setelah kata "Bank" dan mengubahnya menjadi UPPERCASE jika kurang dari atau sama dengan 4 huruf
             foreach ($words as $key => $word) {
@@ -55,7 +55,7 @@ class UserController extends Controller
                 }
             }
 
-            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi nama bank
+            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi name bank
         }, $banks);
 
         return view('manage.users_creation', ['dep_data' => $dep_data, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'bankNames' => $bankNames]);
@@ -82,29 +82,28 @@ class UserController extends Controller
         $hash_pwd = Hash::make($request->password);
 
         $employeeID = $request->employee_id;
-        $year = Carbon::now()->year;
 
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $employeeID . $year . "_profile" . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = '/images_storage';
-            $profile_file->move(public_path($tujuan_upload_profile, $nama_file_profile));
+            $name_file_profile = $employeeID  . "_profile" . "." . $profile_file->getClientOriginalExtension();
+            $upload_folder_profile = '/images_storage';
+            $profile_file->move(public_path($upload_folder_profile, $name_file_profile));
         } else {
-            // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
-            $nama_file_profile = null;
+            // Tentukan nilai default untuk $name_file_profile jika file tidak diunggah
+            $name_file_profile = null;
         }
 
 
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
-            $nama_file_cv = $employeeID . $year . "_cv" . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = '/cv_storage';
-            $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);
+            $name_file_cv = $employeeID . "_cv" . "." . $cv_file->getClientOriginalExtension();
+            $upload_folder_cv = '/cv_storage';
+            $cv_file->move(public_path($upload_folder_cv), $name_file_cv);
         } else {
-            // Tentukan nilai default untuk $nama_file_profile jika file tidak diunggah
-            $nama_file_cv = null;
+            // Tentukan nilai default untuk $name_file_profile jika file tidak diunggah
+            $name_file_cv = null;
         }
 
         User::create([
@@ -143,8 +142,8 @@ class UserController extends Controller
             'usr_bank_branch' => $request->usr_bank_branch,
             'usr_bank_account' => $request->usr_bank_account,
             'usr_bank_account_name' => $request->usr_bank_account_name,
-            'profile_pic' => $nama_file_profile,
-            'cv' => $nama_file_cv,
+            'profile_pic' => $name_file_profile,
+            'cv' => $name_file_cv,
         ]);
 
 
@@ -222,10 +221,10 @@ class UserController extends Controller
         $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
         $banks = $response->json();
 
-        // Mengubah nama bank menjadi huruf kapital pada huruf pertama
+        // Mengubah name bank menjadi huruf kapital pada huruf pertama
         $bankNames = array_map(function ($bank) {
-            $name = ucwords(strtolower($bank['name'])); // Mengubah nama bank menjadi huruf kapital pada huruf pertama
-            $words = explode(' ', $name); // Memisahkan kata dalam nama bank
+            $name = ucwords(strtolower($bank['name'])); // Mengubah name bank menjadi huruf kapital pada huruf pertama
+            $words = explode(' ', $name); // Memisahkan kata dalam name bank
 
             // Mengecek panjang kata setelah kata "Bank" dan mengubahnya menjadi UPPERCASE jika kurang dari atau sama dengan 4 huruf
             foreach ($words as $key => $word) {
@@ -237,7 +236,7 @@ class UserController extends Controller
                 }
             }
 
-            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi nama bank
+            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi name bank
         }, $banks);
         return view('manage.users_edit', ['user' => $user, 'dep_data' => $dep_data, 'pos_data' => $pos_data, 'bankNames' => $bankNames]);
     }
@@ -248,50 +247,49 @@ class UserController extends Controller
         $user = User::find($id);
 
         $employeeID = $user->users_detail->employee_id;
-        $year = Carbon::now()->year;
 
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
             $profile_file = $request->file('profile');
-            $nama_file_profile = $employeeID . $year . "_profile" . "." . $profile_file->getClientOriginalExtension();
-            $tujuan_upload_profile = '/images_storage';
+            $name_file_profile = $employeeID . "_profile" . "." . $profile_file->getClientOriginalExtension();
+            $upload_folder_profile = '/images_storage';
 
             // Menghapus file profil lama jika ada
-            $oldProfileImage = public_path($tujuan_upload_profile . '/' . $nama_file_profile);
+            $oldProfileImage = public_path($upload_folder_profile . '/' . $name_file_profile);
             if (file_exists($oldProfileImage)) {
                 unlink($oldProfileImage);
             }
 
             // Memindahkan file profil yang baru diunggah
-            $profile_file->move(public_path($tujuan_upload_profile), $nama_file_profile); // Gunakan move() dengan path relatif dan nama file
+            $profile_file->move(public_path($upload_folder_profile), $name_file_profile); // Gunakan move() dengan path relatif dan name file
         } elseif ($user->users_detail->profile_pic) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
-            $nama_file_profile = $user->users_detail->profile_pic;
+            $name_file_profile = $user->users_detail->profile_pic;
         } else {
             // Tidak ada foto profil di database dan tidak ada unggahan baru, set nilai menjadi null
-            $nama_file_profile = null;
+            $name_file_profile = null;
         }
 
         // Memeriksa apakah file CV diunggah
         if ($request->hasFile('cv')) {
             $cv_file = $request->file('cv');
 
-            $nama_file_cv = $employeeID . $year . "_cv" . "." . $cv_file->getClientOriginalExtension();
-            $tujuan_upload_cv = '/cv_storage';
+            $name_file_cv = $employeeID . "_cv" . "." . $cv_file->getClientOriginalExtension();
+            $upload_folder_cv = '/cv_storage';
 
             // Menghapus file profil lama jika ada
-            $oldCV = public_path($tujuan_upload_cv . '/' . $nama_file_cv);
+            $oldCV = public_path($upload_folder_cv . '/' . $name_file_cv);
             if (file_exists($oldCV)) {
                 unlink($oldCV);
             }
 
-            $cv_file->move(public_path($tujuan_upload_cv), $nama_file_cv);;
+            $cv_file->move(public_path($upload_folder_cv), $name_file_cv);;
         } elseif ($user->users_detail->cv) {
             // Menggunakan foto profil yang sudah ada dalam database jika ada
-            $nama_file_cv = $user->users_detail->cv;
+            $name_file_cv = $user->users_detail->cv;
         } else {
             // Tidak ada foto profil di database dan tidak ada unggahan baru, set nilai menjadi null
-            $nama_file_cv = null;
+            $name_file_cv = null;
         }
 
         $user->id = $request->usr_id;
@@ -328,8 +326,8 @@ class UserController extends Controller
         $user_detail->usr_bank_account = $request->usr_bank_account;
         $user_detail->usr_bank_account_name = $request->usr_bank_account_name;
         $user_detail->current_address = $request->current_address;
-        $user_detail->profile_pic = $nama_file_profile;
-        $user_detail->cv = $nama_file_cv;
+        $user_detail->profile_pic = $name_file_profile;
+        $user_detail->cv = $name_file_cv;
         $user_detail->save();
 
 
