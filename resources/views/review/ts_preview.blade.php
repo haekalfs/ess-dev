@@ -45,7 +45,11 @@ active
                 <div class="row">
                     <div class="col-md-3 align-items-center text-center">
                         <div class="col-md-3 text-center">
+                            @if($user_info->users_detail->profile_pic)
+                                <img class="img-profile rounded-circle" height="150px"width="150px" style="object-fit:fill;" src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                            @else
                             <img src="{{ asset('img/PC-01.png') }}" style="height: 92px; width: 220px;" />
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -418,6 +422,21 @@ active
 <br>
 <input type="hidden" id="yearSel" value="{{ $year }}">
 <input type="hidden" id="monthSel" value="{{ $month }}">
+
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Picture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <img src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('javascript')
