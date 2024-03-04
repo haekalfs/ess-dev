@@ -102,15 +102,7 @@ active
                         <tr>
                           <th>Remaining Active Period</th>
                            <td style="text-align: start; font-weight:500">: 
-                                @php
-                                    // Mendapatkan tanggal aktif dan tanggal sekarang
-                                    $activePeriode = \Carbon\Carbon::parse($emp_medical_balance->expiration);
-                                    $now = \Carbon\Carbon::now();
-                                    
-                                    // Menghitung selisih bulan
-                                    $diffInMonths = $activePeriode->diffInMonths($now);
-                                @endphp
-                                <span class="text-success font-weight-bold">{{ $diffInMonths }} Months Left </span>
+                                <span class="text-success font-weight-bold">{{ $monthPeriode }} Months Left </span>
                             </td>
                         </tr>
                     </tr>

@@ -831,7 +831,7 @@ class ApprovalController extends Controller
         //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
         // }
 
-        return redirect('/approval/medical')->with('success', "You've Approved <b>$userNameRequestor</b> Medical Reimburse No. MED_$MedId");
+        return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId");
     }
 
     public function reject_medical(Request $request, $id)

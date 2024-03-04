@@ -204,7 +204,7 @@
             <li class="nav-item @yield('active-page-med-reimburse')">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMedReimburse"
                     aria-expanded="true" aria-controls="collapseMedReimburse">
-                    <i class="fas fa-fw fa-hand-holding-medical"></i>
+                    <i class="fas fa-briefcase-medical"></i>
                     <span>Medical Reimburse</span>
                 </a>
                 <div id="collapseMedReimburse" class="collapse" aria-labelledby="headingMedReimburse" data-parent="#accordionSidebar">

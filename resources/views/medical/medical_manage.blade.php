@@ -8,8 +8,8 @@ active
 
 @section('content')
 <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h2 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b>Manage Medical Balance</b></h2>
+<div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
+    <h2 class=" mb-2 text-gray-800"><i class="fas fa-book-medical"></i><b> Manage Medical Balance</b></h2>
     {{-- <small style="color:red"><i>Finance Manager</i></small> --}}
 </div>
 

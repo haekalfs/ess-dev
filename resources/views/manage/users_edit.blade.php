@@ -74,7 +74,7 @@ active
                                         </div>
                                     </div>
                                     @if($user->users_detail->profile_pic)
-                                        <img style="max-width: 110px; max-height: 110px; object-fit:fill;" class="img-thumbnail" src="{{ public_path('images_storage'.$user->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
+                                        <img style="max-width: 110px; max-height: 110px; object-fit:fill;" class="img-thumbnail" src="{{ url('/images_storage/'.$user->users_detail->profile_pic) }}" data-toggle="modal" data-target="#profileModal">
                                     @else
                                     <div class="img-thumbnail no-image"><i class="no-image-text">No Image Available</i></div>
                                     @endif
@@ -550,7 +550,7 @@ active
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <img src="{{ public_path('images_storage'.$user->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+            <img src="{{ url('/images_storage/'.$user->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
         </div>
     </div>
 </div>
@@ -565,7 +565,7 @@ active
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-        <iframe height="600px" src="{{ public_path('images_storage'.$user->users_detail->cv) }}"></iframe>
+        <iframe height="600px" src="{{ url('/cv_storage/'.$user->users_detail->cv )}}"></iframe>
     </div>
   </div>
 </div>
