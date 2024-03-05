@@ -456,16 +456,15 @@ active
 <br>
 <!-- Modal Profile -->
 <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="text-right" width="100px">
-    </div>
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-body">
-                <div class="close-icon">
-                    <img width="35" height="35" src="https://img.icons8.com/ios-glyphs/60/macos-close.png" alt="macos-close" data-dismiss="modal">
-                </div>
-                <img src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
+            <div class="modal-header">
+                <h5 class="modal-title text-small" id="exampleModalLabel">Profile Picture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <img src="{{ url('/images_storage/'.$user_info->users_detail->profile_pic) }}" class="img-fluid" alt="Profile Picture">
         </div>
     </div>
 </div>
