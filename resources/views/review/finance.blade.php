@@ -36,7 +36,8 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Filter Timesheets</h6>
         <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export as Excel</a>
+            <a class="d-none d-sm-inline-block btn btn-outline-secondary btn-sm shadow-sm" type="button" href="/timesheet/review/fm/export-allowance/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm"></i> Export Allowances</a>
+            <a class="d-none d-sm-inline-block btn btn-secondary btn-sm shadow-sm ml-2" type="button" href="/timesheet/review/fm/export/{{ $Month }}/{{ $Year }}/"><i class="fas fa-fw fa-file-export fa-sm text-white-50"></i> Export as Excel</a>
         </div>
     </div>
     <form method="GET" action="/timesheet/review/fm">

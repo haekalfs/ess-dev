@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
         //Review
         Route::get('/timesheet/review/fm', 'ReviewController@review')->name('review.finance');
         Route::get('/timesheet/review/fm/export/{month}/{year}', 'ExportTimesheet@export_excel');
+        Route::get('/timesheet/review/fm/export-allowance/{month}/{year}', 'ExportTimesheet@export_excel_allowance');
         Route::get('/timesheet/review/fm/review/{user_id}/{year}/{month}', 'ReviewController@ts_preview')->name('preview.fm.timesheet');
         Route::get('/timesheet/review/fm/preview/print/{year}/{month}/{user_timesheet}', 'ReviewController@print_selected');
         Route::get('/timesheet/summary/preview/timesheet/{user_id}/{year}/{month}', 'ReviewController@ts_preview');

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\ApprovalTimesheet;
 use App\Models\Timesheet_detail;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -36,11 +37,17 @@ class SendTimesheetApprovalNotification implements ShouldQueue
      */
     public function handle()
     {
+        $currentMonth = Carbon::now()->month; // Get the current month
+        $threeMonthsAgo = Carbon::now()->subMonths(3)->month; // Get the month 3 months ago
+
         $monthPeriod = Timesheet_detail::select('month_periode')
-        ->where('ts_status_id', 20)
-        ->where('RequestTo', $this->user->id)
-        ->groupBy('month_periode')
-        ->get();
+            ->where('ts_status_id', 20)
+            ->where(function($query) use ($currentMonth, $threeMonthsAgo) {
+                $query->whereBetween('MONTH(created_at)', [$currentMonth, $threeMonthsAgo]);
+            })
+            ->where('RequestTo', $this->user->id)
+            ->groupBy('month_periode')
+            ->get();
 
         $notification = new ApprovalTimesheet($this->user, $monthPeriod);
         Mail::send('mailer.timesheetapproval', $notification->data(), function ($message) use ($notification) {
