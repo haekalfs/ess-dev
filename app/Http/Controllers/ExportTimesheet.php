@@ -486,7 +486,6 @@ class ExportTimesheet extends Controller
                     $sheet->setCellValueByColumnAndRow($startCol + 7, $startRow, $row->total_allowance);
                 }
 
-                $total[] = $row->total_incentive;
                 $total[] = $row->total_allowance;
                 if (!$firstRow) {
                     if ($countUserRows === 1) {
