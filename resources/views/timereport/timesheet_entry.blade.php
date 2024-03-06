@@ -900,7 +900,7 @@ function changeFileName(inputId, labelId) {
     }
 
     .round-text-box {/* Border color similar to alert-danger */
-        background-color: #e4e4e4; /* Background color similar to alert-danger */
+        background-color: #f7c121; /* Background color similar to alert-danger */
         color: #7e7e7e; /* Text color similar to alert-danger */
         padding: 5px; /* Adjust padding to control the size of the box */
         border-radius: 10px; /* Border radius for rounded corners */
@@ -908,7 +908,19 @@ function changeFileName(inputId, labelId) {
     }
 
     .round-text-box:hover {
-        background-color: #888888; /* Change the background color on hover */
+        background-color: #b56f00; /* Change the background color on hover */
+        color: #fff; /* Change the text color on hover */
+    }
+    .round-text-box2 {/* Border color similar to alert-danger */
+        background-color: #cdeaff; /* Background color similar to alert-danger */
+        color: #7e7e7e; /* Text color similar to alert-danger */
+        padding: 5px; /* Adjust padding to control the size of the box */
+        border-radius: 10px; /* Border radius for rounded corners */
+        transition: background-color 0.3s; /* Add a smooth transition for the background color */
+    }
+
+    .round-text-box2:hover {
+        background-color: #1075bd; /* Change the background color on hover */
         color: #fff; /* Change the text color on hover */
     }
 </style>
