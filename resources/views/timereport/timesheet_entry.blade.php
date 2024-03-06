@@ -177,19 +177,19 @@ active
                                                 $status = $day['status'];
                                             @endphp
                                             @if ($status === "red")
-                                                <td data-toggle="modal" class="clickable text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div><br></td>
+                                                <td data-toggle="modal" class="clickable test text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div id="desc{{$dayValue}}"></div><br></td>
                                             @elseif ($status === 2907)
-                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
+                                                <td class="clickable test text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
                                                     <a><i class="fas fa-plane-departure fa-sm"></i></a>
                                                 </td>
                                             @elseif ($status === 100)
-                                                <td class="clickable text-danger" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
+                                                <td class="clickable test text-danger" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
                                                     <div class="text-center mt-2"><br><small><i>Weekend Replacement</i></small></div>
                                                 </td>
                                             @elseif ($status === 404)
-                                                <td class="clickable text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
+                                                <td class="clickable test text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.<div id="desc{{$dayValue}}"></div></td>
                                             @else
-                                                <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
+                                                <td data-toggle="modal" class="clickable test text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div id="desc{{$dayValue}}"></div></td>
                                             @endif
                                         @else
                                             @php
@@ -204,9 +204,9 @@ active
                                             @endif
                                             @if ($isCurrentMonth)
                                                 @if (date('N', strtotime($year.'-'.$month.'-'.$dayValue)) == 6 || date('N', strtotime($year.'-'.$month.'-'.$dayValue)) == 7)
-                                                    <td data-toggle="modal" class="clickable text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
+                                                    <td data-toggle="modal" class="clickable test text-danger" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div id="desc{{$dayValue}}"></div></td>
                                                 @else
-                                                    <td data-toggle="modal" class="clickable text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div class="shorter-textDiv" id="desc{{$dayValue}}" style="height: 100px;"></div></td>
+                                                    <td data-toggle="modal" class="clickable test text-dark" data-target="#myModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}.<div id="desc{{$dayValue}}"></div></td>
                                                 @endif
                                             @else
                                                 <td class="prev-month-day">{{ $dayValue }}</td>
@@ -883,6 +883,9 @@ function changeFileName(inputId, labelId) {
         cursor: pointer;
         transition: background-color 0.3s ease-in-out;
     }
+    .test {
+        height: 160px;
+    }
     td:hover {
         background-color: #f5f5f5;
     }
@@ -892,7 +895,7 @@ function changeFileName(inputId, labelId) {
     .calendar {
         background: #ffffff;
         border-radius: 4px;
-        height: 701px;
+        height: 601px;
         perspective: 1000;
         transition: .9s;
         transform-style: preserve-3d;

@@ -278,10 +278,11 @@ function showSuccessMessage(){
                         // descTask.append('<br>');
                         // descTask.append($('<span></span>').addClass('shorter-textbox round-text-box zoom70 inner-anchor font-weight-bold mb-2 text-gray-800').html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + '&#x2022; ' + activity.ts_task).attr('data-target', '#updateModal').attr('data-toggle', 'modal').attr('data-date', activity.ts_date).attr('data-id', activity.ts_id));
                         var roundClass = (activity.ts_id_date % 2 === 1) ? 'round-text-box' : 'round-text-box2';
+                        var icon = (activity.ts_id_date % 2 === 1) ? '&#11162; ' : '&#129034; ';
                         var taskElement = $('<span></span>')
                             .addClass('shorter-textbox zoom70 inner-anchor font-weight-bold mb-2 text-gray-800')
                             .addClass(roundClass)
-                            .html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + '&#x2022; ' + activity.ts_task)
+                            .html('<i>' + activity.ts_from_time + ' - ' + activity.ts_to_time + '</i><br>' + ' <span>'+ icon +'</span>' + activity.ts_task)
                             .attr('data-target', '#updateModal')
                             .attr('data-toggle', 'modal')
                             .attr('data-date', activity.ts_date)
