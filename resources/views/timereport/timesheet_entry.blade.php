@@ -178,7 +178,7 @@ active
                                                 $summary = $day['summary'];
                                             @endphp
                                             @if ($status === "red")
-                                                <td data-toggle="modal" class="clickable test text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}. <div id="desc{{$dayValue}}" class="keep-content">{{ $summary }}</div><br></td>
+                                                <td data-toggle="modal" class="clickable test text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}. <div id="desc{{$dayValue}}"></div><br></td>
                                             @elseif ($status === 2907)
                                                 <td class="clickable test text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
                                                     <a><i class="fas fa-plane-departure fa-sm"></i></a>
@@ -395,7 +395,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Detail Activity :</label>
-                                    <textarea type="text" class="form-control validate" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validate" id="activity" name="activity" rows="3" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -517,7 +517,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Detail Activity :</label>
-                                    <textarea type="text" class="form-control validate-red" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validate-red" id="activity" name="activity" rows="3" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -620,7 +620,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Detail Activity :</label>
-                                    <textarea type="text" class="form-control" id="update_activity" name="update_activity" required></textarea>
+                                    <textarea type="text" class="form-control" id="update_activity" name="update_activity" rows="3" required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -716,7 +716,7 @@ active
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="password">Detail Activity :</label>
-                                    <textarea type="text" class="form-control validateMult" id="activity" name="activity" required></textarea>
+                                    <textarea type="text" class="form-control validateMult" id="activity" name="activity" required rows="3"></textarea>
                                 </div>
                             </div>
                         </div>
