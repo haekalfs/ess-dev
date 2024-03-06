@@ -256,6 +256,100 @@ class TimesheetController extends Controller
         }
     }
 
+    public function getDaySummary($date)
+    {
+        $json = null;
+        $array = null;
+        $cachedData = Cache::get('holiday_data');
+        $maxAttempts = 5;
+        $attempts = 0;
+
+        // Check if the year of the given date is the current year
+        $dateTime = new DateTime($date);
+        $yearToCheck = $dateTime->format('Y');
+        $isCurrentYear = ($yearToCheck == date('Y'));
+
+        while (!$cachedData && $attempts < $maxAttempts) {
+            try {
+                if (!$isCurrentYear) {
+                    // Check if the local file exists before reading it
+                    $localFilePath = public_path("holidays_indonesia.json");
+                    if (file_exists($localFilePath)) {
+                        $json = file_get_contents($localFilePath);
+                    } else {
+                        $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                    }
+                } else {
+                    // Use the API to get the data
+                    $json = file_get_contents("https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json");
+                }
+
+                $array = json_decode($json, true);
+                Cache::put('holiday_data', $array, 60 * 24); // Cache the data for 24 hours
+                $cachedData = $array;
+            } catch (Exception $e) {
+                // Handle exception or log error
+                sleep(1); // Wait for 5 seconds before retrying
+                $attempts++;
+            }
+        }
+
+        if (!$isCurrentYear) {
+            // Forget the cache if the year is not the current year
+            Cache::forget('holiday_data');
+        }
+
+        if (!$cachedData) {
+            Session::flash('failed', 'No Internet Connection, Please Try Again Later!');
+            return redirect(url()->previous());
+        } else {
+            $array = $cachedData;
+            // Use the cached data
+        }
+
+        $usersProject = Project_assignment_user::where('user_id', Auth::id())->pluck('company_project_id')->toArray();
+        $usersRoles = Usr_role::where('user_id', Auth::id())->pluck('role_id')->toArray();
+
+        $holidays = Holidays::where(function($query) use ($usersProject) {
+                $query->where('isProject', 1)
+                    ->where('isHoliday', 1)
+                    ->whereIn('intended_for', $usersProject);
+            })
+            ->orWhere(function($query) use ($usersRoles) {
+                $query->where('isProject', 0)
+                    ->where('isHoliday', 1)
+                    ->whereIn('intended_for', $usersRoles);
+            })
+            ->pluck('ts_date')
+            ->toArray();
+
+        $holidayInPerdana = [];
+        foreach ($holidays as $holidayString) {
+            $holidayInPerdana[] = date('Ymd', strtotime($holidayString));
+        }
+
+        //WeekendReplacement
+        $weekendReplacement = Surat_penugasan::where('user_id', Auth::user()->id)
+            ->where('isTaken', TRUE)
+            ->pluck('date_to_replace')
+            ->toArray();
+
+        // Check tanggal merah berdasarkan libur nasional
+        $dateToCheck = $date->format('Y-m-d');
+
+        if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true) {
+            $summary = $array[$dateToCheck]['summary'][0];
+            return $summary;
+        } else {
+            $dateToCheck2 = $date->format('Ymd');
+            if(in_array($dateToCheck2, $holidayInPerdana)){
+                return "Holiday in Perdana";
+            } else {
+                return "";
+            }
+        }
+    }
+
     public function timesheet_entry($year, $month)
     {
         // $test = Cache::get('holiday_data');
@@ -293,9 +387,11 @@ class TimesheetController extends Controller
                 }
                 $date = Carbon::create($year, $month, $dayCounter);
                 $holiday = $this->getDayStatus($date);
+                $summary = $this->getDaySummary($date);
                 $week[] = [
                     'day' => $dayCounter,
-                    'status' => $holiday
+                    'status' => $holiday,
+                    'summary' => $summary
                 ];
                 $dayCounter++;
                 $firstDayAdded = true;
@@ -303,9 +399,11 @@ class TimesheetController extends Controller
             for ($j = count($week); $j < 7 && $dayCounter <= $numDays; $j++) {
                 $date = Carbon::create($year, $month, $dayCounter);
                 $holiday = $this->getDayStatus($date);
+                $summary = $this->getDaySummary($date);
                 $week[] = [
                     'day' => $dayCounter,
-                    'status' => $holiday
+                    'status' => $holiday,
+                    'summary' => $summary
                 ];
                 $dayCounter++;
             }
