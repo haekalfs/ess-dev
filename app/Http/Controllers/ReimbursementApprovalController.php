@@ -109,13 +109,13 @@ class ReimbursementApprovalController extends Controller
 
         if (in_array($checkUserPost, $getHighPosition)) {
             $Check = DB::table('reimbursement_approval')
-            ->select('reimb_item_id')
-            ->whereNotIn('RequestTo', $ts_approver)
-            ->whereNotIn('RequestTo', [Auth::id()])
-            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 30 THEN 1 ELSE 0 END)')
-            ->groupBy('reimb_item_id')
-            ->pluck('reimb_item_id')
-            ->toArray();
+                ->select('reimb_item_id')
+                ->whereNotIn('RequestTo', $ts_approver)
+                ->whereNotIn('RequestTo', [Auth::id()])
+                ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 30 THEN 1 ELSE 0 END)')
+                ->groupBy('reimb_item_id')
+                ->pluck('reimb_item_id')
+                ->toArray();
             if (!empty($Check)) {
                 $reimbursement_items = Reimbursement_approval::whereIn('reimb_item_id', $Check)->where('reimbursement_id', $id)->where('RequestTo', Auth::id())->groupBy('reimb_item_id')->get();
             } else {

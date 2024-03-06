@@ -44,6 +44,18 @@ class HomeController extends Controller
         $year = date('Y');
         $month = date('m') - 1;
 
+        // Get the hired date of the authenticated user
+        $hiredDate = Carbon::createFromFormat('Y-m-d', Auth::user()->users_detail->hired_date);
+
+        // Get the current date
+        $currentDate = Carbon::today();
+        $isAnniversary = False;
+        // Check if the current date is the anniversary of the hired date
+        if ($currentDate->isSameDay($hiredDate)) {
+            // If it's the anniversary, show the modal notification
+            // Your code to display the modal notification goes here
+            $isAnniversary = TRUE;
+        }
         // Check if the quotes data is cached
         if (!Cache::has('quotes')) {
             // Read the contents of the JSON file if not cached
@@ -216,7 +228,7 @@ class HomeController extends Controller
             $activitiesArray[] = $data;
         }
 
-       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'typeSelected', 'countAssignments', 'activitiesArray', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
+       return view('home', compact('empLeaveQuotaAnnual', 'activities', 'typeSelected', 'countAssignments', 'activitiesArray', 'isAnniversary', 'headline', 'newsFeed','reimbursementCount', 'totalQuota'));
     }
 
     public function notification_indev()

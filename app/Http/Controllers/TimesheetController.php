@@ -11,6 +11,7 @@ use App\Models\Checkinout;
 use App\Models\Company_project;
 use App\Models\Cutoffdate;
 use App\Models\Emp_leave_quota;
+use App\Models\Holidays;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Notification_alert;
@@ -157,6 +158,27 @@ class TimesheetController extends Controller
             // Use the cached data
         }
 
+        $usersProject = Project_assignment_user::where('user_id', Auth::id())->pluck('company_project_id')->toArray();
+        $usersRoles = Usr_role::where('user_id', Auth::id())->pluck('role_id')->toArray();
+
+        $holidays = Holidays::where(function($query) use ($usersProject) {
+                $query->where('isProject', 1)
+                    ->where('isHoliday', 1)
+                    ->whereIn('intended_for', $usersProject);
+            })
+            ->orWhere(function($query) use ($usersRoles) {
+                $query->where('isProject', 0)
+                    ->where('isHoliday', 1)
+                    ->whereIn('intended_for', $usersRoles);
+            })
+            ->pluck('ts_date')
+            ->toArray();
+
+        $holidayInPerdana = [];
+        foreach ($holidays as $holidayString) {
+            $holidayInPerdana[] = date('Ymd', strtotime($holidayString));
+        }
+
         $leaveApproved = [];
         $checkLeaveApproval = Leave_request::where('req_by', Auth::user()->id)->pluck('id');
         foreach ($checkLeaveApproval as $chk) {
@@ -226,6 +248,8 @@ class TimesheetController extends Controller
                 return 404;
             }elseif(in_array($dateToCheck2, $formattedDatesWeekendRepl)){
                 return 100;
+            }elseif(in_array($dateToCheck2, $holidayInPerdana)){
+                return "red";
             } else {
                 return "";
             }
@@ -312,7 +336,6 @@ class TimesheetController extends Controller
             $checkApp = Leave_request_approval::where('leave_request_id', $chk->id)->where('status', 29)->pluck('leave_request_id');
             if (!$checkApp->isEmpty()) {
                 $leaveApproved[] = $checkApp;
-            } else {
             }
         }
         $leaveRequests = Leave_request::where('req_by', Auth::user()->id)->whereIn('id', $leaveApproved)->get();
@@ -1356,19 +1379,20 @@ class TimesheetController extends Controller
         // Set the default time zone to Jakarta
         date_default_timezone_set("Asia/Jakarta");
 
-        // $checkisSubmitted = Timesheet_detail::whereYear('date_submitted', $year)
-        //     ->where('user_timesheet', Auth::user()->id)
-        //     ->where('ts_status_id', 15)
-        //     ->where('month_periode', $year . intval($month))
-        //     ->groupBy('user_timesheet', 'month_periode')
-        //     ->get();
+        // Get the current year and month
+        $currentYear = Carbon::now()->year;
+        $currentMonth = Carbon::now()->month;
 
-        // if (!$checkisSubmitted->isEmpty()) {
-        //     Session::flash('failed', 'Your Timesheet has already been submitted!');
-        //     return redirect()->back();
-        // }
+        // Convert the passed month to an integer
+        $month = intval($month);
 
-        $currentDate = Carbon::now();
+        // Check if the passed year is beyond the current year
+        // or if the passed month is beyond the current month
+        if ($year > $currentYear || ($year == $currentYear && $month >= $currentMonth)) {
+            // Don't allow submission
+            // Redirect or return an error message
+            return redirect()->back()->with('failed', 'Cannot submit timesheet for future months.');
+        }
 
         $dateCut = Cutoffdate::find(1);
         $currentDay = date('j');
@@ -1444,7 +1468,11 @@ class TimesheetController extends Controller
             // var_dump($countRows);
             foreach ($results as $row) {
                 $test = Project_assignment::where('id', $row->ts_task_id)->pluck('company_project_id')->first();
-                $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
+                // $test2 = Project_assignment_user::where('role', "PM")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
+                $getPM = Project_assignment_user::where('role', "PM")
+                    ->where('company_project_id', $test)
+                    ->where('periode_end', '>=', date('Y-m-d'))
+                    ->pluck('user_id');
                 $pa = Project_assignment_user::where('role', "PA")->where('company_project_id', $test)->where('periode_end', '>=', date('Y-m-d'))->pluck('user_id')->first();
                 $checkRole = Project_assignment_user::where('user_id', Auth::user()->id)->where('project_assignment_id', $row->ts_task_id)->pluck('role')->first();
 
@@ -1629,19 +1657,24 @@ class TimesheetController extends Controller
                                     $empApproval[] = $newArrayS;
                                 break;
                                 default:
-                                if(!$test2 == NULL){
-                                    $newArrayPM = [
-                                        'name' => $test2,
-                                        'task' => $row->ts_task,
-                                        'location' => $row->ts_location,
-                                        'mandays' => $row->total_rows,
-                                        'role' => $checkRole,
-                                        'task_id' => $row->ts_task_id,
-                                        'total_incentive' => $totalIncentive,
-                                        'total_allowance' => $totalAllowances,
-                                        'priority' => 3,
-                                    ];
-                                    $empApproval[] = $newArrayPM;
+                                if(!$getPM->isEmpty()){
+                                    foreach($getPM as $pm){
+                                        if(Auth::id() == $pm){
+                                            break;
+                                        }
+                                        $newArrayPM = [
+                                            'name' => $pm,
+                                            'task' => $row->ts_task,
+                                            'location' => $row->ts_location,
+                                            'mandays' => $row->total_rows,
+                                            'role' => $checkRole,
+                                            'task_id' => $row->ts_task_id,
+                                            'total_incentive' => $totalIncentive,
+                                            'total_allowance' => $totalAllowances,
+                                            'priority' => 3,
+                                        ];
+                                        $empApproval[] = $newArrayPM;
+                                    }
                                 }
                                 if(!$pa == NULL){
                                     $newArrayPA = [

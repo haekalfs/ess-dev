@@ -51,15 +51,18 @@ active
             <table class="table table-bordered zoom90" id="dataTable1" width="100%" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
+                        <th>No.</th>
                         <th>Message</th>
                         <th>Intended for</th>
                         <th>At</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @php $no = 1; @endphp
                     @foreach ($history as $approval)
                     <tr>
-                        <td class="text-danger font-weight-bold">{{ $approval->message }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $approval->message }}</td>
                         <td>{{ $approval->intended_for }}</td>
                         <td>{{ $approval->created_at->format('d-M-Y H:i') }}</td>
                     </tr>

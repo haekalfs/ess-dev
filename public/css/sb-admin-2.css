@@ -11354,6 +11354,10 @@ body.sidebar-toggled footer.sticky-footer {
   zoom: 50%;
 }
 
+.zoom85{
+  zoom: 85%;
+}
+
 .long-text {
     display: block;
     overflow: hidden;

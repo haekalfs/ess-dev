@@ -384,7 +384,7 @@ $(document).ready(function() {
         width: 'resolve',
         dropdownAutoWidth: 'false' // need to override the changed default
     });
-    fetchClients();
+fetchClients();
 fetchLocations();
 fetchProjectRoles();
 });

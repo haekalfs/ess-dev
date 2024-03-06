@@ -149,15 +149,15 @@ active
                 </div>
             </div>
             <!-- Card Body -->
-            <div class="card-body zoom80">
+            <div class="card-body zoom85">
                 <table class="table zoom90 table-bordered calendar" id="calendarTable" style="font-size: 18px;">
                     <colgroup>
                         @foreach ($calendar[0] as $dayName)
                             <col style="width: {{ 100 / count($calendar[0]) }}%;">
                         @endforeach
                     </colgroup>
-                    <thead class="thead-dark">
-                        <tr>
+                    <thead class="bg-primary">
+                        <tr class="text-white">
                             @foreach ($calendar[0] as $dayName)
                                 <th>{{ $dayName }}</th>
                             @endforeach
@@ -227,10 +227,10 @@ active
 <div class="card shadow mb-4 zoom90">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Activity Entries</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Detail Activity Entries</h6>
         <div class="text-right">
             @role('s-user') <a class="btn btn-primary btn-sm" type="button"  data-toggle="modal" data-target="#addModal" id="addButton" style="margin-right: 10px;">+ Bulk Entries</a> @else @endrole
-            <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton">Preview</a>
+            <a class="btn btn-secondary btn-sm" type="button" href="{{ $previewButton }}" id="manButton"><i class="fas fa-eye"></i> Preview</a>
         </div>
     </div>
     <!-- Card Body -->
@@ -757,7 +757,7 @@ active
         </div>
     </div>
 </div>
-  <style>
+<style>
     /* CSS for the file container */
 .file-container {
   border: 1px solid #ccc;
@@ -900,15 +900,15 @@ function changeFileName(inputId, labelId) {
     }
 
     .round-text-box {/* Border color similar to alert-danger */
-        background-color: #dee6f2; /* Background color similar to alert-danger */
-        color: #464ad9; /* Text color similar to alert-danger */
+        background-color: #e4e4e4; /* Background color similar to alert-danger */
+        color: #7e7e7e; /* Text color similar to alert-danger */
         padding: 5px; /* Adjust padding to control the size of the box */
         border-radius: 10px; /* Border radius for rounded corners */
         transition: background-color 0.3s; /* Add a smooth transition for the background color */
     }
 
     .round-text-box:hover {
-        background-color: #5886fa; /* Change the background color on hover */
+        background-color: #888888; /* Change the background color on hover */
         color: #fff; /* Change the text color on hover */
     }
 </style>

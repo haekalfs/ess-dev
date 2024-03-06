@@ -39,55 +39,39 @@
         <p class="mb-4">Stay Informed: Your Latest Notifications Await</a>.</p>
     </div>
 </div>
-<div class="row zoom90">
-    <!-- Area Chart -->
-    <div class="col-xl-12 col-lg-12">
-        <div class="table-responsive">
-            <table class="table table-hover" id="notificationsCenter">
-                <thead class="thead-light">
-                    <tr>
-                        <th scope="col">No.</th>
-                        <th scope="col">Notification</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $no = 1; @endphp
-                    @foreach ($notifications as $notification)
-                    <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>
-                            <a class="dropdown-item notification-item d-flex align-items-center"
-                                data-notification-id="{{ $notification->id }}">
-                                @if($notification->importance == 1)
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-check-square text-white"></i>
-                                    </div>
-                                </div>
-                                @else
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-exclamation-triangle text-white"></i>
-                                    </div>
-                                </div>
-                                @endif
-                                <div>
-                                    @if($notification->read_stat == 1)
-                                    <span>{{ $notification->message}}</span>
-                                    @else
-                                    <span class="font-weight-bold">{{ $notification->message}}</span>
-                                    @endif
-                                </div>
-                            </a>
-                        </td>
-                        <td>Test</td>
-                        <td>{{ $notification->created_at }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary" id="judul">Notifications</h6>
+        <div class="text-right">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            @foreach ($notifications as $notification)
+                <a class="dropdown-item notification-item d-flex align-items-center" data-notification-id="{{ $notification->id }}">
+                    @if($notification->importance == 1)
+                    <div class="mr-3">
+                        <div class="icon-circle bg-success">
+                            <i class="fas fa-check-square text-white"></i>
+                        </div>
+                    </div>
+                    @else
+                    <div class="mr-3">
+                        <div class="icon-circle bg-warning">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                    </div>
+                    @endif
+                    <div>
+                        <div class="small text-gray-500">{{ $notification->created_at }}</div>
+                        @if($notification->read_stat == 1)
+                        <span>{{ $notification->message}}</span>
+                        @else
+                        <span class="font-weight-bold">{{ $notification->message}}</span>
+                        @endif
+                    </div>
+                </a>
+            @endforeach
         </div>
     </div>
 </div>

@@ -8,10 +8,17 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Role_template;
 use App\Models\API_key;
+use App\Models\Company_project;
+use App\Models\Document_letter;
+use App\Models\Holidays;
+use App\Models\Project_assignment_user;
 use App\Models\User;
 use App\Models\User_access;
 use App\Models\Usr_role;
+use DateInterval;
+use DateTime;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Row;
 
 class ManagementController extends Controller
@@ -167,7 +174,7 @@ class ManagementController extends Controller
 
     public function assign_roles(Request $request)
     {
-        
+
         $this->validate($request, [
             'inputUser' => 'required',
             'inputRole' => 'required'
@@ -295,5 +302,75 @@ class ManagementController extends Controller
             ->pluck('user_id'); // Retrieve only the user_id values
 
         return response()->json($retrieveRoles);
+    }
+
+    public function holiday_date_entry()
+    {
+        $holidayList = Holidays::all();
+        $documentLetter = Document_letter::all();
+        $roles = Role::all();
+        $getProject = Company_project::all();
+
+        return view('management.manage_holidays', ['getProject' => $getProject, 'holidaysList' => $holidayList, 'documentLetter' => $documentLetter, 'roles' => $roles]);
+    }
+
+    public function holiday_date_save(Request $request)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $validator = Validator::make($request->all(), [
+            'daterange' => 'required',
+            'surat_edar' => 'sometimes',
+            'isHoliday' => 'required',
+            'roles' => 'required',
+            'type' => 'required',
+            'description' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $dateString = $request->daterange;
+        list($startDateString, $endDateString) = explode(' - ', $dateString);
+        $startDate = DateTime::createFromFormat('m/d/Y', $startDateString);
+        $endDate = DateTime::createFromFormat('m/d/Y', $endDateString);
+        $interval = new DateInterval('P1D'); // Interval of 1 day
+
+        while ($startDate <= $endDate) {
+            $dayOfWeek = $startDate->format('N');
+            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
+                $startDate->add($interval);
+                continue;
+            }
+
+            //add new entry
+            Holidays::create([
+                'user_id' => Auth::id(),
+                'ts_date' => $startDate->format('Y-m-d'),
+                'description' => $request->description,
+                'isHoliday' => $request->isHoliday,
+                'isProject' => $request->type,
+                'intended_for' => $request->roles,
+                'surat_edar' => $request->surat_edar,
+                'timesheet_id' => $startDate->format('Ymd')
+            ]);
+
+            // Move to the next day
+            $startDate->add($interval);
+        }
+
+        return redirect(route('holiday.date'))->with('success', 'Success');
+    }
+
+    public function delete_holiday($id)
+    {
+        $holiday = Holidays::find($id);
+
+        if ($holiday) {
+            $holiday->delete();
+            return redirect(route('holiday.date'))->with('success', 'Holiday deleted successfully.');
+        } else {
+            return redirect(route('holiday.date'))->with('error', 'Holiday not found.');
+        }
     }
 }

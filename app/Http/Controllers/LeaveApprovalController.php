@@ -9,6 +9,7 @@ use App\Models\Emp_leave_quota;
 use App\Models\Leave_request;
 use App\Models\Leave_request_approval;
 use App\Models\Leave_request_history;
+use App\Models\Log;
 use App\Models\Notification_alert;
 use App\Models\Position;
 use App\Models\Timesheet_approver;
@@ -160,6 +161,14 @@ class LeaveApprovalController extends Controller
             }
         }
 
+        Log::create([
+            'user_id' => Auth::id(),
+            'type' => 2,
+            'message' => 'Leave Request has been approved by '. Auth::user()->name,
+            'intended_for' => $getLeaveReq->req_by,
+            'importance' => 1
+        ]);
+
         return redirect('/approval/leave')->with('success', "You approved the leave request!");
     }
 
@@ -219,6 +228,14 @@ class LeaveApprovalController extends Controller
         $entry->message = "Your Leave Request has been rejected!";
         $entry->importance = 404;
         $entry->save();
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'type' => 2,
+            'message' => 'Leave Request has been Rejected by '. Auth::user()->name,
+            'intended_for' => $leaveRequest->req_by,
+            'importance' => 1
+        ]);
 
         // Redirect back with a message
         return redirect('/approval/leave')->with('failed', "You rejected the leave request!");

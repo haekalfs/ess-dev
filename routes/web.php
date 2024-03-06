@@ -214,6 +214,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/manage/roles/assign_roles', 'ManagementController@assign_roles');
         Route::match(['get', 'post'], '/management/security_&_roles/add/access/', 'ManagementController@grant_access_to_roles');
+        Route::get('/management/holiday-date/entry', 'ManagementController@holiday_date_entry')->name('holiday.date');
+        Route::post('/management/holiday-date/save', 'ManagementController@holiday_date_save')->name('holiday.save');
+        Route::get('/management/holiday-date/delete/{id}', 'ManagementController@delete_holiday')->name('holiday.delete');
 
         Route::post('/manage/roles/add_roles', 'ManagementController@add_roles');
         Route::get('/manage/roles/delete/{id}', 'ManagementController@delete_roles');

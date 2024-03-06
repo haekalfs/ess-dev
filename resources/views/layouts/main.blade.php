@@ -295,7 +295,7 @@
                         <a class="collapse-item" href="/vendor-list">B2. Vendor List</a>
                         <a class="collapse-item" href="/news-feed/manage">B3. News Feed</a>
                         <a class="collapse-item" href="/company-regulation/commands">B4. Commands</a>
-                        {{-- <a class="collapse-item" href="/hrtools/manage/roles">Manage Roles</a> --}}
+                        <a class="collapse-item" href="{{ route('holiday.date') }}">B5. Add Holidays</a>
                         {{-- <a class="collapse-item" href="/development">User Group</a>
                         <h6 class="collapse-header">Master Data:</h6>
                         <a class="collapse-item" href="/manage/users">List Employees</a>

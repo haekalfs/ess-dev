@@ -8,7 +8,7 @@ active
 
 @section('content')
 <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
-    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="far fa-smile-beam"></i> Welcome onboard, {{ Auth::user()->name }}!</h1>
+    <h1 class="h4 mb-0 font-weight-bold text-gray-800"><i class="far fa-smile-beam"></i> @if($isAnniversary) Happy Anniversary 🎉, @else Welcome onboard, @endif {{ Auth::user()->name }}!</h1>
     {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-smile-beam fa-sm text-white-50"></i> Show Details</a> --}}
 </div>
 @if ($message = Session::get('quotes'))

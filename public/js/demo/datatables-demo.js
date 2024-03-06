@@ -100,6 +100,14 @@ $(document).ready(function() {
 } );
 
 $(document).ready(function() {
+  $('#holidaysTable').DataTable({
+    "order": [[ 0, "asc" ]],
+    "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],
+    "pageLength": 10
+  } );
+} );
+
+$(document).ready(function() {
   $('#listAssignments').DataTable({
     "order": [[ 0, "desc" ]],
     "lengthMenu": [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]],

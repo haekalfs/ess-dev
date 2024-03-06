@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ReminderApprovalDirectorReimbursement;
 use App\Jobs\ReminderApprovalReimbursement;
 use App\Jobs\SendReimbursementReminderFinance;
 use App\Models\Reimbursement;
@@ -12,6 +13,7 @@ use App\Models\Users_detail;
 use App\Models\Usr_role;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class SendReminderApproval extends Command
@@ -47,7 +49,7 @@ class SendReminderApproval extends Command
      */
     public function handle()
     {
-        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
+        $isManager = Timesheet_approver::whereNotIn('group_id', [1])
             ->pluck('approver')->toArray();
 
         // Retrieve user IDs to approve reimbursement
@@ -68,6 +70,39 @@ class SendReminderApproval extends Command
             // Dispatch a reminder if there are pending forms for approval
             if ($checkForms > 0) {
                 dispatch(new ReminderApprovalReimbursement($employee, $checkForms));
+            }
+        }
+
+        $isDirector = Timesheet_approver::whereIn('group_id', [1])
+            ->pluck('approver')->toArray();
+
+        //getApproved from manager
+        $Check = DB::table('reimbursement_approval')
+            ->select('reimb_item_id')
+            ->whereNotIn('RequestTo', $isDirector)
+            ->havingRaw('COUNT(*) = SUM(CASE WHEN status = 30 THEN 1 ELSE 0 END)')
+            ->groupBy('reimb_item_id')
+            ->pluck('reimb_item_id')
+            ->toArray();
+        // Retrieve user IDs to approve reimbursement
+        $isUnapproved = Reimbursement_approval::where('status', 20)->whereIn('RequestTo', $isDirector)
+            ->whereIn('reimb_item_id', $Check)
+            ->groupBy('RequestTo')
+            ->pluck('RequestTo');
+
+        // Retrieve users based on the IDs
+        $directors = User::whereIn('id', $isUnapproved)->get();
+
+        foreach ($directors as $dir) {
+            // Count the number of forms pending approval for each employee
+            $checkFormsDir = Reimbursement_approval::where('status', 20)
+                ->where('RequestTo', $dir->id)
+                ->groupBy('reimbursement_id')
+                ->count();
+
+            // Dispatch a reminder if there are pending forms for approval
+            if ($checkFormsDir > 0) {
+                dispatch(new ReminderApprovalDirectorReimbursement($dir, $checkFormsDir));
             }
         }
     }
