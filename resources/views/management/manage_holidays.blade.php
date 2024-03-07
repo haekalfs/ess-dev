@@ -51,6 +51,7 @@ active
                         <th>Description</th>
                         <th>Intended For</th>
                         <th>isHoliday</th>
+                        <th>Status</th>
                         <th>Created By</th>
                         <th width='120px'>Action</th>
                     </tr>
@@ -69,6 +70,13 @@ active
                         @endif
                         @if($record->isHoliday == TRUE)
                             <td>YES</td>
+                        @else
+                            <td>NO</td>
+                        @endif
+                        @if($record->status == 1)
+                            <td>Approved</td>
+                        @elseif($record->status == 404)
+                            <td>Rejected</td>
                         @else
                             <td>NO</td>
                         @endif

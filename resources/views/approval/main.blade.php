@@ -127,6 +127,23 @@ active
         </div>
     </div>
 
+    <div class="col-xl-3 col-md-6 mb-4 approval_holidays">
+        <div class="card border-left-holidays shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-red-candy text-uppercase mb-1">
+                            Holidays Approval</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-snowman fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-xl-3 col-md-6 mb-4 approval_po">
         <div class="card border-left-po shadow h-100 py-2">
             <div class="card-body">
@@ -187,6 +204,7 @@ active
     const approval_po = document.querySelector('.approval_po');
     const approval_pr = document.querySelector('.approval_pr');
     const approval_rn = document.querySelector('.approval_rn');
+    const approval_holidays = document.querySelector('.approval_holidays');
 
     approval_po.addEventListener('click', function() {
     window.location.href = 'https://e-form.perdana.co.id/';
@@ -196,6 +214,10 @@ active
     });
     approval_rn.addEventListener('click', function() {
     window.location.href = 'https://e-form.perdana.co.id/';
+    });
+
+    approval_holidays.addEventListener('click', function() {
+    window.location.href = '/approval/holidays-approval';
     });
 
     cardP_assignment.addEventListener('click', function() {
@@ -238,7 +260,12 @@ active
         approval_rn.style.cursor = 'default';
     });
 
-
+    approval_holidays.addEventListener('mouseover', function() {
+        approval_holidays.style.cursor = 'pointer';
+    });
+    approval_holidays.addEventListener('mouseout', function() {
+        approval_holidays.style.cursor = 'default';
+    });
     cardTimesheet.addEventListener('mouseover', function() {
     cardTimesheet.style.cursor = 'pointer';
     });

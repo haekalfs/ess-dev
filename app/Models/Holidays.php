@@ -10,7 +10,7 @@ class Holidays extends Model
     use HasFactory;
 
     protected $table = "holidays";
-    protected $fillable = ["id", "user_id", "ts_date", 'surat_edar','description', "isHoliday", "intended_for", "isProject", "timesheet_id", "created_at", "updated_at"];
+    protected $fillable = ["id", "user_id", "ts_date", 'surat_edar','description', "isHoliday", "status", "approvedBy", "intended_for", "isProject", "timesheet_id", "created_at", "updated_at"];
 
     public function timesheet(){
     	return $this->belongsTo('App\Models\Timesheet', 'timesheet_id', 'ts_id_date');

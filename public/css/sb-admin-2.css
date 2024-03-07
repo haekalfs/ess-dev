@@ -9640,6 +9640,10 @@ a.text-warning:hover, a.text-warning:focus {
   color: #BFEA7C !important;
 }
 
+.text-red-candy {
+  color: #BF3131 !important;
+}
+
 .text-green-donker {
   color: #2D9596 !important;
 }
@@ -10119,7 +10123,11 @@ a:focus {
 
 .border-left-po {
     border-left: 0.25rem solid #BFEA7C !important;
-  }
+}
+
+.border-left-holidays {
+    border-left: 0.25rem solid #BF3131 !important;
+}
 
 .border-left-pr {
   border-left: 0.25rem solid #2D9596 !important;
@@ -11495,6 +11503,11 @@ body.sidebar-toggled footer.sticky-footer {
 }
 
 .p_assignment:hover .card {
+  animation-name: zoomIn;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+.approval_holidays:hover .card {
   animation-name: zoomIn;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;

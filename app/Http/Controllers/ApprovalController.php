@@ -18,6 +18,7 @@ use App\Models\Medical_approval;
 use App\Jobs\NotifyMedicalRejected;
 use App\Jobs\NotifyMedicalApproved;
 use App\Models\Cutoffdate;
+use App\Models\Holidays;
 use App\Models\Medical_payment;
 use App\Models\Log;
 // use App\Http\Controllers\GlobalDateTime;
@@ -691,6 +692,40 @@ class ApprovalController extends Controller
         return view('approval.ts_preview', compact('year', 'month', 'getTotalDays', 'totalHours', 'info', 'formattedDatesWeekendRepl', 'assignmentNames', 'user_id', 'srtDate', 'startDate', 'endDate', 'formattedDates', 'formattedDatesHoliday'), ['activities' => $activities, 'user_info' => $user_info, 'workflow' => $workflow]);
     }
 
+    public function holidayApproval()
+    {
+        $accessController = new AccessController();
+        $result = $accessController->usr_acc(204);
+
+        $listHolidays = Holidays::where('status', FALSE)->groupBy('surat_edar')->get();
+        return view('approval.holidays', ['holidaysList' => $listHolidays]);
+    }
+
+    public function retrieveHolidaysData($id)
+    {
+        // Get the Timesheet records between the start and end dates
+        $itemData = Holidays::where('surat_edar', $id)->where('status', FALSE)->get();
+
+        return response()->json($itemData);
+    }
+
+    public function approve_holidays($docId)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        Holidays::where('surat_edar', $docId)->where('status', FALSE)->update(['status' => TRUE, 'approvedBy' => Auth::id()]);
+
+        Session::flash('success',"You approved the holiday dates!");
+        return redirect()->back();
+    }
+
+    public function reject_holidays($docId)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        Holidays::where('surat_edar', $docId)->where('status', FALSE)->update(['status' => 404, 'approvedBy' => Auth::id()]);
+
+        Session::flash('success',"You approved the holiday dates!");
+        return redirect()->back();
+    }
 
     // Medical Approval
     public function medical_approval()

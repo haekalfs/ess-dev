@@ -171,6 +171,7 @@ class TimesheetController extends Controller
                     ->where('isHoliday', 1)
                     ->whereIn('intended_for', $usersRoles);
             })
+            ->where('status', 1)
             ->pluck('ts_date')
             ->toArray();
 
@@ -320,6 +321,7 @@ class TimesheetController extends Controller
                     ->where('isHoliday', 1)
                     ->whereIn('intended_for', $usersRoles);
             })
+            ->where('status', 1)
             ->pluck('ts_date')
             ->toArray();
 

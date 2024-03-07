@@ -114,6 +114,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/approval/project/assignment/approve/{id}', 'ApprovalProjectController@approve_assignment')->name('approve.project.assignment');
         Route::get('/approval/project/assignment/reject/{id}', 'ApprovalProjectController@reject_assignment')->name('reject.project.assignment');
 
+        //approval holidays
+        Route::get('/approval/holidays-approval', 'ApprovalController@holidayApproval')->name('approval.holidays');
+        Route::get('/retrieveHolidaysDetail/{id}', 'ApprovalController@retrieveHolidaysData');
+        Route::match(['get', 'post'], '/approval/holidays/approve/{id}', 'ApprovalController@approve_holidays')->name('holidays.approve');
+        Route::match(['get', 'post'], '/approval/holidays/reject/{id}', 'ApprovalController@reject_holidays')->name('holidays.reject');
+
         //myprofile
         Route::get('/myprofile', 'MyProfileController@index')->name('myprofile');
 
