@@ -473,7 +473,7 @@ active
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="email">Identity No :</label>
-                                                    <input class="form-control" type="number"  name="usr_id_no" placeholder="Number Identity..." value="{{ $user->users_detail->usr_id_no }}" />
+                                                    <input class="form-control" type="text" name="usr_id_no" placeholder="Number Identity..." value="{{ $user->users_detail->usr_id_no }}" />
                                                     @if($errors->has('usr_id_no'))
                                                         <div class="text-danger">
                                                             {{ $errors->first('usr_id_no')}}
