@@ -164,32 +164,44 @@ class HomeController extends Controller
         array_push($ts_approver, $new_approver_id);
 
 
-        // Retrieve
+        // Retrieve company project IDs
         $getCompanyProjectIds = Project_assignment::where('company_project_id', 3)->pluck('id')->toArray();
 
-        // Retrieve User
+        // Retrieve user assignments for company projects
         $getUsersAssignment = Project_assignment_user::whereIn('company_project_id', $getCompanyProjectIds)->groupBy('user_id')->pluck('user_id')->toArray();
 
-        $activitiesQuery = Timesheet::select('ts_user_id',
-                 DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
-                 DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count'))
-        ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->whereNotIn('ts_task', ['Sick', 'Other']); // Filter for come times before 8 AM
-        // Order by attendance_days_count
+        // Construct the activities query
+        $activitiesQuery = Timesheet::select(
+                'ts_user_id',
+                DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
+                DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count')
+            )
+            ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->whereNotIn('ts_task', ['Sick', 'Other']); // Exclude specific tasks
 
+        // Apply conditions based on the selected type
         if ($typeSelected) {
             if ($typeSelected == 1) {
-                $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Replace ['Task1', 'Task2'] with your condition
+                $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Filter for tasks in the HO location and before 8 AM
             } elseif ($typeSelected == 2) {
-                $activitiesQuery->whereIn('ts_location', $getCompanyProjectIds)->whereRaw('TIME(ts_from_time) < ?', ['18:00:00'])->where('ts_user_id', $getUsersAssignment); // Replace ['HO'] with your condition
+                $activitiesQuery->whereIn('ts_location', $getCompanyProjectIds)
+                    ->whereRaw('TIME(ts_from_time) < ?', ['18:00:00'])
+                    ->whereIn('ts_user_id', $getUsersAssignment); // Filter for tasks in company projects, before 6 PM, and assigned users
             }
         } else {
-            $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']);
+            // Default condition for type not selected
+            $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Default: tasks in HO location and before 8 AM
         }
 
-        $activities = $activitiesQuery->whereNotIn('ts_user_id', $ts_approver)
-        ->groupBy('ts_user_id')
-        ->orderByDesc('attendance_days_count')->take(5)->get();
+        // Exclude approvers
+        $activitiesQuery->whereNotIn('ts_user_id', $ts_approver);
+
+        // Group and order the results
+        $activities = $activitiesQuery->groupBy('ts_user_id')
+            ->orderByDesc('attendance_days_count')
+            ->take(5)
+            ->get();
+
 
         // Transform the result into an array
         $activitiesArray = [];
