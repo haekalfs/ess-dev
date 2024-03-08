@@ -6,6 +6,7 @@ use App\Models\Emp_leave_quota;
 use App\Models\Headline;
 use App\Models\News_feed;
 use App\Models\Notification_alert;
+use App\Models\Project_assignment;
 use App\Models\Project_assignment_user;
 use App\Models\Reimbursement;
 use App\Models\Timesheet;
@@ -138,25 +139,6 @@ class HomeController extends Controller
         ->take(5)
         ->pluck('user_id');
 
-        // Retrieve the total mandays for the top 5 employees
-        $topEmployeesWithMandays = DB::table('timesheet_details')
-        ->select('user_timesheet', DB::raw('SUM(ts_mandays) as total_mandays'))
-        ->whereIn('user_timesheet', $employeesWithMostAssignments)
-        ->whereIn('created_at', function ($query) use ($year, $month) {
-            $query->select(DB::raw('MAX(created_at)'))
-                ->from('timesheet_details')
-                ->whereColumn('timesheet_details.user_timesheet', '=', 'user_timesheet')
-                ->where('ts_status_id', 29)
-                ->where('timesheet_details.month_periode', $year . intval($month))
-                ->groupBy('user_timesheet', 'ts_mandays');
-        })
-        ->whereNotIn('ts_task', ['Other', 'Sick', 'HO'])
-        ->where('ts_status_id', 29)
-        ->where('timesheet_details.month_periode', $year . intval($month))
-        ->groupBy('user_timesheet')
-        ->take(5)
-        ->get();
-
         $reimbursementCount = Reimbursement::where('f_req_by', Auth::id())->whereYear('created_at', $currentYear)->count();
 
         $empLeaveQuotaAnnual = Emp_leave_quota::where('user_id', Auth::user()->id)
@@ -181,21 +163,28 @@ class HomeController extends Controller
         $new_approver_id = 'julyansyah'; // Replace with the actual ID of the new approver
         array_push($ts_approver, $new_approver_id);
 
+
+        // Retrieve
+        $getCompanyProjectIds = Project_assignment::where('company_project_id', 3)->pluck('id')->toArray();
+
+        // Retrieve User
+        $getUsersAssignment = Project_assignment_user::whereIn('company_project_id', $getCompanyProjectIds)->groupBy('user_id')->pluck('user_id')->toArray();
+
         $activitiesQuery = Timesheet::select('ts_user_id',
                  DB::raw('SEC_TO_TIME(MIN(TIME_TO_SEC(ts_from_time))) as earliest_come_time'),
                  DB::raw('COUNT(DISTINCT DATE(ts_date)) as attendance_days_count'))
         ->whereBetween('ts_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-        ->whereNotIn('ts_task', ['Sick', 'Other'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Filter for come times before 8 AM
+        ->whereNotIn('ts_task', ['Sick', 'Other']); // Filter for come times before 8 AM
         // Order by attendance_days_count
 
         if ($typeSelected) {
             if ($typeSelected == 1) {
-                $activitiesQuery->whereIn('ts_location', ['HO']); // Replace ['Task1', 'Task2'] with your condition
+                $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Replace ['Task1', 'Task2'] with your condition
             } elseif ($typeSelected == 2) {
-                $activitiesQuery->whereNotIn('ts_location', ['HO']); // Replace ['HO'] with your condition
+                $activitiesQuery->whereIn('ts_location', $getCompanyProjectIds)->whereRaw('TIME(ts_from_time) < ?', ['10:00:00'])->where('ts_user_id', $getUsersAssignment); // Replace ['HO'] with your condition
             }
         } else {
-            $activitiesQuery->whereIn('ts_location', ['HO']);
+            $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']);
         }
 
         $activities = $activitiesQuery->whereNotIn('ts_user_id', $ts_approver)
