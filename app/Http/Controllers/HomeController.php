@@ -181,7 +181,7 @@ class HomeController extends Controller
             if ($typeSelected == 1) {
                 $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Replace ['Task1', 'Task2'] with your condition
             } elseif ($typeSelected == 2) {
-                $activitiesQuery->whereIn('ts_location', $getCompanyProjectIds)->whereRaw('TIME(ts_from_time) < ?', ['10:00:00'])->where('ts_user_id', $getUsersAssignment); // Replace ['HO'] with your condition
+                $activitiesQuery->whereIn('ts_location', $getCompanyProjectIds)->whereRaw('TIME(ts_from_time) < ?', ['18:00:00'])->where('ts_user_id', $getUsersAssignment); // Replace ['HO'] with your condition
             }
         } else {
             $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']);
