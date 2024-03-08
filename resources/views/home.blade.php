@@ -248,7 +248,7 @@ $total_years_of_service = $diff->y;
                 <div class="text-right">
                     <select class="form-control" id="type" name="type" required onchange="redirectToPage()">
                         <option value="1" @if (1 == $typeSelected) selected @endif>Head Office</option>
-                        <option value="2" @if (2 == $typeSelected) selected @endif>Non-Head Office</option>
+                        <option value="2" @if (2 == $typeSelected) selected @endif>JOB Tomori Pertamina-Medco E&P 2022-2025</option>
                     </select>
                 </div>
             </div>
