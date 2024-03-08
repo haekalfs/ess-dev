@@ -456,7 +456,7 @@ active
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="email">Identity Type :</label>
-                                                    <select class="form-control " name="usr_id_type" >
+                                                    <select class="form-control" name="usr_id_type" >
                                                         <option selected disabled>Choose...</option>
                                                         <option value="KTP" @if($user->users_detail->usr_id_type == 'KTP') selected @endif>KTP</option>
                                                         <option value="SIM" @if($user->users_detail->usr_id_type == 'SIM') selected @endif>SIM</option>
@@ -473,7 +473,7 @@ active
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="email">Identity No :</label>
-                                                    <input class="form-control" type="text"   name="usr_id_no" placeholder="Number Identity..." value="{{ $user->users_detail->usr_id_no }}" />
+                                                    <input class="form-control" type="number"  name="usr_id_no" placeholder="Number Identity..." value="{{ $user->users_detail->usr_id_no }}" />
                                                     @if($errors->has('usr_id_no'))
                                                         <div class="text-danger">
                                                             {{ $errors->first('usr_id_no')}}
@@ -485,7 +485,7 @@ active
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="password">Identity Expiration :</label>
-                                                    <input class="form-control" type="text"  name="usr_id_expiration" placeholder="User Identity Expiration..." value="{{ $user->users_detail->usr_id_expiration }}" />
+                                                    <input class="form-control" type="date" name="usr_id_expiration" placeholder="User Identity Expiration..." value="{{ $user->users_detail->usr_id_expiration }}" />
                                                     @if($errors->has('usr_id_expiration'))
                                                         <div class="text-danger">
                                                             {{ $errors->first('usr_id_expiration')}}
@@ -496,7 +496,7 @@ active
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="comment">NPWP :</label>
-                                                    <input class="form-control" type="text"   name="usr_npwp" placeholder="NPWP Number..." value="{{ $user->users_detail->usr_npwp }}" />
+                                                    <input class="form-control" type="text" name="usr_npwp" placeholder="NPWP Number..." value="{{ $user->users_detail->usr_npwp }}" />
                                                     @if($errors->has('usr_npwp'))
                                                         <div class="text-danger">
                                                             {{ $errors->first('usr_npwp')}}
