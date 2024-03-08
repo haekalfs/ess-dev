@@ -49,7 +49,7 @@ active
                     <a class="nav-link" id="page2-tab" data-toggle="tab" href="#page2" role="tab" aria-controls="page2" aria-selected="false"><i class="fas fa-plane-departure"></i> Submission</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-calendar-week" style="color: #ff0000;"></i> Integration</a>
+                    <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-fingerprint" style="color: #ff0000;"></i> Integration</a>
                 </li>
             </ul>
             <div class="card-body">
@@ -313,22 +313,22 @@ active
                                     <div class="col-md-4">
                                         <div class="card mb-4">
                                             <div class="card-header">
-                                                <span class="text-danger">Attendance Policy</span>
+                                                <span class="text-danger">Attendance Machine Policy</span>
                                             </div>
                                             <div class="card-body" style="background-color: rgb(247, 247, 247);">
                                                 <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
                                                 <ul>
-                                                    <li>All reimbursement requests must comply with company policies.</li>
-                                                    <li>Employees are responsible for accurately documenting all expenses.</li>
-                                                    <li>Reimbursements will only be provided for approved business-related expenses.</li>
+                                                    <li>All employees must adhere to the company's attendance machine policy.</li>
+                                                    <li>Employees are required to use the attendance machine to record their daily working hours accurately.</li>
+                                                    <li>Unauthorized adjustments to attendance records are strictly prohibited.</li>
                                                 </ul>
 
                                                 <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
                                                 <ol>
-                                                    <li>Attach all necessary receipts and supporting documentation.</li>
-                                                    <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
-                                                    <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
-                                                    <li class="text-danger">Payment will be made 14 weeks after approval and receipt submission to the Finance Department <a href="#">Read More.</a></li>
+                                                    <li>Ensure all attendance records are correctly captured by the attendance machine.</li>
+                                                    <li>Report any discrepancies or issues with the attendance machine to the HR department immediately.</li>
+                                                    <li>Attendance records must be submitted to the HR department for verification and approval.</li>
+                                                    <li class="text-danger">Any discrepancies found in attendance records may result in disciplinary actions.</li>
                                                 </ol>
                                             </div>
                                         </div>

@@ -147,7 +147,7 @@ active
                                 <div class="form-group">
                                     <select class="form-control" name="roles" required>
                                         <option value="Others" disabled selected>Select a type</option>
-                                        <optgroup label="Your Projects" id="project">
+                                        <optgroup label="Member of Project :" id="project">
                                             @if ($getProject->isEmpty())
                                                 <option disabled><i>No Project Assigned</i></option>
                                             @else
@@ -156,7 +156,7 @@ active
                                                 @endforeach
                                             @endif
                                         </optgroup>
-                                        <optgroup label="Others" style="display: none;" id="roleList">
+                                        <optgroup label="Member of Role :" style="display: none;" id="roleList">
                                             @foreach($roles as $role)
                                                 <option value="{{$role->id}}">{{ $role->description}}</option>
                                             @endforeach

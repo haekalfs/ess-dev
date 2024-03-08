@@ -354,8 +354,6 @@ class TimesheetController extends Controller
 
     public function timesheet_entry($year, $month)
     {
-        // $test = Cache::get('holiday_data');
-        // var_dump($test);
         $year = Crypt::decrypt($year);
         $month = Crypt::decrypt($month);
         $lastUpdate = DB::table('timesheet')
@@ -367,6 +365,19 @@ class TimesheetController extends Controller
             ->first();
 
         date_default_timezone_set("Asia/Jakarta");
+        //get Hired date
+        $hired_date = Users_detail::where('user_id', Auth::user()->id)->pluck('hired_date')->first();
+        $hired_date = new DateTime($hired_date);
+
+        // Get the year of the hired date
+        $hiredYear = $hired_date->format('Y');
+
+        // Check if the passed year is before the year of the hired date
+        if ($year < $hiredYear) {
+            // Redirect the user back or show an error message
+            return redirect()->back()->with('failed', 'You cannot access timesheet entry for years before your hiring year.');
+        }
+
         $numDays = Carbon::create($year, $month)->daysInMonth;
 
         $calendar = [];
