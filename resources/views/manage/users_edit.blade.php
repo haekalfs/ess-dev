@@ -136,56 +136,71 @@ active
                     <div class="tab-content" id="pageTabContent">
                         <div class="tab-pane fade show active" id="page1" role="tabpanel" aria-labelledby="page1-tab">
                             <div class="col-md-12">
-                                <h6 class="h5 m-0 font-weight-bold text-primary mb-4"><i class="fas fa-user-circle"></i> Employee's Account & Profile Information</h6>
+                                <h6 class="h5 m-0 font-weight-bold text-primary mt-2 mb-4"><i class="fas fa-user-circle"></i> Employee's Account & Profile Information</h6>
+                                <hr class="sidebar-divider mb-4">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="email">Employee ID :</label>
-                                                    <input class="form-control"   name="employee_id" placeholder="Employee ID..." value="{{ $user->users_detail->employee_id }}" readonly/>
-                                                    @if($errors->has('employee_id'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('employee_id')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 140px;" class="mr-2">
+                                                        <p style="margin: 0;">Employee ID :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control"   name="employee_id" placeholder="Employee ID..." value="{{ $user->users_detail->employee_id }}" readonly/>
+                                                        @if($errors->has('employee_id'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('employee_id')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="password">User ID :</label>
-                                                    <input class="form-control flex"    name="usr_id" placeholder="User ID..." value="{{ $user->id }}" readonly/>
-                                                    @if($errors->has('usr_id'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_id')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 140px;" class="mr-2">
+                                                        <p style="margin: 0;">User ID :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control flex" name="usr_id" placeholder="User ID..." value="{{ $user->id }}" readonly/>
+                                                        @if($errors->has('usr_id'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_id')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="row">
                                                     <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label for="comment">Full Name :</label>
-                                                            <input class="form-control" type="text" name="name" placeholder="Name..." value="{{ $user->name }}">
-                                                            @if($errors->has('name'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('name')}}
-                                                                </div>
-                                                            @endif
+                                                        <div class="d-flex align-items-center mb-4">
+                                                            <div style="width: 140px;" class="mr-2">
+                                                                <p style="margin: 0;">Full Name :</p>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <input class="form-control" type="text" name="name" placeholder="Name..." value="{{ $user->name }}">
+                                                                @if($errors->has('name'))
+                                                                    <div class="text-danger">
+                                                                        {{ $errors->first('name')}}
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-4">
+                                                            <div style="width: 140px;" class="mr-2">
+                                                                <p style="margin: 0;">Email :</p>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <input class="form-control" name="email" placeholder="Email..." value="{{ $user->email }}" />
+                                                                @if($errors->has('email'))
+                                                                    <div class="text-danger">
+                                                                        {{ $errors->first('email')}}
+                                                                    </div>
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label for="password">Email :</label>
-                                                    <input class="form-control" name="email" placeholder="Email..." value="{{ $user->email }}" />
-                                                    @if($errors->has('email'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('email')}}
-                                                        </div>
-                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -193,92 +208,105 @@ active
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="email">Birth Date :</label>
-                                                    <input class="form-control" type="date" name="usr_dob" id="usr_dob" value="{{ $user->users_detail->usr_dob }}"/>
-                                                    @if($errors->has('usr_dob'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_dob')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 120px;" class="mr-2">
+                                                        <p style="margin: 0;">Birth Date :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control" type="date" name="usr_dob" id="usr_dob" value="{{ $user->users_detail->usr_dob }}"/>
+                                                        @if($errors->has('usr_dob'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_dob')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 120px;" class="mr-2">
+                                                        <p style="margin: 0;">Gender :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <select class="form-control " name="usr_gender">
+                                                            <option selected disabled>Choose...</option>
+                                                            <option value="M" @if($user->users_detail->usr_gender == 'M') selected @endif>Male</option>
+                                                            <option value="F" @if($user->users_detail->usr_gender == 'F') selected @endif>Female</option>
+                                                        </select>
+                                                        @if($errors->has('usr_gender'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_gender')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 120px;" class="mr-2">
+                                                        <p style="margin: 0;">Marital Status :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <select class="form-control " name="usr_merital_status">
+                                                            <option selected disabled>Choose...</option>
+                                                            <option value="S" @if($user->users_detail->usr_merital_status == 'S') selected @endif>Single</option>
+                                                            <option value="M" @if($user->users_detail->usr_merital_status == 'M') selected @endif>Married</option>
+                                                            <option value="Widow" @if($user->users_detail->usr_merital_status == 'Widow') selected @endif>Widow (Janda)</option>
+                                                            <option value="Widower" @if($user->users_detail->usr_merital_status == 'Widower') selected @endif>Widower (Duda)</option>
+                                                            <option value="Divorced" @if($user->users_detail->usr_merital_status == 'Divorced') selected @endif>Divorced (Cerai)</option>
+                                                        </select>
+                                                        @if($errors->has('usr_merital_status'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_merital_status')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="email">Birth Place (City) :</label>
-                                                    <input class="form-control" type="text"   name="usr_birth_place" placeholder="Birth Place..." value="{{ $user->users_detail->usr_birth_place }}"/>
-                                                    @if($errors->has('usr_birth_place'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_birth_place')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 130px;" class="mr-2">
+                                                        <p style="margin: 0;">Birth Place :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control" type="text" name="usr_birth_place" placeholder="Birth Place..." value="{{ $user->users_detail->usr_birth_place }}"/>
+                                                        @if($errors->has('usr_birth_place'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_birth_place')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="password">Gender :</label>
-                                                    <select class="form-control " name="usr_gender">
-                                                        <option selected disabled>Choose...</option>
-                                                        <option value="M" @if($user->users_detail->usr_gender == 'M') selected @endif>Male</option>
-                                                        <option value="F" @if($user->users_detail->usr_gender == 'F') selected @endif>Female</option>
-                                                    </select>
-                                                    @if($errors->has('usr_gender'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_gender')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 110px;" class="mr-2">
+                                                        <p style="margin: 0;">Religion :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <select class="form-control " name="usr_religion">
+                                                            <option selected disabled>Choose...</option>
+                                                            <option value="Islam" @if($user->users_detail->usr_religion == 'Islam') selected @endif>Islam</option>
+                                                            <option value="Kristen" @if($user->users_detail->usr_religion == 'Kristen') selected @endif>Kristen Protestan</option>
+                                                            <option value="Katholik" @if($user->users_detail->usr_religion == 'Katholik') selected @endif>Kristen Katholik</option>
+                                                            <option value="Konghucu" @if($user->users_detail->usr_religion == 'Konghucu') selected @endif>Konghucu</option>
+                                                            <option value="Hindu" @if($user->users_detail->usr_religion == 'Hindu') selected @endif>Hindu</option>
+                                                            <option value="Buddha" @if($user->users_detail->usr_religion == 'Buddha') selected @endif>Buddha</option>
+                                                            <option value="O" @if($user->users_detail->usr_religion == 'O') selected @endif>Others</option>
+                                                        </select>
+                                                        @if($errors->has('usr_religion'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_religion')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="email">Religion :</label>
-                                                    <select class="form-control " name="usr_religion">
-                                                        <option selected disabled>Choose...</option>
-                                                        <option value="Islam" @if($user->users_detail->usr_religion == 'Islam') selected @endif>Islam</option>
-                                                        <option value="Kristen" @if($user->users_detail->usr_religion == 'Kristen') selected @endif>Kristen Protestan</option>
-                                                        <option value="Katholik" @if($user->users_detail->usr_religion == 'Katholik') selected @endif>Kristen Katholik</option>
-                                                        <option value="Konghucu" @if($user->users_detail->usr_religion == 'Konghucu') selected @endif>Konghucu</option>
-                                                        <option value="Hindu" @if($user->users_detail->usr_religion == 'Hindu') selected @endif>Hindu</option>
-                                                        <option value="Buddha" @if($user->users_detail->usr_religion == 'Buddha') selected @endif>Buddha</option>
-                                                        <option value="O" @if($user->users_detail->usr_religion == 'O') selected @endif>Others</option>
-                                                    </select>
-                                                    @if($errors->has('usr_religion'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_religion')}}
-                                                        </div>
-                                                    @endif
-                                                    {{-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> --}}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="password">Marital Status :</label>
-                                                <select class="form-control " name="usr_merital_status">
-                                                        <option selected disabled>Choose...</option>
-                                                        <option value="S" @if($user->users_detail->usr_merital_status == 'S') selected @endif>Single</option>
-                                                        <option value="M" @if($user->users_detail->usr_merital_status == 'M') selected @endif>Married</option>
-                                                        <option value="Widow" @if($user->users_detail->usr_merital_status == 'Widow') selected @endif>Widow (Janda)</option>
-                                                        <option value="Widower" @if($user->users_detail->usr_merital_status == 'Widower') selected @endif>Widower (Duda)</option>
-                                                        <option value="Divorced" @if($user->users_detail->usr_merital_status == 'Divorced') selected @endif>Divorced (Cerai)</option>
-                                                    </select>
-                                                    @if($errors->has('usr_merital_status'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_merital_status')}}
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="password">Number of Children :</label>
-                                                    <input class="form-control" type="text"   name="usr_children" placeholder="Number of Childern..." value="{{ $user->users_detail->usr_children }}"/>
-                                                    @if($errors->has('usr_children'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_children')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 130px;" class="mr-2">
+                                                        <p style="margin: 0;">Num of Children :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control" type="text" name="usr_children" placeholder="Number of Childern..." value="{{ $user->users_detail->usr_children }}"/>
+                                                        @if($errors->has('usr_children'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_children')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -289,49 +317,66 @@ active
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h6 class="h5 m-0 font-weight-bold text-primary mt-4 mb-4"><i class="fas fa-address-book"></i> Employee's Address Information</h6>
+                                        <hr class="sidebar-divider mb-4">
                                         <div class="row">
                                             <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="password">City :</label>
-                                                    <input class="form-control"   name="usr_address_city" placeholder="Address City..." value="{{ $user->users_detail->usr_address_city }}"/>
-                                                    @if($errors->has('usr_address_city'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_address_city')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 70px;" class="mr-2">
+                                                        <p style="margin: 0;">City :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control" name="usr_address_city" placeholder="Address City..." value="{{ $user->users_detail->usr_address_city }}"/>
+                                                        @if($errors->has('usr_address_city'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_address_city')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="password">Postal Code :</label>
-                                                    <input class="form-control"   name="usr_address_postal" placeholder="Address Postal..." value="{{ $user->users_detail->usr_address_postal}}"/>
-                                                    @if($errors->has('usr_address_postal'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_address_postal')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 130px;" class="mr-2">
+                                                        <p style="margin: 0;">Postal Code :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control"   name="usr_address_postal" placeholder="Address Postal..." value="{{ $user->users_detail->usr_address_postal}}"/>
+                                                        @if($errors->has('usr_address_postal'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_address_postal')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="password">Home Number :</label>
-                                                    <input class="form-control"   name="usr_phone_home" placeholder="Home Phone Number..." value="{{ $user->users_detail->usr_phone_home }}"/>
-                                                    @if($errors->has('usr_phone_home'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_phone_home')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 140px;" class="mr-2">
+                                                        <p style="margin: 0;">Home Number :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control"   name="usr_phone_home" placeholder="Home Phone Number..." value="{{ $user->users_detail->usr_phone_home }}"/>
+                                                        @if($errors->has('usr_phone_home'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_phone_home')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="password">Phone Number :</label>
-                                                    <input class="form-control" type="text" name="usr_phone_mobile" placeholder="Mobile Phone Number..." value="{{ $user->users_detail->usr_phone_mobile }}"/>
-                                                    @if($errors->has('usr_phone_mobile'))
-                                                        <div class="text-danger">
-                                                            {{ $errors->first('usr_phone_mobile')}}
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-center mb-4">
+                                                    <div style="width: 145px;" class="mr-2">
+                                                        <p style="margin: 0;">Phone Number :</p>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input class="form-control" type="text" name="usr_phone_mobile" placeholder="Mobile Phone Number..." value="{{ $user->users_detail->usr_phone_mobile }}"/>
+                                                        @if($errors->has('usr_phone_mobile'))
+                                                            <div class="text-danger">
+                                                                {{ $errors->first('usr_phone_mobile')}}
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -366,6 +411,7 @@ active
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6 class="h5 m-0 font-weight-bold text-primary mt-4 mb-4"><i class="fas fa-user-tag"></i> Employement Status</h6>
+                                        <hr class="sidebar-divider mb-4">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -418,6 +464,7 @@ active
                                     </div>
                                     <div class="col-md-6">
                                         <h6 class="h5 m-0 font-weight-bold text-danger mt-4 mb-4"><i class="fas fa-user-check"></i> Hired & Resignation Date</h6>
+                                        <hr class="sidebar-divider mb-4">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -452,6 +499,7 @@ active
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6 class="h5 m-0 font-weight-bold text-danger mt-2 mb-4"><i class="fas fa-id-card"></i> Employee's Identity Card Information</h6>
+                                        <hr class="sidebar-divider mb-4">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -508,6 +556,7 @@ active
                                     </div>
                                     <div class="col-md-6">
                                         <h6 class="h5 m-0 font-weight-bold text-success mt-2 mb-4"><i class="fas fa-university" style="color: #00d55c;"></i> Employee's Bank Account Information</h6>
+                                        <hr class="sidebar-divider mb-4">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">

@@ -76,7 +76,8 @@ active
                     <div class="col-md-9">
                         <div class="row">
                             <div class="col-md-12">
-                                <h1 class="m-0 font-weight-bold text-dark">[{{$user_info->users_detail->employee_id}}] {{Auth::user()->name}}</h1><br>
+                                <h1 class="m-0 font-weight-bold text-dark">[{{$user_info->users_detail->employee_id}}] {{Auth::user()->name}}</h1>
+                                <hr class="sidebar-divider">
                                 <table class="table table-borderless">
                                     <tbody>
                                         <tr class="table-sm">
@@ -110,7 +111,8 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Contact Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Contact Information
+                                                        <hr class="sidebar-divider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -149,7 +151,8 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Profile Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Profile Information
+                                                        <hr class="sidebar-divider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -202,7 +205,8 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Document Information</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Document Information
+                                                        <hr class="sidebar-divider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -234,7 +238,8 @@ active
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Bank Account</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h5" colspan="2">Bank Account
+                                                        <hr class="sidebar-divider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
