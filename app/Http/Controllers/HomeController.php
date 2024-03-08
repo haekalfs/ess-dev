@@ -184,9 +184,10 @@ class HomeController extends Controller
             if ($typeSelected == 1) {
                 $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Filter for tasks in the HO location and before 8 AM
             } elseif ($typeSelected == 2) {
-                $activitiesQuery->whereIn('ts_task_id', $getCompanyProjectIds)
-                    ->whereRaw('TIME(ts_from_time) < ?', ['18:00:00'])
-                    ->whereIn('ts_user_id', $getUsersAssignment); // Filter for tasks in company projects, before 6 PM, and assigned users
+                // $activitiesQuery->whereIn('ts_task_id', $getCompanyProjectIds)
+                //     ->whereRaw('TIME(ts_from_time) < ?', ['18:00:00'])
+                //     ->whereIn('ts_user_id', $getUsersAssignment);
+                $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']);  // Filter for tasks in company projects, before 6 PM, and assigned users
             }
         } else {
             // Default condition for type not selected
