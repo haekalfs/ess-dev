@@ -31,7 +31,7 @@ active
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Users Accounts</h6>
         <div class="text-right">
-            <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" href="/manage/users/new-user-registration" ><i class="fas fa-plus fa-sm text-white-50"></i> Add User</a>
+            <a class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" href="/manage/users/new-user-registration" ><i class="fas fa-plus fa-sm text-white-50"></i> Add New User</a>
         </div>
     </div>
     <div class="card-body">
@@ -65,11 +65,11 @@ active
                                 <i class="fas fa-user-times" style="color: #ff0000;"></i>
                             @endif
                         </td>
-                        <td class="text-center" style="width: 10%;">
+                        <td class="text-center" style="width: 15%;">
                             <a href="/users/edit/{{ Crypt::encrypt($p->id) }}" title="Edit" class="btn btn-primary btn-sm mr-2" >
-                                <i class="fas fa-fw fa-edit justify-content-center"></i>
+                                <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
                             </a>
-                            <a title="delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ $p->id }}"><i class="fas fa-fw fa-trash justify-content"></i></a>
+                            <a title="delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ $p->id }}"><i class="fas fa-fw fa-trash justify-content"></i> Delete</a>
                         </td>
                     </tr>
                     @endforeach
