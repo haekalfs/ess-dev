@@ -165,7 +165,7 @@ class HomeController extends Controller
 
 
         // Retrieve company project IDs
-        $getCompanyProjectIds = Project_assignment::where('company_project_id', 3)->pluck('id')->toArray();
+        $getCompanyProjectIds = Project_assignment::where('company_project_id', 3)->pluck('task_id')->toArray();
 
         // Retrieve user assignments for company projects
         $getUsersAssignment = Project_assignment_user::whereIn('company_project_id', $getCompanyProjectIds)->groupBy('user_id')->pluck('user_id')->toArray();
