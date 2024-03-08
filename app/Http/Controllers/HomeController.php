@@ -168,7 +168,7 @@ class HomeController extends Controller
         $getCompanyProjectIds = Project_assignment::where('company_project_id', 3)->pluck('task_id')->toArray();
 
         // Retrieve user assignments for company projects
-        $getUsersAssignment = Project_assignment_user::whereIn('company_project_id', $getCompanyProjectIds)->groupBy('user_id')->pluck('user_id')->toArray();
+        $getUsersExcluded = Project_assignment_user::where('role', "PM")->groupBy('user_id')->pluck('user_id')->toArray();
 
         // Construct the activities query
         $activitiesQuery = Timesheet::select(
@@ -185,7 +185,8 @@ class HomeController extends Controller
                 $activitiesQuery->whereIn('ts_location', ['HO'])->whereRaw('TIME(ts_from_time) < ?', ['08:00:00']); // Filter for tasks in the HO location and before 8 AM
             } elseif ($typeSelected == 2) {
                 $activitiesQuery->whereIn('ts_task_id', $getCompanyProjectIds)
-                    ->whereRaw('TIME(ts_from_time) < ?', ['18:00:00']); // Filter for tasks in company projects, before 6 PM, and assigned users
+                    ->whereRaw('TIME(ts_from_time) < ?', ['18:00:00'])
+                    ->whereNotIn('ts_user_id', $getUsersExcluded); // Filter for tasks in company projects, before 6 PM, and assigned users
             }
         } else {
             // Default condition for type not selected
