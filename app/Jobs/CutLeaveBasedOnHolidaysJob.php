@@ -71,18 +71,30 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
         // $array = json_decode($json, true);
 
         $year = date('Y'); // Specify the year you want to retrieve data for
+        $month = date('m');
         $holidayKeyword = "Cuti Bersama"; // Specify the keyword you want to filter
 
-        $totalHolidays = 0;
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month)->endOfMonth();
 
-        foreach ($array as $date => $holiday) {
-            if (substr($date, 0, 4) === $year && isset($holiday['summary'][0]) && strpos($holiday['summary'][0], $holidayKeyword) !== false) {
+        $totalHolidays = 0;
+        $holidaysName = [];
+
+        // Iterate over each day in the month
+        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            $dateToCheck = $date->format('Y-m-d');
+
+            // Check if the date is a holiday and matches the keyword
+            if (isset($array[$dateToCheck]) && $array[$dateToCheck]['holiday'] === true && isset($array[$dateToCheck]['summary'][0]) && strpos($array[$dateToCheck]['summary'][0], $holidayKeyword) !== false) {
+                $holidaysName[] = json_encode($array[$dateToCheck]['summary']);
                 $totalHolidays++;
             }
         }
 
+        $monthPeriod = $year.intval($month);
         $checkIfAlreadyCut = Leave_request_history::whereYear('created_at', $year)
-            ->where('leave_request_id', 99)
+            ->where('leave_request_id', $monthPeriod)
             ->get();
 
         $currentDate = Carbon::now();
@@ -107,10 +119,6 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                         ->orderBy('expiration', 'asc')
                         ->get();
 
-                        // if ($totalHolidays > 12) { // Set the maximum cut to only 8
-                        //     $totalHolidays = 12;
-                        // }
-
                         $countQuota = $totalHolidays; // Initialize the count
 
                         foreach ($checkQuota as $key => $quota) {
@@ -130,10 +138,10 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                                 $history->req_by = $user->id;
                                 $history->quota_used = $deductedQuota;
                                 $history->quota_left = $quota->quota_left;
-                                $history->description = "Joint Holidays [Deducted by System]";
+                                $history->description = "[Deducted by System] Joint Holidays : " . implode(', ', $holidaysName);
                                 $history->leave_id = $quota->leave_id;
                                 $history->emp_leave_quota_id = $quota->id;
-                                $history->leave_request_id = 99;
+                                $history->leave_request_id = $monthPeriod;
                                 $history->requested_days = $totalHolidays;
                                 $history->save();
 

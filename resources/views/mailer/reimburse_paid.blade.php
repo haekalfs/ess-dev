@@ -1,6 +1,6 @@
 <p>Dear {{ $name }},</p>
 
-<p>Your Reimbursement Request : {{ $formCreator->f_type }}, has been Paid with total amount approved : Rp {{ number_format($formCreator->f_granted_funds, 0, ',', '.') }}. Kindly check the details for the documents.</p>
+<p>Your Reimbursement Request : {{ $formCreator->f_type }}, has been Paid with total amount approved : Rp {{ number_format(intval($formCreator->f_granted_funds), 0, ',', '.') }}. Kindly check the details for the documents.</p>
 
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>

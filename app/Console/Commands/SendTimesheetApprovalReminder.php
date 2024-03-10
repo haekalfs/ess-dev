@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SendTimesheetApprovalNotification;
 use App\Mail\ApprovalTimesheet;
 use App\Models\Notification_alert;
+use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Usr_role;
@@ -45,16 +46,27 @@ class SendTimesheetApprovalReminder extends Command
      */
     public function handle()
     {
+        $pendingApprovals = [];
+        $timesheetApprovers = Timesheet_approver::all();
         // $users = User::where('id', 'haekals')->get();
-        $userToApprove = Timesheet_detail::where('ts_status_id', 20)->groupBy('RequestTo')->pluck('RequestTo')->toArray();
-        $users = User::whereIn('id', $userToApprove)->get();
+
+        foreach($timesheetApprovers as $tsApprover){
+            $userToApprove = Timesheet_detail::where('ts_status_id', 20)
+                ->where('RequestTo', $tsApprover->approver)
+                ->exists();
+            if ($userToApprove) {
+                $pendingApprovals[] = $tsApprover->approver;
+            }
+        }
+
+        $users = User::whereIn('id', $pendingApprovals)->get();
 
         foreach ($users as $user) {
             dispatch(new SendTimesheetApprovalNotification($user));
         }
 
         $notification = Timesheet_detail::where('ts_status_id', 20)
-        ->whereIn('RequestTo', $userToApprove)
+        ->whereIn('RequestTo', $pendingApprovals)
         ->groupBy('month_periode', 'user_timesheet', 'RequestTo')
         ->get();
 
