@@ -43,7 +43,7 @@ class SendTimesheetApprovalNotification implements ShouldQueue
         $monthPeriod = Timesheet_detail::select('month_periode')
             ->where('ts_status_id', 20)
             ->where(function($query) use ($currentMonth, $threeMonthsAgo) {
-                $query->whereBetween('MONTH(created_at)', [$currentMonth, $threeMonthsAgo]);
+                $query->whereRaw('MONTH(created_at) BETWEEN ? AND ?', [$currentMonth, $threeMonthsAgo]);
             })
             ->where('RequestTo', $this->user->id)
             ->groupBy('month_periode')

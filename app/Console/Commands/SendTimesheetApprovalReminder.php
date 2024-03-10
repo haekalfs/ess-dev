@@ -46,18 +46,8 @@ class SendTimesheetApprovalReminder extends Command
      */
     public function handle()
     {
-        $pendingApprovals = [];
-        $timesheetApprovers = Timesheet_approver::all();
-        // $users = User::where('id', 'haekals')->get();
-
-        foreach($timesheetApprovers as $tsApprover){
-            $userToApprove = Timesheet_detail::where('ts_status_id', 20)
-                ->where('RequestTo', $tsApprover->approver)
-                ->exists();
-            if ($userToApprove) {
-                $pendingApprovals[] = $tsApprover->approver;
-            }
-        }
+        $pendingApprovals = Timesheet_detail::where('ts_status_id', 20)
+            ->pluck('RequestTo');
 
         $users = User::whereIn('id', $pendingApprovals)->get();
 
@@ -83,8 +73,6 @@ class SendTimesheetApprovalReminder extends Command
 
     public function schedule(Schedule $schedule)
     {
-        $schedule->command('timesheet:send-reminder')
-            ->twiceMonthly(1, 10)
-            ->daily();
+        //
     }
 }
