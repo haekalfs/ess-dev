@@ -37,14 +37,16 @@ class SendTimesheetApprovalNotification implements ShouldQueue
      */
     public function handle()
     {
+        date_default_timezone_set("Asia/Jakarta");
         $currentMonth = Carbon::now()->month; // Get the current month
-        $threeMonthsAgo = Carbon::now()->subMonths(3)->month; // Get the month 3 months ago
+        $threeMonthsAgo = Carbon::now()->subMonths(2)->month; // Get the month 3 months ago
 
         $monthPeriod = Timesheet_detail::select('month_periode')
             ->where('ts_status_id', 20)
-            ->where(function($query) use ($currentMonth, $threeMonthsAgo) {
-                $query->whereRaw('MONTH(created_at) BETWEEN ? AND ?', [$currentMonth, $threeMonthsAgo]);
-            })
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfMonth()->subMonths(2), // Start of current month, two months ago
+                Carbon::now()->endOfMonth() // End of current month
+            ])
             ->where('RequestTo', $this->user->id)
             ->groupBy('month_periode')
             ->get();

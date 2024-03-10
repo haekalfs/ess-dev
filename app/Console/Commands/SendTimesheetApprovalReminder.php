@@ -9,6 +9,7 @@ use App\Models\Timesheet_approver;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Usr_role;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Mail;
@@ -46,7 +47,16 @@ class SendTimesheetApprovalReminder extends Command
      */
     public function handle()
     {
-        $pendingApprovals = Timesheet_detail::where('ts_status_id', 20)
+        date_default_timezone_set("Asia/Jakarta");
+        $currentMonth = Carbon::now()->month;
+        $twoMonthsAgo = Carbon::now()->subMonths(2)->month; // Adjusted to subMonths(2)
+
+        $pendingApprovals = Timesheet_detail::whereBetween('created_at', [
+                Carbon::now()->startOfMonth()->subMonths(2), // Start of current month, two months ago
+                Carbon::now()->endOfMonth() // End of current month
+            ])
+            ->where('ts_status_id', 20)
+            ->groupBy('RequestTo')
             ->pluck('RequestTo');
 
         $users = User::whereIn('id', $pendingApprovals)->get();
@@ -69,6 +79,7 @@ class SendTimesheetApprovalReminder extends Command
             $entry->type = 2;
             $entry->save();
         }
+        $this->info('Cut Leave data processing job dispatched!'. $pendingApprovals);
     }
 
     public function schedule(Schedule $schedule)
