@@ -17,7 +17,7 @@ class Leave_request_history extends Model
     }
 
     public function emp_leave_quota(){
-    	return $this->belongsTo('App\Models\Emp_leave_quota')
+    	return $this->belongsTo('App\Models\Emp_leave_quota', 'emp_leave_quota_id', 'id')
         ->withDefault();
     }
 

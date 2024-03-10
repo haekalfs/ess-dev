@@ -138,7 +138,7 @@ class CutLeaveBasedOnHolidaysJob implements ShouldQueue
                                 $history->req_by = $user->id;
                                 $history->quota_used = $deductedQuota;
                                 $history->quota_left = $quota->quota_left;
-                                $history->description = "[Deducted by System] Joint Holidays : " . implode(', ', $holidaysName);
+                                $history->description = "Joint Holidays : " . implode(', ', $holidaysName);
                                 $history->leave_id = $quota->leave_id;
                                 $history->emp_leave_quota_id = $quota->id;
                                 $history->leave_request_id = $monthPeriod;
