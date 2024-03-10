@@ -29,7 +29,8 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['suspicious'])->group(function () {
-        Route::get('/test-database-connection', 'CommandsController@testDatabaseConnection');
+        Route::get('/download-cv-employee', 'ManagementController@generateDocument');
+        Route::get('/checkEmailAccountAvailability/{userAccount}', 'UserController@checkDuplicateEmail');
         //Commands
         Route::get('/fetch-and-format-holidays', [HolidayController::class, 'fetchAndFormatHolidays']);
         Route::get('/cut-leave-based-on-joint-holidays', 'CommandsController@cut_leave_based_on_joint_holidays');

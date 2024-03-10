@@ -2,64 +2,45 @@
 
 namespace App\Mail;
 
+use App\Models\Reimbursement;
+use App\Models\Reimbursement_approval;
+use App\Models\Reimbursement_item;
+use App\Models\Timesheet_approver;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class UserCreation extends Mailable
 {
-    use Queueable, SerializesModels;
-    protected $emailUser;
-    protected $userName;
+    protected $employee;
 
-    public function __construct($emailUser, $userName, $path)
+    public function __construct(User $employee)
     {
-        $this->emailUser = $emailUser;
-        $this->userName = $userName;
-        
+        $this->employee = $employee;
     }
 
     public function build()
     {
-        $data = [
-            'name' => $this->userName,
-            'email' => $this->emailUser,
-            'userName' => $this->userName,
-            'emailUser' => $this->emailUser,
-            'link' => 'https://timereport.perdana.co.id/'
-        ];
+        $subject = 'Welcome to Perdana Consulting, Explore the Power of ERP Solutions with Us!';
+        $link = 'https://timereport.perdana.co.id/';
 
-        $subject = 'ESS Acount';
-
-        return $this->markdown('mailer.user_creation', $data)
-            ->subject($subject)
-            ->to($this->emailUser)
-            ->attach(public_path('User Manual ESS Perdana Consulting 2023.pdf'), [
-            'as' => 'User Manual ESS Perdana Consulting 2023.pdf',
-            'mime' => 'application/pdf',
+        // Attach the generated document
+        $documentPath = public_path('User Manual ESS Perdana Consulting 2023.pdf');
+        $this->attach($documentPath, [
+            'as' => "User Manual ESS Perdana Consulting 2023.docx"
         ]);
-    }
 
-    public function emailSubject()
-    {
-        return 'ESS Account';
-    }
-
-    public function emailTo()
-    {
-        return $this->emailUser;
-    }
-
-    public function data()
-    {
-        return [
-            'name' => $this->userName,
-            'email' => $this->emailUser,
-            'userName' => $this->userName,
-            'emailUser' => $this->emailUser,
-            'link' => 'https://timereport.perdana.co.id/'
-        ];
+        return $this->markdown('mailer.user_creation')
+            ->subject($subject)
+            ->to($this->employee->email)
+            ->with([
+                'name' => $this->employee->name,
+                'email' => $this->employee->email,
+                'employee' => $this->employee,
+                'link' => $link
+            ]);
     }
 }

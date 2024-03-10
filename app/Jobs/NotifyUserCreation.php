@@ -2,8 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Mail\ApprovalLeave;
+use App\Mail\DisbursementOrderMail;
+use App\Mail\ReimbursementPaid;
+use App\Mail\ReimbursementPartiallyApproved;
+use App\Mail\ReimbursementPriorApproval;
 use App\Mail\UserCreation;
-// use App\Models\User;
+use App\Models\Reimbursement;
+use App\Models\Reimbursement_approval;
+use App\Models\Reimbursement_item;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,27 +22,19 @@ use Illuminate\Support\Facades\Mail;
 
 class NotifyUserCreation implements ShouldQueue
 {
-    protected $emailUser;
-    protected $userName;
-    protected $attachmentPath;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(string $emailUser, string $userName, $attachmentPath = null)
+    protected $employee;
+
+    public function __construct(User $employee)
     {
-        $this->emailUser = $emailUser;
-        $this->userName = $userName;
-        $this->attachmentPath = $attachmentPath ?: public_path('User Manual ESS Perdana Consulting 2023.pdf');
+        $this->employee = $employee;
     }
 
     public function handle()
     {
-        $notification = new UserCreation($this->emailUser, $this->userName, $this->attachmentPath);
+        $notification = new UserCreation($this->employee);
 
-        
-            Mail::send('mailer.user_creation', $notification->data(), function ($message) use ($notification) {
-                $message->to($notification->emailTo())
-                    ->subject($notification->emailSubject())
-                    ->attach($this->attachmentPath); // Melampirkan berkas
-            });
-    
+        Mail::send($notification);
     }
 }

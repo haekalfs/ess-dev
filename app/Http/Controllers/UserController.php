@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Jobs\CreateEmailAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Exception;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 
@@ -82,6 +84,7 @@ class UserController extends Controller
         $hash_pwd = Hash::make($request->password);
 
         $employeeID = $request->employee_id;
+        $emailAccount = $request->email."@perdana.co.id";
 
         // Memeriksa apakah file foto profil diunggah
         if ($request->hasFile('profile')) {
@@ -109,7 +112,7 @@ class UserController extends Controller
         User::create([
             'id' => $request->usr_id,
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $emailAccount,
             'password' => $hash_pwd,
         ]);
 
@@ -184,10 +187,14 @@ class UserController extends Controller
         $user_role->user_id = $request->usr_id;
         $user_role->save();
 
-        // $emailUser = $request->email;
-        // $userName = $request->name;
+        //Create Email Account
+        $emailUser = $request->email;
+        $password = $request->password;
 
-        // dispatch(new NotifyUserCreation($emailUser, $userName));
+        $employee = User::find($request->usr_id);
+
+        dispatch(new CreateEmailAccount($emailUser, $password));
+        dispatch(new NotifyUserCreation($employee));
 
         return redirect('/manage/users')->with('success', 'User Create successfully');
     }
@@ -332,5 +339,56 @@ class UserController extends Controller
 
 
         return redirect()->back()->with('success', "You've Edited $user->name Successfully");
+    }
+
+    public function checkDuplicateEmail($checkEmail)
+    {
+        // Replace these with your cPanel credentials and server details
+        $cpanelUsername = 'perdanac';
+        $cpanelPassword = 'SYn-#,MSkTY%';
+        $cpanelHostname = 'perdana.co.id'; // e.g., example.com
+
+        $emailAccount = $checkEmail."@perdana.co.id";
+        // Authenticate with cPanel API
+        $client = new Client(['base_uri' => "https://$cpanelHostname:2083"]);
+        try {
+            // Send a request to list email accounts
+            $response = $client->request('GET', '/execute/Email/list_pops', [
+                'auth' => [$cpanelUsername, $cpanelPassword],
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode("$cpanelUsername:$cpanelPassword"),
+                ],
+            ]);
+
+            // Get the response body
+            $body = $response->getBody()->getContents();
+
+            // Check if the request was successful
+            if ($response->getStatusCode() === 200) {
+                // Decode the JSON response
+                $emailAccounts = json_decode($body, true);
+
+                // Ensure the 'data' key exists in the response
+                if (isset($emailAccounts['data'])) {
+                    // Loop through email accounts data
+                    foreach ($emailAccounts['data'] as $account) {
+                        // Compare email addresses
+                        if ($account['email'] === $emailAccount) {
+                            // Email already exists
+                            return response()->json(['success' => false, 'message' => 'Duplicate email found']);
+                        }
+                    }
+                }
+
+                // No duplicate found
+                return response()->json(['success' => true, 'message' => 'No duplicate email found']);
+            } else {
+                // Failed to retrieve email accounts
+                return response()->json(['success' => false, 'message' => 'Failed to retrieve email accounts']);
+            }
+        } catch (Exception $e) {
+            // Handle exceptions
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 }

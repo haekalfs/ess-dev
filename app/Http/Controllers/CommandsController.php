@@ -12,6 +12,8 @@ use App\Models\Notification_alert;
 use App\Models\Timesheet_detail;
 use App\Models\User;
 use App\Models\Users_detail;
+use Exception;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -98,34 +100,5 @@ class CommandsController extends Controller
 
         // Optionally, you can flash a message to indicate successful dispatch
         return redirect()->back()->with('success', 'Employment status check job dispatched successfully!');
-    }
-
-    public function testDatabaseConnection()
-    {
-        // Database configuration
-        $dbHost = '203.161.184.119'; // Replace with your database host
-        $dbPort = '3306'; // Replace with your database port (typically 3306 for MySQL)
-        $dbName = 'perdanac_web2022'; // Replace with your database name
-        $dbUsername = 'perdanac_admin24'; // Replace with your database username
-        $dbPassword = 'Predana@2024!'; // Replace with your database password
-
-        // Database connection
-        try {
-            $connection = new \PDO("mysql:host=$dbHost;port=$dbPort;dbname=$dbName", $dbUsername, $dbPassword);
-            $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-            // Execute a sample query to test the connection
-            $statement = $connection->query('SELECT * FROM wpx3_posts LIMIT 1');
-            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
-            // Close the database connection
-            $connection = null;
-
-            // Return the result
-            return response()->json(['success' => true, 'message' => 'Database connection successful.', 'data' => $result]);
-        } catch (\PDOException $e) {
-            // Return error message if connection fails
-            return response()->json(['success' => false, 'message' => 'Database connection failed.', 'error' => $e->getMessage()]);
-        }
     }
 }

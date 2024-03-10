@@ -19,7 +19,9 @@ use DateInterval;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Row;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 class ManagementController extends Controller
 {
@@ -372,5 +374,24 @@ class ManagementController extends Controller
         } else {
             return redirect(route('holiday.date'))->with('error', 'Holiday not found.');
         }
+    }
+
+    public function generateDocument()
+    {
+        // Render the view to HTML
+        $htmlContent = View::make('management.database.word_template')->render();
+
+        // Load the Word template
+        $template = new TemplateProcessor(public_path('template_cv_test.docx'));
+
+        // Replace the placeholder with the HTML content
+        $template->setValue('CONTENT', $htmlContent);
+
+        // Save the generated document to storage
+        $tempFilePath = storage_path('app/generated_document.docx');
+        $template->saveAs($tempFilePath);
+
+        // Download the generated document
+        return response()->download($tempFilePath, 'generated_document.docx')->deleteFileAfterSend(true);
     }
 }

@@ -136,7 +136,7 @@ active
                 <tbody>
                     @foreach ($leaveRequests as $lr)
                         <tr>
-                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lr->req_date)->format('d-M-Y') }}</td>
+                            <td data-order="{{$lr->req_date}}">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lr->req_date)->format('d-M-Y') }}</td>
                             <td>{{ $lr->leave->description }}</td>
                             <td>
                                 @foreach ($lr->dateGroups as $key => $group)
@@ -344,7 +344,7 @@ active
                                             <tbody>
                                                 @foreach ($leaveQuotaUsage as $lqu)
                                                     <tr>
-                                                        <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->req_date)->format('d-M-Y') }}</td>
+                                                        <td data-order="{{$lqu->req_date}}">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->req_date)->format('d-M-Y') }}</td>
                                                         <td>{{ $lqu->requested_days }} Days</td>
                                                         <td>{{ $lqu->description }}</td>
                                                         <td>{{ $lqu->leave->description }} Period ({{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->emp_leave_quota->active_periode)->format('Y') }})</td>
