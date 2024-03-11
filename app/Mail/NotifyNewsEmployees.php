@@ -14,7 +14,7 @@ class NotifyNewsEmployees extends Mailable
     protected $employee;
     protected $titleOfNews;
 
-    public function __construct(User $employee, int $titleOfNews)
+    public function __construct(User $employee, string $titleOfNews)
     {
         $this->employee = $employee;
         $this->titleOfNews = $titleOfNews;
