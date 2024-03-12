@@ -299,10 +299,13 @@ class ReimburseController extends Controller
                     ->groupBy('reimbursement_id')
                     ->pluck('id')
                     ->toArray();
-        if ($reimbursement->created_at->diffInDays(now()) <= 14) {
-            if(empty($isReceived)){
-                Session::flash('failed',"You have to give all hard copies of the receipts to the finance department within 2 weeks otherwise the reimbursement will not be proceeds!");
-            }
+
+        $diffInDays = $reimbursement->created_at->diffInDays(now());
+
+        if ($diffInDays <= 14 && empty($isReceived)) {
+            Session::flash('failed', "You have to submit all hard copies of the receipts to the finance department within 2 weeks, otherwise the reimbursement will not proceed!");
+        } elseif ($diffInDays > 14 && $reimbursement->status_id == 404) {
+            Session::flash('failed', "Reimbursement request has been rejected due to failure to submit the receipts on time!");
         }
 
         return view('reimbursement.view_details', ['reimbursement' => $reimbursement,'user' => $emp, 'f_id' => $f_id, 'reimbursement_items' => $reimbursement_items]);
@@ -1128,5 +1131,47 @@ class ReimburseController extends Controller
             dispatch(new SendDisbursementOrder($employee, $data));
         }
         return response()->download(public_path("reimbursement/Result_$data->f_id.docx"), "Disbursement_Order_Letter_$data->f_id".'_'."$data->f_purpose_of_purchase"."_"."$dateCreated".".docx");
+    }
+
+    public function reject_request(Request $request, $formId)
+    {
+        $validator = Validator::make($request->all(), [
+            'notes' => 'sometimes'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $mainForm = Reimbursement::find($formId);
+        $mainForm->status_id = 404;
+        $mainForm->f_granted_funds = 0;
+        $mainForm->save();
+
+        // Find all reimbursement items associated with the formId and update them
+        Reimbursement_item::where('reimbursement_id', $formId)
+            ->update([
+                'edited_by_finance' => true,
+                'approved_amount' => 0
+            ]);
+
+        //Set the other to 403
+        Reimbursement_approval::where('reimbursement_id', $formId)
+            ->update(['status' => 403]);
+
+        // Loop through each reimb_item
+        foreach ($mainForm->items as $reimbItem) {
+            // Create a new Reimbursement_approval record
+            Reimbursement_approval::create([
+                'reimb_item_id' => $reimbItem->id,
+                'RequestTo' => Auth::id(),
+                'status' => 404,
+                'approved_amount' => 0,
+                'reimbursement_id' => $formId,
+                'notes' => $request->notes
+            ]);
+        }
+
+        return redirect()->back()->with('failed', 'You rejected the request!');
     }
 }

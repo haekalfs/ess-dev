@@ -159,6 +159,38 @@ active
                             </a>
                             <a href="/reimbursement/export/request/{{ $reimbursement->id }}" class="btn btn-secondary btn-sm"><i class="far fa-file-excel"></i> Export as Excel</a>
                         </div>
+                    @else
+                        @if($reimbursement->status_id !== 404)
+                        <div id="rejectContainer">
+                            <div class="btn-group">
+                                <button class="btn btn-danger btn-sm dropdown-toggle" style="margin-right: 5px;" type="button" id="approveDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-fw fa-ban fa-sm text-white-50"></i> Reject Request
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="approveDropdown">
+                                    <form action="/reimbursement/manage/reject-request/{{ $reimbursement->id }}" method="post">
+                                        @csrf
+                                        <div class="col-md-12 zoom90">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="approval_notes">Notes :</label>
+                                                                <textarea type="text" class="form-control" style="width: 300px;" name="notes">Kwitansi / Nota Belum Diterima oleh Tim Keuangan!</textarea>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button type="submit" class="btn btn-sm btn-danger" onclick='isconfirm();'>Send & Reject</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -312,8 +344,8 @@ active
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-sm" id="rejectBtn" onclick="setFormAction('/reimbursement/finance/reject/')"><i class="fas fa-times"></i> Reject</button>
-                    <button type="button" class="btn btn-primary btn-sm" id="approveBtn" onclick="setFormAction('/reimbursement/finance/approve/')"><i class="fas fa-save"></i> Approve</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="rejectBtn" onclick="setFormAction('/reimbursement/finance/reject/')"><i class="fas fa-times"></i> Reject Item</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="approveBtn" onclick="setFormAction('/reimbursement/finance/approve/')"><i class="fas fa-save"></i> Approve Item</button>
                 </div>
             </form>
 		</div>
@@ -356,6 +388,7 @@ $(document).ready(function() {
                 $('#confirmBtn'+ id).hide();
                 $('#btnContainer'+ id).show();
                 $('#proccessContainer').show();
+                $('#rejectContainer').hide();
             },
             error: function() {
                 $('#loadingIndicatorView'+ id).hide();
