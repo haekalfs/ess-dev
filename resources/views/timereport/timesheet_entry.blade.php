@@ -178,7 +178,7 @@ active
                                                 $summary = $day['summary'];
                                             @endphp
                                             @if ($status === "red")
-                                                <td data-toggle="modal" class="clickable test text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}. <div id="desc{{$dayValue}}"></div><br></td>
+                                                <td data-toggle="modal" class="clickable test text-danger" data-target="#redModal" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}">{{ $dayValue }}. <small class="mb-4">{{ $summary }}</small> <div id="desc{{$dayValue}}"></div><br></td>
                                             @elseif ($status === 2907)
                                                 <td class="clickable test text-dark" data-date="{{ $year }}-{{ $month }}-{{ $dayValue }}" id="task_entry{{ $dayValue }}"><del>{{ $dayValue }}</del>.&nbsp;
                                                     <a><i class="fas fa-plane-departure fa-sm"></i></a>
