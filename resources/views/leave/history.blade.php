@@ -312,7 +312,7 @@ active
                                                             echo '<h6 class="h6 text-primary mb-2"><i>Active</i></h6>';
                                                         }
                                                         ?></td>
-                                                        <td>{{ $lqa->quota_used }}</td>
+                                                        <td>{{ $lqa->quota_used }} Days <small><i>out of {{ $lqa->leave->leave_quota }}</i></small></td>
                                                         <td>{{ $lqa->quota_left }}</td>
                                                     </tr>
                                                 @endforeach
@@ -347,7 +347,7 @@ active
                                                         <td data-order="{{$lqu->req_date}}">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->req_date)->format('d-M-Y') }}</td>
                                                         <td>{{ $lqu->requested_days }} Days</td>
                                                         <td>{{ $lqu->description }}</td>
-                                                        <td>{{ $lqu->leave->description }} Period ({{ \Carbon\Carbon::createFromFormat('Y-m-d', $lqu->emp_leave_quota->active_periode)->format('Y') }})</td>
+                                                        <td>{{ $lqu->leave->description }}</td>
                                                         <td>{{ $lqu->quota_used }}</td>
                                                         <td>{{ $lqu->emp_leave_quota->quota_left }}</td>
                                                         {{-- <td>{{ $lqu->emp_leave_quota->active_periode }}</td>

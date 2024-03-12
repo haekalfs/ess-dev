@@ -2,7 +2,7 @@
 
 <p>We hope this message finds you well. We are excited to share with you the latest news:</p>
 
-<p>{{ $titleOfNews }}</p>
+<p>Title : {{ $titleOfNews }}</p>
 <p>Please open this link below :<br><a href="{{ $link }}"><strong>Click Here</strong></a></p>
 <br>
 <p>Regards,<br><img src="{{ asset('img/PC-01Mailer.png') }}" style="height: 40px; width: 90px;" /> <br><strong>ESS Admin</strong></p><br>

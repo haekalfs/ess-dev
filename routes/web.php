@@ -30,6 +30,7 @@ Auth::routes();
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['suspicious'])->group(function () {
         Route::get('/download-cv-employee', 'ManagementController@generateDocument');
+        Route::get('/generate-pdf', 'ManagementController@generatePdf');
         Route::get('/checkEmailAccountAvailability/{userAccount}', 'UserController@checkDuplicateEmail');
         //Commands
         Route::get('/fetch-and-format-holidays', [HolidayController::class, 'fetchAndFormatHolidays']);
@@ -230,6 +231,7 @@ Route::middleware(['auth'])->group(function () {
 
         //Employees Database
         Route::get('/manage/list/employees', 'EmployeesDatabase@index')->name('emp.database');
+        Route::get('/manage/list/employees/cv-creator/{id}', 'EmployeesDatabase@cv_preview')->name('emp.cv.preview');
         Route::get('/manage/list/export-users', 'EmployeesDatabase@exportData')->name('export.users');
 
         // API KEY Setting
@@ -247,6 +249,9 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/hr/compliance/timesheet/settings/save', 'HrController@timesheet_settings_save');
         Route::put("/hr/compliance/update/regulations", 'HrController@update_regulation');
         Route::put("/hr/compliance/update/cutoff-date", 'HrController@update_cutoffdate');
+
+        Route::post('/system-management/add-new-approver', 'HrController@add_new_approver');
+        Route::get('/system-management/remove-approver/{id}', 'HrController@remove_approver')->name('remove.approver');
         // Exit Clearance
         Route::get('/hr/exit_clearance/', 'HrController@exit_clear');
         Route::get('/hr/exit_clearance/print/{id}', 'HrController@print');

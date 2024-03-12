@@ -23,6 +23,7 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Ilovepdf\Ilovepdf;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 
 class HrController extends Controller
 {
@@ -129,6 +130,54 @@ class HrController extends Controller
         }
 
         return redirect()->back()->with('success', 'Compliance Edit Success');
+    }
+
+    public function add_new_approver(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_name' => 'sometimes',
+            'department' => 'sometimes',
+            'setAs' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()]);
+        }
+
+        $setAs = $request->setAs;
+        $desc = "";
+        if ($setAs == 1) {
+            $desc = "Director Level";
+        } else {
+            $desc = "Reviewer"; // Or any other default description
+        }
+        // Create Timesheet_approver record
+        Timesheet_approver::create([
+            'department_id' => $request->department,
+            'approver_level' => $desc,
+            'approver' => $request->user_name,
+            'group_id' => $request->setAs,
+        ]);
+
+        return redirect()->back()->with('success', 'Compliance Edit Success');
+    }
+
+    public function remove_approver($userId)
+    {
+        // Find the timesheet approver by ID
+        $approver = Timesheet_approver::find($userId);
+
+        // Check if the timesheet approver exists
+        if ($approver) {
+            // Delete the timesheet approver
+            $approver->delete();
+
+            // Redirect back with a success message
+            return redirect()->back()->with('success', 'User has been successfully removed from the group.');
+        }
+
+        // If the timesheet approver does not exist, redirect back with a failure message
+        return redirect()->back()->with('failed', 'User not found or already removed from the group.');
     }
 
 	public function exit_clear()

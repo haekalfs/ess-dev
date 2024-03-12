@@ -55,17 +55,63 @@ active
             <div class="card-body">
                 <div class="tab-content" id="pageTabContent">
                     <div class="tab-pane fade show active" id="page1" role="tabpanel" aria-labelledby="page1-tab">
+                        <div class="col-md-12">
+                            <h6 class="h5 m-0 font-weight-bold text-secondary mt-2 mb-4"><i class="fas fa-users-cog"></i> Manage Approvers</h6><hr class="sidebar-divider">
+                            <form id="f_form" action="/system-management/add-new-approver" method="post">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="email">User Name :</label>
+                                            <select class="form-control" name="user_name" required>
+                                                <option selected disabled>Select...</option>
+                                                @foreach($users as $employees)
+                                                <option value="{{$employees->id}}">{{ $employees->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="password">Department :</label>
+                                            <select class="form-control" name="department" required>
+                                                <option selected disabled>Select...</option>
+                                                @foreach($department as $dept)
+                                                <option value="{{$dept->id}}">{{ $dept->department_name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="password">Set As :</label>
+                                            <select class="form-control" name="setAs" required>
+                                                <option selected disabled>Select...</option>
+                                                <option value="2">Reviewer</option>
+                                                <option value="1">Director Authorization</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 d-flex justify-content-center align-items-end">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary">Insert</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                         <form action="/hr/compliance/update/regulations" method="POST">
                             @method('PUT')
                             @csrf
                             <div class="col-md-12">
                                 <div class="row">
+                                    @php $no = 1 @endphp
                                     @foreach($department as $dp)
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 mt-4">
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole h6" colspan="2">{{ $dp->department_name }}</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-secondary @endrole h6" colspan="2">{{ $no++ }}. {{ $dp->department_name }} Dept.</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -75,13 +121,22 @@ active
                                                             @foreach($dp->approvers as $dpa)
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
-                                                                    <label for="email">Name :</label>
-                                                                    <select class="form-control" name="approvers{{$dpa->id}}" >
-                                                                        <option selected disabled>Choose...</option>
-                                                                        @foreach($user as $us)
-                                                                            <option value="{{ $us->id }}" @if( $us->id == $dpa->approver ) selected @endif >{{ $us->name }}</option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                    @if($dpa->group_id == 1)
+                                                                    <label for="email">Director Authorization :</label>
+                                                                    @else
+                                                                    <label for="email">Initial Reviewer :</label>
+                                                                    @endif
+                                                                    <div class="input-group"> <!-- Wrap select and button in an input-group -->
+                                                                        <select class="form-control" name="approvers{{$dpa->id}}">
+                                                                            <option selected disabled>Choose...</option>
+                                                                            @foreach($user as $us)
+                                                                            <option value="{{ $us->id }}" @if( $us->id == $dpa->approver ) selected @endif>{{ $us->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                        <div class="input-group-append">
+                                                                            <a class="btn btn-danger" href="{{ route('remove.approver', ['id' => $dpa->id]) }}" onclick='isconfirm();'><i class="fas fa-trash-alt"></i></a> <!-- Add the button here -->
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             @endforeach
@@ -92,37 +147,39 @@ active
                                         </table>
                                     </div>
                                     @endforeach
-                                    <div class="col-md-12">
+                                    <div class="col-md-5">
                                         <table class="table table-borderless">
                                             <thead>
                                                 <tr>
-                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-secondary @endrole h6" colspan="2">Default Approvers</th>
+                                                    <th style="padding-left: 0;" class="m-0 font-weight-bold @role('freelancer') text-success @else text-secondary @endrole h6" colspan="2">Default Approvers<hr class="sidebar-divider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr class="table-sm">
                                                     <td>
                                                         <div class="row">
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-12">
                                                                 <div class="form-group">
-                                                                    <label for="email">First Approver :</label>
-                                                                    <select class="form-control" name="Default_FA" >
-                                                                        <option selected disabled>Choose...</option>
-                                                                        @foreach($user as $us)
-                                                                        <option value="{{ $us->id }}" @if( $us->id == $Default1->approver ) selected @endif >{{ $us->name }}</option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                    <label for="email">Initial Reviewer :</label>
+                                                                    <div class="input-group"> <!-- Wrap select and button in an input-group -->
+                                                                        <select class="form-control" name="Default_FA" >
+                                                                            <option selected disabled>Choose...</option>
+                                                                            @foreach($user as $us)
+                                                                            <option value="{{ $us->id }}" @if( $us->id == $Default1->approver ) selected @endif >{{ $us->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-md-6">
                                                                 <div class="form-group">
-                                                                    <label for="password">Prior Approver :</label>
-                                                                    <select class="form-control" name="Default_PA" >
-                                                                        <option selected disabled>Choose...</option>
-                                                                        @foreach($user as $us)
-                                                                        <option value="{{ $us->id }}" @if( $us->id == $Default2->approver ) selected @endif >{{ $us->name }}</option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                    <label for="email">Director Authorization :</label>
+                                                                    <div class="input-group"> <!-- Wrap select and button in an input-group -->
+                                                                        <select class="form-control" name="Default_PA" >
+                                                                            <option selected disabled>Choose...</option>
+                                                                            @foreach($user as $us)
+                                                                            <option value="{{ $us->id }}" @if( $us->id == $Default2->approver ) selected @endif >{{ $us->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -131,8 +188,24 @@ active
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="col-md-12 mb-4">
-                                        <span class="m-0 font-weight-bold text-danger h6" colspan="2">Additional Restrictions</span>
+                                    <div class="col-md-7 mt-4">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <span class="text-danger">Revision Authorization Protocol</span>
+                                            </div>
+                                            <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                                                <ul>
+                                                    <li><strong>Department Approval Responsibility:</strong> Each department is responsible for reviewing and approving any edits made within their respective areas.</li>
+                                                    <li><strong>Adherence to Policies:</strong> All employees must adhere to the company's editing approval policies and procedures as outlined by their department.</li>
+                                                    <li><strong>Accuracy and Accountability:</strong> Employees are required to ensure that any edits made are accurate and comply with departmental standards. Unauthorized adjustments to records are strictly prohibited.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mb-4 mt-4">
+                                        <span class="m-0 font-weight-bold text-danger h6" colspan="2">Additional Configuration & Restriction</span>
+                                        <hr class="sidebar-divider">
                                     </div>
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-center mb-4">
@@ -161,10 +234,8 @@ active
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 200px;">
+                                            <div style="width: 140px;">
                                                 <p style="margin: 0;">Always CC To :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -176,8 +247,6 @@ active
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
                                         <div class="d-flex align-items-center mb-4">
                                             <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Medical Admin :</p>
@@ -191,10 +260,8 @@ active
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
                                         <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 200px;" class="mr-2">
+                                            <div style="width: 140px;" class="mr-2">
                                                 <p style="margin: 0;">Reimbursement Admin :</p>
                                             </div>
                                             <div class="flex-grow-1">
@@ -207,6 +274,24 @@ active
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <span class="text-danger">Role-Based Access Control Administration</span>
+                                            </div>
+                                            <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Guidelines for Managing Roles and Permissions</h6>
+                                                <p>Our Role-Based Access Control (RBAC) system enables administrators to effectively manage user roles and permissions within our system. Below are the key guidelines for administering roles and permissions:</p>
+                                                <ul>
+                                                    <li><strong>Role Assignment:</strong> Assign appropriate roles to users based on their responsibilities and access needs.</li>
+                                                    <li><strong>Permission Configuration:</strong> Configure permissions for each role to restrict or grant access to specific features or data.</li>
+                                                    <li><strong>Access Review:</strong> Regularly review and update role assignments and permissions to ensure compliance with organizational policies.</li>
+                                                    <li><strong>Audit Trails:</strong> Maintain audit trails to track changes to role assignments and permissions for accountability and security purposes.</li>
+                                                    <li><strong>Training and Documentation:</strong> Provide training and documentation to administrators and users on role management best practices and system usage.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <button class="br-icon"></button>
@@ -216,32 +301,63 @@ active
                         <form action="/hr/compliance/update/cutoff-date" method="POST">
                             @method('PUT')
                             @csrf
-
                             <div class="col-md-12">
                                 <div class="row">
-                                    @foreach($cutoffDate as $cd)
                                     <div class="col-md-6">
-                                        <div class="mb-4 mt-2">
-                                            <span class="font-weight-bold text-danger h6" colspan="2">{{ $cd->name }}</span>
+                                        <div class="row">
+                                            @php
+                                                $classes = ['text-danger', 'text-primary', 'text-secondary', 'text-success'];
+                                            @endphp
+
+                                            @foreach($cutoffDate as $key => $cd)
+                                                @php
+                                                    // Get the class for this iteration
+                                                    $class = $classes[$key % count($classes)];
+                                                @endphp
+
+                                                <div class="col-md-6">
+                                                    <div class="mb-4 mt-2">
+                                                        <span class="font-weight-bold {{ $class }} h6" colspan="2">{{ $cd->name }}</span>
+                                                        <hr class="sidebar-divider mb-4">
+                                                    </div>
+                                                    <div class="d-flex align-items-center mb-4">
+                                                        <div style="width: 140px;" class="mr-2">
+                                                            <p style="margin: 0;">Start Date :</p>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="number" class="form-control" name="cutoff_dates[{{ $cd->id }}][start_date]" value="{{ $cd->start_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center mb-4">
+                                                        <div style="width: 140px;" class="mr-2">
+                                                            <p style="margin: 0;">End Date :</p>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input type="number" class="form-control" name="cutoff_dates[{{ $cd->id }}][closed_date]" value="{{ $cd->closed_date }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">Start Date :</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <span class="text-danger">Submission Deadline Management</span>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="cutoff_dates[{{ $cd->id }}][start_date]" value="{{ $cd->start_date }}">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-4">
-                                            <div style="width: 140px;" class="mr-2">
-                                                <p style="margin: 0;">End Date :</p>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <input type="number" class="form-control" name="cutoff_dates[{{ $cd->id }}][closed_date]" value="{{ $cd->closed_date }}">
+                                            <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Guidelines for Managing Submission Deadlines</h6>
+                                                <p>Our submission deadline management system ensures strict adherence to cutoff dates and imposes necessary restrictions. Below are the guidelines for effectively managing submission deadlines:</p>
+                                                <ul>
+                                                    <li><strong>Submission Policies:</strong> Establish clear policies regarding submission deadlines, including cutoff dates and time restrictions.</li>
+                                                    <li><strong>Authorization Levels:</strong> Assign authorization levels to users to restrict or grant access to submission functions based on their roles and responsibilities.</li>
+                                                    <li><strong>Automated Alerts:</strong> Implement automated alerts and notifications to remind users of approaching submission deadlines and cutoff times.</li>
+                                                    <li><strong>Enforcement Measures:</strong> Enforce strict adherence to submission deadlines through system-imposed restrictions and penalties for late submissions.</li>
+                                                    <li><strong>Review and Monitoring:</strong> Regularly review and monitor submission activities to ensure compliance with established deadlines and identify any potential issues.</li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </div>
-                                    @endforeach
                                 </div>
                             </div>
                             <button class="br-icon"></button>
@@ -300,7 +416,7 @@ active
                                                                     <td>{{ $uf->user->name }}</td>
                                                                     <td style="width: 20%;">{{ $uf->fingerprint_id }}</td>
                                                                     <td class="text-center" style="width: 20%;">
-                                                                    <a href="/hr/compliance/integration/delete/{{$uf->id}}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                                                    <a href="/hr/compliance/integration/delete/{{$uf->id}}" onclick='isconfirm();' class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
                                                                     </td>
                                                                 </tr>
                                                             @endforeach

@@ -27,6 +27,13 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+
+@if ($message = Session::get('notify'))
+<div class="alert alert-danger alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{!! $message !!}</strong>
+</div>
+@endif
 <div class="card shadow mb-4 zoom90">
     <div class="card-header d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Manage Department</h6>

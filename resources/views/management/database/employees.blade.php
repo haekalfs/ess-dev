@@ -80,19 +80,21 @@ active
                             <table class="table table-bordered zoom90" id="myProjects" width="100%" cellspacing="0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>User ID</th>
                                         <th>Name</th>
                                         <th>Email</th>
+                                        <th>Preferred Role</th>
+                                        <th>Experiences</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($users as $user)
                                     <tr>
-                                        <td>{{ $user->user_id }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
-                                        <td class="text-center"><a class="btn btn-sm btn-primary"> Download</a></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-center"><a class="btn btn-sm btn-primary" href="{{ route('emp.cv.preview', ['id' => $user->id]) }}"><i class="fas fa-hand-pointer"></i> Select</a></td>
                                     </tr>
                                     @endforeach
                                  </tbody>

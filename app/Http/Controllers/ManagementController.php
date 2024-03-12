@@ -10,6 +10,8 @@ use App\Models\Role_template;
 use App\Models\API_key;
 use App\Models\Company_project;
 use App\Models\Document_letter;
+use App\Models\Employees_cv;
+use App\Models\Employees_experiences;
 use App\Models\Holidays;
 use App\Models\Project_assignment_user;
 use App\Models\User;
@@ -17,6 +19,8 @@ use App\Models\User_access;
 use App\Models\Usr_role;
 use DateInterval;
 use DateTime;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -176,7 +180,6 @@ class ManagementController extends Controller
 
     public function assign_roles(Request $request)
     {
-
         $this->validate($request, [
             'inputUser' => 'required',
             'inputRole' => 'required'
@@ -237,12 +240,6 @@ class ManagementController extends Controller
     {
         DB::table('roles')->where('id', $id)->delete();
         return redirect()->back()->with('failed', 'Role has been deleted!');
-    }
-
-    public function test($id)
-    {
-        $kntl = User::where('id', $id)->get();
-        return response()->json($kntl);
     }
 
     public function edit($id)
@@ -378,14 +375,29 @@ class ManagementController extends Controller
 
     public function generateDocument()
     {
-        // Render the view to HTML
-        $htmlContent = View::make('management.database.word_template')->render();
-
         // Load the Word template
         $template = new TemplateProcessor(public_path('template_cv_test.docx'));
 
-        // Replace the placeholder with the HTML content
-        $template->setValue('CONTENT', $htmlContent);
+        // Fetch data from your database or any other source
+        $dataRows = Employees_cv::find(1); // Assuming your model contains the data for filling the template
+        $dataExperiences = Employees_experiences::where('cv_id', 1)->get();
+
+        //set value
+        $template->setValue('emp_name', $dataRows->full_name);
+        $template->setValue('experiences_years', $dataRows->years_of_experiences);
+        $template->setValue('education', $dataRows->education);
+        $template->setValue('language', $dataRows->language);
+        // Loop through the data rows and replace placeholders
+        $counter = 1; // Counter for numbering each row
+        foreach ($dataExperiences as $data) {
+            $template->setValue('Description' . $counter, $data->description);
+            $template->setValue('Customer' . $counter, $data->customer);
+            $template->setValue('Role' . $counter, $data->role);
+            $template->setValue('Location' . $counter, $data->location);
+            $template->setValue('Duration' . $counter, $data->duration);
+            $template->setValue('JobDescription' . $counter, $data->job_description);
+            $counter++;
+        }
 
         // Save the generated document to storage
         $tempFilePath = storage_path('app/generated_document.docx');
@@ -393,5 +405,28 @@ class ManagementController extends Controller
 
         // Download the generated document
         return response()->download($tempFilePath, 'generated_document.docx')->deleteFileAfterSend(true);
+    }
+
+    public function generatePdf()
+    {
+        // Render the Blade view to HTML
+        $html = view('management.database.pdf_template', [
+            'title' => 'Sample PDF',
+            'content' => 'This is the content of the PDF.'
+        ])->render();
+
+        // Instantiate Dompdf with options
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Load HTML content
+        $dompdf->loadHtml($html);
+
+        // Render PDF (optional)
+        $dompdf->render();
+
+        // Download the generated PDF
+        return $dompdf->stream('generated_document.pdf');
     }
 }

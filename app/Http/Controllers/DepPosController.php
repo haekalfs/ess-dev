@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Timesheet_approver;
 use App\Models\User;
 use App\Models\Users_detail;
+use Illuminate\Support\Facades\Session;
 
 class DepPosController extends Controller
 {
@@ -18,6 +19,7 @@ class DepPosController extends Controller
         $position_List = Position::all();
         $users = User::all();
 
+        Session::flash('notify', 'This section is linked with Compliance! <a href="/hr/compliance/">Click Here</a> to manage the approvers');
         return view('management.position', ['department_List' => $department_List, 'users' => $users, 'position_List' => $position_List]);
     }
 
