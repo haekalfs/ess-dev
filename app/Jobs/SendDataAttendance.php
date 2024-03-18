@@ -33,10 +33,10 @@ class SendDataAttendance implements ShouldQueue
         while (!$success && $attempts < $maxAttempts) {
             try {
                 foreach ($usersData as $data) {
-                    if (!$data->fingerId->user_id) {
-                        // Handle the case where user_id is null (optional)
-                        continue; // Skip processing this row
-                    }
+                    // if (!$data->fingerId->user_id) {
+                    //     // Handle the case where user_id is null (optional)
+                    //     continue; // Skip processing this row
+                    // }
 
                     if ($data->fingerId->user_id && $data->date && ($data->earliest_time || $data->latest_time)) {
                         $earliestTime = $data->earliest_time ? Carbon::createFromFormat('H:i:s', $data->earliest_time) : null;
