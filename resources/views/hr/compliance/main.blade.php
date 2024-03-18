@@ -60,7 +60,7 @@ active
                     <div class="tab-pane fade show active" id="page1" role="tabpanel" aria-labelledby="page1-tab">
                         <div class="col-md-12">
                             <h6 class="h5 m-0 font-weight-bold text-secondary mt-2 mb-4"><i class="fas fa-users-cog"></i> Manage Approvers</h6><hr class="sidebar-divider">
-                            <form id="f_form" action="/system-management/add-new-approver" method="post">
+                            <form action="/system-management/add-new-approver" method="post">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-5">
