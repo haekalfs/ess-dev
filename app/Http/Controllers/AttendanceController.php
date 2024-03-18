@@ -65,8 +65,7 @@ class AttendanceController extends Controller
         foreach ($rows as $key => $row) {
             if ($key === 0) continue; // Skip the header row
 
-            $originalDate = $row[0]; // Assuming the date is in the first column
-            $date = date('Y-m-d', strtotime(str_replace('/', '-', $originalDate)));
+            $date = $row[0]; // Assuming the date is in the first column
             $payroll = $row[1]; // Assuming payroll is in the second column
             $tapIn = $row[3]; // Assuming Tap in is in the third column
             $tapOut = $row[4]; // Assuming Tap out is in the fourth column
