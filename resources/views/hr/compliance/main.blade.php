@@ -376,7 +376,7 @@ active
                                             <div class="col-md-5">
                                                 <div class="form-group">
                                                     <label for="email">User Name :</label>
-                                                    <select class="form-control" id="user_name" name="user_name" required>
+                                                    <select class="form-control" id="user_name" name="userName" required>
                                                         <option selected disabled>Select...</option>
                                                         @foreach($users as $employees)
                                                         <option value="{{$employees->id}}">{{ $employees->name}}</option>
