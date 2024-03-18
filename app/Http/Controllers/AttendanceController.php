@@ -39,7 +39,7 @@ class AttendanceController extends Controller
 
         while (!$success && $attempts < $maxAttempts) {
             try {
-                // dispatch(new ProcessAttendanceData());
+                dispatch(new ProcessAttendanceData());
                 // If ProcessAttendanceData runs successfully without throwing exceptions,
                 // it reaches here without encountering a catch block.
                 dispatch(new SendDataAttendance());
