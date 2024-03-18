@@ -474,7 +474,7 @@ active
                                             </div>
                                             <div class="col-md-1 d-flex justify-content-center align-items-end">
                                                 <div class="form-group">
-                                                    <button type="submit" id="insert-data-fingerprint" class="btn btn-primary">Insert</button>
+                                                    <button type="submit" class="btn btn-primary">Insert</button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12"><br>
