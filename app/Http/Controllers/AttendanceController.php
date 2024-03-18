@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\CheckInOutImport;
 use App\Jobs\ProcessAttendanceData;
 use App\Jobs\SendDataAttendance;
 use App\Models\Checkinout;
@@ -9,6 +10,8 @@ use App\Models\Timesheet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AttendanceController extends Controller
 {
@@ -36,7 +39,7 @@ class AttendanceController extends Controller
 
         while (!$success && $attempts < $maxAttempts) {
             try {
-                dispatch(new ProcessAttendanceData());
+                // dispatch(new ProcessAttendanceData());
                 // If ProcessAttendanceData runs successfully without throwing exceptions,
                 // it reaches here without encountering a catch block.
                 dispatch(new SendDataAttendance());
@@ -49,5 +52,39 @@ class AttendanceController extends Controller
         }
 
         return redirect()->back()->with('success', "Employee's Attendance Data has been successfully sent to Timesheet Table!");
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('file');
+        $spreadsheet = IOFactory::load($file);
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        foreach ($rows as $key => $row) {
+            if ($key === 0) continue; // Skip the header row
+
+            $date = $row[0]; // Assuming the date is in the first column
+            $payroll = $row[1]; // Assuming payroll is in the second column
+            $tapIn = $row[3]; // Assuming Tap in is in the third column
+            $tapOut = $row[4]; // Assuming Tap out is in the fourth column
+
+            // Save Tap in entry to the CheckInOut model
+            CheckInOut::create([
+                'date' => $date,
+                'user_id' => $payroll,
+                'time' => $tapIn,
+            ]);
+
+            // Save Tap out entry to the CheckInOut model
+            CheckInOut::create([
+                'date' => $date,
+                'user_id' => $payroll,
+                'time' => $tapOut,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Data imported successfully.');
     }
 }

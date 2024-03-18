@@ -51,6 +51,9 @@ active
                 <li class="nav-item">
                     <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-fingerprint" style="color: #ff0000;"></i> Integration</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="page4-tab" data-toggle="tab" href="#page4" role="tab" aria-controls="page4" aria-selected="false"><i class="fas fa-fingerprint" style="color: #ffff06;"></i> Integration Manual</a>
+                </li>
             </ul>
             <div class="card-body">
                 <div class="tab-content" id="pageTabContent">
@@ -453,6 +456,88 @@ active
                             </div>
                         </form>
                     </div>
+                    <div class="tab-pane fade" id="page4" role="tabpanel" aria-labelledby="page4-tab">
+                        <form method="post" action="{{ route('import.checkinout') }}" enctype="multipart/form-data">
+                            @csrf
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                            <div class="col-md-11">
+                                                <div class="form-group">
+                                                    <label for="receipt">CSV File :</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="file" name="file" aria-describedby="inputreceipt" onchange="displayFileName()">
+                                                        <label class="custom-file-label" for="file" id="file-label">Choose file</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1 d-flex justify-content-center align-items-end">
+                                                <div class="form-group">
+                                                    <button type="submit" id="insert-data-fingerprint" class="btn btn-primary">Insert</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12"><br>
+                                                <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
+                                                    Your entry has been saved successfully.
+                                                </div>
+                                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
+                                                    An error occurred while saving your entry. Please try again.
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>No.</th>
+                                                                <th>Name</th>
+                                                                <th>Fingerprint ID</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>@php $no = 1 @endphp
+                                                            @foreach ($usersFingerprint as $uf)
+                                                                <tr>
+                                                                    <td style="width: 10%;">{{ $no++ }}</td>
+                                                                    <td>{{ $uf->user->name }}</td>
+                                                                    <td style="width: 20%;">{{ $uf->fingerprint_id }}</td>
+                                                                    <td class="text-center" style="width: 20%;">
+                                                                    <a href="/hr/compliance/integration/delete/{{$uf->id}}" onclick='isconfirm();' class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <span class="text-danger">Attendance Machine Policy</span>
+                                            </div>
+                                            <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                                                <ul>
+                                                    <li>All employees must adhere to the company's attendance machine policy.</li>
+                                                    <li>Employees are required to use the attendance machine to record their daily working hours accurately.</li>
+                                                    <li>Unauthorized adjustments to attendance records are strictly prohibited.</li>
+                                                </ul>
+
+                                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
+                                                <ol>
+                                                    <li>Ensure all attendance records are correctly captured by the attendance machine.</li>
+                                                    <li>Report any discrepancies or issues with the attendance machine to the HR department immediately.</li>
+                                                    <li>Attendance records must be submitted to the HR department for verification and approval.</li>
+                                                    <li class="text-danger">Any discrepancies found in attendance records may result in disciplinary actions.</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -516,5 +601,12 @@ active
             });
         });
     });
+
+    function displayFileName() {
+        const fileInput = document.getElementById("file");
+        const fileName = fileInput.files[0].name;
+        const label = document.getElementById("file-label");
+        label.innerText = fileName;
+    }
 </script>
 @endsection

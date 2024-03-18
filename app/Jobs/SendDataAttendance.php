@@ -87,6 +87,13 @@ class SendDataAttendance implements ShouldQueue
                                     'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
                                     'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
                                 ]);
+                            } else {
+                                Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
+                                ->where('ts_user_id', $data->fingerId->user_id)
+                                ->update([
+                                    'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
+                                    'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
+                                ]);
                             }
                         }
                     }
