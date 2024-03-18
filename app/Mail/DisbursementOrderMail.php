@@ -30,7 +30,7 @@ class DisbursementOrderMail extends Mailable
         $link = 'https://timereport.perdana.co.id/reimbursement/manage/';
 
         // Attach the generated document
-        $f_id = $this->formCreator->f_id.'_'.$this->formCreator->user->name;
+        $f_id = $this->formCreator->f_id;
         $documentPath = public_path("reimbursement/Result_$f_id.docx");
         $this->attach($documentPath, [
             'as' => "Disbursement_Order_Letter_$f_id.docx"
