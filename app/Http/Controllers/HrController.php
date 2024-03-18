@@ -261,7 +261,7 @@ class HrController extends Controller
 	public function add_user_fingerprint(Request $request)
 	{
 		$request->validate([
-			'userName' => 'required',
+			'user_name' => 'required',
 			'f_id' => 'required',
 		]);
 
