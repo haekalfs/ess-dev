@@ -17,6 +17,7 @@ use App\Models\Medical_details;
 use App\Models\Medical_approval;
 use App\Jobs\NotifyMedicalRejected;
 use App\Jobs\NotifyMedicalApproved;
+use App\Jobs\NotifyMedicalToFinance;
 use App\Models\Cutoffdate;
 use App\Models\Holidays;
 use App\Models\Medical_payment;
@@ -401,7 +402,7 @@ class ApprovalController extends Controller
         Log::create([
             'user_id' => Auth::id(),
             'type' => 2,
-            'message' => 'Timesheet has been approved by '. Auth::user()->name,
+            'message' => 'Timesheet has been approved by ' . Auth::user()->name,
             'intended_for' => $user_timesheet,
             'importance' => 1
         ]);
@@ -490,7 +491,7 @@ class ApprovalController extends Controller
         Log::create([
             'user_id' => Auth::id(),
             'type' => 2,
-            'message' => 'Timesheet has been rejected by '. Auth::user()->name,
+            'message' => 'Timesheet has been rejected by ' . Auth::user()->name,
             'intended_for' => $user_timesheet,
             'importance' => 1
         ]);
@@ -714,7 +715,7 @@ class ApprovalController extends Controller
         date_default_timezone_set("Asia/Jakarta");
         Holidays::where('surat_edar', $docId)->where('status', FALSE)->update(['status' => TRUE, 'approvedBy' => Auth::id()]);
 
-        Session::flash('success',"You approved the holiday dates!");
+        Session::flash('success', "You approved the holiday dates!");
         return redirect()->back();
     }
 
@@ -723,7 +724,7 @@ class ApprovalController extends Controller
         date_default_timezone_set("Asia/Jakarta");
         Holidays::where('surat_edar', $docId)->where('status', FALSE)->update(['status' => 404, 'approvedBy' => Auth::id()]);
 
-        Session::flash('success',"You approved the holiday dates!");
+        Session::flash('success', "You approved the holiday dates!");
         return redirect()->back();
     }
 
@@ -836,7 +837,7 @@ class ApprovalController extends Controller
     {
 
         $request->validate([
-            'input_approve_note' => 'required',
+            'input_approve_note' => 'sometimes',
         ]);
 
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
@@ -858,14 +859,20 @@ class ApprovalController extends Controller
         $medPay->paid_status = 20;
         $medPay->save();
 
+        $userFinance = $medPay->payment_approver;
+        $Finance = User::where('id', $userFinance)->first();
+        $emailFinance = $Finance->email;
+        // dd($emailFinance);
         $MedId = $user_med->id;
 
         $employees = User::where('id', $userMedId)->get();
         $userName = Auth::user()->name;
 
-        foreach ($employees as $employee) {
-            dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
-        }
+        // foreach ($employees as $employee) {
+        //     dispatch(new NotifyMedicalApproved($employee, $userName, $MedId));
+        // }
+
+        // dispatch(new NotifyMedicalToFinance($employee, $emailFinance, $MedId));
 
         return redirect('/approval/medical')->with('success', "You've Approved $userNameRequestor Medical Reimburse No. MED_$MedId");
     }
@@ -896,12 +903,23 @@ class ApprovalController extends Controller
 
         $employees = User::where('id', $userMedId)->get();
         $approverName = Auth::user()->name;
-        $MedId = $medical->med_number;
+        $MedId = $id;
 
         foreach ($employees as $employee) {
             dispatch(new NotifyMedicalRejected($employee, $MedId, $approverName));
         }
 
         return redirect('/approval/medical')->with('success', "You rejected $userName Medical Reimburse !");
+    }
+
+    public function reject_med_det($id, $mdet_id)
+    {
+        $medical_det = Medical_details::where('medical_id', $id)->where('mdet_id', $mdet_id)->first();
+        $medical_det->amount_approved = 0;
+        $medical_det->status = 0;
+        $medical_det->save();
+        // dd($medical_det);
+
+        return redirect()->back()->with('success', "You rejected some Medical Attachment !");
     }
 }

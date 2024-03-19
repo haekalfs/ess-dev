@@ -50,7 +50,11 @@ active
                             <td>{{ $rn['role'] }}</td>
                             <td>{{ $rn['description'] }}</td>
                             <td>
-                              <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                @if($rn->id == '3')
+                                    <span>Cant Do Any Action</span>
+                                @else
+                                    <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

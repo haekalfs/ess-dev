@@ -285,11 +285,13 @@ Route::middleware(['auth'])->group(function () {
 
         // medical review FM
         Route::get('/medical/review', 'MedicalController@review_fm')->middleware('auth');
+        Route::get('/medical/review/export_excel/{id}', 'MedicalController@export_excel')->middleware('auth');
         Route::get('/medical/review/view/{id}', 'MedicalController@detail_review')->middleware('auth');
         Route::put('/medical/review/{id}', 'MedicalController@paid')->middleware('auth');
 
         //medical approval
         Route::get('/medical/approval/{id}', 'ApprovalController@approval_edit')->middleware('auth');
+        Route::get('/medical/approval/{id}/reject/{mdet_id}', 'ApprovalController@reject_med_det')->middleware('auth');
         Route::put('/medical/approval/{id}/update/{mdet_id}', 'ApprovalController@update_approval')->middleware('auth');
         Route::put('/medical/approval/{id}/approve', 'ApprovalController@approve_medical')->middleware('auth');
         Route::put('/medical/approval/{id}/reject', 'ApprovalController@reject_medical')->middleware('auth');

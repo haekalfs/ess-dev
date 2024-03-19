@@ -66,7 +66,7 @@ active
 	align-items: center;
 }
 </style>
-<div class="row zoom80">
+<div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
@@ -114,12 +114,16 @@ active
                             <td style="text-align: start; font-weight:500">: {{$med->med_req_date}}</td>
                         </tr>
                         <tr>
+                            <th>Medical Type</th>
+                            <td style="text-align: start; font-weight:500">: {{ $med->medical_type->name_type }} {!! $med->medical_type->icon !!}</td>
+                        </tr>
+                        <tr>
                             <th>Payment Method</th>
                             <td style="text-align: start; font-weight:500">: {{$med->med_payment}}</td>
                         </tr>
                         <tr>
-                            <th>No Account Bank</th>
-                            <td style="text-align: start; font-weight:500">: {{ $med->user->users_detail->usr_bank_account }}  An. {{ $med->user->users_detail->usr_bank_account_name }} </td>
+                            <th>Notes</th>
+                            <td style="text-align: start; font-weight:500">: {{ $med->notes }}</td>
                         </tr>
                     </tr>
                 </table>
@@ -127,7 +131,7 @@ active
         </div>
     </div>
 </div>
-<div class="row zoom80">
+<div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
@@ -135,8 +139,10 @@ active
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
                 <div class="text-right">
-                    <a class="btn btn-success btn-sm" type="button"  data-toggle="modal" data-target="#approveModal" id="addButton"><i class="fas fa-check"></i> Approve</a>
-                    <a class="btn btn-danger btn-sm" type="button"  data-toggle="modal" data-target="#rejectModal" id="addButton"><i class="fas fa-times"></i> Reject</a>
+                    <a class="btn btn-success btn-sm" type="button" id="addButton" onclick="validateAndOpenModal()">
+                        <i class="fas fa-check"></i> Approve
+                    </a>
+                    <a class="btn btn-danger btn-sm" type="button"  data-toggle="modal" data-target="#rejectModal" id="addButton"><i class="fas fa-times"></i> Reject All</a>
                 </div>
             </div>
             <!-- Card Body -->
@@ -150,8 +156,8 @@ active
                                 <th>Reciept Date</th>
                                 <th>Description</th>
                                 <th>Amount Request</th>
-                                <th>Amount Approved</th>
-                                <th>Action</th>
+                                <th>Estimate Approved</th>
+                                <th class="text-center">Action</th>
                         </thead>
                         <tbody>
 							@foreach($medDet as $md)
@@ -173,17 +179,27 @@ active
                                     <input type="number" id="amountApprovedInput" value="{{ $md->amount_approved }}" hidden>
                                     Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
-                                <td class="row-cols-2 justify-content-betwen text-center">
-                                    @if($md->receipt_real == false)
-                                    <a id="confirmReceiptBtn{{$md->mdet_id}}" title="Confirm" class="btn btn-secondary btn-sm confirm-receipt-btn">
-                                        <i class="fas fa-fw fa-notes-medical justify-content-center"></i><span class="text-sm"> Confirm Receipt</span>
-                                    </a>
+                                <td class="col-2 justify-content-betwen text-center">
+                                    @if($md->status == true)
+                                        @if($md->receipt_real == false)
+                                        <a id="confirmReceiptBtn{{$md->mdet_id}}" title="Confirm" class="btn btn-secondary btn-sm confirm-receipt-btn">
+                                            <i class="fas fa-fw fa-notes-medical justify-content-center"></i><span class="text-sm"> Confirm Receipt</span>
+                                        </a>
+                                        @else
+                                        <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Update" class="btn btn-primary btn-sm" >
+                                            <i class="fas fa-fw fa-edit justify-content-center"></i> Update
+                                        </a>
+                                        @endif
+                                        <!-- Periksa jika hanya ada satu objek $medDet -->
+                                        @if(count($medDet) > 1)
+                                        {{-- <a  href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-ban"></i> Reject</a> --}}
+                                        <a  onclick="confirmDelete('{{ $med->id }}', '{{ $md->mdet_id }}')" title="Delete" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-ban"></i> Reject
+                                        </a>
+                                        @endif
                                     @else
-                                    <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Update" class="btn btn-primary btn-sm" >
-                                        <i class="fas fa-fw fa-edit justify-content-center"></i>Update
-                                    </a>
+                                        <span class="text-sm font-italic font-weight-bold">You've Rejected this !!</span>
                                     @endif
-                                    {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
                                 </td>
 							</tr>
 							@endforeach
@@ -269,8 +285,8 @@ active
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-sm btn-danger" data-dismiss="modal" aria-label="Close">Cancel</button>
-                    <button class="btn-sm btn-success">Save</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" aria-label="Close">Cancel</button>
+                    <button class="btn btn-sm btn-success">Save</button>
                 </div>
             </div>
         </div>
@@ -323,8 +339,8 @@ active
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
-                <input type="button" class=" btn-success btn-sm" value="Submit" id="btn-submit" onclick="validateForm()">
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                <input type="button" class=" btn btn-success btn-sm" value="Submit" id="btn-submit" onclick="validateForm()">
             </div>
         </div>
     </div>
@@ -370,126 +386,81 @@ active
                 </table>
             </div>
             <div class="modal-footer ">
-                <button type="button" class="btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
-                <button class="btn-sm btn-primary">Reject</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                <button class="btn btn-sm btn-primary">Reject</button>
             </div>
         </div>
     </div>
 </div>
 </form>
-
-<!-- JavaScript untuk mengaktifkan modal Bootstrap -->
 <script>
-    $(document).ready(function() {
-        $('.modal').on('shown.bs.modal', function () {
-            $(this).find('.modal-title').focus();
-        });
-    });
-
-function formatAmount(input) {
-  // Mengambil nilai input
-  let amount = input.value;
-
-  // Menghapus karakter selain angka
-  amount = amount.replace(/\D/g, '');
-
-  // Menambahkan pemisah ribuan setiap 3 angka
-  amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  // Memperbarui nilai input dengan format terbaru
-  input.value = amount;
-}
-
-function changeFileName(inputId, labelId) {
-  var input = document.getElementById(inputId);
-  var label = document.getElementById(labelId);
-  label.textContent = input.files[0].name;
-}
-
-
-//Amount
-// Mengubah titik menjadi angka biasa dan menghitung total amount
-var amountElements = document.getElementsByClassName("amount");
-var totalAmount = 0;
-
-for (var i = 0; i < amountElements.length; i++) {
-  var amountText = amountElements[i].textContent;
-  var amountNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
-  totalAmount += amountNumber;
-}
-
-// Menampilkan total amount
-var totalAmountDisplay = document.getElementById("totalAmount");
-totalAmountDisplay.textContent = "Rp. " + totalAmount.toLocaleString('id-ID');
-
-
-
-// Amount Approved
-// Mengubah titik menjadi angka biasa dan menghitung total amount amountApproved
-document.addEventListener("DOMContentLoaded", function() {
-    var amountApprovedElements = document.getElementsByClassName("amountApproved");
-    var totalAmountApproved = 0;
-
-    for (var i = 0; i < amountApprovedElements.length; i++) {
-        var amountText = amountApprovedElements[i].textContent;
-        var amountApprovedNumber = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
-        totalAmountApproved += amountApprovedNumber;
-    }
-
-    // Display total amount approved in different locations
-    var totalAmountApprovedDisplay1 = document.getElementById("totalAmountApproved");
-    totalAmountApprovedDisplay1.textContent = "Rp. " + totalAmountApproved.toLocaleString('id-ID');
-
-    var totalAmountApprovedDisplay2 = document.getElementById("totalAmountApproved2");
-    totalAmountApprovedDisplay2.textContent = "Rp. " + totalAmountApproved.toLocaleString('id-ID');
-
-    // Update total amount approved in input field
-    var totalAmountApprovedInput = document.getElementById("totalAmountApprovedInput");
-    if (totalAmountApprovedInput) {
-        totalAmountApprovedInput.value = totalAmountApproved.toLocaleString().replace(/,/g, ".");
-    }
-});
-// Simpan nilai totalApprovedAmount dalam input tersembunyi saat menghitungnya
-document.getElementById('totalAmountApprovedInput').value = totalApprovedAmountInput;
-
-function validateForm() {
-        // Mendapatkan nilai input
-        var totalAmountApproved = document.getElementById("totalAmountApprovedInput").value;
-        
-        // Memeriksa apakah nilai input adalah 0
-        if (parseInt(totalAmountApproved) === 0) {
-            // Jika nilai input adalah 0, tampilkan pesan kesalahan
-            alert("Please fill the approved amount first");
-        } else {
-            // Jika nilai input bukan 0, submit formulir
-            document.getElementById("approve").submit();
-        }
-    }
-</script>
-
-<script>
+    document.addEventListener('DOMContentLoaded', function() {
     // Loop melalui setiap tombol dan menambahkan event listener untuk setiap klik
     var buttons = document.querySelectorAll('.confirm-receipt-btn');
     buttons.forEach(function(button) {
         button.addEventListener('click', function() {
-            // Mendapatkan ID dari tombol yang diklik
             var mdet_id = button.getAttribute('id').replace('confirmReceiptBtn', '');
 
             // Mengirimkan permintaan Ajax untuk memanggil fungsi receipt di MedicalController
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/medical/approval/receipt/' + mdet_id , true); // Ganti URL sesuai kebutuhan Anda
+            xhr.open('GET', '/medical/approval/receipt/' + mdet_id, true);
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    alert('Receipt confirmed successfully');
+                    // Berhasil, reload halaman
                     location.reload();
                 } else {
                     // Gagal, tampilkan pesan kesalahan jika perlu
                     alert('Failed to confirm receipt');
-                    console.log(xhr.responseText);
                 }
             };
             xhr.send();
         });
     });
+});
+    function validateAndOpenModal() {
+    var receiptRealArray = <?php echo json_encode($md->receipt_real); ?>;
+    var statusArray = <?php echo json_encode($md->status); ?>;
+
+    // Mengecek apakah semua receipt adalah true jika statusnya true
+    var allStatusAreTrue = true;
+    if (Array.isArray(statusArray)) {
+        for (var i = 0; i < statusArray.length; i++) {
+            if (!statusArray[i]) {
+                allStatusAreTrue = false;
+                break;
+            }
+        }
+    } else {
+        allStatusAreTrue = statusArray;
+    }
+
+    // Mengecek apakah semua receipt adalah true jika statusnya true
+    var allReceiptsAreTrue = true;
+    if (Array.isArray(receiptRealArray)) {
+        for (var i = 0; i < receiptRealArray.length; i++) {
+            if (!receiptRealArray[i]) {
+                allReceiptsAreTrue = false;
+                break;
+            }
+        }
+    } else {
+        allReceiptsAreTrue = receiptRealArray;
+    }
+
+    // Menampilkan modal jika semua receipt adalah true
+    if (allStatusAreTrue) {
+        if (allReceiptsAreTrue) {
+            $('#approveModal').modal('show');
+        } else {
+            alert('All receipts must be confirmed first for approval');
+        }
+    } else {
+        alert('You already reject all receipts');
+    }
+}
+
 </script>
+@section('javascript')
+<script src="{{ asset('js/medical_approval.js') }}"></script>
+@endsection
 @endsection

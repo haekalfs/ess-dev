@@ -31,7 +31,7 @@ active
 </div>
 @endif
 
-<div class="card shadow mb-4 zoom80">
+<div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Approval History</h6>
         <div class="text-right">
@@ -46,7 +46,7 @@ active
                         <th>Request Date</th>
                         <th>Request By</th>
                         <th>Payment</th>
-                        {{-- <th>Status</th>  --}}
+                        <th>Medical Type</th> 
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -57,8 +57,8 @@ active
                         <td>{{ $med->medical->med_req_date }}</td>
                         <td>{{ $med->medical->user->name }}</td>
                         <td>{{ $med->medical->med_payment }}</td>
-                        {{-- <td>{{ $med->med_status }}</td> --}}
-                        <td class="row-cols-2 justify-content-betwen text-center">
+                        <td>@if($med->medical->type_id){{ $med->medical->medical_type->name_type }} {!! $med->medical->medical_type->icon !!}@endif</td>
+                        <td class="justify-content-betwen text-center">
                             <a href="/medical/approval/{{ $med->medical_id }}" title="Edit" class="btn btn-primary btn-sm" >
                                 <i class="fas fa-fw fa-eye justify-content-center"></i> View
                             </a>

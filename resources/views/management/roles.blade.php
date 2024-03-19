@@ -179,7 +179,12 @@ active
                                                     <td>{{ $rn->role }}</td>
                                                     <td>{{ $rn->description }}</td>
                                                     <td style="width: 10%;">
-                                                      <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                                       @if($rn->id == 3 || $rn->id == 7)
+                                                            <span class="text-center font-italic">No Action</span>
+                                                        @else
+                                                            <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
+                                                        @endif
+                                                        {{-- <a href="/manage/roles/delete/{{ $rn->id }}" onclick='isconfirm();'class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a> --}}
                                                     </td>
                                                 </tr>
                                             @endforeach
