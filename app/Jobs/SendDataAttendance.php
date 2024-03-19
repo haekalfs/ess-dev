@@ -33,6 +33,11 @@ class SendDataAttendance implements ShouldQueue
         while (!$success && $attempts < $maxAttempts) {
             try {
                 foreach ($usersData as $data) {
+                    // if (!$data->fingerId->user_id) {
+                    //     // Handle the case where user_id is null (optional)
+                    //     continue; // Skip processing this row
+                    // }
+
                     if ($data->fingerId->user_id && $data->date && ($data->earliest_time || $data->latest_time)) {
                         $earliestTime = $data->earliest_time ? Carbon::createFromFormat('H:i:s', $data->earliest_time) : null;
                         $latestTime = $data->latest_time ? Carbon::createFromFormat('H:i:s', $data->latest_time) : null;
@@ -83,6 +88,13 @@ class SendDataAttendance implements ShouldQueue
                             Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
                                 ->where('ts_user_id', $data->fingerId->user_id)
                                 ->where('ts_location', 'HO')
+                                ->update([
+                                    'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
+                                    'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,
+                                ]);
+                            } else {
+                                Timesheet::where('ts_id_date', str_replace('-', '', $data->date))
+                                ->where('ts_user_id', $data->fingerId->user_id)
                                 ->update([
                                     'ts_from_time' => $earliestTime ? $earliestTime->format('H:i') : null,
                                     'ts_to_time' => $latestTime ? $latestTime->format('H:i') : null,

@@ -355,6 +355,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/send-data/timesheet-absence', 'AttendanceController@sendData')->name('sendData');
         Route::put('/myprofile/cv_upload/{id}', 'MyProfileController@upload_cv')->name('Upload CV');
         Route::get('/checkIsHoliday', 'TimesheetController@checkIsHoliday');
+        Route::post('/import-check-in-out', 'AttendanceController@import')->name('import.checkinout');
     });
     //Non
     Route::post('/medical/entry/store', 'MedicalController@store')->middleware('auth');
