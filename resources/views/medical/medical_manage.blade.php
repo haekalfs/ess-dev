@@ -9,7 +9,7 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4 zoom90">
-    <h2 class=" mb-2 text-gray-800"><i class="fas fa-book-medical"></i><b> Manage Medical Balance</b></h2>
+    <h4 class=" mb-2 text-gray-800"><i class="fas fa-book-medical"></i><b> Manage Medical Balance</b></h4>
     {{-- <small style="color:red"><i>Finance Manager</i></small> --}}
 </div>
 
@@ -92,7 +92,7 @@ active
                                             <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleCheckboxes()">
                                         </div>
                                     </th> --}}
-                                    <th>User ID</th>
+                                    <th>Emp ID</th>
                                     <th>Name</th>
                                     <th>Balance</th>
                                     <th>Remaining</th>
@@ -112,7 +112,7 @@ active
                                     <td>{{ $mB->medical_deducted }}</td>
                                     <td>{{ $mB->active_periode }}</td>
                                     <td>{{ $mB->expiration }}</td>
-                                    <td class="text-center"><button class="btn btn-warning btn-sm" type="button" data-toggle="modal" data-target="#balanceEditModal{{ $mB->id }}"><i class="fa fa-edit" aria-hidden="true"></i> Edit</button></td>
+                                    <td class="text-center"><button class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#balanceEditModal{{ $mB->id }}"><i class="fa fa-edit" aria-hidden="true"></i> Edit</button></td>
                                 </tr>
                                 @endforeach
                                 </tbody>
@@ -216,14 +216,22 @@ active
                 <div class="modal-body text-start">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="password">Edit Balance (Rp.)</label>
+                            <label for="password">Balance (Rp.)</label>
                             <input class="form-control flex" name="input_edit_balance" id="input_balance" placeholder="Balance..." value="{{ $mB->medical_balance }}"  oninput="formatAmount(this)" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Remaining (Rp.)</label>
+                            <input class="form-control flex" name="input_edit_remaining" id="input_remaining" placeholder="Remaining..." value="{{ $mB->medical_remaining }}"  oninput="formatAmount(this)" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Deducted (Rp.)</label>
+                            <input class="form-control flex" name="input_edit_deducted" id="input_deducted" placeholder="Deducted..." value="{{ $mB->medical_deducted }}"  oninput="formatAmount(this)" required/>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-sm btn-danger" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-sm btn-success">Save Changes</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-save"></i>  Save Changes</button>
                 </div>
             </div>
         </div>

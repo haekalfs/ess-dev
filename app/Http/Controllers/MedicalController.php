@@ -16,19 +16,24 @@ use App\Models\Users_detail;
 use App\Models\Timesheet_approver;
 use App\Models\Emp_medical_balance;
 use App\Models\Position;
+use App\Models\Setting;
 use Illuminate\Contracts\Session\Session as SessionSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
-use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Ilovepdf\Ilovepdf;
 use Illuminate\Support\Facades\Storage;
 use function GuzzleHttp\Promise\all;
 use App\Http\Controllers\DateTime;
+use App\Models\Medical_type;
 use App\Models\Timesheet;
 use DateTime as GlobalDateTime;
 use Illuminate\Support\Facades\File;
+
 
 class MedicalController extends Controller
 {
@@ -59,7 +64,8 @@ class MedicalController extends Controller
         }
 
         $med = Medical::where('user_id', $user->id)->whereYear('med_req_date', $currentYear)->get();
-        // dd($med->medical_approval);
+
+        // dd($med);
         $emp_medical_balance = Emp_medical_balance::where('user_id', Auth::user()->id)->where('active_periode', Carbon::now()->year)
             ->first();
 
@@ -69,7 +75,7 @@ class MedicalController extends Controller
 
         // Menghitung selisih bulan
         $monthPeriode = $activePeriode->diffInMonths($now);
-
+        // $medType = Medical_type::whereIn('id', $med->medical_type)->get();
         return view(
             'medical.medical',
             [
@@ -109,8 +115,8 @@ class MedicalController extends Controller
         if (!$lastId) {
             $nextId = '4400000';
         }
-
-        return view('medical.medical_request', compact('nextId'));
+        $medical_types = Medical_type::all();
+        return view('medical.medical_request', compact('nextId', 'medical_types'));
     }
 
     public function store(Request $request)
@@ -167,6 +173,8 @@ class MedicalController extends Controller
         $medical->med_req_date = date('Y-m-d');
         $medical->med_payment = $request->payment_method;
         $medical->med_total_amount = $request->totalAmountInput;
+        $medical->type_id = $request->med_type;
+        $medical->notes = $request->notes;
         $medical->save();
 
         // Memproses setiap data yang diinputkan ke tabel Medicals_detail
@@ -175,11 +183,7 @@ class MedicalController extends Controller
             $extension = $attachment->getClientOriginalExtension();
             $filename = $attachment_num . $request_date . $key . '.' . $extension;
 
-            $amount = str_replace('.', '', $amounts[$key]); // Menghilangkan titik
-            // $result = $amount * 0.8;
-            // $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
-            // $format_angka = number_format($roundedAmount, 0, ',', '.');
-            // Menyimpan file attach ke dalam folder yang diinginkan
+
             $attach_folder = '/medical';
             $attachment->move(public_path($attach_folder), $filename);
 
@@ -192,7 +196,8 @@ class MedicalController extends Controller
             $meddet->mdet_desc = $descriptions[$key];
             $meddet->amount_approved =  $amounts[$key];
             $meddet->mdet_date_exp = $date_exp[$key];
-            $meddet->real_receipt = 0;
+            $meddet->receipt_real = 0;
+            $meddet->status = 1;
             $meddet->save();
         }
 
@@ -213,11 +218,15 @@ class MedicalController extends Controller
         $employees = User::where('id', $userToApprove)->get();
         $userName = Auth::user()->name;
         $medical_id = $nextId;
-        foreach ($employees as $employee) {
-            dispatch(new NotifyMedicalCreation($employee, $userName, $medical_id));
-        }
 
-        return redirect('/medical/history')->with('success', 'You have successfully submitted the Medical Reimbursement, Dont forget to bring the original receipt to the Finance Department.');
+
+
+        // foreach ($employees as $employee) {
+        //     // dd($employees, $userName, $medical_id);
+        //     dispatch(new NotifyMedicalCreation($employee, $userName, $medical_id));
+        // }
+
+        return redirect("/medical/edit/$nextId")->with('success', 'You have successfully submitted the Medical Reimbursement, Dont forget to bring the original receipt to the Finance Department.');
     }
 
 
@@ -229,7 +238,7 @@ class MedicalController extends Controller
         $med_Pay = Medical_payment::where('medical_id', [$id])->first();
 
         foreach ($medDets as $medDet) {
-            
+
             $fileNameOld = $medDet->mdet_attachment;
 
             $attach_folder = '/medical';
@@ -256,7 +265,7 @@ class MedicalController extends Controller
         $medDet = Medical_details::where('medical_id', $id)->get();
         $medApp = Medical_approval::where('medical_id', $id)->get();
         $medPay = Medical_payment::where('medical_id', $id)->get();
-
+        $medType = Medical_type::where('id', $med->type_id)->first();
         $lastUpdated = $med->medical_approval->updated_at;
 
         // Hitung selisih waktu antara sekarang dan waktu terakhir diperbarui
@@ -276,6 +285,7 @@ class MedicalController extends Controller
                 'medApp' => $medApp,
                 'medPay' => $medPay,
                 'timeDiff' => $timeDiff,
+                'medType' => $medType,
             ]
         );
     }
@@ -440,7 +450,6 @@ class MedicalController extends Controller
         $approve = Timesheet_approver::where('id', 15)->first();
         $approval = $approve->approver;
 
-        $medReview = Medical_approval::where('status', 29)->pluck('medical_id')->toArray(); // Get medical_ids that match the condition
 
         $user = User::all();
 
@@ -449,6 +458,7 @@ class MedicalController extends Controller
         $currentMonth = date('m');
         $years = range($currentYear, $currentYear - 10);
 
+        $medReview = Medical_approval::where('status', 29)->pluck('medical_id')->toArray(); // Get medical_ids that match the condition
         $statusPay = $request->input('status_pay', '20'); // Mengambil nilai status_pay dari permintaan, defaultnya '20' (Unpaid)
 
         $query = Medical::whereIn('id', $medReview)
@@ -505,41 +515,63 @@ class MedicalController extends Controller
     {
         $med = Medical::findOrFail($id);
         $userMedId = $med->user_id;
-        $medDet = Medical_details::where('medical_id', $med->id)->get();
+        $medDet = Medical_details::where('medical_id', $med->id)->where('status', true)->get();
         $user = Users_detail::where('user_id', $userMedId)->first();
 
-        $hired_date = $user->hired_date; // assuming $hired_date is in Y-m-d format
-        $current_date = date('Y-m-d'); // get the current date
+        // $hired_date = $user->hired_date; // assuming $hired_date is in Y-m-d format
+        // $current_date = date('Y-m-d'); // get the current date
 
-        // create DateTime objects from the hired_date and current_date values
-        $hired_date_obj = new GlobalDateTime($hired_date);
-        $current_date_obj = new GlobalDateTime($current_date);
+        // // create DateTime objects from the hired_date and current_date values
+        // $hired_date_obj = new GlobalDateTime($hired_date);
+        // $current_date_obj = new GlobalDateTime($current_date);
 
-        // calculate the difference between the hired_date and current_date
-        $diff = $current_date_obj->diff($hired_date_obj);
+        // // calculate the difference between the hired_date and current_date
+        // $diff = $current_date_obj->diff($hired_date_obj);
 
-        // get the total number of years from the difference object
-        $total_years_of_service = $diff->y;
+        // // get the total number of years from the difference object
+        // $total_years_of_service = $diff->y;
 
-        $medAppUpdate = Medical_approval::where('medical_id', $med->id)
-            ->whereIn('RequestTo', [Auth::user()->id])
-            ->whereNotIN('status', [15])
-            ->orderByDesc('updated_at')
-            ->orderBy('medical_id')
-            ->first();
+        // $medAppUpdate = Medical_approval::where('medical_id', $med->id)
+        //     ->whereIn('RequestTo', [Auth::user()->id])
+        //     ->whereNotIN('status', [15])
+        //     ->orderByDesc('updated_at')
+        //     ->orderBy('medical_id')
+        //     ->first();
+
+        $formattedAmounts = [];
+        foreach ($medDet as $detail) {
+            $amounts = str_replace('.', '', $detail->amount_approved); // Menghilangkan titik
+            $result = $amounts * 0.8;
+            $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
+            $format_amount = number_format($roundedAmount, 0, ',', '.');
+
+            $formattedAmounts[] = $format_amount;
+            $total[] = $roundedAmount;
+        }
+        $totals = array_sum($total);
+        $totalAmount = number_format($totals, 0, ',', '.');
 
         $currentYear = Carbon::now()->year;
         $medBalance = Emp_medical_balance::where('user_id', $userMedId)
             ->where('active_periode', '<=', $currentYear)->where('expiration', '>=', $currentYear)
             ->first();
 
-        $position = Position::all();
+        // Mendapatkan tanggal aktif dan tanggal sekarang
+        $activePeriode = Carbon::parse($medBalance->expiration);
+        $now = Carbon::now();
+
+        // Menghitung selisih bulan
+        $diffInMonths = $activePeriode->diffInMonths($now);
+
         return view(
             'medical.review.view_details_review',
             [
                 'med' => $med,
                 'medBalance' => $medBalance,
                 'medDet' => $medDet,
+                'diffInMonths' => $diffInMonths,
+                'formattedAmounts' => $formattedAmounts,
+                'totalAmount' => $totalAmount,
             ]
         );
     }
@@ -548,7 +580,7 @@ class MedicalController extends Controller
     {
         $user_med = Medical::where('id', $id)->first(); // Mengambil objek Medical dengan ID tertentu
         $userId = $user_med->user_id;
-        $MedId = $user_med->med_number;
+        $MedId = $user_med->id;
         $employees = User::where('id', $userId)->get();
         $userName = Auth::user()->name;
 
@@ -570,7 +602,7 @@ class MedicalController extends Controller
             $medBalance->medical_remaining = $formattedTotal;
             $medBalance->save();
         } else {
-            // Handle the case when $balance is non-numeric
+            abort(404);
         }
 
         $deducted = $medBalance->medical_deducted;
@@ -583,7 +615,7 @@ class MedicalController extends Controller
             $medBalance->medical_deducted = $formattedDeductedTotal;
             $medBalance->save();
         } else {
-            // Handle the case when $deducted or $totalAmountApproved is non-numeric
+            abort(404);
         }
 
         $medPay = Medical_payment::where('medical_id', $id)->firstOrFail();
@@ -592,9 +624,9 @@ class MedicalController extends Controller
         $medPay->total_payment = $totalAmountPaid;
         $medPay->save();
 
-        foreach ($employees as $employee) {
-            dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
-        }
+        // foreach ($employees as $employee) {
+        //     dispatch(new NotifyMedicalPaid($employee, $userName, $MedId,));
+        // }
         $userName = $user_med->user->name; // Mengambil nama pengguna terkait
 
         return redirect('/medical/review')->with('success', "You Have Paid $userName Medical Reimbursement ");
@@ -668,8 +700,118 @@ class MedicalController extends Controller
         $userName = $medBalance->user->name;
 
         $medBalance->medical_balance = $request->input_edit_balance;
+        $medBalance->medical_remaining = $request->input_edit_remaining;
+        $medBalance->medical_deducted = $request->input_edit_deducted;
         $medBalance->save();
 
         return redirect()->back()->with('success', "You've Successfully Edited $userName Medical Balance. ");
+    }
+    //Export Finance
+    public function export_excel($id)
+    {
+        $checkUserPost = Auth::user()->users_detail->position->id;
+
+        //Tabel Setting Export Role
+        $settingExport = Setting::where('id', 2)->first();
+        $checkSettingExport = $settingExport->position_id;
+        $totalApprovedAmount = 0;
+
+        $mainForm = Medical::find($id);
+        $approvalForm = Medical_approval::where('medical_id', $id)->first();
+        $approvalFormID = $approvalForm->RequestTo;
+        $nameApprove = User::where('id', $approvalFormID)->first();
+        $Approvers = $nameApprove->name;
+        $deptApprover = $nameApprove->users_detail->department->department_name;
+
+
+        $templatePath = public_path('template_medical_export.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        // Set up the starting row and column for the data
+        $startRow = 17;
+        $startCol = 2;
+
+        $medDet = Medical_details::where('medical_id', $id)->where('status', true)->get();
+
+        $latestReceipt = Medical_details::where('medical_id', $id)->orderBy('mdet_date_exp', 'desc')->first();
+        $receiptExpiration = $latestReceipt->mdet_date_exp;
+        $dateAfterTwoMonths = date('Y-m-d', strtotime($receiptExpiration . ' +2 months'));
+
+        $formattedAmounts = [];
+        foreach ($medDet as $detail) {
+            $amounts = str_replace('.', '', $detail->amount_approved); // Menghilangkan titik
+            $result = $amounts * 0.8;
+            $roundedAmount = intval($result); // Membulatkan ke angka genap terdekat
+            $format_amount = number_format($roundedAmount, 0, ',', '.');
+
+            $formattedAmounts[] = $format_amount;
+            $total[] = $roundedAmount;
+        }
+        $totals = array_sum($total);
+        $totalAmount = number_format($totals, 0, ',', '.');
+
+        // Set up the starting row and column for the data
+        $startRow = 17;
+        $startCol = 1;
+
+        // Tulis data dari tabel user
+        $row = $startRow;
+
+        $sheet->setCellValue('C' . 4, $mainForm->user->name);
+        $sheet->setCellValue('C' . 5, $mainForm->user->users_detail->employee_id);
+        $sheet->setCellValue('C' . 7, $Approvers);
+        $sheet->setCellValue('C' . 8, $deptApprover);
+        $sheet->setCellValue('E' . 7, $receiptExpiration);
+        $sheet->setCellValue('E' . 8, $dateAfterTwoMonths);
+        $sheet->setCellValue('C' . 11, $mainForm->medical_type->name_type);
+        $sheet->setCellValue('C' . 14, 'MED_' . $mainForm->id);
+
+
+        foreach ($medDet as $md) {
+            // Define the URL (you can change this to any URL or route you want)
+            $attachedFileUrl = url('/medical/' . $md->mdet_attachment);
+
+            // Apply formatting to make the text underlined and blue
+            $style = [
+                'font' => ['color' => ['rgb' => '0000FF'], 'underline' => true],
+            ];
+
+            $sheet->getStyleByColumnAndRow(1, $row)->applyFromArray($style);
+            // Set the text for the hyperlink (e.g., 'Attachment')
+            $sheet->setCellValueByColumnAndRow(1, $row, 'View File');
+
+            // Add a hyperlink to the specific cell (e.g., cell in $startCol and $startRow)
+            $sheet->getCellByColumnAndRow(1, $row)
+                ->getHyperlink()
+                ->setUrl($attachedFileUrl);
+            $sheet->getCellByColumnAndRow(1, $row)
+                ->getHyperlink()
+                ->setTooltip('Click to download attachment');
+
+            $sheet->setCellValue('C' . $row, $md->mdet_desc);
+            $sheet->setCellValue('D' . $row, str_replace('.', '', $md->mdet_amount));
+            $sheet->setCellValue('E' . $row, str_replace('.', '', $md->amount_approved));
+            $row++;
+        }
+
+        $sheet->setCellValue('E' . 31, str_replace('.', '', $totalAmount));
+        $sheet->setCellValue('E' . 33, str_replace('.', '', $totalAmount));
+        $sheet->setCellValue('E' . 35, $mainForm->user->users_detail->usr_bank_name . " : " . $mainForm->user->users_detail->usr_bank_account);
+
+        if ($mainForm->medical_payment->paid_status == 20) {
+            $status = "All Approved";
+        } else {
+            $status = "Paid";
+        }
+        $sheet->setCellValue('E' . 37, $status);
+        $sheet->setCellValue('E' . 37, $mainForm->medical_payment->payment_date);
+
+        // Simpan file Excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'MED_' . $mainForm->id . '_' . $mainForm->user->name . '.xlsx';
+        $writer->save($filename);
+
+
+        return response()->download($filename)->deleteFileAfterSend(true);
     }
 }

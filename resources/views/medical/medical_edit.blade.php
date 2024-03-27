@@ -61,7 +61,7 @@ active
 	align-items: center;
 }
 </style>
-<div class="row zoom80">
+<div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4" >
@@ -76,8 +76,8 @@ active
                         <table class="table table-borderless font-weight-bold">
                             <tbody>
                                 <tr class="table-sm">
-                                    <td>Name</td>
-                                    <td>: {{$user_info->name}}</td>
+                                    <td>Medical Type :</td>
+                                    <td class="col-8">: {{$med->medical_type->name_type}} {!! $med->medical_type->icon !!}</td>
                                 </tr>
 								<tr class="table-sm">
                                     <td>Request Date</td>
@@ -118,6 +118,10 @@ active
                                             @endif
                                         </small>
                                     </td>
+                                </tr>
+                                <tr class="table-sm">
+                                    <td>Notes :</td>
+                                    <td class="col-8">: {{$med->notes}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -175,7 +179,7 @@ active
                                     <th>Total Funds Provided</th>
                                     <td>: {{ 'Rp. '. $med->medical_payment->total_payment }}</td>
                                 </tr>
-                                <tr class="table-sm text-danger font-weight-bold"">
+                                <tr class="table-sm text-danger font-weight-bold">
                                     <th>Medical Deducted</th>
                                     <td>: {{ 'Rp. '.$med->medical_payment->total_payment }}</td>
                                 </tr>
@@ -186,21 +190,23 @@ active
         </div>
     </div>
 </div>
-<div class="row zoom80">
+<div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
-                
+                    <a data-toggle="modal" data-target="#ModalStatus" title="Status" class="btn btn-primary btn-sm font-weight-bold" >
+                        <i class="fas fa-fw fa-info-circle justify-content-center"></i> Check Status
+                    </a>
                 @php
                     $approved = false;
                 @endphp
                 @if ($med->medical_approval->status == 29)
 
                 @elseif ($med->medical_approval->status == 404)
-                    <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#resubmitModal"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
+                   <a class="btn btn-primary btn-sm" type="button" data-toggle="modal" data-target="#resubmitModal"><i class="fas fa-fw fa-paper-plane fa-sm text-white-50"></i> Re-Submit</a>
                 @endif
                 {{-- <a class="btn btn-secondary btn-sm" type="button" href="/medical/edit/{{ $med->id }}/download" target="_blank" id="manButton"><i class="fas fa-fw fa-download fa-sm text-white-50"></i> Download</a> --}}
                 
@@ -217,7 +223,7 @@ active
                                 <th>Description</th>
                                 <th>Amount Request</th>
                                 <th>Estimated Funds</th>
-                                <th>Action</th>
+                                <th class="text-center">Action</th>
                         </thead>
                         <tbody>
 							@foreach($medDet as $md)
@@ -240,16 +246,19 @@ active
                                 </td>
                                 <td class="row-col-2 justify-content-betwen text-center">
                                     @if ($med->medical_approval->status == 29)
-                                        <a data-toggle="modal" data-target="#ModalStatus{{ $md->mdet_id }}" title="Status" class="btn btn-secondary btn-sm" >
-                                            <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
-                                        </a> 
+                                        @if($md->status == false)
+                                            <span class="text-sm text-danger font-weight-bold font-italic">Reject By Approver <i class="fa fa-exclamation-circle" style="color: red" aria-hidden="true"></i></span>
+                                        @else
+                                            <span class="text-sm text-italic">No Action Needed</span>
+                                        @endif
                                     @else
-                                        <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
-                                            <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
-                                        </a>
-                                        <a data-toggle="modal" data-target="#ModalStatus{{ $md->mdet_id }}" title="Status" class="btn btn-secondary btn-sm" >
-                                            <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
-                                        </a>
+                                        @if($md->status == false)
+                                            <span class="text-sm text-danger text-italic">Reject By Approver <i class="fa fa-exclamation-circle" style="color: red" aria-hidden="true"></i></span>
+                                        @else
+                                            <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
+                                                <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
+                                            </a>
+                                        @endif
                                     @endif
                                     {{-- @if(empty($medButton))
                                         <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
@@ -309,7 +318,7 @@ active
 <!-- Modal Attachment -->
 @foreach($medDet as $md)
 
-    <div class="modal fade" id="ModalStatus{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="ModalStatus" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -319,7 +328,7 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered zoom80" width="100%" cellspacing="0">
+                    <table class="table table-bordered zoom90" width="100%" cellspacing="0">
                         <thead class="thead-light">
                             <tr>
                                 <th>Approver</th>

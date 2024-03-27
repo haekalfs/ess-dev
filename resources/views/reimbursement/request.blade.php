@@ -156,7 +156,7 @@ active
                         <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
                         <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
                         <li class="text-danger">
-                            Payment will be made 14 weeks after approval and receipt submission to the Finance Department
+                            Payment will be made 14 days after approval and receipt submission to the Finance Department
                             <a href="#" data-toggle="modal" data-target="#additionalRulesModal">Read More.</a>
                         </li>
                     </ol>
@@ -278,7 +278,7 @@ active
                     <li>Submit the reimbursement request to the appropriate supervisor or manager for approval.</li>
                     <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
                     <li class="text-danger">
-                        Payment will be made 14 weeks after approval and receipt submission to the Finance Department.
+                        Payment will be made 14 days after approval and receipt submission to the Finance Department.
                     </li>
                     <li>Reimbursement will take 2 weeks or more.</li>
                 </ol>

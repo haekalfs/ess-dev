@@ -9,12 +9,19 @@ active
 @section('content')
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h4 class=" mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Request Number # MED_{{ $med->id }}</b></h4>
-    <div>
+    <h4 class="mb-2 text-gray-800"><i class="fas fa-fw fa-hand-holding-medical"></i><b> Medical Request Number # MED_{{ $med->id }}</b></h4>
+    <div class="dropdown">
+        <button class="btn btn-secondary btn-sm dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-file-export"></i> Export
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {{-- <a class="dropdown-item font-weight-bold" href="#"><i class="fas fa-file-word" style="color: #0673c6;"></i> Export to Word</a> --}}
+            <a class="dropdown-item font-weight-bold" href="/medical/review/export_excel/{{ $med->id }}"><i class="fas fa-file-excel" style="color: #068e3a;"></i> Export to Excel</a>
+        </div>
         <a class="btn btn-danger btn-sm" type="button" href="/medical/review" id="manButton"><i class="fas fa-fw fa-backward fa-sm text-white-50"></i> Back</a>
     </div>
 </div>
-<h5 class="m-0 font-weight-bold text-primary"></h5>
+
 
 {{-- <form method="POST" action="/medical/edit/{{  $med->mdet_id }}" enctype="multipart/form-data"> --}}
 @if ($message = Session::get('success'))
@@ -82,11 +89,11 @@ active
             <div class="card-body">
                 <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                     <tr>
-                        <th>Medical Balance</th>
+                        <th>Medical Limit</th>
                         <td style="text-align: start; font-weight:500">: {{ $medBalance->medical_balance }}</td>
                     </tr>
                     <tr>
-                        <th>Medical Remaining</th>
+                        <th>Medical Balance</th>
                         <td style="text-align: start; font-weight:500">: {{ $medBalance->medical_remaining }}</td>
                     </tr>
                     <tr>
@@ -96,14 +103,6 @@ active
                     <tr>
                         <th>Remaining Active Periode</th>
                         <td style="text-align: start; font-weight:500">: 
-                            @php
-                                // Mendapatkan tanggal aktif dan tanggal sekarang
-                                $activePeriode = \Carbon\Carbon::parse($medBalance->expiration);
-                                $now = \Carbon\Carbon::now();
-                                
-                                // Menghitung selisih bulan
-                                $diffInMonths = $activePeriode->diffInMonths($now);
-                            @endphp
                             <span class="text-success font-weight-bold">{{ $diffInMonths }} Months Left </span>
                         </td>
                     </tr>
@@ -114,14 +113,19 @@ active
 
 </div>
 
-<div class="row zoom80">
+<div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Medical Details</h6>
-                <button class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $med->id }}"><i class="fa fa-check" aria-hidden="true"></i> Pay</button>
+                <div class="row-md-12 justify-content-end">
+                    <a data-toggle="modal" data-target="#ModalStatus" title="Status" class="btn btn-primary btn-sm" >
+                        <i class="fas fa-fw fa-info-circle justify-content-center"></i> Check Approver
+                    </a>
+                    <button class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#viewModal{{ $med->id }}"><i class="fa fa-check" aria-hidden="true"></i> Mark As Paid</button>
+                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -133,8 +137,9 @@ active
                                 <th>Attachment</th>
                                 <th>Description</th>
                                 <th class="text-danger font-weight-bold">Amount Request</th>
+                                <th class="text-secondary font-weight-bold">Approved Funds</th>
                                 <th class="text-success font-weight-bold">Estimated Funds</th>
-                                <th>Action</th>
+                                {{-- <th>Action</th> --}}
                         </thead>
                         <tbody>
 							@foreach($medDet as $md)
@@ -147,10 +152,13 @@ active
 								<td class="text-danger font-weight-bold" >
                                     Rp. <span class="amount" id="amount">{{ $md->mdet_amount }}</span>
                                 </td>
-								<td class="text-success font-weight-bold">
-                                    Rp. <span class="amountApproved" id="amountApproved">{{ $med->medical_approval->total_amount_approved }}</span>
+								<td class="text-secondary font-weight-bold">
+                                    Rp. <span class="amountApproved" id="amountApproved">{{ $md->amount_approved }}</span>
                                 </td>
-                                <td class="row-col-2 justify-content-betwen text-center">
+                                <td class="text-success font-weight-bold">
+                                    Rp. <span>{{ $formattedAmounts[$loop->index] }}</span>
+                                </td>
+                                {{-- <td class="row-col-2 justify-content-betwen text-center">
                                     @if ($med->medical_approval->status == 29)
                                         <a data-toggle="modal" data-target="#ModalStatus{{ $md->mdet_id }}" title="Status" class="btn btn-secondary btn-sm" >
                                             <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
@@ -163,14 +171,14 @@ active
                                             <i class="fas fa-fw fa-info-circle justify-content-center"></i> Status
                                         </a>
                                     @endif
-                                    {{-- @if(empty($medButton))
+                                    @if(empty($medButton))
                                         <a data-toggle="modal" data-target="#ModalMedDet{{ $md->mdet_id }}" title="Edit" class="btn btn-warning btn-sm" >
                                             <i class="fas fa-fw fa-edit justify-content-center"></i>
                                         </a>
                                     @else
-                                    @endif --}}
-                                    {{-- <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a> --}}
-                                </td>
+                                    @endif
+                                    <a href="/medical/edit/{{ $med->id }}/delete/{{ $md->mdet_id }}" title="Delete" class="btn btn-danger btn-sm" ><i class="fas fa-fw fa-trash justify-content"></i></a>
+                                </td> --}}
 							</tr>
 							@endforeach
                         </tbody>
@@ -196,7 +204,7 @@ active
 <!-- Modal Attachment -->
 @foreach($medDet as $md)
 
-    <div class="modal fade" id="ModalStatus{{ $md->mdet_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="ModalStatus" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -206,7 +214,7 @@ active
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered zoom80" width="100%" cellspacing="0">
+                    <table class="table table-bordered zoom90" width="100%" cellspacing="0">
                         <thead class="thead-light">
                             <tr>
                                 <th>Approver</th>
@@ -262,9 +270,9 @@ active
                 </div>
                 <div class="modal-body">
                     @if(pathinfo($md->mdet_attachment, PATHINFO_EXTENSION) == 'pdf')
-                        <iframe src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
+                        <iframe src="{{ url('/medical/'.$md->mdet_attachment) }}" width="100%" height="500px" alt="Attachment"></iframe>
                     @else
-                        <img src="{{ url('/storage/med_pic/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
+                        <img src="{{ url('/medical/'.$md->mdet_attachment) }}" width="100%" alt="Attachment">
                     @endif
                 </div>
             </div>
@@ -289,11 +297,14 @@ active
                 <div class="modal-body text-start d-flex justify-content-center">
                     <div class="row">
                         <table class="table table-borderless table-sm" width="100%" cellspacing="0">
+                            @foreach($medDet as $mD)
+                                <input hidden class="text-sm" name="approved_fund" value="{{ $formattedAmounts[$loop->index] }}">
+                            @endforeach
                             <tr>
                                 <td style="text-align: center;">
                                     <div class="form-group justify-content-center" style="display: flex; align-items: center;">
                                         <label  for="password" style="height: 15px; text-align: center; margin-right: 10px;">Total Payable (Rp.) :</label>
-                                        <input class="form-control flex" name="input_total_paid" id="total_paid" value="{{ $med->medical_approval->total_amount_approved }}" style="width: 200px; height: 25px;" oninput="formatCurrency(this)"/>
+                                        <input class="form-control flex" name="input_total_paid" id="total_paid" value="{{ $totalAmount }}" style="width: 200px; height: 25px;" oninput="formatCurrency(this)"/>
                                     </div>
                                 </td>
                             </tr>

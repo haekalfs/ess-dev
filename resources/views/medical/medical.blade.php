@@ -38,7 +38,7 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="row zoom80">
+<div class="row zoom90">
     <!-- Area Chart -->
     <div class="col-xl-6 col-lg-6">
         <div class="card shadow mb-4">
@@ -83,7 +83,7 @@ active
                 <table class="table table-borderless table-sm" width="100%" cellspacing="0">
                     <tr>
                         <tr>
-                          <th width="300px">Balance</th>
+                          <th width="300px">Balance Limit</th>
                             <td style="text-align: start;"> :
                                 <span id="medicalBalance" style="font-weight:700; ">**********</span>
                                 <a href="#" onclick="togglePasswordVisibility()">
@@ -112,7 +112,7 @@ active
     </div>
 </div>
 
-<div class="card shadow mb-4 zoom80">
+<div class="card shadow mb-4 zoom90">
     <!-- Card Header - Dropdown -->
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Medical History</h6>
@@ -123,22 +123,25 @@ active
     <!-- Card Body -->
     <div class="card-body">
         <table class="table table-bordered table-hover " id="dataTable">
-                <thead class="thead-light">
+                <thead class="thead-light font-weight-bold">
                     <tr class="text-center">
                         <th>Request Number</th>
                         <th>Request Date</th>
-                        <th>Payment Method</th>
+                        <th>Medical Type</th>
+                        {{-- <th>Payment Method</th> --}}
                         <th>Approval Status</th>
                         <th>Payment Status</th>
-                        <th width="120px">Action</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($med as $q)
                     <tr>
-                        <td>MED_{{$q->id}}</td>
+                        <td class="font-weight-bold">MED_{{$q->id}}</td>
                         <td>{{$q->med_req_date}}</td>
-                        <td>{{$q->med_payment}}</td>
+                        <td>
+                            @if($q->type_id){{ $q->medical_type->name_type }} {!! $q->medical_type->icon !!}@endif
+                        </td>
                         <td class="text-center">
                             @switch($q->medical_approval->status)
                                 @case(29)
@@ -196,7 +199,7 @@ active
 <div class="modal fade" id="delete{{ $q->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header bg-warning">
+      <div class="modal-header bg-primary">
         <h5 class="modal-title  text-white" id="staticBackdropLabel">Alert !!</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -207,7 +210,7 @@ active
         <h6>Are You Sure Want Delete This Record !!!</h6>
       </div>
       <div class="modal-footer justify-content-center">
-        <button type="button" class="btn-sm btn-primary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
         <a href="/medical/delete/{{ $q->id }}" title="Delete" class="btn btn-danger btn-sm" >Yes Im Sure</a>
       </div>
     </div>
@@ -225,18 +228,14 @@ active
         window.location.href = url; // Redirect to the desired page
     }
     document.getElementById('newRequestBtn').addEventListener('click', function(event) {
-        // Ambil nilai dari variabel yang sudah didefinisikan sebelumnya
+       
         var totalYearsOfService = {{ $total_years_of_service }};
         // var medicalBalance = {{ $emp_medical_balance->medical_balance  }};
 
-        // Lakukan validasi
         if (totalYearsOfService >= 1 ) {
-            // Lanjutkan untuk pindah halaman jika kondisi terpenuhi
             window.location.href = event.target.href;
         } else {
-            // Tampilkan alert jika kondisi tidak terpenuhi
             alert('Unfortunately your service year is still below one year !!!');
-            // Hentikan aksi default (pindah halaman)
             event.preventDefault();
         }
     });

@@ -23,6 +23,8 @@ class Medical extends Authenticatable
         'med_req_date',
         'med_payment',
         'med_status',
+        'medical_type',
+        'notes',
     ];
 
     public function user()
@@ -42,5 +44,9 @@ class Medical extends Authenticatable
     public function medical_payment()
     {
         return $this->hasOne('App\Models\Medical_payment');
+    }
+    public function medical_type()
+    {
+        return $this->belongsTo(Medical_type::class, 'type_id');
     }
 }

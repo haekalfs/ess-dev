@@ -9,27 +9,22 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Medical_details extends Authenticatable
+class Medical_type extends Authenticatable
 {
     use HasFactory;
     // use SoftDeletes;
 
-    // protected $dates = ['deleted_at'];
-    protected $primaryKey = 'mdet_id';
-    protected $table = 'medicals_details';
+    public $incrementing = false;
+    protected $primaryKey = 'id';
+    protected $table = 'medical_type';
     protected $fillable = [
-        'mdet_id',
-        'medical_id',
-        'mdet_attachment',
-        'mdet_amount',
-        'mdet_desc',
-        'amount_approved',
-        'receipt_real'
+        'id',
+        'name_type',
     ];
 
     public function medical()
     {
-        return $this->belongsTo(Medical::class, 'medical_id');
+        return $this->hasOne(Medical::class, 'id');
     }
 
     // public function medical(){

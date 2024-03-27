@@ -34,33 +34,80 @@ active
 @csrf
 <!-- Page Heading -->
     <!-- Area Chart -->
-    <div class="col-xl-12 col-lg-12 zoom80">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h5 class="m-0 font-weight-bold text-primary">Medical Details</h5>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body row">
-                <div class="col-md-3">
-                    <label>Payment Method <span class="text-danger">*</span>:</label><br />
-                    <label class="col-md-5">
-                        <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
-                        <span class="form-radio-sign">Cash</span>
-                    </label>
-                    <label class="col-md-6">
-                        <input class="form-radio-input" type="radio" name="payment_method" value="Transfer Bank">
-                        <span class="form-radio-sign">Transfer Bank</span>
-                    </label>
+    <div class="col-xl-12 col-lg-12 zoom90">
+        <div class="row">
+            <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h5 class="m-0 font-weight-bold text-primary">Medical Details</h5>
                 </div>
-                <div class="col-md-12" id="accountNumberField" style="display: none;">
+                <!-- Card Body -->
+                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12"><br>
-                            <h6 class="m-0 font-weight-bold text-primary" id="judul">Your Account Number : {{ Auth::user()->users_detail->usr_bank_account }} ({{ Auth::user()->users_detail->usr_bank_name }})</h6>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="password">Medical Type : <span class="text-danger">*</span></label>
+                                <select class="form-control " name="med_type" required >
+                                    <option selected disabled>Choose...</option>
+                                    @foreach($medical_types as $mt)
+                                    <option value="{{ $mt->id }}">{{ $mt->name_type }} {!! $mt->icon !!}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="comment">Notes <span class="text-danger">*</span>:</label>
+                                <textarea class="form-control" id="comment" rows="2" name="notes" required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label>Payment Method <span class="text-danger">*</span>:</label><br />
+                            <div class="row">
+                                <label class="col-md-6">
+                                    <input class="form-radio-input" type="radio" name="payment_method" value="Cash" checked="">
+                                    <span class="form-radio-sign">Cash</span>
+                                </label>
+                                <label class="col-md-6">
+                                    <input class="form-radio-input" type="radio" name="payment_method" value="Transfer Bank">
+                                    <span class="form-radio-sign">Transfer Bank</span>
+                                </label>
+                            </div>
+                        </div>
+                    <div class="col-md-12" id="accountNumberField" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-12"><br>
+                                <h6 class="m-0 font-weight-bold text-primary" id="judul">Your Account Number : {{ Auth::user()->users_detail->usr_bank_account }} ({{ Auth::user()->users_detail->usr_bank_name }})</h6>
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-xl-6 col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span class="text-danger">Medical Reimbursement Policy</span>
+                </div>
+                <div class="card-body rules" style="background-color: rgb(247, 247, 247);">
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                    <ul>
+                        <li>All Medical Reimbursement requests must comply with company policies.</li>
+                        <li>Employees are responsible for accurately documenting all expenses.</li>
+                        <li>Medical Reimbursement is only for employees who have served 1 year or more.</li>
+                        <li>Medical Reimbursement will deduct the medical balance according to the amount approved by the finance department.</li>
+                        <li>The receipt date limit for Medical Reimbursement is 2 months..</li>
+                    </ul>
+                    <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
+                <ol>
+                    <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
+                    <a href="#" data-toggle="modal" data-target="#additionalRulesModal">Read More.</a>
+                </ol>
+                </div>
+            </div>
+        </div>
         </div>
         <div class="card shadow mb-4">
             <!-- Card Header -->
@@ -150,7 +197,45 @@ active
             </div>
         </div>
     </div>
-</form>  
+</form> 
+
+
+<div class="modal fade" id="additionalRulesModal" tabindex="-1" aria-labelledby="additionalRulesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="additionalRulesModalLabel">Additional Rules</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="additionalRulesContent">
+                <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                <ul>
+                    <li>All Medical Reimbursement requests must comply with company policies.</li>
+                    <li>Employees are responsible for accurately documenting all expenses.</li>
+                    <li>Medical Reimbursement is only for employees who have served 1 year or more.</li>
+                    <li>Medical Reimbursement will deduct the medical balance according to the amount approved by the finance department.</li>
+                    <li>The receipt date limit for Medical Reimbursement is 2 months..</li>
+                </ul>
+
+                <h6 class="h6 mb-2 font-weight-bold text-gray-800">Submission Process</h6>
+                <ol>
+                    <li>Attach all necessary receipts and supporting documentation.</li>
+                    <li>Submit the reimbursement request to the appropriate finance staff for approval.</li>
+                    <li>Hardcopy of the receipt must be given to finance within 2 weeks</li>
+                    {{-- <li class="text-danger">
+                        Payment will be made 14 weeks after approval and receipt submission to the Finance Department.
+                    </li> --}}
+                    {{-- <li>Reimbursement will take 2 weeks or more.</li> --}}
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('javascript')
