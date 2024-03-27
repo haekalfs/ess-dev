@@ -17,6 +17,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class LeaveApprovalController extends Controller
@@ -106,7 +107,7 @@ class LeaveApprovalController extends Controller
             return redirect('/approval/leave')->with('success', "You approved the leave request!");
         }
 
-        $timesheetApproversDir = Timesheet_approver::whereIn('id', [40, 45, 55, 60])->pluck('approver')->toArray();
+        $timesheetApproversDir = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
 
         $tsStatusId = in_array(Auth::user()->id, $timesheetApproversDir) ? '29' : '20';
         $activity = in_array(Auth::user()->id, $timesheetApproversDir) ? 'All Approved' : 'Approved';

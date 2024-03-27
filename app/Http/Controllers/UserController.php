@@ -321,7 +321,7 @@ class UserController extends Controller
         //dibikin dinamis
         $user_role = new Usr_role();
         $user_role->role_name = "non-internal";
-        $user_role->role_id = 15;
+        $user_role->role_id = 18;
         $user_role->user_id = $request->usr_id;
         $user_role->save();
 
