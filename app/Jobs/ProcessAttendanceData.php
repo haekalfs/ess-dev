@@ -22,6 +22,7 @@ class ProcessAttendanceData implements ShouldQueue
 
     public function handle()
     {
+        //harus dibuat by DB
         $IP = "192.168.1.113";
         $Key = "2907";
 

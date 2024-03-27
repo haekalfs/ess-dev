@@ -51,7 +51,7 @@ class SendReminderLeaveRequestApproval extends Command
      */
     public function handle()
     {
-        $isManager = Timesheet_approver::whereIn('id', [10, 15, 20, 50, 25])
+        $isManager = Timesheet_approver::whereNotIn('group_id', [1])
             ->pluck('approver')->toArray();
 
         // Retrieve user IDs to approve reimbursement

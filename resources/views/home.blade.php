@@ -30,6 +30,12 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
+@role('non-internal')
+<div class="alert alert-warning alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Due to access restrictions, Non-Internal Employees are only permitted to access a limited selection of menus.</strong>
+</div>
+@endrole
 <?php
 $hired_date = Auth::user()->users_detail->hired_date; // assuming $hired_date is in Y-m-d format
 $current_date = date('Y-m-d'); // get the current date

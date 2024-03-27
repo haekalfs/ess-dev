@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
 
     @yield('css-js-if-exist')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom fonts for this template-->
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <!-- Custom styles for this template-->
@@ -49,7 +50,7 @@
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav @role('admin') bg-gradient-primary  @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav @role('non-internal') bg-gradient-success  @else bg-gradient-primary @endrole sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
@@ -305,6 +306,22 @@
             </li>
             @else
             @endusr_acc
+
+            @usr_acc(999)
+            {{-- <li class="nav-item @yield('active-page-cv-creator')">
+                <a class="nav-link" href="{{ route('mycv') }}">
+                    <i class="fas fa-passport"></i>
+                    <span>CV Creator</span>
+                </a>
+            </li> --}}
+            <li class="nav-item @yield('active-page-perform.metrics')">
+                <a class="nav-link" href="{{ route('kpi') }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Emp. Performance Metrics</span>
+                </a>
+            </li>
+            @endusr_acc
+
             <!-- Divider -->
             @usr_acc(901)
             <hr class="sidebar-divider">

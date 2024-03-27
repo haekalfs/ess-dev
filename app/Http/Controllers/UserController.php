@@ -14,6 +14,7 @@ use App\Models\Emp_leave_quota;
 use App\Models\Emp_medical_balance;
 use App\Models\Usr_role;
 use App\Jobs\NotifyUserCreation;
+use App\Models\Vendor_list;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -28,8 +29,17 @@ class UserController extends Controller
 {
     public function index()
     {
-        $data = User::all();
-        return view('manage.users', ['data' => $data]);
+        $data = User::whereIn('id', function ($query) {
+            $query->select('user_id')
+                ->from('users_details')
+                ->whereIn('employee_status', ['Permanent', 'Contract', 'Probation', 'MT']);
+        })->get();
+        $getFreelancer = User::whereIn('id', function ($query) {
+            $query->select('user_id')
+                ->from('users_details')
+                ->where('employee_status', 'Freelance');
+        })->get();
+        return view('manage.users', ['data' => $data, 'dataFreelancer' => $getFreelancer]);
     }
 
     public function user_creation()
@@ -184,6 +194,134 @@ class UserController extends Controller
         $user_role = new Usr_role();
         $user_role->role_name = "employee";
         $user_role->role_id = 8;
+        $user_role->user_id = $request->usr_id;
+        $user_role->save();
+
+        //Create Email Account
+        $emailUser = $request->email;
+        $password = $request->password;
+
+        $employee = User::find($request->usr_id);
+
+        dispatch(new CreateEmailAccount($emailUser, $password));
+        dispatch(new NotifyUserCreation($employee));
+
+        return redirect('/manage/users')->with('success', 'User Create successfully');
+    }
+
+    public function freelance_creation()
+    {
+        $dataVendor = Vendor_list::all();
+        $dep_data = Department::all();
+        $pos_data = Position::all();
+        $latestForm = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('employee_id')->max();
+        $nextEmpID = $latestForm + 1;
+
+        $response = Http::get('https://raw.githubusercontent.com/mul14/gudang-data/master/bank/bank.json');
+        $banks = $response->json();
+
+        // Mengubah name bank menjadi huruf kapital pada huruf pertama
+        $bankNames = array_map(function ($bank) {
+            $name = ucwords(strtolower($bank['name'])); // Mengubah name bank menjadi huruf kapital pada huruf pertama
+            $words = explode(' ', $name); // Memisahkan kata dalam name bank
+
+            // Mengecek panjang kata setelah kata "Bank" dan mengubahnya menjadi UPPERCASE jika kurang dari atau sama dengan 4 huruf
+            foreach ($words as $key => $word) {
+                if (strtolower($word) === 'bank' && isset($words[$key + 1])) {
+                    $nextWord = $words[$key + 1];
+                    if (strlen($nextWord) <= 4) {
+                        $words[$key + 1] = strtoupper($nextWord);
+                    }
+                }
+            }
+
+            return implode(' ', $words); // Menggabungkan kata-kata kembali menjadi name bank
+        }, $banks);
+
+        return view('manage.freelance_creation', ['dep_data' => $dep_data, 'dataVendor' => $dataVendor, 'pos_data' => $pos_data, 'nextEmpID' => $nextEmpID, 'bankNames' => $bankNames]);
+    }
+
+    public function store_freelance(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+            'password' => 'required',
+            'usr_id' => ['required', 'unique:users,id', 'regex:/^[a-z0-9]+$/'],
+            'email' => 'required',
+            'status' => 'required',
+            'employee_status' => 'required',
+            'position' => 'required',
+            'department' => 'required',
+            'hired_date' => 'required',
+            'employee_id' => 'required',
+            'profile_pic' => 'sometimes|file|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        $lastId = Users_detail::whereNull('deleted_at')->orderBy('id', 'desc')->pluck('id')->first();
+        $nextId = intval(substr($lastId, 4)) + 1;
+        $hash_pwd = Hash::make($request->password);
+
+        $employeeID = $request->employee_id;
+        $emailAccount = $request->email."@perdana.co.id";
+
+        // Memeriksa apakah file foto profil diunggah
+        if ($request->hasFile('profile')) {
+            $profile_file = $request->file('profile');
+            $name_file_profile = $employeeID  . "_profile" . "." . $profile_file->getClientOriginalExtension();
+            $upload_folder_profile = '/images_storage';
+            $profile_file->move(public_path($upload_folder_profile, $name_file_profile));
+        } else {
+            // Tentukan nilai default untuk $name_file_profile jika file tidak diunggah
+            $name_file_profile = null;
+        }
+
+
+        // Memeriksa apakah file CV diunggah
+        if ($request->hasFile('cv')) {
+            $cv_file = $request->file('cv');
+            $name_file_cv = $employeeID . "_cv" . "." . $cv_file->getClientOriginalExtension();
+            $upload_folder_cv = '/cv_storage';
+            $cv_file->move(public_path($upload_folder_cv), $name_file_cv);
+        } else {
+            // Tentukan nilai default untuk $name_file_profile jika file tidak diunggah
+            $name_file_cv = null;
+        }
+
+        User::create([
+            'id' => $request->usr_id,
+            'name' => $request->name,
+            'email' => $emailAccount,
+            'password' => $hash_pwd,
+        ]);
+
+        Users_detail::create([
+            'id' => $nextId,
+            'user_id' => $request->usr_id,
+            'employee_id' => $employeeID,
+            'position_id' => $request->position,
+            'department_id' => $request->department,
+            'status_active' => $request->status,
+            'employee_status' => $request->employee_status,
+            'hired_date' => $request->hired_date,
+            'usr_address' => $request->usr_address,
+            'usr_address_city' => $request->usr_address_city,
+            'usr_address_postal' => $request->usr_address_postal,
+            'usr_npwp' => $request->usr_npwp,
+            'usr_id_type' => $request->usr_id_type,
+            'usr_id_no' => $request->usr_id_no,
+            'usr_id_expiration' => $request->usr_id_expiration,
+            'usr_bank_name' => $request->usr_bank_name,
+            'usr_bank_branch' => $request->usr_bank_branch,
+            'usr_bank_account' => $request->usr_bank_account,
+            'usr_bank_account_name' => $request->usr_bank_account_name,
+            'profile_pic' => $name_file_profile,
+            'cv' => $name_file_cv,
+        ]);
+
+        //dibikin dinamis
+        $user_role = new Usr_role();
+        $user_role->role_name = "non-internal";
+        $user_role->role_id = 15;
         $user_role->user_id = $request->usr_id;
         $user_role->save();
 

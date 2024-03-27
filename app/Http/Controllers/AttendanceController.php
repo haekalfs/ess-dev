@@ -8,6 +8,7 @@ use App\Jobs\SendDataAttendance;
 use App\Models\Checkinout;
 use App\Models\Timesheet;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -70,16 +71,19 @@ class AttendanceController extends Controller
             $tapIn = $row[3]; // Assuming Tap in is in the third column
             $tapOut = $row[4]; // Assuming Tap out is in the fourth column
 
+            $date = DateTime::createFromFormat('d/m/Y', $date);
+            $formattedDate = $date->format('Y-m-d');
+
             // Save Tap in entry to the CheckInOut model
             CheckInOut::create([
-                'date' => $date,
+                'date' => $formattedDate,
                 'user_id' => $payroll,
                 'time' => $tapIn,
             ]);
 
             // Save Tap out entry to the CheckInOut model
             CheckInOut::create([
-                'date' => $date,
+                'date' => $formattedDate,
                 'user_id' => $payroll,
                 'time' => $tapOut,
             ]);

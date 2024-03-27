@@ -12,6 +12,7 @@ use App\Models\Company_project;
 use App\Models\Document_letter;
 use App\Models\Employees_cv;
 use App\Models\Employees_experiences;
+use App\Models\Headline;
 use App\Models\Holidays;
 use App\Models\Project_assignment_user;
 use App\Models\User;
@@ -25,6 +26,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Row;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class ManagementController extends Controller
@@ -375,36 +380,34 @@ class ManagementController extends Controller
 
     public function generateDocument()
     {
-        // Load the Word template
-        $template = new TemplateProcessor(public_path('template_cv_test.docx'));
+        $experiences = Employees_experiences::all(); // Assuming you retrieve all rows
 
-        // Fetch data from your database or any other source
-        $dataRows = Employees_cv::find(1); // Assuming your model contains the data for filling the template
-        $dataExperiences = Employees_experiences::where('cv_id', 1)->get();
+        // Load the template file
+        $templatePath = public_path('template_cv2.docx');
+        $templateProcessor = new TemplateProcessor($templatePath);
 
-        //set value
-        $template->setValue('emp_name', $dataRows->full_name);
-        $template->setValue('experiences_years', $dataRows->years_of_experiences);
-        $template->setValue('education', $dataRows->education);
-        $template->setValue('language', $dataRows->language);
-        // Loop through the data rows and replace placeholders
-        $counter = 1; // Counter for numbering each row
-        foreach ($dataExperiences as $data) {
-            $template->setValue('Description' . $counter, $data->description);
-            $template->setValue('Customer' . $counter, $data->customer);
-            $template->setValue('Role' . $counter, $data->role);
-            $template->setValue('Location' . $counter, $data->location);
-            $template->setValue('Duration' . $counter, $data->duration);
-            $template->setValue('JobDescription' . $counter, $data->job_description);
-            $counter++;
+        // Initialize job_desc variable to store concatenated job descriptions
+        $jobDesc = '';
+
+        // Loop through each experience and concatenate job descriptions
+        foreach ($experiences as $experience) {
+            // Assuming you have a field like 'job_description' in your Employees_experiences model
+            $jobDesc .= $experience->job_description . "<w:br />";
         }
 
-        // Save the generated document to storage
-        $tempFilePath = storage_path('app/generated_document.docx');
-        $template->saveAs($tempFilePath);
+        // Set the concatenated job descriptions in the template
+        $templateProcessor->setValue('job_desc', $jobDesc);
 
-        // Download the generated document
-        return response()->download($tempFilePath, 'generated_document.docx')->deleteFileAfterSend(true);
+        // Save the modified template as a new DOCX file
+        $outputFilePath = storage_path('app/public/output.docx');
+        $templateProcessor->saveAs($outputFilePath);
+
+        // Download the generated DOCX file
+        $headers = [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
+        $fileName = "generated_document";
+        return response()->download($outputFilePath, "$fileName.docx", $headers);
     }
 
     public function generatePdf()

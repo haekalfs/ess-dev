@@ -52,7 +52,7 @@ active
                     <a class="nav-link" id="page3-tab" data-toggle="tab" href="#page3" role="tab" aria-controls="page3" aria-selected="false"><i class="fas fa-fingerprint" style="color: #ff0000;"></i> Integration</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="page4-tab" data-toggle="tab" href="#page4" role="tab" aria-controls="page4" aria-selected="false"><i class="fas fa-fingerprint" style="color: #ffff06;"></i> Integration Manual</a>
+                    <a class="nav-link" id="page4-tab" data-toggle="tab" href="#page4" role="tab" aria-controls="page4" aria-selected="false"><i class="fas fa-fingerprint" style="color: #ffff06;"></i> Manual Integration</a>
                 </li>
             </ul>
             <div class="card-body">
@@ -309,7 +309,7 @@ active
                                     <div class="col-md-6">
                                         <div class="row">
                                             @php
-                                                $classes = ['text-danger', 'text-primary', 'text-secondary', 'text-success'];
+                                                $classes = ['text-danger', 'text-primary', 'text-secondary', 'text-success', 'text-cyan'];
                                             @endphp
 
                                             @foreach($cutoffDate as $key => $cd)
@@ -325,18 +325,18 @@ active
                                                     </div>
                                                     <div class="d-flex align-items-center mb-4">
                                                         <div style="width: 140px;" class="mr-2">
-                                                            <p style="margin: 0;">Start Date :</p>
+                                                            <p style="margin: 0;">Start on :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <input type="number" class="form-control" name="cutoff_dates[{{ $cd->id }}][start_date]" value="{{ $cd->start_date }}">
+                                                            <input type="text" class="form-control" name="cutoff_dates[{{ $cd->id }}][start_date]" value="{{ $cd->start_date }}">
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-4">
                                                         <div style="width: 140px;" class="mr-2">
-                                                            <p style="margin: 0;">End Date :</p>
+                                                            <p style="margin: 0;">Closed on :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <input type="number" class="form-control" name="cutoff_dates[{{ $cd->id }}][closed_date]" value="{{ $cd->closed_date }}">
+                                                            <input type="text" class="form-control" name="cutoff_dates[{{ $cd->id }}][closed_date]" value="{{ $cd->closed_date }}">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -461,7 +461,7 @@ active
                             @csrf
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-12">
                                         <div class="row">
                                             <div class="col-md-11">
                                                 <div class="form-group">
@@ -477,41 +477,9 @@ active
                                                     <button type="submit" class="btn btn-primary">Insert</button>
                                                 </div>
                                             </div>
-                                            <div class="col-md-12"><br>
-                                                <div class="alert alert-success alert-success-saving" role="alert" style="display: none;">
-                                                    Your entry has been saved successfully.
-                                                </div>
-                                                <div class="alert alert-danger alert-danger-delete" role="alert" style="display: none;">
-                                                    An error occurred while saving your entry. Please try again.
-                                                </div>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered zoom90" width="100%" id="dataTable" cellspacing="0">
-                                                        <thead class="thead-light">
-                                                            <tr>
-                                                                <th>No.</th>
-                                                                <th>Name</th>
-                                                                <th>Fingerprint ID</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>@php $no = 1 @endphp
-                                                            @foreach ($usersFingerprint as $uf)
-                                                                <tr>
-                                                                    <td style="width: 10%;">{{ $no++ }}</td>
-                                                                    <td>{{ $uf->user->name }}</td>
-                                                                    <td style="width: 20%;">{{ $uf->fingerprint_id }}</td>
-                                                                    <td class="text-center" style="width: 20%;">
-                                                                    <a href="/hr/compliance/integration/delete/{{$uf->id}}" onclick='isconfirm();' class="btn btn-danger btn-sm" ><i class='fas fa-fw fa-trash-alt'></i> Remove</a>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-12">
                                         <div class="card mb-4">
                                             <div class="card-header">
                                                 <span class="text-danger">Attendance Machine Policy</span>

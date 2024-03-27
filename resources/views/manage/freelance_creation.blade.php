@@ -29,12 +29,12 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<form method="POST" action="/users/store" onsubmit="return isConfirm()" id="multiStepForm" enctype="multipart/form-data">
+<form method="POST" action="/users/non-internal/store" onsubmit="return isConfirm()" id="multiStepForm" enctype="multipart/form-data">
     @csrf
     <div id="step1" class="step">
         <div class="zoom90 d-sm-flex align-items-center justify-content-between">
             <div>
-                <h1 class="h4 mb-2 font-weight-bold text-gray-800"><i class="fas fa-user-plus"></i>&nbsp; User Registration</h1>
+                <h1 class="h4 mb-2 font-weight-bold text-gray-800"><i class="fas fa-user-plus"></i>&nbsp; Non-Internal User Registration</h1>
                 <p class="mb-4">Fill out all the required fields</a>.</p>
             </div>
             <div>
@@ -204,119 +204,22 @@ active
                                         </div>
                                         <div class="col-md-6">
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-12">
                                                     <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 120px;" class="mr-2">
-                                                            <p style="margin: 0;">Birth Date :</p>
+                                                        <div style="width: 140px;" class="mr-2">
+                                                            <p style="margin: 0;">Select Vendor :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <input class="form-control" type="date" name="usr_dob" id="usr_dob" value="" />
-                                                            @if($errors->has('usr_dob'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_dob')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 120px;" class="mr-2">
-                                                            <p style="margin: 0;">Gender :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <select class="form-control " name="usr_gender">
+                                                            <select class="form-control" name="vendor" required >
                                                                 <option selected disabled>Choose...</option>
-                                                                <option value="M">Male</option>
-                                                                <option value="F">Female</option>
+                                                                @foreach($dataVendor as $dv)
+                                                                <option value="{{ $dv->id }}">{{ $dv->company }}</option>
+                                                                @endforeach
                                                             </select>
-                                                            @if($errors->has('usr_gender'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_gender')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 120px;" class="mr-2">
-                                                            <p style="margin: 0;">Marital Status :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <select class="form-control " name="usr_merital_status">
-                                                                <option selected disabled>Choose...</option>
-                                                                <option value="S">Single</option>
-                                                                <option value="M">Married</option>
-                                                                <option value="Widow">Widow (Janda)</option>
-                                                                <option value="Widower">Widower (Duda)</option>
-                                                                <option value="Divorced">Divorced (Cerai)</option>
-                                                            </select>
-                                                            @if($errors->has('usr_merital_status'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_merital_status')}}
-                                                                </div>
-                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 130px;" class="mr-2">
-                                                            <p style="margin: 0;">Birth Place :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <input class="form-control" type="text"   name="usr_birth_place" placeholder="Birth Place...">
-                                                            @if($errors->has('usr_birth_place'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_birth_place')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 110px;" class="mr-2">
-                                                            <p style="margin: 0;">Religion :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <select class="form-control " name="usr_religion">
-                                                                <option selected disabled>Choose...</option>
-                                                                <option value="Islam">Islam</option>
-                                                                <option value="Kristen">Kristen Protestan</option>
-                                                                <option value="Katholik">Kristen Katholik</option>
-                                                                <option value="Konghucu">Konghucu</option>
-                                                                <option value="Hindu">Hindu</option>
-                                                                <option value="Buddha">Buddha</option>
-                                                                <option value="O">Others</option>
-                                                            </select>
-                                                            @if($errors->has('usr_religion'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_religion')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 130px;" class="mr-2">
-                                                            <p style="margin: 0;">Num of Children :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <input class="form-control" type="text"   name="usr_children" placeholder="Number of Childern...">
-                                                            @if($errors->has('usr_children'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_children')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h6 class="h5 m-0 font-weight-bold text-primary mt-4 mb-4"><i class="fas fa-address-book"></i> Employee's Address Information</h6>
-                                            <hr class="sidebar-divider mb-4">
-                                            <div class="row">
-                                                <div class="col-md-3">
                                                     <div class="d-flex align-items-center mb-4">
                                                         <div style="width: 70px;" class="mr-2">
                                                             <p style="margin: 0;">City :</p>
@@ -331,7 +234,7 @@ active
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-6">
                                                     <div class="d-flex align-items-center mb-4">
                                                         <div style="width: 130px;" class="mr-2">
                                                             <p style="margin: 0;">Postal Code :</p>
@@ -346,56 +249,13 @@ active
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 140px;" class="mr-2">
-                                                            <p style="margin: 0;">Home Number :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <input class="form-control" name="usr_phone_home" placeholder="Home Phone Number...">
-                                                            @if($errors->has('usr_phone_home'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_phone_home')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 145px;" class="mr-2">
-                                                            <p style="margin: 0;">Phone Number :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <input class="form-control" type="text"   name="usr_phone_mobile" placeholder="Mobile Phone Number...">
-                                                            @if($errors->has('usr_phone_mobile'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_phone_mobile')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label for="email">Address :</label>
-                                                        <textarea class="form-control" name="usr_address" placeholder="User Address..." style="height: 120px;"></textarea>
+                                                        <textarea class="form-control" name="usr_address" placeholder="User Address..." rows="3"></textarea>
                                                         @if($errors->has('usr_address'))
                                                             <div class="text-danger">
                                                                 {{ $errors->first('usr_address')}}
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="password">Current Address :</label>
-                                                        <textarea class="form-control" name="current_address" placeholder="Current Address..." style="height: 120px;"></textarea>
-                                                        @if($errors->has('current_address'))
-                                                            <div class="text-danger">
-                                                                {{ $errors->first('current_address')}}
                                                             </div>
                                                         @endif
                                                     </div>
