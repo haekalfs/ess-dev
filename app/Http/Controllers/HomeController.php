@@ -160,8 +160,10 @@ class HomeController extends Controller
         $startDate = Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month)->endOfMonth();
         $ts_approver = Timesheet_approver::where('group_id', 1)->pluck('approver')->toArray();
-        $new_approver_id = 'julyansyah'; // Replace with the actual ID of the new approver
-        array_push($ts_approver, $new_approver_id);
+        $new_approver_ids = ['julyansyah', 'suryadi']; // Replace with the actual IDs of the new approvers
+        foreach ($new_approver_ids as $new_approver_id) {
+            array_push($ts_approver, $new_approver_id);
+        }
 
 
         // Retrieve company project IDs
