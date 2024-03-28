@@ -47,10 +47,12 @@ active
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="email">Type :</label>
+                            <label for="email">Select Employee :</label>
                             <select class="form-control" name="showOpt" required>
-                                <option value="10" selected>Regular Timesheet</option>
-                                <option value="100">Overtime</option>
+                                <option value="1">All</option>
+                                @foreach ($employees as $emp)
+                                    <option value="{{ $emp->id }}" @if ($emp->id == $userSelected) selected @endif>{{ $emp->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>

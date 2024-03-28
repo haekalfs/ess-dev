@@ -362,8 +362,8 @@ class ExportTimesheet extends Controller
                 if ($end_time > $start_time) {
 
                     $time_diff_seconds = $end_time - $start_time;
-                    if($time_diff_seconds > 3600){
-                        $time_diff_seconds -= 3600;
+                    if($time_diff_seconds > 1800){
+                        $time_diff_seconds -= 1800;
                     } else {
                         $time_diff_seconds -= $time_diff_seconds;
                     }

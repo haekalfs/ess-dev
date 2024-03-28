@@ -7,6 +7,13 @@ active
 @endsection
 
 @section('content')
+<div class="d-sm-flex align-items-center zoom90 justify-content-between">
+    <div>
+        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-users"></i> Manage Users</h1>
+        <p class="mb-3">Manage Users Account.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm shadow-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Position & Department</a>
+</div>
 @if ($message = Session::get('success'))
 <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -20,13 +27,6 @@ active
     <strong>{{ $message }}</strong>
 </div>
 @endif
-<div class="d-sm-flex align-items-center zoom90 justify-content-between">
-    <div>
-        <h1 class="h3 mb-2 font-weight-bold text-gray-800"><i class="fas fa-users"></i> Manage Users</h1>
-        <p class="mb-3">Manage Users Account.</p>
-    </div>
-    <a class="btn btn-secondary btn-sm shadow-sm" href="/hrtools/manage/position"><i class="fas fa-solid fa-user-plus fa-sm text-white-50"></i> Position & Department</a>
-</div>
 <div class="card shadow mb-4 zoom90">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary" id="judul">Users Accounts</h6>
@@ -76,11 +76,10 @@ active
                                         <i class="fas fa-user-times" style="color: #ff0000;"></i>
                                     @endif
                                 </td>
-                                <td class="text-center" style="width: 15%;">
+                                <td class="text-center" style="width: 10%;">
                                     <a href="/users/edit/{{ Crypt::encrypt($p->id) }}" title="Edit" class="btn btn-primary btn-sm mr-2" >
                                         <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
                                     </a>
-                                    <a title="delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ $p->id }}"><i class="fas fa-fw fa-trash justify-content"></i> Delete</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -119,11 +118,10 @@ active
                                         <i class="fas fa-user-times" style="color: #ff0000;"></i>
                                     @endif
                                 </td>
-                                <td class="text-center" style="width: 15%;">
+                                <td class="text-center" style="width: 10%;">
                                     <a href="/users/edit/{{ Crypt::encrypt($fl->id) }}" title="Edit" class="btn btn-primary btn-sm mr-2" >
                                         <i class="fas fa-fw fa-edit justify-content-center"></i> Edit
                                     </a>
-                                    <a title="delete" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ $p->id }}"><i class="fas fa-fw fa-trash justify-content"></i> Delete</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -134,28 +132,4 @@ active
         </div>
     </div>
 </div>
-<!-- Modal -->
-@foreach($data as $p)
-<!-- Modal Deelete -->
-<div class="modal fade" id="deleteModal{{ $p->id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title  text-white" id="staticBackdropLabel">Alert !!</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body text-center">
-        <img class="mb-2" width="96" height="96" src="https://img.icons8.com/color/96/general-warning-sign.png" alt="general-warning-sign"/>
-        <h6>Are You Sure Want Delete This Record !!!</h6>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
-        <a href="/users/delete/{{ Crypt::encrypt($p->id) }}" title="Delete" class="btn btn-danger btn-sm" >Yes Im Sure</a>
-      </div>
-    </div>
-  </div>
-</div>
-@endforeach
 @endsection

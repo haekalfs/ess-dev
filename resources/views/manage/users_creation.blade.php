@@ -32,78 +32,94 @@ active
 <form method="POST" action="/users/store" onsubmit="return isConfirm()" id="multiStepForm" enctype="multipart/form-data">
     @csrf
     <div id="step1" class="step">
-        <div class="zoom90 d-sm-flex align-items-center justify-content-between">
-            <div>
-                <h1 class="h4 mb-2 font-weight-bold text-gray-800"><i class="fas fa-user-plus"></i>&nbsp; User Registration</h1>
-                <p class="mb-4">Fill out all the required fields</a>.</p>
-            </div>
-            <div>
-                <a href="/manage/users" class="btn btn-danger mr-2" id="manButton"><i class="fas fa-backward"></i>&nbsp; Kembali</a>
+        <div class="d-sm-flex align-items-center zoom90 justify-content-between mb-4">
+            <h4 class="h4 mb-0 font-weight-bold text-gray-800"><i class="fas fa-user-plus"></i>&nbsp; User Registration</h4>
+            <div class="d-sm-flex justify-content-end ">
+                <a href="/manage/users" class="btn btn-secondary mr-2" id="manButton"><i class="fas fa-backward"></i>&nbsp; Kembali</a>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Submit</button>
             </div>
         </div>
         <div class="row zoom90">
          <!-- Area Chart -->
-            <div class="col-xl-7 col-lg-7">
-                <div class="card shadow mb-4">
-                    <!-- Card Header - Dropdown -->
-                    <div class="dropdown">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Profile Picture & CV</h6>
-                        </div>
-                            <!-- Card Body -->
-                        <div class="card-body">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Profile Picture :</label>
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="openFileInIframe('profile', 'profile-label', 'profile-preview')">
-                                                <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
+            <div class="col-xl-4 col-lg-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card shadow mb-4">
+                            <!-- Card Header - Dropdown -->
+                            <div class="dropdown">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Profile Picture</h6>
+                                </div>
+                                    <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>Profile Picture :</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="profile" name="profile" value="" onchange="openFileInIframe('profile', 'profile-label', 'profile-preview')">
+                                                        <label class="custom-file-label" for="profile" id="profile-label">Choose file</label>
+                                                    </div>
+                                                    <img id="profile-preview" src="" class="mt-4" style="max-width: 110px; max-height: 200px; object-fit:fill;"></img>
+                                                </div>
                                             </div>
-                                            <img id="profile-preview" src="" class="mt-4" style="max-width: 110px; max-height: 200px; object-fit:fill;"></img>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Emp. CV :</label>
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="openFileInIframe('cv', 'cv-label', 'cv-preview')">
-                                                <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card shadow mb-4">
+                            <!-- Card Header - Dropdown -->
+                            <div class="dropdown">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold @role('freelancer') text-success @else text-primary @endrole">Employee's Resume</h6>
+                                </div>
+                                    <!-- Card Body -->
+                                <div class="card-body">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>Emp. CV :</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="cv" name="cv" value="" onchange="openFileInIframe('cv', 'cv-label', 'cv-preview')">
+                                                        <label class="custom-file-label" for="cv" id="cv-label">Choose file</label>
+                                                    </div>
+                                                    <iframe id="cv-preview" src="" frameborder="0" class="mt-4" style="display: none; width: 100%; max-height: 400px; margin-top: 10px;"></iframe>
+                                                </div>
                                             </div>
-                                            <iframe id="cv-preview" src="" frameborder="0" class="mt-4" style="display: none; width: 100%; max-height: 400px; margin-top: 10px;"></iframe>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="text-danger font-weight-bold">User Data Verification</span>
+                            </div>
+                            <div class="card-body" style="background-color: rgb(247, 247, 247);">
+                                <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
+                                <ul>
+                                    <li>Ensure all user data is accurately updated in accordance with company policies.</li>
+                                    <li>Verify and validate user information to maintain data integrity.</li>
+                                    <li>Unauthorized modifications to user records are strictly prohibited.</li>
+                                    <li>Double-check user details for completeness and correctness before saving changes.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-xl-5 col-lg-5">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span class="text-danger font-weight-bold">User Data Verification</span>
-                    </div>
-                    <div class="card-body" style="background-color: rgb(247, 247, 247);">
-                        <h6 class="h6 mb-2 font-weight-bold text-gray-800">General Guidelines</h6>
-                        <ul>
-                            <li>Ensure all user data is accurately updated in accordance with company policies.</li>
-                            <li>Verify and validate user information to maintain data integrity.</li>
-                            <li>Unauthorized modifications to user records are strictly prohibited.</li>
-                            <li>Double-check user details for completeness and correctness before saving changes.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-12 col-lg-12">
+            <div class="col-xl-8 col-lg-8">
                 <div class="card shadow mb-4">
                     <!-- Card Header - Dropdown -->
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Employee Details</h6>
                     </div>
-                    <ul class="nav nav-tabs" id="pageTabs" role="tablist">
+                    <ul class="nav nav-tabs zoom90" id="pageTabs" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" id="page1-tab" data-toggle="tab" href="#page1" role="tab" aria-controls="page1" aria-selected="true"><i class="fas fa-user-circle"></i> Account & Profile Details</a>
                         </li>
@@ -119,7 +135,7 @@ active
                                     <h6 class="h5 m-0 font-weight-bold text-primary mt-2 mb-4"><i class="fas fa-user-circle"></i> Employee's Account & Profile Information</h6>
                                     <hr class="sidebar-divider mb-4">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="d-flex align-items-center mb-4">
@@ -202,11 +218,11 @@ active
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 120px;" class="mr-2">
+                                                        <div style="width: 140px;" class="mr-2">
                                                             <p style="margin: 0;">Birth Date :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -219,7 +235,7 @@ active
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 120px;" class="mr-2">
+                                                        <div style="width: 140px;" class="mr-2">
                                                             <p style="margin: 0;">Gender :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -236,7 +252,7 @@ active
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 120px;" class="mr-2">
+                                                        <div style="width: 140px;" class="mr-2">
                                                             <p style="margin: 0;">Marital Status :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -271,7 +287,7 @@ active
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 110px;" class="mr-2">
+                                                        <div style="width: 130px;" class="mr-2">
                                                             <p style="margin: 0;">Religion :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -316,37 +332,7 @@ active
                                             <h6 class="h5 m-0 font-weight-bold text-primary mt-4 mb-4"><i class="fas fa-address-book"></i> Employee's Address Information</h6>
                                             <hr class="sidebar-divider mb-4">
                                             <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 70px;" class="mr-2">
-                                                            <p style="margin: 0;">City :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <input class="form-control"   name="usr_address_city" placeholder="Address City...">
-                                                            @if($errors->has('usr_address_city'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_address_city')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 130px;" class="mr-2">
-                                                            <p style="margin: 0;">Postal Code :</p>
-                                                        </div>
-                                                        <div class="flex-grow-1">
-                                                            <input class="form-control"   name="usr_address_postal" placeholder="Address Postal...">
-                                                            @if($errors->has('usr_address_postal'))
-                                                                <div class="text-danger">
-                                                                    {{ $errors->first('usr_address_postal')}}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-6">
                                                     <div class="d-flex align-items-center mb-4">
                                                         <div style="width: 140px;" class="mr-2">
                                                             <p style="margin: 0;">Home Number :</p>
@@ -361,9 +347,9 @@ active
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-6">
                                                     <div class="d-flex align-items-center mb-4">
-                                                        <div style="width: 145px;" class="mr-2">
+                                                        <div style="width: 140px;" class="mr-2">
                                                             <p style="margin: 0;">Phone Number :</p>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -371,6 +357,36 @@ active
                                                             @if($errors->has('usr_phone_mobile'))
                                                                 <div class="text-danger">
                                                                     {{ $errors->first('usr_phone_mobile')}}
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center mb-4">
+                                                        <div style="width: 140px;" class="mr-2">
+                                                            <p style="margin: 0;">City :</p>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input class="form-control"   name="usr_address_city" placeholder="Address City...">
+                                                            @if($errors->has('usr_address_city'))
+                                                                <div class="text-danger">
+                                                                    {{ $errors->first('usr_address_city')}}
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center mb-4">
+                                                        <div style="width: 140px;" class="mr-2">
+                                                            <p style="margin: 0;">Postal Code :</p>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <input class="form-control"   name="usr_address_postal" placeholder="Address Postal...">
+                                                            @if($errors->has('usr_address_postal'))
+                                                                <div class="text-danger">
+                                                                    {{ $errors->first('usr_address_postal')}}
                                                                 </div>
                                                             @endif
                                                         </div>
@@ -406,7 +422,7 @@ active
                                 </div>
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <h6 class="h5 m-0 font-weight-bold text-primary mt-4 mb-4"><i class="fas fa-user-tag"></i> Employement Status</h6>
                                             <hr class="sidebar-divider mb-4">
                                             <div class="row">
@@ -459,7 +475,7 @@ active
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <h6 class="h5 m-0 font-weight-bold text-danger mt-4 mb-4"><i class="fas fa-user-check"></i> Hired & Resignation Date</h6>
                                             <hr class="sidebar-divider mb-4">
                                             <div class="row">
@@ -494,7 +510,7 @@ active
                             <div class="tab-pane fade" id="page3" role="tabpanel" aria-labelledby="page3-tab">
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12 mb-3">
                                             <h6 class="h5 m-0 font-weight-bold text-danger mt-2 mb-4"><i class="fas fa-id-card"></i> Employee's Identity Card Information</h6>
                                             <hr class="sidebar-divider mb-4">
                                             <div class="row">
@@ -551,7 +567,7 @@ active
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <h6 class="h5 m-0 font-weight-bold text-success mt-2 mb-4"><i class="fas fa-university" style="color: #00d55c;"></i> Employee's Bank Account Information</h6>
                                             <hr class="sidebar-divider mb-4">
                                             <div class="row">

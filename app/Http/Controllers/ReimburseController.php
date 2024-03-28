@@ -580,6 +580,7 @@ class ReimburseController extends Controller
 
         $Month = date('m');
         $Year = date('Y');
+        $userId = Null;
 
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
@@ -598,11 +599,20 @@ class ReimburseController extends Controller
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
             $month_periode = $Year . intval($Month);
+            $userId = $request->showOpt;
 
-            $approvals = Reimbursement::whereIn('status_id', [29, 2002])
-            ->whereYear('created_at', $Year)
-            ->whereMonth('created_at', $Month)
-            ->get();
+            if($userId == 1){
+                $approvals = Reimbursement::whereIn('status_id', [29, 2002])
+                ->whereYear('created_at', $Year)
+                ->whereMonth('created_at', $Month)
+                ->get();
+            } else {
+                $approvals = Reimbursement::whereIn('status_id', [29, 2002])
+                ->whereYear('created_at', $Year)
+                ->whereMonth('created_at', $Month)
+                ->where('f_req_by', $userId)
+                ->get();
+            }
         } else {
             $approvals = Reimbursement::whereIn('status_id', [29, 2002])
             ->whereYear('created_at', $Year)
@@ -631,7 +641,7 @@ class ReimburseController extends Controller
                 ->update(['read_stat' => 1]);
         }
 
-        return view('reimbursement.manage.history', compact('approvals', 'notify', 'notifyMonth', 'yearsBefore', 'Month', 'Year', 'employees'));
+        return view('reimbursement.manage.history', compact('approvals', 'userId', 'notify', 'notifyMonth', 'yearsBefore', 'Month', 'Year', 'employees'));
     }
 
     public function disbursed_item($formId)

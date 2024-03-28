@@ -349,7 +349,7 @@ class UserController extends Controller
         $med = Emp_medical_balance::where('user_id', $user)->delete();
         $user_role = Usr_role::where('user_id', $user)->delete();
 
-        return redirect()->back()->with('success', "You've Deleted User $name Successfully");
+        return redirect('/manage/users')->with('success', "You've Deleted User $name Successfully");
     }
 
 

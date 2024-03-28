@@ -50,7 +50,7 @@ active
                             <select class="form-control" name="showOpt" required>
                                 <option value="1">All</option>
                                 @foreach ($employees as $emp)
-                                    <option value="{{ $emp->id }}">{{ $emp->name }}</option>
+                                    <option value="{{ $emp->id }}" @if ($emp->id == $userSelected) selected @endif>{{ $emp->name }}</option>
                                 @endforeach
                             </select>
                         </div>

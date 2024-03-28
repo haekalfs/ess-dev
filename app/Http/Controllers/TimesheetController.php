@@ -2020,6 +2020,7 @@ class TimesheetController extends Controller
     {
         $Month = date('m');
         $Year = date('Y');
+        $userSelected = Null;
 
         $nowYear = date('Y');
         $yearsBefore = range($nowYear - 4, $nowYear);
@@ -2041,14 +2042,20 @@ class TimesheetController extends Controller
         if ($validator->passes()) {
             $Year = $request->yearOpt;
             $Month = $request->monthOpt;
-            $approvals->where('month_periode', $Year . intval($Month));
+            $userSelected = $request->showOpt;
+
+            if($userSelected == 1){
+                $approvals->where('month_periode', $Year . intval($Month));
+            } else {
+                $approvals->where('month_periode', $Year . intval($Month))->where('user_timesheet', $userSelected);
+            }
         } else {
             $approvals->where('month_periode', $Year . intval($Month));
         }
 
         $approvals = $approvals->get();
         // dd($approvals);
-        return view('timereport.summary', compact('approvals', 'yearsBefore', 'Month', 'Year', 'employees'));
+        return view('timereport.summary', compact('approvals', 'userSelected', 'yearsBefore', 'Month', 'Year', 'employees'));
     }
 
     public function remind($id, $year, $month)

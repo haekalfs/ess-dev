@@ -20,7 +20,6 @@ use App\Http\Middleware\CheckRole;
 |
 */
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth');
 
 Route::get('login/google', [LoginController::class, 'redirectToProvider']);
 Route::get('login/google/callbackESS', [LoginController::class, 'handleProviderCallback']);
@@ -30,6 +29,7 @@ Auth::routes();
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['suspicious'])->group(function () {
         Route::middleware(['checkNonInternalRole'])->group(function () {
+            Route::get('/', [App\Http\Controllers\HomeController::class, 'index']);
             Route::get('/download-cv-employee', 'ManagementController@generateDocument');
             Route::get('/generate-pdf', 'ManagementController@generatePdf');
             Route::get('/checkEmailAccountAvailability/{userAccount}', 'UserController@checkDuplicateEmail');
